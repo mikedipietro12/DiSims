@@ -1,0 +1,1508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Weak Acid Titration Simulator</title>
+<meta name="viewport" content="width=1440" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" data-presets="react" src="tweaks-panel.jsx"></script>
+
+<style>
+  :root {
+    --bg: #0a0d10;
+    --panel: #10151a;
+    --panel-2: #0d1216;
+    --border: #1e2a33;
+    --border-2: #2a3a45;
+    --text: #e5e7eb;
+    --text-dim: #8a98a5;
+    --text-faint: #56636e;
+    --cyan: #4dd0e1;
+    --cyan-dim: #2a7a85;
+    --amber: #f5a524;
+    --magenta: #e879f9;
+    --lime: #a3e635;
+    --rose: #fb7185;
+    --violet: #a78bfa;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+  body {
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(77,208,225,0.04), transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(232,121,249,0.03), transparent 50%);
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  button { font-family: inherit; }
+  input, select { font-family: 'JetBrains Mono', monospace; }
+
+  /* Top bar */
+  .topbar {
+    display: flex; align-items: center;
+    gap: 24px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel-2);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+  .topbar .brand {
+    color: var(--cyan);
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .topbar .live-dot {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--lime); margin-right: 6px;
+    box-shadow: 0 0 6px var(--lime);
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .topbar .stat { color: var(--text-dim); }
+  .topbar .stat b { color: var(--text); font-weight: 500; }
+  .topbar .spacer { flex: 1; }
+
+  /* Panel */
+  .panel {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .panel-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(to bottom, #141b21, #10151a);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .panel-head .title { color: var(--cyan); font-weight: 600; }
+  .panel-head .title::before {
+    content: '▸'; margin-right: 6px; color: var(--cyan-dim);
+  }
+  .panel-head .meta { color: var(--text-faint); font-size: 10px; }
+  .panel-body { flex: 1; padding: 14px; min-height: 0; position: relative; }
+  .panel-body.scroll { overflow: auto; }
+
+  /* Layout */
+  .layout {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    grid-template-rows: 1.35fr 1fr;
+    gap: 10px;
+    padding: 10px;
+    height: calc(100vh - 38px);
+    min-height: 760px;
+  }
+
+  /* Equation pane */
+  .eq-stack { display: flex; flex-direction: column; gap: 10px; height: 100%; }
+  .eq-analyte {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .eq-analyte-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    display: flex; flex-direction: column; gap: 2px;
+    flex-shrink: 0;
+  }
+  .eq-analyte-label .tag {
+    color: var(--cyan);
+    font-size: 9px;
+  }
+  .eq-analyte .preset-row { flex: 1; justify-content: flex-end; }
+  .eq-row {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    flex: 1;
+    display: flex; flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  .eq-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .eq-line {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; flex-wrap: wrap;
+    min-height: 42px;
+  }
+  .eq-species {
+    display: inline-flex; flex-direction: column; align-items: center;
+    gap: 4px;
+    transition: all 400ms ease;
+  }
+  .eq-species .formula {
+    font-weight: 600;
+    line-height: 1;
+    transition: all 500ms cubic-bezier(.4,0,.2,1);
+    text-shadow: 0 0 16px currentColor;
+  }
+  .eq-species .pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-faint);
+    letter-spacing: 0.05em;
+  }
+  .eq-op {
+    color: var(--text-dim);
+    font-size: 22px;
+    font-weight: 300;
+    padding: 0 2px;
+  }
+  .eq-arrow {
+    display: inline-flex; flex-direction: column; align-items: center;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .eq-arrow .k { font-size: 9px; color: var(--text-faint); margin-top: 2px; letter-spacing: 0.05em; }
+
+  /* Beaker */
+  .beaker-wrap {
+    display: grid; grid-template-columns: 1fr 200px;
+    gap: 14px; height: 100%;
+  }
+  .beaker-canvas-wrap {
+    position: relative;
+    background:
+      linear-gradient(180deg, #080b0e 0%, #0a0e12 100%);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .beaker-canvas-wrap canvas { display: block; width: 100%; height: 100%; }
+  .beaker-legend {
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 10px; background: var(--panel-2);
+    border: 1px solid var(--border);
+  }
+  .legend-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.12em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .legend-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .legend-row:last-child { border-bottom: none; }
+  .legend-row .swatch {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 0 6px currentColor;
+  }
+  .legend-row .count { color: var(--text-dim); }
+  .legend-row.hdr {
+    font-size: 9px; color: var(--text-faint);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px; letter-spacing: 0.1em;
+  }
+
+  /* Graph */
+  .graph-wrap {
+    position: relative;
+    height: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+  }
+  .graph-wrap svg { display: block; width: 100%; height: 100%; }
+  .graph-overlay {
+    position: absolute; top: 10px; right: 12px;
+    display: flex; flex-direction: column; align-items: flex-end;
+    gap: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+  .graph-overlay .ph {
+    font-size: 32px; color: var(--cyan); font-weight: 500;
+    text-shadow: 0 0 10px rgba(77,208,225,0.5);
+    line-height: 1;
+  }
+  .graph-overlay .vol { color: var(--amber); font-size: 14px; }
+
+  .region-label {
+    position: absolute; bottom: 14px; left: 14px;
+    display: flex; gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-faint); letter-spacing: 0.08em;
+  }
+  .region-label .active { color: var(--cyan); }
+
+  /* Controls */
+  .control-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 14px;
+  }
+  .ctrl-group {
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    padding: 8px 10px;
+  }
+  .ctrl-group.full { grid-column: 1 / -1; }
+  .ctrl-head {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.12em;
+    color: var(--text-faint); text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .ctrl-head .tag { color: var(--cyan); }
+
+  .field { display: flex; flex-direction: column; gap: 3px; margin-bottom: 6px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--text-dim);
+    letter-spacing: 0.06em;
+    display: flex; justify-content: space-between;
+  }
+  .field label .val { color: var(--text); font-weight: 500; }
+  .field input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 2px; background: var(--border-2); outline: none;
+    border-radius: 0;
+  }
+  .field input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 12px; height: 12px; border-radius: 0;
+    background: var(--cyan); cursor: pointer;
+    box-shadow: 0 0 8px rgba(77,208,225,0.6);
+  }
+  .field input[type="range"]::-moz-range-thumb {
+    width: 12px; height: 12px; border-radius: 0;
+    background: var(--cyan); cursor: pointer; border: none;
+    box-shadow: 0 0 8px rgba(77,208,225,0.6);
+  }
+  .field select, .field input[type="number"] {
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border-2);
+    padding: 6px 8px; font-size: 12px;
+    outline: none;
+  }
+  .field select:focus, .field input[type="number"]:focus { border-color: var(--cyan); }
+
+  .btn-row { display: flex; gap: 6px; }
+  .btn {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--border-2);
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 150ms;
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px;
+  }
+  .btn:hover { border-color: var(--text-dim); color: var(--cyan); }
+  .btn.primary { border-color: var(--lime); color: var(--lime); }
+  .btn.primary:hover { background: rgba(163,230,53,0.08); box-shadow: 0 0 10px rgba(163,230,53,0.2); }
+  .btn.warn { border-color: var(--amber); color: var(--amber); }
+  .btn.warn:hover { background: rgba(245,165,36,0.08); }
+  .btn.danger { border-color: var(--rose); color: var(--rose); }
+  .btn.danger:hover { background: rgba(251,113,133,0.08); }
+  .btn.active { background: rgba(77,208,225,0.1); border-color: var(--cyan); color: var(--cyan); }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor;
+  }
+
+  .status-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .status-cell {
+    background: var(--panel-2);
+    padding: 8px 10px;
+  }
+  .status-cell .k {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: var(--text-faint);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .status-cell .v {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px; color: var(--text);
+    font-weight: 500; margin-top: 2px;
+  }
+  .status-cell .v.accent { color: var(--cyan); }
+
+  /* Preset row */
+  .preset-row { display: flex; gap: 4px; flex-wrap: wrap; }
+  .preset-btn {
+    padding: 4px 8px; font-size: 10px;
+    border: 1px solid var(--border-2); background: transparent;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.06em; cursor: pointer;
+  }
+  .preset-btn:hover { color: var(--cyan); border-color: var(--cyan-dim); }
+  .preset-btn.active { color: var(--cyan); border-color: var(--cyan); background: rgba(77,208,225,0.05); }
+
+  /* Chemistry formulas — subscripts/superscripts */
+  .chem sub { font-size: 0.65em; vertical-align: sub; font-weight: 500; }
+  .chem sup { font-size: 0.65em; vertical-align: super; font-weight: 500; }
+
+  .hl-HA { color: var(--cyan); }
+  .hl-A  { color: var(--magenta); }
+  .hl-H3O { color: var(--amber); }
+  .hl-OH { color: var(--lime); }
+  .hl-H2O { color: #cbd5e1; }
+  .hl-Na { color: var(--violet); }
+  .hl-H2A { color: var(--cyan); }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo, useCallback } = React;
+
+// =============================================================================
+// CHEMISTRY MODEL
+// =============================================================================
+
+const ACIDS = {
+  HF:      { name: 'Hydrofluoric acid',  formula: 'HF',              HA: 'HF',                    A: 'F',                      pKa: 3.17,  strong: false },
+  CH3COOH: { name: 'Acetic acid',        formula: 'CH₃COOH',          HA: 'CH<sub>3</sub>COOH',    A: 'CH<sub>3</sub>COO',     pKa: 4.76,  strong: false },
+  HCOOH:   { name: 'Formic acid',        formula: 'HCOOH',            HA: 'HCOOH',                 A: 'HCOO',                   pKa: 3.75,  strong: false },
+  HCN:     { name: 'Hydrocyanic acid',   formula: 'HCN',              HA: 'HCN',                   A: 'CN',                     pKa: 9.21,  strong: false },
+  NH4:     { name: 'Ammonium',           formula: 'NH₄⁺',             HA: 'NH<sub>4</sub>',        A: 'NH<sub>3</sub>',         pKa: 9.25,  strong: false, HAcharge: '+', Acharge: '' },
+  HCl:     { name: 'Hydrochloric acid',  formula: 'HCl',              HA: 'HCl',                   A: 'Cl',                     pKa: -7,    strong: true  },
+};
+
+// pH solver: given Ca (initial acid conc in current volume), Cb (initial base conc added),
+// pKa, strong flag — compute pH using the exact quadratic where possible.
+function computePH({Ca, Cb, pKa, strong}) {
+  const Kw = 1e-14;
+  const Ka = Math.pow(10, -pKa);
+
+  // Handle trivial cases
+  if (Ca <= 0 && Cb <= 0) return 7;
+
+  if (strong) {
+    // Strong acid + strong base
+    if (Cb < Ca) {
+      const H = Ca - Cb;
+      return -Math.log10(Math.max(H, 1e-14));
+    } else if (Cb > Ca) {
+      const OH = Cb - Ca;
+      return 14 + Math.log10(Math.max(OH, 1e-14));
+    } else {
+      return 7;
+    }
+  }
+
+  // Weak acid titrated with strong base
+  // Species:
+  //   before eq point: buffer of HA and A-
+  //   at eq point: A- only (basic)
+  //   after eq point: excess OH-
+  const f = Ca > 0 ? Cb / Ca : 0; // fraction neutralized
+
+  if (Cb <= 0) {
+    // Pure weak acid: Ka = x^2/(Ca - x)
+    // x^2 + Ka*x - Ka*Ca = 0
+    const x = (-Ka + Math.sqrt(Ka*Ka + 4*Ka*Ca)) / 2;
+    return -Math.log10(Math.max(x, 1e-14));
+  }
+
+  if (f < 0.999) {
+    // Buffer region, Henderson-Hasselbalch with correction
+    const nHA = Ca - Cb;
+    const nA = Cb;
+    // H-H
+    let pH = pKa + Math.log10(nA / nHA);
+    return pH;
+  }
+
+  if (f < 1.001) {
+    // At equivalence point: only A-, Kb = Kw/Ka
+    const Kb = Kw / Ka;
+    // Total A- conc = Ca (but it's been diluted already, passed in as Ca here via caller)
+    const CA = Ca;
+    const x = (-Kb + Math.sqrt(Kb*Kb + 4*Kb*CA)) / 2;
+    const OH = x;
+    return 14 + Math.log10(Math.max(OH, 1e-14));
+  }
+
+  // Past equivalence: excess OH-
+  const OH = Cb - Ca;
+  return 14 + Math.log10(Math.max(OH, 1e-14));
+}
+
+// Full titration state — given current added volume, gives all species info
+function titrationState({acidKey, Ca0, Va, Cb0, Vb}) {
+  const acid = ACIDS[acidKey];
+  const Vtot = Va + Vb; // mL
+  const molA = Ca0 * Va / 1000;    // mol of acid originally
+  const molB = Cb0 * Vb / 1000;    // mol of base added
+  const CaCurr = Vtot > 0 ? (molA / (Vtot/1000)) : Ca0; // current diluted analytic conc of HA
+  const CbCurr = Vtot > 0 ? (molB / (Vtot/1000)) : 0;
+
+  const pH = computePH({Ca: CaCurr, Cb: CbCurr, pKa: acid.pKa, strong: acid.strong});
+  const H  = Math.pow(10, -pH);
+  const OH = Math.pow(10, pH - 14);
+
+  // Compute species concentrations
+  const Ka = Math.pow(10, -acid.pKa);
+  let cHA, cA;
+  if (acid.strong) {
+    cHA = Math.max(CaCurr - CbCurr, 0) * 0.001; // essentially 0 for any HCl
+    // effectively fully dissociated; HA ~ 0
+    cHA = 1e-12;
+    cA = CaCurr;
+  } else {
+    // Distribute total A mass (CaCurr) between HA and A- using alpha
+    const alpha1 = Ka / (Ka + H);      // fraction as A-
+    const alpha0 = H / (Ka + H);       // fraction as HA
+    cHA = CaCurr * alpha0;
+    cA  = CaCurr * alpha1;
+    // Also account for any conjugate base produced by added strong base that isn't "on" the acid
+    // Already handled via charge balance implicitly; use simplified model for visuals.
+  }
+
+  // "equivalence volume"
+  const Veq = (Ca0 * Va) / Cb0;
+
+  return {
+    acid, Vtot, CaCurr, CbCurr, pH, H, OH, cHA, cA, Veq,
+    fractionNeutralized: Veq > 0 ? Vb / Veq : 0,
+  };
+}
+
+// =============================================================================
+// PANE 1 — EQUATIONS with proportional sizing
+// =============================================================================
+
+function Species({ html, color, weight, role }) {
+  // weight: 0..1 relative dominance → size 12..46px
+  const size = 14 + weight * 32;
+  const opacity = 0.35 + weight * 0.65;
+  return (
+    <span className="eq-species">
+      <span
+        className="formula chem"
+        style={{ fontSize: size, color, opacity }}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+      <span className="pct">{(weight * 100).toFixed(1)}%</span>
+    </span>
+  );
+}
+
+function EquationsPane({ state, acidKey, setAcidKey, running }) {
+  const { acid, cHA, cA, H, OH, CaCurr, CbCurr } = state;
+
+  // Normalize species weights for the dissociation equation
+  const total = cHA + cA + H + OH + 1e-18;
+  const wHA = cHA / total;
+  const wA  = cA  / total;
+  const wH  = H   / total;
+  // H2O is by far the most abundant but we don't scale by literal amount;
+  // we show H2O at modest fixed size because otherwise it dominates visually.
+  const wH2O = 0.15;
+
+  // For the neutralization eq:
+  //   pre-eq: mostly HA + added OH (consumed) → A- + H2O
+  //   post-eq: HA depleted, excess OH- remains
+  // Visualize by moles. Include excess OH after equivalence so OH dominates at high pH.
+  const molHA = Math.max(CaCurr - CbCurr, 0);
+  const molA  = Math.min(CbCurr, CaCurr);
+  const molOHexcess = Math.max(CbCurr - CaCurr, 0); // unreacted excess OH
+  const totalN = molHA + molA + molOHexcess + 1e-9;
+  const nHA = molHA / totalN;
+  const nA  = molA  / totalN;
+  const nOHx = molOHexcess / totalN;
+  // OH weight on LHS: show recently-added/about-to-react OH. Scale with excess if past eq.
+  const wOHleft = nOHx > 0.02 ? Math.max(0.25, nOHx) : 0.25;
+
+  return (
+    <div className="panel">
+      <div className="panel-head">
+        <span className="title">EQUILIBRIUM · SPECIES</span>
+        <span className="meta">SIZE ∝ MOLAR FRACTION</span>
+      </div>
+      <div className="panel-body">
+        <div className="eq-stack">
+
+          {setAcidKey && (
+            <div className="eq-analyte">
+              <div className="eq-analyte-label">
+                <span>◇ ANALYTE</span>
+                <span className="tag">pKa {acid.pKa}{acid.strong ? ' · STRONG' : ''}</span>
+              </div>
+              <div className="preset-row">
+                {Object.entries(ACIDS).map(([k, a]) => (
+                  <button key={k} className={'preset-btn' + (k === acidKey ? ' active' : '')}
+                    onClick={() => setAcidKey(k)} disabled={running}>
+                    {a.formula}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="eq-row">
+            <div className="eq-label">◇ ACID DISSOCIATION · K<sub>a</sub> = {Math.pow(10, -acid.pKa).toExponential(2)}</div>
+            <div className="eq-line">
+              <Species html={`<span>${acid.HA}</span>${acid.HAcharge === '+' ? '<sup>+</sup>' : ''}`} color="var(--cyan)" weight={Math.max(wHA, 0.05)} />
+              <span className="eq-op">+</span>
+              <Species html="H<sub>2</sub>O" color="#cbd5e1" weight={wH2O} />
+              <span className="eq-arrow">
+                ⇌
+                <span className="k">pKa {acid.pKa}</span>
+              </span>
+              <Species html={`<span>${acid.A}</span><sup>${acid.Acharge === '' ? '' : '−'}</sup>`.replace('<sup></sup>','<sup>−</sup>')} color="var(--magenta)" weight={Math.max(wA, 0.03)} />
+              <span className="eq-op">+</span>
+              <Species html="H<sub>3</sub>O<sup>+</sup>" color="var(--amber)" weight={Math.max(wH, 0.03)} />
+            </div>
+          </div>
+
+          <div className="eq-row">
+            <div className="eq-label">◇ NEUTRALIZATION WITH STRONG BASE · NaOH</div>
+            <div className="eq-line">
+              <Species html={`<span>${acid.HA}</span>${acid.HAcharge === '+' ? '<sup>+</sup>' : ''}`} color="var(--cyan)" weight={Math.max(nHA, 0.05)} />
+              <span className="eq-op">+</span>
+              <Species html="OH<sup>−</sup>" color="var(--lime)" weight={wOHleft} />
+              <span className="eq-arrow">→<span className="k">forward</span></span>
+              <Species html={`<span>${acid.A}</span><sup>−</sup>`} color="var(--magenta)" weight={Math.max(nA, 0.05)} />
+              <span className="eq-op">+</span>
+              <Species html="H<sub>2</sub>O" color="#cbd5e1" weight={0.2} />
+              {nOHx > 0.02 && (
+                <>
+                  <span className="eq-op">+</span>
+                  <Species html="OH<sup>−</sup><span style='font-size:0.6em;opacity:0.7'> excess</span>" color="var(--lime)" weight={nOHx} />
+                </>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// =============================================================================
+// PANE 2 — BEAKER (canvas particle sim)
+// =============================================================================
+
+const SPECIES_COLORS = {
+  HA:  '#4dd0e1',
+  A:   '#e879f9',
+  H3O: '#f5a524',
+  OH:  '#a3e635',
+  H2O: '#3b4d5c',
+  Na:  '#a78bfa',
+};
+
+function BeakerPane({ state, running, acidKey, ionScale = 'proportional', particleDensity = 400, maxParticles = 180, showDrip = true, fluidTint = true }) {
+  const canvasRef = useRef(null);
+  const particlesRef = useRef([]);
+  const targetsRef = useRef({ HA: 0, A: 0, H3O: 0, OH: 0, Na: 0 });
+  const stateRef = useRef(state);
+  const cfgRef = useRef({ showDrip, fluidTint });
+  const rafRef = useRef(null);
+  const dropRef = useRef({ active: false, t: 0, lastFire: 0 });
+  const dosingRef = useRef(false);
+
+  // Keep latest state/config available to the render loop WITHOUT re-subscribing
+  useEffect(() => { stateRef.current = state; }, [state]);
+  useEffect(() => { cfgRef.current = { showDrip, fluidTint }; }, [showDrip, fluidTint]);
+
+  // Compute target counts — truly proportional by default.
+  // For acetic acid at 0.1M: cHA ≈ 0.0987, cA ≈ cH ≈ 1.3e-3.
+  // With density=400: HA ≈ 39, A⁻ and H₃O⁺ ≈ 0 (0.52 rounded). This matches reality —
+  // a tiny fraction dissociated is visually invisible, which IS the point.
+  // To keep ions from vanishing entirely until *really* gone, we show 1 particle
+  // when conc ≥ 1% of the dominant bulk species.
+  const cappedCounts = useMemo(() => {
+    const { cHA, cA, H, OH, CbCurr } = state;
+    const bulkMax = Math.max(cHA, cA, CbCurr, 1e-12);
+    const threshold = bulkMax * 0.003; // show at least 1 if ≥0.3% of dominant
+
+    function scale(c) {
+      if (ionScale === 'log') {
+        // Log mode — amplifies trace species for pedagogical visibility
+        if (c <= 1e-14) return 0;
+        const n = Math.round(Math.log10(c / 1e-7) * 6 + 10);
+        return Math.max(0, Math.min(40, n));
+      }
+      // Proportional (default): linear with a tiny floor for non-zero trace
+      let n = Math.round(c * particleDensity);
+      if (n === 0 && c >= threshold) n = 1;
+      return Math.max(0, n);
+    }
+
+    let out = {
+      HA:  scale(cHA),
+      A:   scale(cA),
+      H3O: scale(H),
+      OH:  scale(OH),
+      Na:  scale(CbCurr),
+    };
+
+    const total = out.HA + out.A + out.H3O + out.OH + out.Na;
+    if (total > maxParticles) {
+      const k = maxParticles / total;
+      out = {
+        HA:  Math.round(out.HA * k),
+        A:   Math.round(out.A * k),
+        H3O: Math.max(out.H3O > 0 ? 1 : 0, Math.round(out.H3O * k)),
+        OH:  Math.max(out.OH > 0 ? 1 : 0, Math.round(out.OH * k)),
+        Na:  Math.round(out.Na * k),
+      };
+    }
+    return out;
+  }, [state.cHA, state.cA, state.H, state.OH, state.CbCurr, ionScale, particleDensity, maxParticles]);
+
+  useEffect(() => {
+    targetsRef.current = cappedCounts;
+  }, [cappedCounts]);
+
+  // Trigger a drop animation when CbCurr increases
+  const prevCbRef = useRef(state.CbCurr);
+  const lastDoseTimeRef = useRef(0);
+  useEffect(() => {
+    if (state.CbCurr > prevCbRef.current + 1e-6) {
+      lastDoseTimeRef.current = performance.now();
+    }
+    prevCbRef.current = state.CbCurr;
+  }, [state.CbCurr]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      const r = canvas.getBoundingClientRect();
+      canvas.width = r.width * devicePixelRatio;
+      canvas.height = r.height * devicePixelRatio;
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    }
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+
+    // Initialize particles
+    const parts = particlesRef.current;
+
+    function getBeakerBounds() {
+      const r = canvas.getBoundingClientRect();
+      const W = r.width, H = r.height;
+      const bx = W * 0.18, by = H * 0.20;
+      const bw = W * 0.64, bh = H * 0.72;
+      // fluid fill proportional to total volume vs 80mL reference
+      const s = stateRef.current;
+      const fillFrac = Math.min(1, (s.Vtot / 80) * 0.8 + 0.2);
+      const fy = by + bh * (1 - fillFrac);
+      return { W, H, bx, by, bw, bh, fy };
+    }
+
+    function spawnParticle(type, bounds) {
+      const { bx, bw, bh, fy, by } = bounds;
+      const base = {
+        type,
+        x: bx + 8 + Math.random() * (bw - 16),
+        y: fy + 8 + Math.random() * (by + bh - fy - 16),
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: type === 'HA' || type === 'A' ? 3.6 : (type === 'Na' ? 3.2 : 3),
+        born: performance.now(),
+        alpha: 0,
+      };
+      if (type === 'HA') {
+        // HA is a bonded H–A pair: partner H rotates around the A anchor
+        base.r = 3.8;
+        base.theta = Math.random() * Math.PI * 2;
+        base.omega = (Math.random() - 0.5) * 0.04;
+        base.bondLen = 7.5;
+      }
+      return base;
+    }
+
+    function step() {
+      const bounds = getBeakerBounds();
+      const { W, H, bx, by, bw, bh, fy } = bounds;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Background grid
+      ctx.save();
+      ctx.strokeStyle = 'rgba(30,42,51,0.5)';
+      ctx.lineWidth = 1;
+      const grid = 24;
+      for (let x = 0; x < W; x += grid) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      }
+      for (let y = 0; y < H; y += grid) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+      ctx.restore();
+
+      // Burette
+      const burX = bx + bw * 0.5;
+      const burTop = 4;
+      const burBottom = by - 8;
+      ctx.save();
+      ctx.strokeStyle = '#2a3a45';
+      ctx.fillStyle = 'rgba(163,230,53,0.12)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(burX - 7, burTop);
+      ctx.lineTo(burX - 7, burBottom - 6);
+      ctx.lineTo(burX - 2, burBottom);
+      ctx.lineTo(burX + 2, burBottom);
+      ctx.lineTo(burX + 7, burBottom - 6);
+      ctx.lineTo(burX + 7, burTop);
+      ctx.closePath();
+      ctx.stroke();
+      // fluid level in burette
+      ctx.fillRect(burX - 6, burTop + 4, 12, (burBottom - 10 - burTop) * 0.7);
+      // glow
+      ctx.fillStyle = 'rgba(163,230,53,0.06)';
+      ctx.fillRect(burX - 6, burTop + 4, 12, (burBottom - 10 - burTop) * 0.7);
+      ctx.restore();
+
+      // Dripping animation — stylized, fires on a fixed cadence while base is being dosed.
+      // (Decoupled from actual mL increments so it reads as imagery, not 1:1.)
+      const nowMs = performance.now();
+      const dosingRecently = (nowMs - lastDoseTimeRef.current) < 600;
+      if (cfgRef.current.showDrip && dosingRecently && !dropRef.current.active
+          && nowMs - dropRef.current.lastFire > 1400) {
+        dropRef.current.active = true;
+        dropRef.current.t = 0;
+        dropRef.current.lastFire = nowMs;
+      }
+      if (cfgRef.current.showDrip && dropRef.current.active) {
+        dropRef.current.t += 0.35; // slow fall
+        const t = dropRef.current.t;
+        const dy = burBottom + t * 1.3;
+        if (dy < fy + 4) {
+          ctx.save();
+          ctx.fillStyle = '#a3e635';
+          ctx.shadowColor = '#a3e635';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.ellipse(burX, dy, 3.2, 5, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        } else {
+          dropRef.current.active = false;
+          dropRef.current.t = 0;
+        }
+      }
+
+      // Beaker glass
+      ctx.save();
+      ctx.strokeStyle = '#2a3a45';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.lineTo(bx, by + bh);
+      ctx.lineTo(bx + bw, by + bh);
+      ctx.lineTo(bx + bw, by);
+      ctx.stroke();
+      // Tick marks
+      ctx.strokeStyle = '#1e2a33';
+      ctx.fillStyle = '#56636e';
+      ctx.font = '9px JetBrains Mono';
+      for (let i = 1; i <= 4; i++) {
+        const ty = by + bh * (i / 5);
+        ctx.beginPath();
+        ctx.moveTo(bx, ty); ctx.lineTo(bx + 6, ty);
+        ctx.stroke();
+        ctx.fillText(`${(5 - i) * 20}`, bx - 18, ty + 3);
+      }
+      ctx.restore();
+
+      // Fluid
+      ctx.save();
+      const grad = ctx.createLinearGradient(0, fy, 0, by + bh);
+      const pH = stateRef.current.pH;
+      // fluid tint shifts with pH
+      const tint = !cfgRef.current.fluidTint ? [120, 160, 190] :
+                   pH < 4 ? [255, 110, 90] :
+                   pH < 6 ? [255, 180, 80] :
+                   pH < 8 ? [180, 220, 160] :
+                   pH < 10 ? [120, 200, 220] :
+                   [150, 140, 240];
+      grad.addColorStop(0, `rgba(${tint[0]},${tint[1]},${tint[2]},0.08)`);
+      grad.addColorStop(1, `rgba(${tint[0]},${tint[1]},${tint[2]},0.18)`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(bx + 1, fy, bw - 2, by + bh - fy - 1);
+      // meniscus
+      ctx.strokeStyle = `rgba(${tint[0]},${tint[1]},${tint[2]},0.5)`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(bx + 1, fy); ctx.lineTo(bx + bw - 1, fy);
+      ctx.stroke();
+      ctx.restore();
+
+      // Manage particle population toward targets.
+      // For reactions we use a smoothed "deficit" — when counts need to drop,
+      // we trigger attack animations (OH + HA → A + H2O) instead of silent fades.
+      const t = targetsRef.current;
+      const byType = { HA: [], A: [], H3O: [], OH: [], Na: [] };
+      for (const p of parts) if (byType[p.type]) byType[p.type].push(p);
+
+      for (const type of ['HA','A','H3O','OH','Na']) {
+        const need = t[type] | 0;
+        const have = byType[type].length;
+        if (have < need) {
+          for (let i = 0; i < need - have; i++) parts.push(spawnParticle(type, bounds));
+        } else if (have > need && type !== 'HA') {
+          for (let i = 0; i < have - need; i++) {
+            const victim = byType[type][byType[type].length - 1 - i];
+            if (victim) victim._dying = true;
+          }
+        }
+      }
+
+      // Reaction attack: when HA count needs to decrease, pick an OH (or spawn virtual OH arrival)
+      // and pair it with an HA. OH flies toward HA, pulls off the H (creates H2O puff), leaves A.
+      const haOverrun = byType.HA.length - (t.HA | 0);
+      if (haOverrun > 0) {
+        for (let i = 0; i < haOverrun; i++) {
+          const victim = byType.HA[i];
+          if (!victim || victim._reacting) continue;
+          victim._reacting = true;
+          victim._reactT = 0;
+          // Find nearest OH as attacker, else spawn one from top
+          let attacker = byType.OH.find(o => !o._busy);
+          if (!attacker) {
+            attacker = spawnParticle('OH', bounds);
+            attacker.x = burX; attacker.y = fy + 2;
+            attacker.alpha = 1;
+            parts.push(attacker);
+          }
+          attacker._busy = true;
+          attacker._target = victim;
+          victim._attacker = attacker;
+        }
+      }
+
+      // Update & draw particles
+      const now = performance.now();
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const p = parts[i];
+
+        // Reacting OH homes in on target HA
+        if (p.type === 'OH' && p._target && !p._target._removed) {
+          const tg = p._target;
+          const dx = tg.x - p.x, dy = tg.y - p.y;
+          const d = Math.hypot(dx, dy) + 0.001;
+          p.vx += (dx / d) * 0.18;
+          p.vy += (dy / d) * 0.18;
+          p.vx *= 0.85; p.vy *= 0.85;
+          if (d < 10) {
+            // Reaction! spawn a brief "H2O" flash, remove OH, convert HA → A
+            tg._flashX = (p.x + tg.x) / 2;
+            tg._flashY = (p.y + tg.y) / 2;
+            tg._flashT = 1;
+            // Convert the HA particle into A (just relabel, keep position)
+            tg.type = 'A';
+            tg.r = 3.8;
+            tg._reacting = false;
+            tg._attacker = null;
+            p._removed = true;
+            p._dying = true;
+          }
+        } else {
+          // Brownian motion
+          p.vx += (Math.random() - 0.5) * 0.1;
+          p.vy += (Math.random() - 0.5) * 0.1;
+          p.vx *= 0.96; p.vy *= 0.96;
+        }
+        p.x += p.vx; p.y += p.vy;
+
+        // HA bonded-pair rotation
+        if (p.type === 'HA') {
+          p.theta += p.omega;
+        }
+
+        // Fluid bounds
+        const r = p.r + 1;
+        if (p.x < bx + r) { p.x = bx + r; p.vx *= -0.6; }
+        if (p.x > bx + bw - r) { p.x = bx + bw - r; p.vx *= -0.6; }
+        if (p.y < fy + r) { p.y = fy + r; p.vy *= -0.6; }
+        if (p.y > by + bh - r) { p.y = by + bh - r; p.vy *= -0.6; }
+
+        const age = (now - p.born) / 400;
+        if (p._dying) p.alpha = Math.max(0, p.alpha - 0.04);
+        else p.alpha = Math.min(1, age);
+
+        if (p._dying && p.alpha <= 0.01) {
+          parts.splice(i, 1); continue;
+        }
+
+        // Draw
+        ctx.save();
+        if (p.type === 'HA') {
+          // Draw A atom
+          const cA = SPECIES_COLORS.A;
+          ctx.globalAlpha = p.alpha * 0.95;
+          ctx.shadowColor = cA; ctx.shadowBlur = 6;
+          ctx.fillStyle = cA;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+          // Bond line
+          const hx = p.x + Math.cos(p.theta) * p.bondLen;
+          const hy = p.y + Math.sin(p.theta) * p.bondLen;
+          ctx.shadowBlur = 0;
+          ctx.globalAlpha = p.alpha * 0.45;
+          ctx.strokeStyle = '#8898a8'; ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(hx, hy); ctx.stroke();
+          // Draw H atom
+          const cH = SPECIES_COLORS.H3O;
+          ctx.globalAlpha = p.alpha * 0.95;
+          ctx.shadowColor = cH; ctx.shadowBlur = 6;
+          ctx.fillStyle = cH;
+          ctx.beginPath(); ctx.arc(hx, hy, p.r * 0.6, 0, Math.PI*2); ctx.fill();
+        } else {
+          const c = SPECIES_COLORS[p.type];
+          ctx.globalAlpha = p.alpha * 0.95;
+          ctx.shadowColor = c; ctx.shadowBlur = 6;
+          ctx.fillStyle = c;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+          // highlight
+          ctx.shadowBlur = 0;
+          ctx.globalAlpha = p.alpha * 0.4;
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(p.x - p.r * 0.35, p.y - p.r * 0.35, p.r * 0.35, 0, Math.PI*2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // H2O flash from a recent reaction
+        if (p._flashT && p._flashT > 0) {
+          ctx.save();
+          ctx.globalAlpha = p._flashT * 0.8;
+          ctx.strokeStyle = '#cbd5e1';
+          ctx.lineWidth = 1.2;
+          const rr = (1 - p._flashT) * 14 + 4;
+          ctx.beginPath();
+          ctx.arc(p._flashX, p._flashY, rr, 0, Math.PI*2);
+          ctx.stroke();
+          ctx.fillStyle = '#cbd5e1';
+          ctx.globalAlpha = p._flashT * 0.6;
+          ctx.font = '9px JetBrains Mono';
+          ctx.fillText('H₂O', p._flashX + 6, p._flashY - 6);
+          ctx.restore();
+          p._flashT -= 0.04;
+        }
+      }
+
+      // Label the beaker
+      ctx.save();
+      ctx.fillStyle = '#56636e';
+      ctx.font = '9px JetBrains Mono';
+      ctx.fillText(`V = ${stateRef.current.Vtot.toFixed(1)} mL`, bx, by + bh + 14);
+      ctx.fillText(`pH ${stateRef.current.pH.toFixed(2)}`, bx + bw - 50, by + bh + 14);
+      ctx.restore();
+
+      rafRef.current = requestAnimationFrame(step);
+    }
+
+    rafRef.current = requestAnimationFrame(step);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      ro.disconnect();
+    };
+  }, []);
+
+  const acid = ACIDS[acidKey];
+
+  return (
+    <div className="panel">
+      <div className="panel-head">
+        <span className="title">BEAKER · MOLECULAR VIEW</span>
+        <span className="meta">N = {cappedCounts.HA + cappedCounts.A + cappedCounts.H3O + cappedCounts.OH + cappedCounts.Na} PARTICLES</span>
+      </div>
+      <div className="panel-body" style={{ padding: 10 }}>
+        <div className="beaker-wrap">
+          <div className="beaker-canvas-wrap">
+            <canvas ref={canvasRef} />
+          </div>
+          <div className="beaker-legend">
+            <div className="legend-row hdr">
+              <span>SPECIES</span><span>COUNT</span>
+            </div>
+            <div className="legend-row">
+              <span>
+                <svg className="swatch-pair" width="26" height="12" viewBox="0 0 26 12" style={{ marginRight: 6, verticalAlign: 'middle' }}>
+                  <line x1="8" y1="6" x2="19" y2="6" stroke="#8898a8" strokeWidth="1.2" opacity="0.55" />
+                  <circle cx="8" cy="6" r="4" fill={SPECIES_COLORS.A} style={{ filter: `drop-shadow(0 0 3px ${SPECIES_COLORS.A})` }} />
+                  <circle cx="19" cy="6" r="2.6" fill={SPECIES_COLORS.H3O} style={{ filter: `drop-shadow(0 0 3px ${SPECIES_COLORS.H3O})` }} />
+                </svg>
+                <span className="chem" dangerouslySetInnerHTML={{__html: 'H–' + acid.A + ' bonded pair'}} />
+              </span>
+              <span className="count">{cappedCounts.HA}</span>
+            </div>
+            <div className="legend-row">
+              <span>
+                <span className="swatch" style={{ background: SPECIES_COLORS.A, color: SPECIES_COLORS.A }} />
+                <span className="chem" dangerouslySetInnerHTML={{__html: acid.A + '⁻'}} />
+              </span>
+              <span className="count">{cappedCounts.A}</span>
+            </div>
+            <div className="legend-row">
+              <span>
+                <span className="swatch" style={{ background: SPECIES_COLORS.H3O, color: SPECIES_COLORS.H3O }} />
+                H₃O⁺
+              </span>
+              <span className="count">{cappedCounts.H3O}</span>
+            </div>
+            <div className="legend-row">
+              <span>
+                <span className="swatch" style={{ background: SPECIES_COLORS.OH, color: SPECIES_COLORS.OH }} />
+                OH⁻
+              </span>
+              <span className="count">{cappedCounts.OH}</span>
+            </div>
+            <div className="legend-row">
+              <span>
+                <span className="swatch" style={{ background: SPECIES_COLORS.Na, color: SPECIES_COLORS.Na }} />
+                Na⁺
+              </span>
+              <span className="count">{cappedCounts.Na}</span>
+            </div>
+            <div style={{ marginTop: 10, fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: 'var(--text-faint)', lineHeight: 1.5, letterSpacing: '0.05em' }}>
+              H₂O solvent not rendered. H₃O⁺/OH⁻ counts use √-scaled visibility.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// =============================================================================
+// PANE 3 — LIVE GRAPH
+// =============================================================================
+
+function GraphPane({ history, state, maxVol, equivVol, showEqMarker = true, curveGlow = true }) {
+  const svgRef = useRef(null);
+  const [dims, setDims] = useState({ w: 800, h: 320 });
+
+  useEffect(() => {
+    if (!svgRef.current) return;
+    const ro = new ResizeObserver(entries => {
+      for (const e of entries) {
+        setDims({ w: e.contentRect.width, h: e.contentRect.height });
+      }
+    });
+    ro.observe(svgRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  const pad = { t: 18, r: 22, b: 36, l: 44 };
+  const plotW = Math.max(10, dims.w - pad.l - pad.r);
+  const plotH = Math.max(10, dims.h - pad.t - pad.b);
+
+  const xMax = Math.max(maxVol, equivVol * 1.8, 40);
+  const yMax = 14;
+
+  const xScale = v => pad.l + (v / xMax) * plotW;
+  const yScale = p => pad.t + plotH - (p / yMax) * plotH;
+
+  // Region labels
+  const region =
+    !history.length || state.CbCurr === 0 ? 'INITIAL' :
+    state.fractionNeutralized < 0.95 ? 'BUFFER' :
+    state.fractionNeutralized < 1.05 ? 'EQUIVALENCE' :
+    'EXCESS BASE';
+
+  // Build path
+  const path = history.map((pt, i) => `${i === 0 ? 'M' : 'L'} ${xScale(pt.v).toFixed(2)} ${yScale(pt.ph).toFixed(2)}`).join(' ');
+
+  // Grid
+  const xTicks = [];
+  const step = xMax <= 20 ? 2 : xMax <= 50 ? 5 : 10;
+  for (let v = 0; v <= xMax; v += step) xTicks.push(v);
+  const yTicks = [0, 2, 4, 6, 8, 10, 12, 14];
+
+  const last = history[history.length - 1];
+
+  return (
+    <div className="panel" style={{ gridColumn: '1 / 2' }}>
+      <div className="panel-head">
+        <span className="title">LIVE TITRATION · pH vs VOLUME</span>
+        <span className="meta">POINTS: {history.length} · EQ PT: {equivVol.toFixed(2)} mL</span>
+      </div>
+      <div className="panel-body" style={{ padding: 0 }}>
+        <div className="graph-wrap">
+          <svg ref={svgRef} viewBox={`0 0 ${dims.w} ${dims.h}`} preserveAspectRatio="none">
+            {/* bg grid */}
+            {xTicks.map(v => (
+              <line key={'x' + v} x1={xScale(v)} x2={xScale(v)} y1={pad.t} y2={pad.t + plotH}
+                stroke="#1a242d" strokeWidth="1" strokeDasharray={v === 0 ? '' : '2 3'} />
+            ))}
+            {yTicks.map(p => (
+              <line key={'y' + p} x1={pad.l} x2={pad.l + plotW} y1={yScale(p)} y2={yScale(p)}
+                stroke="#1a242d" strokeWidth="1" strokeDasharray={p === 0 || p === 14 ? '' : '2 3'} />
+            ))}
+            {/* pH=7 line */}
+            <line x1={pad.l} x2={pad.l + plotW} y1={yScale(7)} y2={yScale(7)}
+              stroke="#2a3a45" strokeDasharray="4 4" strokeWidth="1" />
+            <text x={pad.l + plotW - 4} y={yScale(7) - 4} fill="#56636e"
+              fontSize="9" fontFamily="JetBrains Mono, monospace" textAnchor="end">pH = 7</text>
+
+            {/* equivalence point marker */}
+            {equivVol > 0 && equivVol < xMax && showEqMarker && (
+              <g>
+                <line x1={xScale(equivVol)} x2={xScale(equivVol)} y1={pad.t} y2={pad.t + plotH}
+                  stroke="#f5a524" strokeDasharray="3 3" strokeWidth="1" opacity="0.5" />
+                <text x={xScale(equivVol) + 4} y={pad.t + 12} fill="#f5a524"
+                  fontSize="9" fontFamily="JetBrains Mono, monospace">EQ PT</text>
+              </g>
+            )}
+
+            {/* axes */}
+            <line x1={pad.l} x2={pad.l + plotW} y1={pad.t + plotH} y2={pad.t + plotH} stroke="#2a3a45" strokeWidth="1" />
+            <line x1={pad.l} x2={pad.l} y1={pad.t} y2={pad.t + plotH} stroke="#2a3a45" strokeWidth="1" />
+
+            {/* y axis labels */}
+            {yTicks.map(p => (
+              <text key={'yl' + p} x={pad.l - 8} y={yScale(p) + 3}
+                fill="#56636e" fontSize="10" fontFamily="JetBrains Mono, monospace" textAnchor="end">{p}</text>
+            ))}
+            {/* x axis labels */}
+            {xTicks.map(v => (
+              <text key={'xl' + v} x={xScale(v)} y={pad.t + plotH + 14}
+                fill="#56636e" fontSize="10" fontFamily="JetBrains Mono, monospace" textAnchor="middle">{v}</text>
+            ))}
+
+            {/* axis titles */}
+            <text x={pad.l + plotW / 2} y={dims.h - 6} fill="#8a98a5"
+              fontSize="10" fontFamily="JetBrains Mono, monospace" textAnchor="middle" letterSpacing="1">VOLUME BASE ADDED (mL)</text>
+            <text x={12} y={pad.t + plotH / 2} fill="#8a98a5"
+              fontSize="10" fontFamily="JetBrains Mono, monospace" textAnchor="middle"
+              transform={`rotate(-90, 12, ${pad.t + plotH / 2})`} letterSpacing="1">pH</text>
+
+            {/* curve */}
+            {path && (
+              <>
+                <path d={path} fill="none" stroke="#4dd0e1" strokeWidth="1.8"
+                  style={curveGlow ? { filter: 'drop-shadow(0 0 4px rgba(77,208,225,0.6))' } : {}} />
+                {/* last-point dot */}
+                {last && (
+                  <g>
+                    <circle cx={xScale(last.v)} cy={yScale(last.ph)} r="7"
+                      fill="none" stroke="#4dd0e1" strokeWidth="1" opacity="0.4">
+                      <animate attributeName="r" values="5;10;5" dur="1.5s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="0.6;0;0.6" dur="1.5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx={xScale(last.v)} cy={yScale(last.ph)} r="3" fill="#4dd0e1"
+                      style={{ filter: 'drop-shadow(0 0 4px #4dd0e1)' }} />
+                  </g>
+                )}
+              </>
+            )}
+          </svg>
+
+          <div className="graph-overlay">
+            <div className="mono" style={{color:'var(--text-faint)'}}>▸ CURRENT pH</div>
+            <div className="ph">{state.pH.toFixed(2)}</div>
+            <div className="vol mono">{state.CbCurr > 0 ? `+${(state.Vtot - state.CaCurr === 0 ? 0 : history.length && history[history.length-1].v.toFixed(2))} mL NaOH` : 'AWAITING TITRANT'}</div>
+          </div>
+
+          <div className="region-label">
+            <span className={region === 'INITIAL' ? 'active' : ''}>◦ INITIAL</span>
+            <span className={region === 'BUFFER' ? 'active' : ''}>◦ BUFFER</span>
+            <span className={region === 'EQUIVALENCE' ? 'active' : ''}>◦ EQUIVALENCE</span>
+            <span className={region === 'EXCESS BASE' ? 'active' : ''}>◦ EXCESS BASE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// =============================================================================
+// PANE 4 — CONTROLS
+// =============================================================================
+
+function ControlPane({
+  acidKey, setAcidKey,
+  Ca0, setCa0,
+  Va, setVa,
+  Cb0, setCb0,
+  addRate, setAddRate,
+  running, setRunning,
+  reset,
+  state,
+  equivVol,
+  volAdded,
+}) {
+  const acid = ACIDS[acidKey];
+
+  return (
+    <div className="panel">
+      <div className="panel-head">
+        <span className="title">CONTROL · CONDITIONS</span>
+        <span className="meta">{running ? '● RUNNING' : '○ IDLE'}</span>
+      </div>
+      <div className="panel-body scroll" style={{ padding: 10 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+
+          <div className="ctrl-group">
+            <div className="ctrl-head"><span>◇ ACID · INITIAL</span><span className="tag">FLASK</span></div>
+            <div className="field">
+              <label>[HA]<sub>0</sub> (mol/L) <span className="val">{Ca0.toFixed(3)}</span></label>
+              <input type="range" min="0.01" max="1.0" step="0.01" value={Ca0}
+                onChange={e => setCa0(+e.target.value)} disabled={running} />
+            </div>
+            <div className="field">
+              <label>V<sub>acid</sub> (mL) <span className="val">{Va.toFixed(1)}</span></label>
+              <input type="range" min="10" max="100" step="1" value={Va}
+                onChange={e => setVa(+e.target.value)} disabled={running} />
+            </div>
+          </div>
+
+          <div className="ctrl-group">
+            <div className="ctrl-head"><span>◇ TITRANT · NaOH</span><span className="tag">BURETTE</span></div>
+            <div className="field">
+              <label>[OH⁻]<sub>0</sub> (mol/L) <span className="val">{Cb0.toFixed(3)}</span></label>
+              <input type="range" min="0.01" max="1.0" step="0.01" value={Cb0}
+                onChange={e => setCb0(+e.target.value)} disabled={running} />
+            </div>
+            <div className="field">
+              <label>ADD RATE (mL/s) <span className="val">{addRate.toFixed(2)}</span></label>
+              <input type="range" min="0.05" max="3.0" step="0.05" value={addRate}
+                onChange={e => setAddRate(+e.target.value)} />
+            </div>
+          </div>
+
+          <div className="status-grid">
+            <div className="status-cell">
+              <div className="k">V added</div>
+              <div className="v">{volAdded.toFixed(2)} <span style={{color:'var(--text-faint)',fontSize:10}}>mL</span></div>
+            </div>
+            <div className="status-cell">
+              <div className="k">EQ VOL</div>
+              <div className="v accent">{equivVol.toFixed(2)} <span style={{color:'var(--text-faint)',fontSize:10}}>mL</span></div>
+            </div>
+            <div className="status-cell">
+              <div className="k">% NEUT</div>
+              <div className="v">{(state.fractionNeutralized * 100).toFixed(1)}<span style={{color:'var(--text-faint)',fontSize:10}}>%</span></div>
+            </div>
+          </div>
+
+          <div className="btn-row">
+            <button className={'btn primary' + (running ? ' active' : '')}
+              onClick={() => setRunning(true)} disabled={running}>
+              <span className="dot" /> START
+            </button>
+            <button className="btn warn" onClick={() => setRunning(false)} disabled={!running}>
+              ❚❚ PAUSE
+            </button>
+            <button className="btn danger" onClick={reset}>
+              ■ STOP
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// =============================================================================
+// APP
+// =============================================================================
+
+function App() {
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "ionScale": "proportional",
+    "particleDensity": 400,
+    "maxParticles": 180,
+    "simSpeed": 1,
+    "showDrip": true,
+    "showEqMarker": true,
+    "curveGlow": true,
+    "accentHue": 188,
+    "fluidTint": false
+  }/*EDITMODE-END*/;
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  const [acidKey, setAcidKey] = useState('CH3COOH');
+  const [Ca0, setCa0] = useState(0.10);
+  const [Va, setVa] = useState(25.0);
+  const [Cb0, setCb0] = useState(0.10);
+  const [addRate, setAddRate] = useState(0.4); // mL/s
+  const [running, setRunning] = useState(false);
+  const [volAdded, setVolAdded] = useState(0); // mL
+  const [history, setHistory] = useState([]); // {v, ph}
+
+  const equivVol = useMemo(() => (Ca0 * Va) / Cb0, [Ca0, Va, Cb0]);
+
+  // On param change while idle, reset curve
+  useEffect(() => {
+    if (!running && volAdded === 0) {
+      // Seed with initial point
+      const s0 = titrationState({acidKey, Ca0, Va, Cb0: Cb0, Vb: 0});
+      setHistory([{ v: 0, ph: s0.pH }]);
+    }
+  }, [acidKey, Ca0, Va, Cb0, running, volAdded]);
+
+  // apply simSpeed to interval tick rate
+  useEffect(() => {
+    if (!running) return;
+    const id = setInterval(() => {
+      setVolAdded(prev => {
+        const maxV = equivVol * 2.0;
+        if (prev >= maxV) { setRunning(false); return prev; }
+        const next = Math.min(prev + addRate * 0.05 * tweaks.simSpeed, maxV);
+        const s = titrationState({ acidKey, Ca0, Va, Cb0, Vb: next });
+        setHistory(h => {
+          if (!h.length || Math.abs(next - h[h.length - 1].v) > 0.02) {
+            return [...h, { v: next, ph: s.pH }];
+          }
+          return h;
+        });
+        return next;
+      });
+    }, 50);
+    return () => clearInterval(id);
+  }, [running, addRate, acidKey, Ca0, Va, Cb0, equivVol, tweaks.simSpeed]);
+
+  const reset = () => {
+    setRunning(false);
+    setVolAdded(0);
+    setHistory([]);
+  };
+
+  const state = titrationState({ acidKey, Ca0, Va, Cb0, Vb: volAdded });
+
+  // Max volume for graph x-axis
+  const xMax = Math.max(equivVol * 2.0, volAdded);
+
+  return (
+    <>
+      <div className="topbar">
+        <span className="brand"><span className="live-dot" />TITRATION.LAB</span>
+        <span className="stat">MODE <b>WEAK ACID / STRONG BASE</b></span>
+        <span className="stat">ANALYTE <b>{ACIDS[acidKey].formula}</b></span>
+        <span className="stat">T <b>298.15 K</b></span>
+        <span className="stat">P <b>1 atm</b></span>
+        <span className="spacer" />
+        <span className="stat">pH <b style={{color:'var(--cyan)'}}>{state.pH.toFixed(3)}</b></span>
+        <span className="stat">V<sub>tot</sub> <b>{state.Vtot.toFixed(2)} mL</b></span>
+        <span className="stat">t <b className="mono">{(volAdded / Math.max(addRate, 0.01)).toFixed(1)}s</b></span>
+      </div>
+
+      <div className="layout">
+        <GraphPane history={history} state={state} maxVol={xMax} equivVol={equivVol}
+          showEqMarker={tweaks.showEqMarker} curveGlow={tweaks.curveGlow} />
+        <BeakerPane state={state} running={running} acidKey={acidKey}
+          ionScale={tweaks.ionScale}
+          particleDensity={tweaks.particleDensity}
+          maxParticles={tweaks.maxParticles}
+          showDrip={tweaks.showDrip}
+          fluidTint={tweaks.fluidTint} />
+        <EquationsPane state={state} acidKey={acidKey} setAcidKey={setAcidKey} running={running} />
+        <ControlPane
+          acidKey={acidKey} setAcidKey={setAcidKey}
+          Ca0={Ca0} setCa0={setCa0}
+          Va={Va} setVa={setVa}
+          Cb0={Cb0} setCb0={setCb0}
+          addRate={addRate} setAddRate={setAddRate}
+          running={running} setRunning={setRunning}
+          reset={reset}
+          state={state}
+          equivVol={equivVol}
+          volAdded={volAdded}
+        />
+      </div>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Molecular view">
+          <TweakRadio label="Ion count scaling" value={tweaks.ionScale}
+            options={[
+              { value: 'proportional', label: 'Proportional' },
+              { value: 'log', label: 'Log (amplified)' },
+            ]}
+            onChange={v => setTweak('ionScale', v)} />
+          <TweakSlider label="Particle density" value={tweaks.particleDensity}
+            min={100} max={1200} step={50} unit=" /M"
+            onChange={v => setTweak('particleDensity', v)} />
+          <TweakSlider label="Max particles" value={tweaks.maxParticles}
+            min={60} max={400} step={10}
+            onChange={v => setTweak('maxParticles', v)} />
+          <TweakToggle label="Show burette drip" value={tweaks.showDrip}
+            onChange={v => setTweak('showDrip', v)} />
+          <TweakToggle label="pH-colored fluid" value={tweaks.fluidTint}
+            onChange={v => setTweak('fluidTint', v)} />
+        </TweakSection>
+
+        <TweakSection label="Simulation">
+          <TweakSlider label="Sim speed" value={tweaks.simSpeed}
+            min={0.25} max={4} step={0.25} unit="×"
+            onChange={v => setTweak('simSpeed', v)} />
+        </TweakSection>
+
+        <TweakSection label="Graph">
+          <TweakToggle label="Equivalence marker" value={tweaks.showEqMarker}
+            onChange={v => setTweak('showEqMarker', v)} />
+          <TweakToggle label="Curve glow" value={tweaks.curveGlow}
+            onChange={v => setTweak('curveGlow', v)} />
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
