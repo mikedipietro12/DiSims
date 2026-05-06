@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collision Theory</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #ffffff; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+canvas { display: block; }
+
+#tabs {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  z-index: 10;
+  pointer-events: none;
+}
+.tab {
+  padding: 7px 22px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.04);
+  color: rgba(0,0,0,0.4);
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.tab.active {
+  background: rgba(200,160,0,0.12);
+  border-color: rgba(200,160,0,0.5);
+  color: #a07800;
+}
+body.dark .tab {
+  border-color: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.3);
+}
+body.dark .tab.active {
+  background: rgba(255,210,50,0.12);
+  border-color: rgba(255,210,50,0.5);
+  color: #ffd232;
+}
+
+#counter {
+  position: fixed;
+  bottom: 20px; left: 20px;
+  color: rgba(0,0,0,0.55);
+  font-size: 14px;
+  letter-spacing: 0.4px;
+  z-index: 10;
+  pointer-events: none;
+}
+body.dark #counter { color: rgba(255,255,255,0.55); }
+
+#bg-toggle {
+  position: fixed;
+  top: 14px; right: 14px;
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(0,0,0,0.18);
+  background: rgba(0,0,0,0.05);
+  color: rgba(0,0,0,0.5);
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 11;
+  letter-spacing: 0.3px;
+  transition: background 0.2s;
+}
+#bg-toggle:hover { background: rgba(0,0,0,0.11); }
+body.dark #bg-toggle {
+  border-color: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.5);
+}
+body.dark #bg-toggle:hover { background: rgba(255,255,255,0.12); }
+
+#reset-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: rgba(255,255,255,0.75);
+  z-index: 20;
+}
+body.dark #reset-overlay { background: rgba(0,0,0,0.65); }
+#reset-overlay h2 {
+  color: #a07800;
+  font-size: 26px;
+  margin-bottom: 8px;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+body.dark #reset-overlay h2 { color: #ffd232; }
+#reset-overlay p {
+  color: rgba(0,0,0,0.4);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+body.dark #reset-overlay p { color: rgba(255,255,255,0.4); }
+#reset-btn {
+  padding: 11px 32px;
+  border-radius: 22px;
+  border: 1.5px solid #a07800;
+  background: rgba(200,160,0,0.1);
+  color: #a07800;
+  font-size: 14px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: background 0.2s;
+}
+#reset-btn:hover { background: rgba(200,160,0,0.22); }
+body.dark #reset-btn { border-color: #ffd232; background: rgba(255,210,50,0.1); color: #ffd232; }
+body.dark #reset-btn:hover { background: rgba(255,210,50,0.25); }
+
+#canvas3d {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#reaction-panel {
+  display: none;
+  position: fixed;
+  right: 12px;
+  top: 56px;
+  bottom: 52px;
+  left: auto;
+  transform: none;
+  z-index: 12;
+  pointer-events: auto;
+  padding: 12px 14px 14px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  width: min(248px, 36vw);
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+body.dark #reaction-panel {
+  border-color: rgba(255,255,255,0.15);
+  background: rgba(30,32,48,0.92);
+}
+#reaction-panel .row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+#reaction-panel label {
+  font-size: 11px;
+  letter-spacing: 0.35px;
+  color: rgba(0,0,0,0.55);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+body.dark #reaction-panel label { color: rgba(255,255,255,0.55); }
+#reaction-panel input[type="range"] { width: 100%; }
+#reaction-panel .seg {
+  display: flex;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid rgba(0,0,0,0.12);
+}
+body.dark #reaction-panel .seg { border-color: rgba(255,255,255,0.2); }
+#reaction-panel .seg button {
+  padding: 6px 12px;
+  font-size: 11px;
+  border: none;
+  background: rgba(0,0,0,0.04);
+  color: rgba(0,0,0,0.45);
+  cursor: pointer;
+}
+body.dark #reaction-panel .seg button {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.45);
+}
+#reaction-panel .seg button.on {
+  background: rgba(200,160,0,0.2);
+  color: #8a6500;
+}
+body.dark #reaction-panel .seg button.on {
+  background: rgba(255,210,50,0.18);
+  color: #ffd232;
+}
+#reaction-reset {
+  padding: 7px 16px;
+  border-radius: 12px;
+  border: 1.5px solid #a07800;
+  background: rgba(200,160,0,0.1);
+  color: #a07800;
+  font-size: 11px;
+  cursor: pointer;
+  letter-spacing: 0.4px;
+}
+body.dark #reaction-reset {
+  border-color: #ffd232;
+  background: rgba(255,210,50,0.1);
+  color: #ffd232;
+}
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<canvas id="canvas3d"></canvas>
+
+<div id="tabs">
+  <button class="tab active" id="tab-water">Water</button>
+  <button class="tab"        id="tab-salt">Salt Dissolving</button>
+  <button class="tab"        id="tab-reaction">Reaction rates</button>
+</div>
+
+<div id="reaction-panel">
+  <div class="row">
+    <label>Temperature<input type="range" id="r-temp" min="5" max="100" value="58"></label>
+    <label>Concentration (acid)<input type="range" id="r-conc" min="8" max="72" value="34"></label>
+    <label>Surface area <span style="opacity:0.75;font-weight:400">(0–33 one block · 34–66 three · 67+ many floor pairs)</span><input type="range" id="r-surface" min="0" max="100" value="50"></label>
+    <div>
+      <label style="min-width:auto">Nature of reactant</label>
+      <div class="seg" id="r-acid-seg">
+        <button type="button" class="on" data-acid="hcl">HCl (ions)</button>
+        <button type="button" data-acid="hf">HF (weak)</button>
+      </div>
+    </div>
+    <button type="button" id="reaction-reset">Reset scene</button>
+  </div>
+</div>
+
+<div id="counter">Molecules remaining: 10</div>
+
+<button id="bg-toggle">Dark Mode</button>
+
+<div id="reset-overlay">
+  <h2 id="overlay-title">All reactions complete!</h2>
+  <p  id="overlay-sub">H₂O + H₂O → H₃O⁺ + OH⁻</p>
+  <button id="reset-btn">Try Again</button>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+const SPEED_THRESHOLD = 1.2;
+const FLICK_SCALE     = 0.22;
+const WALL_DAMP       = 0.82;
+const BOUNCE_DAMP     = 0.72;
+const MOL_RADIUS      = 30;
+const O_R             = 21;
+const H_R             = 8;
+const H_DIST          = 28;
+const BOND_HALF       = 52 * Math.PI / 180;
+
+// Water geometry (local frame: 0=right, +y=down)
+const H1_LOCAL     = -Math.PI / 2 - BOND_HALF;
+const H2_LOCAL     = -Math.PI / 2 + BOND_HALF;
+const LP_LOCAL     =  Math.PI / 2;              // lone-pair axis (down in local frame)
+const LP1_LOCAL    =  Math.PI / 2 - BOND_HALF;
+const LP2_LOCAL    =  Math.PI / 2 + BOND_HALF;
+const LP_LOBE_DIST = H_DIST * 1.05;            // ≈29.4
+const LP_LOBE_R    = 19;
+
+// Ion sizes: Na⁺ smaller than Cl⁻ (real ionic radii)
+const NA_R        = 13;
+const CL_R        = 20;
+const ION_SPACING = NA_R + CL_R; // 33px — adjacent ions touch on the face
+
+// 3D crystal projection offsets (isometric-ish, going upper-right for depth)
+const DEPTH_X     = 14;  // screen-right per depth unit
+const DEPTH_Y     = 14;  // screen-up per depth unit (subtracted from y)
+
+// Crystal grid size
+const GRID_COLS   = 4;
+const GRID_ROWS   = 4;
+const GRID_DEPTHS = 3;
+
+let bgColor     = '#ffffff';
+let isDark      = false;
+let currentMode = 'water'; // 'water' | 'salt' | 'reaction'
+let run2dLoop     = true;
+let run3dLoop     = false;
+let reactionSim   = null;
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+// ── WaterMolecule ─────────────────────────────────────────────────────────────
+class WaterMolecule {
+  constructor(x, y, av) {
+    this.x = x; this.y = y;
+    this.vx = 0; this.vy = 0;
+    this.angle = Math.random() * Math.PI * 2;
+    this.av    = av;
+    this.phase = Math.random() * Math.PI * 2;
+    this.radius = MOL_RADIUS;
+    this.hAngles  = [H1_LOCAL, H2_LOCAL];
+    this.lpAngles = [LP1_LOCAL, LP2_LOCAL];
+    this.charge   = 0;       // water mode: 0, +1, -1
+    this.solvatingIon = null; // salt mode: one ion per water
+  }
+
+  resetToWater() {
+    this.hAngles  = [H1_LOCAL, H2_LOCAL];
+    this.lpAngles = [LP1_LOCAL, LP2_LOCAL];
+    this.charge   = 0;
+  }
+
+  h1World()      { const a = this.angle + H1_LOCAL; return { x: this.x + Math.cos(a)*H_DIST, y: this.y + Math.sin(a)*H_DIST }; }
+  h1WorldAngle() { return this.angle + H1_LOCAL; }
+  lpWorldAngle() { return this.angle + LP_LOCAL; }
+  lp1World()     { const a = this.angle + LP1_LOCAL; return { x: this.x + Math.cos(a)*LP_LOBE_DIST, y: this.y + Math.sin(a)*LP_LOBE_DIST }; }
+  lp2World()     { const a = this.angle + LP2_LOCAL; return { x: this.x + Math.cos(a)*LP_LOBE_DIST, y: this.y + Math.sin(a)*LP_LOBE_DIST }; }
+
+  update(W, H) {
+    this.x += this.vx; this.y += this.vy;
+    this.angle += this.av;
+    if (this.x - this.radius < 0)   { this.x = this.radius;     this.vx =  Math.abs(this.vx)*WALL_DAMP; }
+    if (this.x + this.radius > W)   { this.x = W-this.radius;   this.vx = -Math.abs(this.vx)*WALL_DAMP; }
+    if (this.y - this.radius < 0)   { this.y = this.radius;     this.vy =  Math.abs(this.vy)*WALL_DAMP; }
+    if (this.y + this.radius > H)   { this.y = H-this.radius;   this.vy = -Math.abs(this.vy)*WALL_DAMP; }
+    this.vx *= 0.994; this.vy *= 0.994;
+  }
+
+  draw(ctx, t, proxAlpha, squish = null) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+    this._aura(ctx);
+    this._clouds(ctx, t, squish);
+    for (const ha of this.hAngles) {
+      const isReactive = this.charge === 0 ? ha === H1_LOCAL : this.charge === +1;
+      this._drawH(ctx, ha, isReactive, isReactive ? proxAlpha : 0);
+    }
+    this._oxygen(ctx);
+    ctx.restore();
+  }
+
+  _aura(ctx) {
+    const col = isDark ? 'rgba(255,200,40,0.07)' : 'rgba(100,130,200,0.05)';
+    const g = ctx.createRadialGradient(0, 0, 5, 0, 0, 65);
+    g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(0, 0, 65, 0, Math.PI*2); ctx.fill();
+  }
+
+  _clouds(ctx, t, squish = null) {
+    const breathe  = 1 + 0.10 * Math.sin(t*2.1 + this.phase);
+    const lobeR    = LP_LOBE_R * breathe;
+    const lobeDist = LP_LOBE_DIST;
+
+    let fillInner, fillMid, strokeCol, orbFill, orbStroke, shadowCol;
+    if (this.charge === +1) {
+      fillInner='rgba(230,90,10,0.48)';  fillMid='rgba(230,90,10,0.18)';
+      strokeCol='rgba(190,55,0,0.88)';   orbFill='rgba(150,45,0,0.92)';
+      orbStroke='rgba(190,65,0,0.80)';   shadowCol='rgba(255,160,60,0.8)';
+    } else if (this.charge === -1) {
+      fillInner='rgba(255,230,0,0.55)';  fillMid='rgba(255,230,0,0.22)';
+      strokeCol='rgba(200,175,0,0.92)';  orbFill='rgba(160,135,0,0.92)';
+      orbStroke='rgba(200,175,0,0.80)';  shadowCol='rgba(255,240,80,0.9)';
+    } else {
+      fillInner='rgba(220,170,0,0.40)';  fillMid='rgba(220,170,0,0.15)';
+      strokeCol='rgba(160,110,0,0.82)';  orbFill='rgba(120,76,0,0.92)';
+      orbStroke='rgba(160,110,0,0.80)';  shadowCol='rgba(255,210,60,0.8)';
+    }
+
+    for (const lpAngle of this.lpAngles) {
+      const lx = Math.cos(lpAngle)*lobeDist;
+      const ly = Math.sin(lpAngle)*lobeDist;
+      ctx.save();
+      ctx.translate(lx, ly);
+      ctx.rotate(lpAngle);
+      ctx.scale(1.45, 0.65);
+      if (squish && squish.amount > 0.02) {
+        const eff = squish.amount * (1 + 0.18*Math.sin(t*(6+squish.amount*14) + this.phase));
+        ctx.rotate(squish.angle - this.angle - lpAngle);
+        ctx.scale(1 + 0.30*eff, 1 - 0.22*eff);
+      }
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, lobeR);
+      g.addColorStop(0, fillInner); g.addColorStop(0.5, fillMid); g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(0, 0, lobeR, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = strokeCol; ctx.lineWidth = 1.8; ctx.stroke();
+      ctx.save();
+      ctx.shadowColor=shadowCol; ctx.shadowBlur=4;
+      ctx.fillStyle=orbFill; ctx.strokeStyle=orbStroke; ctx.lineWidth=0.9;
+      const od = lobeR*0.38;
+      ctx.beginPath(); ctx.arc(-od,0,3,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.arc( od,0,3,0,Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.restore();
+      ctx.restore();
+    }
+  }
+
+  _drawH(ctx, localAngle, isReactive, proxAlpha) {
+    const hx = Math.cos(localAngle)*H_DIST;
+    const hy = Math.sin(localAngle)*H_DIST;
+    if (isReactive && proxAlpha > 0) {
+      const pulse = 0.5 + 0.5*Math.sin(Date.now()/300);
+      const glowR = H_R + 7 + pulse*4 + proxAlpha*6;
+      const g = ctx.createRadialGradient(hx,hy,H_R,hx,hy,glowR);
+      g.addColorStop(0, `rgba(255,255,200,${0.5*proxAlpha})`);
+      g.addColorStop(1, 'rgba(255,255,200,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(hx,hy,glowR,0,Math.PI*2); ctx.fill();
+    }
+    const g = ctx.createRadialGradient(hx-2,hy-2,1,hx,hy,H_R);
+    g.addColorStop(0,'#ffffff'); g.addColorStop(0.5,'#ddeeff'); g.addColorStop(1,'#a8bcd0');
+    ctx.fillStyle = g;
+    ctx.shadowColor='rgba(180,210,255,0.5)';
+    ctx.shadowBlur = isReactive ? 8 + proxAlpha*10 : 6;
+    ctx.beginPath(); ctx.arc(hx,hy,H_R,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,0.60)'; ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.arc(hx,hy,H_R,0,Math.PI*2); ctx.stroke();
+    ctx.shadowBlur = 0;
+    if (isReactive) {
+      ctx.fillStyle = isDark ? 'rgba(180,205,255,0.8)' : 'rgba(40,80,160,0.75)';
+      ctx.font='10px serif'; ctx.textAlign='center';
+      ctx.fillText('δ+', hx, hy-H_R-3);
+    }
+  }
+
+  _oxygen(ctx) {
+    ctx.shadowColor='rgba(210,50,50,0.75)'; ctx.shadowBlur=14;
+    const g = ctx.createRadialGradient(-6,-6,1,0,0,O_R);
+    g.addColorStop(0,'#ffcccc'); g.addColorStop(0.3,'#e85050');
+    g.addColorStop(0.7,'#bf2828'); g.addColorStop(1,'#8a1818');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(0,0,O_R,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = isDark ? 'rgba(140,175,255,0.65)' : 'rgba(40,80,190,0.7)';
+    ctx.font='9px serif'; ctx.textAlign='center';
+    ctx.fillText('δ−', 0, O_R+7);
+  }
+}
+
+// ── IonMolecule ───────────────────────────────────────────────────────────────
+class IonMolecule {
+  constructor(x, y, type, gridRow, gridCol, gridDepth) {
+    this.x = x; this.y = y;
+    this.vx = 0; this.vy = 0;
+    this.type      = type;   // 'na' | 'cl'
+    this.radius    = type === 'na' ? NA_R : CL_R;
+    this.dissolved    = false;
+    this.inCrystal    = true;
+    this.solvatingWater = null;
+    this.offsetAngle  = 0;
+    this.offsetDist   = 0;
+    this.gridRow   = gridRow;
+    this.gridCol   = gridCol;
+    this.gridDepth = gridDepth;
+    // Scale ion size slightly for depth (back ions look smaller/further)
+    this.depthScale = 1 - gridDepth * 0.09;
+    this.depthAlpha = 1 - gridDepth * 0.18;
+  }
+
+  update(W, H) {
+    if (this.solvatingWater) {
+      const wa = this.solvatingWater.angle + this.offsetAngle;
+      this.x  = this.solvatingWater.x + Math.cos(wa)*this.offsetDist;
+      this.y  = this.solvatingWater.y + Math.sin(wa)*this.offsetDist;
+      this.vx = this.solvatingWater.vx;
+      this.vy = this.solvatingWater.vy;
+      return;
+    }
+    this.x += this.vx; this.y += this.vy;
+    if (this.x-this.radius < 0)   { this.x=this.radius;     this.vx= Math.abs(this.vx)*WALL_DAMP; }
+    if (this.x+this.radius > W)   { this.x=W-this.radius;   this.vx=-Math.abs(this.vx)*WALL_DAMP; }
+    if (this.y-this.radius < 0)   { this.y=this.radius;     this.vy= Math.abs(this.vy)*WALL_DAMP; }
+    if (this.y+this.radius > H)   { this.y=H-this.radius;   this.vy=-Math.abs(this.vy)*WALL_DAMP; }
+    this.vx *= 0.994; this.vy *= 0.994;
+  }
+
+  draw(ctx, t) {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+
+    const isNa  = this.type === 'na';
+    const r     = this.radius * (this.dissolved ? 1 : this.depthScale);
+    const alpha = this.dissolved ? 1 : this.depthAlpha;
+
+    ctx.globalAlpha = alpha;
+
+    if (this.dissolved) {
+      const pulse = 0.5 + 0.5*Math.sin(t*3.5 + (isNa ? 0 : Math.PI));
+      ctx.shadowColor = isNa ? 'rgba(125,60,152,0.9)' : 'rgba(30,132,73,0.9)';
+      ctx.shadowBlur  = 12 + pulse*10;
+    } else {
+      ctx.shadowColor = isNa ? 'rgba(125,60,152,0.4)' : 'rgba(30,132,73,0.4)';
+      ctx.shadowBlur  = 5;
+    }
+
+    const g = ctx.createRadialGradient(-r*0.3, -r*0.3, 1, 0, 0, r);
+    if (isNa) {
+      g.addColorStop(0,    '#ead5f5');
+      g.addColorStop(0.45, '#a569bd');
+      g.addColorStop(1,    '#6c3483');
+    } else {
+      g.addColorStop(0,    '#d5f5e3');
+      g.addColorStop(0.45, '#52be80');
+      g.addColorStop(1,    '#1a5e36');
+    }
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.strokeStyle = isNa ? 'rgba(108,52,131,0.65)' : 'rgba(26,94,54,0.65)';
+    ctx.lineWidth   = 1.2;
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI*2); ctx.stroke();
+
+    ctx.fillStyle    = '#ffffff';
+    ctx.font         = `bold ${Math.round((isNa ? 9 : 10) * this.depthScale)}px sans-serif`;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor  = 'rgba(0,0,0,0.4)';
+    ctx.shadowBlur   = 2;
+    ctx.fillText(isNa ? 'Na⁺' : 'Cl⁻', 0, 0);
+
+    ctx.restore();
+  }
+}
+
+// ── Canvas & State ─────────────────────────────────────────────────────────────
+const canvas       = document.getElementById('canvas');
+const ctx          = canvas.getContext('2d');
+const counterEl    = document.getElementById('counter');
+const resetOverlay = document.getElementById('reset-overlay');
+const overlayTitle = document.getElementById('overlay-title');
+const overlaySub   = document.getElementById('overlay-sub');
+const resetBtn     = document.getElementById('reset-btn');
+const bgToggle     = document.getElementById('bg-toggle');
+const tabWater     = document.getElementById('tab-water');
+const tabSalt      = document.getElementById('tab-salt');
+const tabReaction  = document.getElementById('tab-reaction');
+const canvas3d     = document.getElementById('canvas3d');
+const reactionPanel = document.getElementById('reaction-panel');
+const rTemp        = document.getElementById('r-temp');
+const rConc        = document.getElementById('r-conc');
+const rSurface     = document.getElementById('r-surface');
+const rAcidSeg     = document.getElementById('r-acid-seg');
+const reactionResetBtn = document.getElementById('reaction-reset');
+
+let molecules    = [];
+let draggedMol   = null;
+let mouseHistory = [];
+let anim         = null;
+const collidedPairs  = new Set();
+
+// Water-mode state
+let remaining = 10;
+
+// Salt-mode state
+let ions           = [];
+let dissolvedCount = 0;
+let totalIons      = 0;
+const dissolvedPairs = new Set();
+
+function resize() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function randomVel(mag) {
+  const a = Math.random() * Math.PI * 2;
+  return { vx: Math.cos(a)*mag, vy: Math.sin(a)*mag };
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+function initMolecules() {
+  if (currentMode === 'reaction') return;
+  const W = canvas.width, H = canvas.height;
+  molecules = []; ions = [];
+  collidedPairs.clear(); dissolvedPairs.clear();
+  draggedMol = null; anim = null;
+  resetOverlay.style.display = 'none';
+
+  if (currentMode === 'water') {
+    remaining = 10;
+    const avs = [-0.007, 0.008, -0.006, 0.009, -0.005, 0.007, -0.008, 0.006, -0.0065, 0.0075];
+    const pct = [
+      [0.20,0.30],[0.55,0.22],[0.78,0.45],[0.28,0.68],[0.68,0.72],
+      [0.42,0.42],[0.72,0.38],[0.18,0.52],[0.88,0.62],[0.48,0.58]
+    ];
+    for (let i = 0; i < 10; i++) {
+      const m = new WaterMolecule(W*pct[i][0], H*pct[i][1], avs[i % avs.length]);
+      const v = randomVel(0.8 + Math.random()*0.5);
+      m.vx = v.vx; m.vy = v.vy;
+      molecules.push(m);
+    }
+
+  } else {
+    // ── Salt mode: 3D isometric NaCl crystal at bottom ──────────────────────
+    dissolvedCount = 0;
+
+    // Crystal front-bottom-left corner anchor
+    const crystalTotalW = (GRID_COLS-1)*ION_SPACING + (GRID_DEPTHS-1)*DEPTH_X;
+    const crystalTotalH = (GRID_ROWS-1)*ION_SPACING + (GRID_DEPTHS-1)*DEPTH_Y;
+    const startX = W*0.5 - crystalTotalW*0.5;
+    const startY = H - 52; // front-bottom row sits here
+
+    // Build ions: draw-order sort is done at render time (back→front = ascending Y)
+    for (let depth = 0; depth < GRID_DEPTHS; depth++) {
+      for (let row = 0; row < GRID_ROWS; row++) {
+        for (let col = 0; col < GRID_COLS; col++) {
+          // Checkerboard in 3D: (row+col+depth) even → Cl⁻ (large, green)
+          const type = (row + col + depth) % 2 === 0 ? 'cl' : 'na';
+          const ix   = startX + col*ION_SPACING + depth*DEPTH_X;
+          const iy   = startY - row*ION_SPACING - depth*DEPTH_Y;
+          const ion  = new IonMolecule(ix, iy, type, row, col, depth);
+          ions.push(ion);
+          molecules.push(ion);
+        }
+      }
+    }
+    totalIons = ions.length; // 4×4×3 = 48
+
+    // Water molecules spread around top and sides (away from bottom-center crystal)
+    const waterPos = [
+      [0.14, 0.14], [0.50, 0.11], [0.86, 0.14],
+      [0.08, 0.48], [0.92, 0.48],
+      [0.15, 0.78], [0.85, 0.78],
+      [0.50, 0.65],
+      [0.32, 0.22], [0.68, 0.20], [0.24, 0.38], [0.76, 0.36],
+      [0.12, 0.28], [0.88, 0.28], [0.40, 0.52], [0.60, 0.48], [0.50, 0.38]
+    ];
+    const avs = [-0.007, 0.008, -0.006, 0.009, -0.005, 0.007, -0.008, 0.006, -0.0065, 0.0075, -0.0072, 0.0068, -0.0055, 0.0082, -0.0068];
+    for (let i = 0; i < waterPos.length; i++) {
+      const m = new WaterMolecule(W*waterPos[i][0], H*waterPos[i][1], avs[i % avs.length]);
+      const v = randomVel(0.7 + Math.random()*0.45);
+      m.vx = v.vx; m.vy = v.vy;
+      molecules.push(m);
+    }
+  }
+  updateCounter();
+}
+
+function updateCounter() {
+  if (currentMode === 'water') {
+    counterEl.textContent = `Molecules remaining: ${remaining}`;
+  } else if (currentMode === 'salt') {
+    counterEl.textContent = `Ions dissolved: ${dissolvedCount} / ${totalIons}`;
+  } else if (currentMode === 'reaction' && reactionSim) {
+    counterEl.textContent = reactionSim.getCounterText();
+  }
+}
+
+// ── Background Toggle ──────────────────────────────────────────────────────────
+bgToggle.addEventListener('click', () => {
+  isDark = !isDark;
+  if (isDark) { bgColor='#1a1a2e'; document.body.classList.add('dark'); bgToggle.textContent='Light Mode'; }
+  else        { bgColor='#ffffff'; document.body.classList.remove('dark'); bgToggle.textContent='Dark Mode'; }
+  if (reactionSim) reactionSim.syncTheme(isDark);
+});
+
+// ── Tab Switching ──────────────────────────────────────────────────────────────
+function leaveReactionTab() {
+  run3dLoop = false;
+  disposeReactionScene();
+  canvas.style.display = 'block';
+  run2dLoop = true;
+}
+
+tabWater.addEventListener('click', () => {
+  if (currentMode === 'water') return;
+  if (currentMode === 'reaction') leaveReactionTab();
+  currentMode = 'water';
+  tabWater.classList.add('active');
+  tabSalt.classList.remove('active');
+  tabReaction.classList.remove('active');
+  initMolecules();
+  requestAnimationFrame(loop);
+});
+tabSalt.addEventListener('click', () => {
+  if (currentMode === 'salt') return;
+  if (currentMode === 'reaction') leaveReactionTab();
+  currentMode = 'salt';
+  tabSalt.classList.add('active');
+  tabWater.classList.remove('active');
+  tabReaction.classList.remove('active');
+  initMolecules();
+  requestAnimationFrame(loop);
+});
+tabReaction.addEventListener('click', () => {
+  if (currentMode === 'reaction') return;
+  run2dLoop = false;
+  currentMode = 'reaction';
+  tabReaction.classList.add('active');
+  tabWater.classList.remove('active');
+  tabSalt.classList.remove('active');
+  canvas.style.display = 'none';
+  initReactionScene();
+});
+
+rAcidSeg.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-acid]');
+  if (!btn) return;
+  for (const b of rAcidSeg.querySelectorAll('button')) b.classList.remove('on');
+  btn.classList.add('on');
+  if (reactionSim) reactionSim.rebuildAcidsFromUI();
+});
+rTemp.addEventListener('input', () => { if (reactionSim) reactionSim.onTempInput(); });
+rConc.addEventListener('input', () => { if (reactionSim) reactionSim.onConcInput(); });
+rSurface.addEventListener('input', () => { if (reactionSim) reactionSim.onSurfaceInput(); });
+reactionResetBtn.addEventListener('click', () => { if (reactionSim) reactionSim.resetScene(); });
+
+// ── Input ──────────────────────────────────────────────────────────────────────
+function getPos(e) {
+  const r = canvas.getBoundingClientRect();
+  const s = e.touches ? e.touches[0] : e;
+  return { x: s.clientX - r.left, y: s.clientY - r.top };
+}
+function getMoleculeAt(pos) {
+  for (const m of molecules) {
+    if (Math.hypot(pos.x-m.x, pos.y-m.y) < m.radius+14) return m;
+  }
+  return null;
+}
+function startDrag(mol, p) {
+  draggedMol = mol;
+  mouseHistory = [{ x: p.x, y: p.y, t: performance.now() }];
+  mol.vx = 0; mol.vy = 0;
+  if (mol.av !== undefined) mol.av = 0;
+  mol.x = p.x; mol.y = p.y;
+}
+function endDrag() {
+  if (!draggedMol) return;
+  if (mouseHistory.length >= 2) {
+    const recent = mouseHistory.slice(-4);
+    const first = recent[0], last = recent[recent.length-1];
+    const dt = last.t - first.t;
+    if (dt > 4) {
+      draggedMol.vx = (last.x-first.x)/dt * 16.67 * FLICK_SCALE;
+      draggedMol.vy = (last.y-first.y)/dt * 16.67 * FLICK_SCALE;
+      if (draggedMol instanceof WaterMolecule) draggedMol.av = (last.x-first.x)/dt*0.0008;
+    }
+  }
+  draggedMol = null; mouseHistory = [];
+}
+
+canvas.addEventListener('mousedown', e => {
+  if (currentMode === 'reaction') return;
+  if (anim && anim.type === 'success') return;
+  const p = getPos(e); const mol = getMoleculeAt(p);
+  if (mol) startDrag(mol, p);
+});
+canvas.addEventListener('mousemove', e => {
+  if (currentMode === 'reaction') return;
+  if (!draggedMol) return;
+  const p = getPos(e);
+  draggedMol.x = p.x; draggedMol.y = p.y;
+  mouseHistory.push({ x: p.x, y: p.y, t: performance.now() });
+  if (mouseHistory.length > 8) mouseHistory.shift();
+});
+canvas.addEventListener('mouseup', endDrag);
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (currentMode === 'reaction') return;
+  if (anim && anim.type === 'success') return;
+  const p = getPos(e); const mol = getMoleculeAt(p);
+  if (mol) startDrag(mol, p);
+}, { passive: false });
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (currentMode === 'reaction') return;
+  if (!draggedMol) return;
+  const p = getPos(e);
+  draggedMol.x = p.x; draggedMol.y = p.y;
+  mouseHistory.push({ x: p.x, y: p.y, t: performance.now() });
+  if (mouseHistory.length > 8) mouseHistory.shift();
+}, { passive: false });
+canvas.addEventListener('touchend', endDrag);
+
+// ── Shared Bounce ──────────────────────────────────────────────────────────────
+function doBounce(a, b) {
+  const dx = b.x-a.x, dy = b.y-a.y;
+  const dist = Math.hypot(dx, dy) || 1;
+  const nx = dx/dist, ny = dy/dist;
+  const v1n = a.vx*nx + a.vy*ny;
+  const v2n = b.vx*nx + b.vy*ny;
+  a.vx += (-v1n + v2n*BOUNCE_DAMP)*nx; a.vy += (-v1n + v2n*BOUNCE_DAMP)*ny;
+  b.vx += (-v2n + v1n*BOUNCE_DAMP)*nx; b.vy += (-v2n + v1n*BOUNCE_DAMP)*ny;
+  a.av += (Math.random()-0.5)*0.05;
+  b.av += (Math.random()-0.5)*0.025;
+  anim = { type:'bounce', t0:performance.now(), cx:(a.x+b.x)/2, cy:(a.y+b.y)/2 };
+}
+
+// ── Water Mode: Proton Transfer ────────────────────────────────────────────────
+function tryDonation(donor, acceptor) {
+  if (acceptor.lpAngles.length === 0) return null;
+  let reactiveH = null;
+  if (donor.charge === 0) {
+    if (donor.hAngles.includes(H1_LOCAL)) reactiveH = H1_LOCAL; else return null;
+  } else if (donor.charge === +1) {
+    let minD = Infinity;
+    for (const ha of donor.hAngles) {
+      const wa = donor.angle + ha;
+      const hPos = { x: donor.x+Math.cos(wa)*H_DIST, y: donor.y+Math.sin(wa)*H_DIST };
+      for (const la of acceptor.lpAngles) {
+        const wa2 = acceptor.angle + la;
+        const lp  = { x: acceptor.x+Math.cos(wa2)*LP_LOBE_DIST, y: acceptor.y+Math.sin(wa2)*LP_LOBE_DIST };
+        const d   = Math.hypot(hPos.x-lp.x, hPos.y-lp.y);
+        if (d < minD) { minD = d; reactiveH = ha; }
+      }
+    }
+    if (reactiveH === null) return null;
+  } else { return null; }
+
+  const hAngle = donor.angle + reactiveH;
+  const hWorld = { x: donor.x+Math.cos(hAngle)*H_DIST, y: donor.y+Math.sin(hAngle)*H_DIST };
+  const lpPositions = acceptor.lpAngles.map(a => {
+    const wa = acceptor.angle + a;
+    return { x: acceptor.x+Math.cos(wa)*LP_LOBE_DIST, y: acceptor.y+Math.sin(wa)*LP_LOBE_DIST };
+  });
+  const dists  = lpPositions.map(lp => Math.hypot(hWorld.x-lp.x, hWorld.y-lp.y));
+  const minIdx = dists.reduce((bi, d, i) => d < dists[bi] ? i : bi, 0);
+  if (dists[minIdx] >= H_R + LP_LOBE_R*1.4 + 5) return null;
+  return { donor, acceptor, reactiveH, lpIdx: minIdx,
+           hEnd: lpPositions[minIdx], receivedAngle: acceptor.lpAngles[minIdx] };
+}
+
+function checkAllCollisions() {
+  for (let i = 0; i < molecules.length; i++) {
+    for (let j = i+1; j < molecules.length; j++) {
+      const key = `${i},${j}`;
+      if (collidedPairs.has(key)) continue;
+      const a = molecules[i], b = molecules[j];
+      if (Math.hypot(a.x-b.x, a.y-b.y) >= a.radius+b.radius) continue;
+      collidedPairs.add(key);
+      setTimeout(() => collidedPairs.delete(key), 700);
+      const speed = Math.max(Math.hypot(a.vx,a.vy), Math.hypot(b.vx,b.vy));
+      let result = null;
+      if (a.charge===0 && b.charge===0)       result = tryDonation(a,b) || tryDonation(b,a);
+      else if (a.charge===+1 && b.charge===-1) result = tryDonation(a,b);
+      else if (a.charge===-1 && b.charge===+1) result = tryDonation(b,a);
+      if (speed > SPEED_THRESHOLD && result) doTransfer(result);
+      doBounce(a, b);
+    }
+  }
+}
+
+function doTransfer(result) {
+  const { donor, acceptor, reactiveH, lpIdx, receivedAngle, isReverse } = result;
+  if (isReverse) {
+    donor.resetToWater(); acceptor.resetToWater();
+  } else {
+    remaining--;
+    updateCounter();
+    donor.hAngles  = donor.hAngles.filter(a => a !== reactiveH);
+    donor.lpAngles = [...donor.lpAngles, reactiveH];
+    donor.charge   = -1;
+    acceptor.lpAngles = acceptor.lpAngles.filter((_,i) => i !== lpIdx);
+    acceptor.hAngles  = [...acceptor.hAngles, receivedAngle];
+    acceptor.charge   = +1;
+  }
+  if (remaining <= 0) {
+    overlayTitle.textContent = 'All reactions complete!';
+    overlaySub.textContent   = 'H₂O + H₂O → H₃O⁺ + OH⁻';
+    setTimeout(() => { resetOverlay.style.display = 'flex'; }, 600);
+  }
+}
+
+function shortestAngleDelta(a, b) {
+  let d = b - a;
+  while (d > Math.PI) d -= 2 * Math.PI;
+  while (d < -Math.PI) d += 2 * Math.PI;
+  return d;
+}
+
+// Nearest of four 90° slot directions around `phase` (tetrahedral first shell, 2D)
+function hydrationSlotAngle(phi, phase) {
+  let rel = phi - phase;
+  while (rel > Math.PI) rel -= 2 * Math.PI;
+  while (rel < -Math.PI) rel += 2 * Math.PI;
+  const k = Math.round(rel / (Math.PI / 2));
+  const kk = ((k % 4) + 4) % 4;
+  return phase + kk * (Math.PI / 2);
+}
+
+// Push apart bulk waters that crowd the same wedge around one dissolved ion
+function applyHydrationShellRepulsion(maxR) {
+  const maxR2 = maxR * maxR;
+  const free = [];
+  for (const m of molecules) {
+    if (m instanceof WaterMolecule && !m.solvatingIon && m !== draggedMol) free.push(m);
+  }
+  for (const ion of ions) {
+    if (!ion.dissolved || !ion.solvatingWater) continue;
+    const near = [];
+    for (const w of free) {
+      const d2 = (w.x - ion.x) ** 2 + (w.y - ion.y) ** 2;
+      if (d2 < maxR2 && d2 > 70) near.push(w);
+    }
+    for (let i = 0; i < near.length; i++) {
+      for (let j = i + 1; j < near.length; j++) {
+        const wi = near[i], wj = near[j];
+        const ai = Math.atan2(wi.y - ion.y, wi.x - ion.x);
+        const aj = Math.atan2(wj.y - ion.y, wj.x - ion.x);
+        if (Math.abs(shortestAngleDelta(ai, aj)) > 0.52) continue;
+        const ddx = wj.x - wi.x, ddy = wj.y - wi.y;
+        const pd = Math.hypot(ddx, ddy);
+        if (pd >= 92 || pd < 0.5) continue;
+        const nx = ddx / pd, ny = ddy / pd;
+        const push = 0.024 * (1 - pd / 92);
+        wi.vx -= nx * push;
+        wi.vy -= ny * push;
+        wj.vx += nx * push;
+        wj.vy += ny * push;
+      }
+    }
+  }
+}
+
+// Lone-pair axis toward Na⁺; H-bisector toward Cl⁻; drift to one of four shell slots, not the ion center
+function applySaltIonFieldToWaters() {
+  const maxR = 260;
+  const maxR2 = maxR * maxR;
+  const shellR = 82;
+
+  for (const m of molecules) {
+    if (!(m instanceof WaterMolecule)) continue;
+    if (m.solvatingIon || m === draggedMol) continue;
+
+    let bx = 0, by = 0, wSum = 0;
+    let px = 0, py = 0;
+
+    for (const ion of ions) {
+      if (!ion.dissolved || !ion.solvatingWater) continue;
+      if (ion.solvatingWater === m) continue;
+
+      const dx = ion.x - m.x;
+      const dy = ion.y - m.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 > maxR2 || d2 < 4) continue;
+
+      const dist = Math.sqrt(d2);
+      const falloff = 1 - dist / maxR;
+      const w = (falloff * falloff) / (d2 + 400);
+
+      const toIon = Math.atan2(dy, dx);
+      const targetAngle = ion.type === 'na'
+        ? toIon - LP_LOCAL
+        : toIon - H1_LOCAL - BOND_HALF;
+
+      bx += Math.cos(targetAngle) * w;
+      by += Math.sin(targetAngle) * w;
+      wSum += w;
+
+      const phiOut = Math.atan2(m.y - ion.y, m.x - ion.x);
+      const phase = ion.hydrationPhase || 0;
+      const slotA = hydrationSlotAngle(phiOut, phase);
+      const tx = ion.x + Math.cos(slotA) * shellR;
+      const ty = ion.y + Math.sin(slotA) * shellR;
+      const sx = tx - m.x, sy = ty - m.y;
+      const ds = Math.hypot(sx, sy) || 1;
+      px += (sx / ds) * w;
+      py += (sy / ds) * w;
+    }
+
+    if (wSum < 1e-10) continue;
+
+    const blendedTarget = Math.atan2(by, bx);
+    const dAng = shortestAngleDelta(m.angle, blendedTarget);
+    const step = Math.max(-0.055, Math.min(0.055, dAng * 0.12));
+    m.angle += step;
+    m.av *= 0.88;
+
+    const pLen = Math.hypot(px, py);
+    if (pLen > 1e-8) {
+      m.vx += (px / pLen) * 0.014;
+      m.vy += (py / pLen) * 0.014;
+    }
+  }
+
+  applyHydrationShellRepulsion(maxR);
+}
+
+// ── Salt Mode: Dissolution ─────────────────────────────────────────────────────
+function checkDissolution() {
+  const waterMols = molecules.filter(m => m instanceof WaterMolecule);
+  for (let wi = 0; wi < waterMols.length; wi++) {
+    const water = waterMols[wi];
+    if (water.solvatingIon) continue; // one ion per water molecule
+
+    for (let ii = 0; ii < ions.length; ii++) {
+      const ion = ions[ii];
+      if (ion.solvatingWater) continue;
+
+      const key = `${wi},${ii}`;
+      if (dissolvedPairs.has(key)) continue;
+
+      let triggered = false;
+
+      if (ion.type === 'na') {
+        // Oxygen lone-pair lobes attract Na⁺
+        for (const lpa of water.lpAngles) {
+          const wa  = water.angle + lpa;
+          const lpX = water.x + Math.cos(wa)*LP_LOBE_DIST;
+          const lpY = water.y + Math.sin(wa)*LP_LOBE_DIST;
+          if (Math.hypot(lpX-ion.x, lpY-ion.y) < LP_LOBE_R + ion.radius + 6) {
+            triggered = true; break;
+          }
+        }
+      } else {
+        // H atoms attract Cl⁻
+        for (const ha of water.hAngles) {
+          const wa  = water.angle + ha;
+          const hX  = water.x + Math.cos(wa)*H_DIST;
+          const hY  = water.y + Math.sin(wa)*H_DIST;
+          if (Math.hypot(hX-ion.x, hY-ion.y) < H_R + ion.radius + 6) {
+            triggered = true; break;
+          }
+        }
+      }
+
+      if (triggered) {
+        dissolvedPairs.add(key);
+        setTimeout(() => dissolvedPairs.delete(key), 700);
+        dissolveIon(water, ion);
+      }
+    }
+  }
+}
+
+function dissolveIon(water, ion) {
+  ion.dissolved      = true;
+  ion.inCrystal      = false;
+  ion.solvatingWater = water;
+  water.solvatingIon = ion;
+
+  // Snap ion to the water's molecular axis, centred between the H atoms or lone pairs,
+  // and set it a bit further out than the atoms themselves.
+  if (ion.type === 'na') {
+    // Na⁺ sits along the lone-pair axis (LP_LOCAL), between the two lone-pair clouds
+    ion.offsetAngle = LP_LOCAL;
+    ion.offsetDist  = LP_LOBE_DIST + LP_LOBE_R*0.5 + NA_R + 6; // ≈ 58px
+  } else {
+    // Cl⁻ sits along the H axis (-π/2), between the two H atoms
+    ion.offsetAngle = -Math.PI / 2;
+    ion.offsetDist  = H_DIST + H_R + CL_R + 8; // ≈ 64px
+  }
+
+  // Four hydration “slots” (90°) use this offset so different crystal sites differ in phase
+  ion.hydrationPhase = (ion.gridRow * 2.17 + ion.gridCol * 1.41 + ion.gridDepth * 0.83) % (Math.PI * 2);
+
+  dissolvedCount++;
+  updateCounter();
+  if (dissolvedCount >= totalIons) {
+    overlayTitle.textContent = 'All ions dissolved!';
+    overlaySub.textContent   = 'NaCl → Na⁺(aq) + Cl⁻(aq)';
+    setTimeout(() => { resetOverlay.style.display = 'flex'; }, 800);
+  }
+}
+
+// ── Crystal Bond Drawing (3D) ──────────────────────────────────────────────────
+function drawCrystalBonds() {
+  ctx.save();
+  ctx.lineWidth = 1.5;
+
+  // Collect in-crystal ions for quick lookup
+  const crystalIons = ions.filter(o => o.inCrystal);
+
+  function findNeighbor(ion, dr, dc, dd) {
+    return crystalIons.find(o =>
+      o.gridRow === ion.gridRow + dr &&
+      o.gridCol === ion.gridCol + dc &&
+      o.gridDepth === ion.gridDepth + dd
+    );
+  }
+
+  // Draw bonds back-to-front so front bonds visually overlap back bonds
+  const sortedCrystal = [...crystalIons].sort((a, b) => a.y - b.y);
+  for (const ion of sortedCrystal) {
+    // Only draw bonds to neighbors with higher col, row, or depth (avoids duplicates)
+    const neighbors = [
+      findNeighbor(ion, 0, 1, 0),  // right (same row, next col)
+      findNeighbor(ion, 1, 0, 0),  // up (next row)
+      findNeighbor(ion, 0, 0, 1),  // depth (toward back)
+    ];
+    for (const nb of neighbors) {
+      if (!nb) continue;
+      // Fade bonds that are deeper
+      const avgDepth = (ion.gridDepth + nb.gridDepth) / 2;
+      const alpha = isDark
+        ? lerp(0.30, 0.12, avgDepth / (GRID_DEPTHS-1))
+        : lerp(0.30, 0.12, avgDepth / (GRID_DEPTHS-1));
+      ctx.strokeStyle = isDark
+        ? `rgba(210,210,230,${alpha})`
+        : `rgba(80,80,120,${alpha})`;
+      ctx.beginPath();
+      ctx.moveTo(ion.x, ion.y);
+      ctx.lineTo(nb.x, nb.y);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
+// ── Animations ─────────────────────────────────────────────────────────────────
+function drawBounce(now) {
+  const a = anim;
+  const p = Math.min((now - a.t0) / 380, 1);
+  const r = 14 + p*32;
+  ctx.save();
+  ctx.strokeStyle = `rgba(220,55,55,${(1-p)*0.75})`;
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(a.cx, a.cy, r, 0, Math.PI*2); ctx.stroke();
+  ctx.restore();
+  if (p >= 1) anim = null;
+}
+
+function drawFlickUI() {
+  if (!draggedMol || mouseHistory.length < 2) return;
+  const recent = mouseHistory.slice(-3);
+  const first = recent[0], last = recent[recent.length-1];
+  const dx = last.x-first.x, dy = last.y-first.y;
+  const spd = Math.hypot(dx, dy);
+  if (spd < 3) return;
+  const pwr = Math.min(spd/35, 1);
+  const r = Math.round(lerp(70, 255, pwr));
+  const g = Math.round(lerp(130, lerp(190,45,pwr), pwr));
+  const b = Math.round(lerp(230, 55, pwr));
+  const ang = Math.atan2(dy, dx);
+  const al  = 16;
+  const ax  = draggedMol.x + Math.cos(ang)*44;
+  const ay  = draggedMol.y + Math.sin(ang)*44;
+  ctx.save();
+  ctx.strokeStyle = `rgba(${r},${g},${b},0.7)`; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(draggedMol.x, draggedMol.y); ctx.lineTo(ax, ay); ctx.stroke();
+  ctx.fillStyle = `rgb(${r},${g},${b})`;
+  ctx.beginPath();
+  ctx.moveTo(ax, ay);
+  ctx.lineTo(ax - al*Math.cos(ang-0.38), ay - al*Math.sin(ang-0.38));
+  ctx.lineTo(ax - al*Math.cos(ang+0.38), ay - al*Math.sin(ang+0.38));
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+function computeSquish(mol) {
+  let dx, dy;
+  if (mol === draggedMol && mouseHistory.length >= 2) {
+    const r = mouseHistory.slice(-3); dx = r[r.length-1].x-r[0].x; dy = r[r.length-1].y-r[0].y;
+  } else { dx = mol.vx*5; dy = mol.vy*5; }
+  const spd = Math.hypot(dx, dy);
+  return { angle: spd > 0.3 ? Math.atan2(dy, dx) : 0, amount: Math.min(spd/18, 1) };
+}
+
+function proximityAlpha(mol) {
+  let minDist = Infinity;
+  for (const m of molecules) {
+    if (m === mol) continue;
+    const d = Math.hypot(mol.x-m.x, mol.y-m.y);
+    if (d < minDist) minDist = d;
+  }
+  return Math.max(0, 1 - minDist/115);
+}
+
+// ── Main Loop ──────────────────────────────────────────────────────────────────
+function loop(now) {
+  if (!run2dLoop) return;
+  const W = canvas.width, H = canvas.height;
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, W, H);
+
+  const t = now / 1000;
+
+  for (const m of molecules) {
+    if (m !== draggedMol) m.update(W, H);
+  }
+
+  if (currentMode === 'salt') applySaltIonFieldToWaters();
+
+  if (!draggedMol) {
+    if (currentMode === 'water') checkAllCollisions();
+    else                         checkDissolution();
+  }
+
+  if (currentMode === 'salt') {
+    // Bonds behind ions
+    drawCrystalBonds();
+
+    // Water molecules
+    for (const m of molecules) {
+      if (!(m instanceof WaterMolecule)) continue;
+      const prox = proximityAlpha(m);
+      const s    = computeSquish(m);
+      m.draw(ctx, t, prox, s.amount > 0.03 ? s : null);
+    }
+
+    // Ions sorted back→front (ascending y = higher on screen = further back drawn first)
+    const sortedIons = [...ions].sort((a, b) => a.y - b.y);
+    for (const ion of sortedIons) ion.draw(ctx, t);
+
+  } else {
+    for (const m of molecules) {
+      const prox = proximityAlpha(m);
+      const s    = computeSquish(m);
+      m.draw(ctx, t, prox, s.amount > 0.03 ? s : null);
+    }
+  }
+
+  drawFlickUI();
+  if (anim && anim.type === 'bounce') drawBounce(now);
+
+  requestAnimationFrame(loop);
+}
+
+// ══ Reaction tab (Three.js) ═══════════════════════════════════════════════════
+class Reaction3DSim {
+  constructor(canvasEl, dark) {
+    this.canvas = canvasEl;
+    this.dark   = dark;
+    this.scene  = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(52, 1, 0.1, 200);
+    this.camera.position.set(7.2, 4.2, 11.5);
+    this.renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: false });
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+    this.controls = new OrbitControls(this.camera, canvasEl);
+    this.controls.enableDamping = true;
+    this.controls.dampingFactor = 0.06;
+    this.controls.minDistance = 4;
+    this.controls.maxDistance = 28;
+    this.controls.minPolarAngle = 0.02;
+    this.controls.maxPolarAngle = Math.PI - 0.02;
+    this.controls.target.set(0, -3.2, 0);
+
+    this.room = { hx: 12, hy: 8.5, hz: 11 };
+    this.crystalRoot = new THREE.Group();
+    this.scene.add(this.crystalRoot);
+
+    this.acidRoot = new THREE.Group();
+    this.scene.add(this.acidRoot);
+
+    this.bubbles = [];
+    this.acids   = [];
+    this.ionBases = [];
+
+    this.lastSurfaceVal = -1;
+    this.lastConcVal   = -1;
+
+    this.rateEma = 0;
+    this.recentHits = [];
+    this.totalCO2  = 0;
+    this.clock = new THREE.Clock();
+
+    this._makeLights();
+    this._makeRoomShell();
+    this.syncTheme(dark);
+    this.onResize();
+  }
+
+  _makeLights() {
+    this.hemi = new THREE.HemisphereLight(0xc8e8ff, 0x404060, 0.85);
+    this.scene.add(this.hemi);
+    this.dir = new THREE.DirectionalLight(0xffffff, 0.55);
+    this.dir.position.set(6, 14, 10);
+    this.scene.add(this.dir);
+  }
+
+  _makeRoomShell() {
+    const { hx, hy, hz } = this.room;
+    const g = new THREE.BoxGeometry(2 * hx, 2 * hy, 2 * hz);
+    const edges = new THREE.EdgesGeometry(g);
+    this.roomLines = new THREE.LineSegments(
+      edges,
+      new THREE.LineBasicMaterial({ color: 0x6699cc, transparent: true, opacity: 0.22 })
+    );
+    this.scene.add(this.roomLines);
+  }
+
+  syncTheme(dark) {
+    this.dark = dark;
+    const bg = dark ? 0x121420 : 0xe8eef5;
+    const fogC = dark ? 0x0a0c14 : 0xd0dae8;
+    this.scene.background = new THREE.Color(bg);
+    this.scene.fog = new THREE.FogExp2(fogC, dark ? 0.028 : 0.022);
+    if (this.roomLines && this.roomLines.material) {
+      this.roomLines.material.color.setHex(dark ? 0x8899bb : 0x557799);
+      this.roomLines.material.opacity = dark ? 0.28 : 0.2;
+    }
+  }
+
+  onResize() {
+    const w = this.canvas.clientWidth || window.innerWidth;
+    const h = this.canvas.clientHeight || window.innerHeight;
+    this.camera.aspect = w / h || 1;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(w, h, false);
+  }
+
+  getAcidType() {
+    const on = rAcidSeg.querySelector('button.on');
+    return on && on.dataset.acid === 'hf' ? 'hf' : 'hcl';
+  }
+
+  getCounterText() {
+    const r = this.rateEma.toFixed(1);
+    return `CO₂ events / s (smoothed): ${r} · total bubbles: ${this.totalCO2}`;
+  }
+
+  onTempInput() {}
+  onConcInput() {
+    const v = +rConc.value;
+    if (v === this.lastConcVal) return;
+    this.lastConcVal = v;
+    this.rebuildAcidsFromUI();
+  }
+
+  onSurfaceInput() {
+    this.rebuildCrystal();
+  }
+
+  resetScene() {
+    this.totalCO2 = 0;
+    this.rateEma = 0;
+    this.recentHits.length = 0;
+    this.rebuildCrystal();
+    this.rebuildAcidsFromUI();
+  }
+
+  _disposeAcidLayer() {
+    for (const a of this.acids) {
+      if (a.group) {
+        this.acidRoot.remove(a.group);
+        a.group.traverse(o => {
+          if (o.geometry) o.geometry.dispose();
+          if (o.material) {
+            if (Array.isArray(o.material)) o.material.forEach(m => m.dispose());
+            else o.material.dispose();
+          }
+        });
+      } else if (a.mesh) {
+        this.acidRoot.remove(a.mesh);
+        if (a.mesh.geometry) a.mesh.geometry.dispose();
+        if (a.mesh.material) a.mesh.material.dispose();
+      }
+    }
+    this.acids = [];
+  }
+
+  _randFluidSpawn(hx, hy, hz, yFluidLo, yFluidHi) {
+    return new THREE.Vector3(
+      (Math.random() - 0.5) * (hx - 2.2) * 1.55,
+      yFluidLo + Math.random() * (yFluidHi - yFluidLo),
+      (Math.random() - 0.5) * (hz - 2.2) * 1.55
+    );
+  }
+
+  _randomThermalVel(mag) {
+    const v = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.38, Math.random() - 0.5);
+    if (v.lengthSq() < 1e-8) v.set(1, 0.3, 0);
+    return v.normalize().multiplyScalar(mag);
+  }
+
+  rebuildAcidsFromUI() {
+    this._disposeAcidLayer();
+    const n = +rConc.value;
+    const acidType = this.getAcidType();
+    const { hx, hy, hz } = this.room;
+    const yFluidLo = -hy + 0.85;
+    const yFluidHi = Math.min(hy - 1.0, 2.0);
+
+    if (acidType === 'hcl') {
+      for (let i = 0; i < n; i++) {
+        const mH = new THREE.Mesh(
+          new THREE.SphereGeometry(0.19, 18, 18),
+          new THREE.MeshStandardMaterial({
+            color: 0xf8f8ff,
+            emissive: 0x2233aa,
+            emissiveIntensity: 0.4,
+            roughness: 0.24,
+            metalness: 0.16
+          })
+        );
+        mH.position.copy(this._randFluidSpawn(hx, hy, hz, yFluidLo, yFluidHi));
+        this.acidRoot.add(mH);
+        this.acids.push({
+          kind: 'hplus',
+          mesh: mH,
+          vel: this._randomThermalVel(0.065 + Math.random() * 0.045),
+          lastReact: 0
+        });
+      }
+      for (let i = 0; i < n; i++) {
+        const mCl = new THREE.Mesh(
+          new THREE.SphereGeometry(0.36, 18, 18),
+          new THREE.MeshStandardMaterial({ color: 0x3d8c5c, roughness: 0.42, metalness: 0.04 })
+        );
+        mCl.position.copy(this._randFluidSpawn(hx, hy, hz, yFluidLo, yFluidHi));
+        this.acidRoot.add(mCl);
+        this.acids.push({
+          kind: 'chloride',
+          mesh: mCl,
+          vel: this._randomThermalVel(0.058 + Math.random() * 0.04)
+        });
+      }
+    } else {
+      for (let i = 0; i < n; i++) {
+        const g = new THREE.Group();
+        const mH = new THREE.Mesh(
+          new THREE.SphereGeometry(0.18, 14, 14),
+          new THREE.MeshStandardMaterial({ color: 0xeeeeff, roughness: 0.3, metalness: 0.04 })
+        );
+        mH.position.set(-0.24, 0, 0);
+        const mF = new THREE.Mesh(
+          new THREE.SphereGeometry(0.36, 16, 16),
+          new THREE.MeshStandardMaterial({ color: 0xa8e8d0, roughness: 0.4, metalness: 0.02 })
+        );
+        mF.position.set(0.28, 0, 0);
+        g.add(mH, mF);
+        g.position.copy(this._randFluidSpawn(hx, hy, hz, yFluidLo, yFluidHi));
+        this.acidRoot.add(g);
+        this.acids.push({
+          kind: 'hf',
+          group: g,
+          mH,
+          mF,
+          vel: this._randomThermalVel(0.06 + Math.random() * 0.04),
+          hfAngle: Math.random() * Math.PI * 2,
+          angVel: (Math.random() - 0.5) * 0.55,
+          lastReact: 0
+        });
+      }
+    }
+    this.lastConcVal = n;
+  }
+
+  rebuildCrystal() {
+    this.ionBases = [];
+    while (this.crystalRoot.children.length) {
+      const o = this.crystalRoot.children[0];
+      this.crystalRoot.remove(o);
+      o.traverse(ch => {
+        if (ch.geometry) ch.geometry.dispose();
+        if (ch.material) {
+          if (Array.isArray(ch.material)) ch.material.forEach(m => m.dispose());
+          else ch.material.dispose();
+        }
+      });
+    }
+
+    const sv = +rSurface.value;
+    const floorY = -this.room.hy + 0.35;
+    const sp = 0.92;
+
+    if (sv <= 33) {
+      this._addLatticeBlock(0, 0, 7, 6, 5, sp, floorY);
+    } else if (sv <= 66) {
+      this._addLatticeBlock(-5.2, -3.6, 4, 5, 4, sp, floorY);
+      this._addLatticeBlock(5.2, 2.8, 4, 5, 4, sp, floorY);
+      this._addLatticeBlock(0, 5.2, 4, 5, 4, sp, floorY);
+    } else {
+      const nPairs = 44;
+      for (let p = 0; p < nPairs; p++) {
+        const ox = (Math.random() - 0.5) * (this.room.hx - 2.4) * 1.92;
+        const oz = (Math.random() - 0.5) * (this.room.hz - 2.4) * 1.92;
+        this._addLatticeBlock(ox, oz, 2, 1, 1, sp * 0.9, floorY);
+      }
+    }
+    this._addCrystalBonds();
+    this.lastSurfaceVal = sv;
+  }
+
+  _addLatticeBlock(ox, oz, cols, rows, deps, spacing, floorY) {
+    const rCa = 0.38;
+    const rCO = 0.48;
+    for (let k = 0; k < deps; k++) {
+      for (let j = 0; j < rows; j++) {
+        for (let i = 0; i < cols; i++) {
+          const isCa = (i + j + k) % 2 === 0;
+          const x = ox + (i - (cols - 1) / 2) * spacing;
+          const z = oz + (k - (deps - 1) / 2) * spacing;
+          const y = floorY + rCO + j * spacing;
+          const rad = isCa ? rCa : rCO;
+          const col = isCa ? 0x5a8fa8 : 0xc4a882;
+          const mesh = new THREE.Mesh(
+            new THREE.SphereGeometry(rad, 18, 18),
+            new THREE.MeshStandardMaterial({ color: col, roughness: 0.42, metalness: 0.08 })
+          );
+          mesh.position.set(x, y, z);
+          this.crystalRoot.add(mesh);
+          this.ionBases.push({ mesh, base: mesh.position.clone(), isCa, spacing });
+        }
+      }
+    }
+  }
+
+  _addCrystalBonds() {
+    const lo = 0.72;
+    const hi = 1.06;
+    for (let i = 0; i < this.ionBases.length; i++) {
+      for (let j = i + 1; j < this.ionBases.length; j++) {
+        const A = this.ionBases[i];
+        const B = this.ionBases[j];
+        const d = A.base.distanceTo(B.base);
+        if (d > lo && d < hi) {
+          const geo = new THREE.BufferGeometry().setFromPoints([A.base.clone(), B.base.clone()]);
+          const line = new THREE.Line(
+            geo,
+            new THREE.LineBasicMaterial({ color: 0x666677, transparent: true, opacity: 0.32 })
+          );
+          line.userData.isCrystalBond = true;
+          this.crystalRoot.add(line);
+        }
+      }
+    }
+  }
+
+  _thermalSpeedScale() {
+    const t = +rTemp.value / 100;
+    return THREE.MathUtils.lerp(0.35, 1.65, t);
+  }
+
+  _jiggleAmp() {
+    return (+rTemp.value / 100) * 0.04;
+  }
+
+  spawnBubble(at) {
+    const r = 0.12 + Math.random() * 0.1;
+    const mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(r, 12, 12),
+      new THREE.MeshStandardMaterial({
+        color: 0xccffff,
+        transparent: true,
+        opacity: 0.55,
+        roughness: 0.2,
+        metalness: 0.1
+      })
+    );
+    mesh.position.copy(at);
+    this.scene.add(mesh);
+    this.bubbles.push({ mesh, vy: 0.04 + Math.random() * 0.05, life: 1, t: 0 });
+    this.totalCO2++;
+  }
+
+  _wallBounce(p, v, hx, hy, hz) {
+    const pad = 0.42;
+    const damp = 0.86;
+    if (p.x > hx - pad) { p.x = hx - pad; v.x *= -damp; }
+    if (p.x < -hx + pad) { p.x = -hx + pad; v.x *= -damp; }
+    if (p.z > hz - pad) { p.z = hz - pad; v.z *= -damp; }
+    if (p.z < -hz + pad) { p.z = -hz + pad; v.z *= -damp; }
+    if (p.y > hy - pad) { p.y = hy - pad; v.y *= -damp; }
+    if (p.y < -hy + pad) { p.y = -hy + pad; v.y *= -damp; }
+  }
+
+  _clearCrystalBonds() {
+    for (let c = this.crystalRoot.children.length - 1; c >= 0; c--) {
+      const ch = this.crystalRoot.children[c];
+      if (ch.userData && ch.userData.isCrystalBond) {
+        this.crystalRoot.remove(ch);
+        if (ch.geometry) ch.geometry.dispose();
+        if (ch.material) ch.material.dispose();
+      }
+    }
+  }
+
+  _refreshCrystalBonds() {
+    this._clearCrystalBonds();
+    this._addCrystalBonds();
+  }
+
+  _spliceAcidAt(ai) {
+    const a = this.acids[ai];
+    if (!a) return;
+    if (a.group) {
+      this.acidRoot.remove(a.group);
+      a.group.traverse(o => {
+        if (o.geometry) o.geometry.dispose();
+        if (o.material) {
+          if (Array.isArray(o.material)) o.material.forEach(m => m.dispose());
+          else o.material.dispose();
+        }
+      });
+    } else if (a.mesh) {
+      this.acidRoot.remove(a.mesh);
+      if (a.mesh.geometry) a.mesh.geometry.dispose();
+      if (a.mesh.material) a.mesh.material.dispose();
+    }
+    this.acids.splice(ai, 1);
+  }
+
+  tryReactProton(holder, hPos, speed, now, fWorld = null) {
+    if (now - holder.lastReact < 55) return false;
+    const rCarb = 0.48;
+    const rH    = 0.19;
+    const reach = rCarb + rH + 0.48;
+
+    const carbPos = new THREE.Vector3();
+    let closestIb = null;
+    let best = null;
+    let bestD = Infinity;
+    for (const ib of this.ionBases) {
+      if (!ib.mesh || ib.isCa) continue;
+      ib.mesh.getWorldPosition(carbPos);
+      const d = hPos.distanceTo(carbPos);
+      if (d < bestD) {
+        bestD = d;
+        closestIb = ib;
+        best = carbPos.clone();
+      }
+    }
+    if (!closestIb || bestD >= reach || !best) return false;
+
+    const isHF = fWorld !== null;
+    let alignFactor = 1;
+    if (isHF) {
+      const vBond = new THREE.Vector3().subVectors(fWorld, hPos);
+      if (vBond.lengthSq() < 1e-10) return false;
+      vBond.normalize();
+      const vTo = new THREE.Vector3().subVectors(best, hPos);
+      if (vTo.lengthSq() < 1e-10) return false;
+      vTo.normalize();
+      const raw = -vBond.dot(vTo);
+      if (raw < 0.84) alignFactor = 0;
+      else alignFactor = Math.pow((raw - 0.84) / 0.16, 3.2);
+    }
+
+    const proximity = Math.max(0, 1 - bestD / reach);
+    const ke = Math.max(0.25, speed / 0.048);
+    let p = isHF
+      ? 0.14 * proximity * Math.min(ke, 1.85) * alignFactor
+      : 0.52 * proximity * Math.min(ke, 2.6);
+    p *= THREE.MathUtils.lerp(0.65, 1.12, (+rTemp.value - 5) / 95);
+    p = Math.min(0.68, p);
+    if (Math.random() >= p) return false;
+
+    holder.lastReact = now;
+    this.spawnBubble(
+      best.clone().add(new THREE.Vector3((Math.random() - 0.5) * 0.12, 0.15, (Math.random() - 0.5) * 0.12))
+    );
+    this.recentHits.push(now);
+
+    const idxIon = this.ionBases.indexOf(closestIb);
+    if (idxIon >= 0 && closestIb.mesh) {
+      this.crystalRoot.remove(closestIb.mesh);
+      closestIb.mesh.geometry.dispose();
+      closestIb.mesh.material.dispose();
+      closestIb.mesh = null;
+      this.ionBases.splice(idxIon, 1);
+    }
+
+    const ai = this.acids.indexOf(holder);
+    if (ai >= 0) this._spliceAcidAt(ai);
+
+    this._refreshCrystalBonds();
+    return true;
+  }
+
+  frame() {
+    const dt = Math.min(this.clock.getDelta(), 0.05);
+    const now = performance.now();
+    this.controls.update();
+
+    const amp = this._jiggleAmp();
+    const t = now * 0.001;
+    let i = 0;
+    for (const ib of this.ionBases) {
+      if (!ib.mesh) continue;
+      const ph = ib.base.x * 0.7 + ib.base.z * 0.5 + i * 0.2;
+      ib.mesh.position.copy(ib.base).add(new THREE.Vector3(
+        Math.sin(t * 2.2 + ph) * amp,
+        Math.sin(t * 1.9 + ph * 1.1) * amp * 0.6,
+        Math.cos(t * 2 + ph) * amp
+      ));
+      i++;
+    }
+
+    const { hx, hy, hz } = this.room;
+    const th = this._thermalSpeedScale();
+    const tempT = (+rTemp.value - 5) / 95;
+    const thN = THREE.MathUtils.clamp((th - 0.35) / 1.15, 0, 1);
+    const targetH = THREE.MathUtils.lerp(0.09, 0.17, tempT) * (0.62 + 0.38 * thN);
+    const targetCl = THREE.MathUtils.lerp(0.08, 0.15, tempT) * (0.62 + 0.38 * thN);
+    const targetHF = THREE.MathUtils.lerp(0.08, 0.15, tempT) * (0.62 + 0.38 * thN);
+    const step = dt * 34;
+    const kick = 0.026 * th;
+
+    const hWorld = new THREE.Vector3();
+    const fWorld = new THREE.Vector3();
+
+    for (let ai = this.acids.length - 1; ai >= 0; ai--) {
+      const spec = this.acids[ai];
+      if (!spec) continue;
+      if (spec.kind === 'hplus' || spec.kind === 'chloride') {
+        spec.vel.x += (Math.random() - 0.5) * kick * dt * 48;
+        spec.vel.y += (Math.random() - 0.5) * kick * dt * 48;
+        spec.vel.z += (Math.random() - 0.5) * kick * dt * 48;
+        const tgt = spec.kind === 'hplus' ? targetH : targetCl;
+        const sp = spec.vel.length();
+        if (sp < 1e-6) spec.vel.copy(this._randomThermalVel(tgt));
+        else spec.vel.multiplyScalar(tgt / sp);
+        spec.mesh.position.addScaledVector(spec.vel, step);
+        this._wallBounce(spec.mesh.position, spec.vel, hx, hy, hz);
+        if (spec.kind === 'hplus') {
+          this.tryReactProton(spec, spec.mesh.position, spec.vel.length(), now, null);
+        }
+      } else if (spec.kind === 'hf') {
+        spec.angVel += (Math.random() - 0.5) * 1.35 * dt;
+        spec.angVel *= 0.988;
+        spec.hfAngle += spec.angVel * dt;
+        const c = Math.cos(spec.hfAngle);
+        const s = Math.sin(spec.hfAngle);
+        spec.mH.position.set(-0.24 * c, 0, -0.24 * s);
+        spec.mF.position.set(0.28 * c, 0, 0.28 * s);
+
+        spec.vel.x += (Math.random() - 0.5) * kick * dt * 44;
+        spec.vel.y += (Math.random() - 0.5) * kick * dt * 44;
+        spec.vel.z += (Math.random() - 0.5) * kick * dt * 44;
+        const sp = spec.vel.length();
+        if (sp < 1e-6) spec.vel.copy(this._randomThermalVel(targetHF));
+        else spec.vel.multiplyScalar(targetHF / sp);
+        spec.group.position.addScaledVector(spec.vel, step);
+        this._wallBounce(spec.group.position, spec.vel, hx, hy, hz);
+
+        spec.mH.getWorldPosition(hWorld);
+        spec.mF.getWorldPosition(fWorld);
+        this.tryReactProton(spec, hWorld, spec.vel.length(), now, fWorld);
+      }
+    }
+
+    for (let b = this.bubbles.length - 1; b >= 0; b--) {
+      const B = this.bubbles[b];
+      B.t += dt;
+      B.mesh.position.y += B.vy * dt * 55;
+      B.mesh.material.opacity = 0.55 * (1 - B.t / 1.8);
+      B.mesh.scale.setScalar(1 + B.t * 0.35);
+      if (B.t > 1.8) {
+        this.scene.remove(B.mesh);
+        B.mesh.geometry.dispose();
+        B.mesh.material.dispose();
+        this.bubbles.splice(b, 1);
+      }
+    }
+
+    while (this.recentHits.length && now - this.recentHits[0] > 1000) this.recentHits.shift();
+    const inst = this.recentHits.length;
+    this.rateEma = this.rateEma * 0.985 + inst * 0.015;
+
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  dispose() {
+    this.controls.dispose();
+    this._disposeAcidLayer();
+    this.crystalRoot.traverse(o => {
+      if (o.geometry) o.geometry.dispose();
+      if (o.material) {
+        if (Array.isArray(o.material)) o.material.forEach(m => m.dispose());
+        else o.material.dispose();
+      }
+    });
+    while (this.crystalRoot.children.length) this.crystalRoot.remove(this.crystalRoot.children[0]);
+    this.ionBases = [];
+    for (const B of this.bubbles) {
+      this.scene.remove(B.mesh);
+      B.mesh.geometry.dispose();
+      B.mesh.material.dispose();
+    }
+    this.bubbles = [];
+    if (this.roomLines) {
+      this.scene.remove(this.roomLines);
+      this.roomLines.geometry.dispose();
+      this.roomLines.material.dispose();
+      this.roomLines = null;
+    }
+    this.renderer.dispose();
+  }
+}
+
+function disposeReactionScene() {
+  run3dLoop = false;
+  if (reactionSim) {
+    reactionSim.dispose();
+    reactionSim = null;
+  }
+  canvas3d.style.display = 'none';
+  reactionPanel.style.display = 'none';
+}
+
+function initReactionScene() {
+  disposeReactionScene();
+  canvas3d.style.display = 'block';
+  reactionPanel.style.display = 'block';
+  reactionSim = new Reaction3DSim(canvas3d, isDark);
+  reactionSim.rebuildCrystal();
+  reactionSim.rebuildAcidsFromUI();
+  run3dLoop = true;
+  reactionLoop();
+}
+
+function reactionLoop() {
+  if (!run3dLoop || !reactionSim) return;
+  reactionSim.frame();
+  updateCounter();
+  requestAnimationFrame(reactionLoop);
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  resize();
+  if (currentMode === 'reaction') {
+    if (reactionSim) reactionSim.onResize();
+  } else {
+    initMolecules();
+  }
+});
+resetBtn.addEventListener('click', () => {
+  resetOverlay.style.display = 'none';
+  initMolecules();
+});
+
+resize();
+initMolecules();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beer's Law</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* Orbital lab — night deck only */
+:root {
+  --bg0: #040a12;
+  --bg1: #0a1520;
+  --panel: rgba(8, 18, 32, 0.88);
+  --accent: #3af0ff;
+  --accent-dim: #1ab8cc;
+  --accent-glow: rgba(58, 240, 255, 0.35);
+  --text: #d8f4ff;
+  --text-muted: rgba(160, 220, 235, 0.55);
+  --glass: rgba(12, 28, 48, 0.82);
+  --glass-border: rgba(58, 240, 255, 0.28);
+  --shadow: 0 0 60px rgba(0, 200, 255, 0.08), 0 16px 48px rgba(0, 0, 0, 0.55);
+  --hud-line: rgba(58, 240, 255, 0.4);
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Segoe UI', 'SF Pro Text', system-ui, -apple-system, sans-serif;
+  background: radial-gradient(120% 100% at 50% 0%, var(--bg1) 0%, var(--bg0) 55%, var(--bg0) 100%);
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Top bar — chamfered HUD strip */
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  gap: 14px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--glass-border);
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 4px 24px rgba(0, 60, 80, 0.08);
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 6px));
+}
+
+#sol-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sol-tab {
+  padding: 9px 20px;
+  border-radius: 4px;
+  border: 1px solid var(--glass-border);
+  background: rgba(0, 200, 212, 0.06);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.sol-tab:hover {
+  background: rgba(0, 200, 212, 0.12);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.sol-tab.active {
+  border-color: var(--accent);
+  background: rgba(0, 200, 212, 0.15);
+  color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow), inset 0 0 24px rgba(0, 200, 212, 0.08);
+}
+
+.sol-tab:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Main stage */
+#main-stage {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+#canvas-main {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Photon inset — docked low so it clears the optical bench */
+#photon-wrap {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: auto;
+  bottom: 10px;
+  width: min(58vw, 520px);
+  height: min(26vh, 228px);
+  min-width: 240px;
+  min-height: 162px;
+  border-radius: 2px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  z-index: 3;
+  clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+}
+
+#photon-wrap header {
+  padding: 9px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-dim);
+  border-bottom: 1px solid var(--glass-border);
+  background: linear-gradient(90deg, rgba(0, 200, 212, 0.08), transparent);
+}
+
+#canvas-photon {
+  display: block;
+  width: 100%;
+  height: calc(100% - 36px);
+}
+
+/* Readouts — centered, stacked above photon panel */
+#readouts {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(10px + min(26vh, 228px) + 18px);
+  z-index: 4;
+  pointer-events: none;
+  text-align: center;
+}
+
+#readout-laser {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--accent-dim);
+  margin-bottom: 6px;
+  opacity: 0.85;
+}
+
+#readout-a {
+  font-family: ui-monospace, 'Cascadia Code', 'Consolas', monospace;
+  font-size: clamp(28px, 4.4vw, 44px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  text-shadow: 0 0 32px var(--accent-glow), 0 0 8px rgba(58, 240, 255, 0.25);
+}
+
+#readout-t {
+  font-family: ui-monospace, 'Consolas', monospace;
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Graph HUD */
+#graph-btn {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 8;
+  padding: 10px 18px;
+  border-radius: 4px;
+  border: 1px solid var(--glass-border);
+  background: rgba(0, 200, 212, 0.1);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: 0 0 20px rgba(58, 240, 255, 0.12);
+}
+
+#graph-btn:hover {
+  background: rgba(0, 200, 212, 0.2);
+  box-shadow: 0 0 24px var(--accent-glow);
+}
+
+#main-stage.graph-active #graph-btn {
+  display: none;
+}
+
+#graph-panel {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  left: 50%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 7;
+  border-left: 1px solid var(--glass-border);
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
+}
+
+#main-stage.graph-active #graph-panel {
+  display: flex;
+}
+
+#graph-panel > header {
+  flex-shrink: 0;
+  padding: 10px 14px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-dim);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 14px;
+}
+
+#graph-lock-info {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--text-muted);
+}
+
+#graph-canvas-wrap {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  padding: 8px 12px;
+}
+
+#canvas-graph {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#graph-actions {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--glass-border);
+}
+
+#graph-actions button {
+  padding: 8px 14px;
+  border-radius: 4px;
+  border: 1px solid var(--glass-border);
+  background: rgba(0, 200, 212, 0.08);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+#graph-actions button:hover:not(:disabled) {
+  background: rgba(0, 200, 212, 0.16);
+  color: var(--accent);
+}
+
+#graph-actions button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+#photon-wrap.split {
+  left: 25%;
+  width: min(46vw, 420px);
+}
+
+#readouts.split {
+  left: 25%;
+}
+
+/* Controls panel */
+#controls {
+  flex-shrink: 0;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--glass-border);
+  background: var(--glass);
+  backdrop-filter: blur(14px);
+}
+
+#controls-inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 18px 26px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.ctrl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ctrl label {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.ctrl label span.val {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.ctrl input[type="range"] {
+  width: 100%;
+  height: 11px;
+  border-radius: 2px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(0, 80, 100, 0.2);
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--glass-border);
+}
+
+.ctrl input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 22px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-dim) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 14px var(--accent-glow);
+  cursor: pointer;
+}
+
+.ctrl input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 22px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-dim) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+}
+
+#r-wavelength {
+  background: linear-gradient(
+    90deg,
+    #4b0082 0%,
+    #0000ff 14%,
+    #00ffff 28%,
+    #00ff00 42%,
+    #ffff00 56%,
+    #ff8000 70%,
+    #ff0000 85%,
+    #8b0000 100%
+  );
+  height: 11px;
+}
+
+#r-wavelength::-webkit-slider-thumb {
+  border-color: rgba(255, 255, 255, 0.95);
+}
+
+@media (max-width: 720px) {
+  #topbar-hint { display: none; }
+}
+
+@media (max-width: 640px) {
+  #photon-wrap {
+    width: min(94vw, 440px);
+    height: min(22vh, 190px);
+    bottom: 8px;
+  }
+  #readouts {
+    bottom: calc(8px + min(22vh, 190px) + 14px);
+    padding: 0 12px;
+  }
+  #graph-btn {
+    right: 8px;
+    bottom: 8px;
+    padding: 8px 12px;
+  }
+  #graph-panel {
+    left: 0;
+    top: 45%;
+    bottom: 0;
+    border-left: none;
+    border-top: 1px solid var(--glass-border);
+  }
+  #main-stage.graph-active #photon-wrap.split {
+    left: 50%;
+    width: min(92vw, 400px);
+  }
+  #readouts.split {
+    left: 50%;
+  }
+}
+
+.ctrl-locked input[type="range"] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div id="sol-tabs"></div>
+    <span id="topbar-hint" style="font-size:10px;letter-spacing:0.14em;color:var(--text-muted);text-transform:uppercase;">Laser switch on source</span>
+  </header>
+
+  <div id="main-stage">
+    <canvas id="canvas-main"></canvas>
+    <div id="readouts">
+      <div id="readout-laser">LASER ON</div>
+      <div id="readout-a">A = 0.000</div>
+      <div id="readout-t">%T = 100.0%</div>
+    </div>
+    <div id="photon-wrap">
+      <header>Particle flux — cuvette slice</header>
+      <canvas id="canvas-photon"></canvas>
+    </div>
+    <button type="button" id="graph-btn">Graph</button>
+    <div id="graph-panel">
+      <header>
+        Beer's law curve
+        <span id="graph-lock-info"></span>
+      </header>
+      <div id="graph-canvas-wrap">
+        <canvas id="canvas-graph"></canvas>
+      </div>
+      <div id="graph-actions">
+        <button type="button" id="g-plot">Plot point</button>
+        <button type="button" id="g-end" disabled>End graph</button>
+        <button type="button" id="g-add" hidden>Add more points</button>
+        <button type="button" id="g-close">Close graph</button>
+      </div>
+    </div>
+  </div>
+
+  <footer id="controls">
+    <div id="controls-inner">
+      <div class="ctrl">
+        <label>Concentration <em style="font-style:normal">(mol/L)</em> <span class="val" id="v-conc"></span></label>
+        <input type="range" id="r-conc" min="0" max="1000" value="250" step="1">
+      </div>
+      <div class="ctrl" id="ctrl-path">
+        <label>Path length <em style="font-style:normal">(cm)</em> <span class="val" id="v-path"></span></label>
+        <input type="range" id="r-path" min="50" max="500" value="200" step="1">
+      </div>
+      <div class="ctrl" id="ctrl-lambda">
+        <label>Wavelength <em style="font-style:normal">(nm)</em> <span class="val" id="v-lambda"></span></label>
+        <input type="range" id="r-wavelength" min="380" max="750" value="525" step="1">
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Solution catalog (ε in L·mol⁻¹·cm⁻¹ at λ_max; Gaussian σ in nm) ───────
+  const SOLUTIONS = {
+    cuso4: {
+      id: 'cuso4',
+      label: 'CuSO₄',
+      formula: 'CuSO₄ (aq)',
+      lambdaMax: 700,
+      epsMax: 52,
+      sigma: 70,
+      baseRgb: [55, 145, 235],
+    },
+    kmno4: {
+      id: 'kmno4',
+      label: 'KMnO₄',
+      formula: 'KMnO₄ (aq)',
+      lambdaMax: 525,
+      epsMax: 78,
+      sigma: 42,
+      baseRgb: [115, 35, 175],
+    },
+    cocl2: {
+      id: 'cocl2',
+      label: 'CoCl₂',
+      formula: 'CoCl₂ (aq)',
+      lambdaMax: 512,
+      epsMax: 32,
+      sigma: 48,
+      baseRgb: [225, 115, 175],
+    },
+    fescn: {
+      id: 'fescn',
+      label: 'Fe(SCN)²⁺',
+      formula: 'Fe(SCN)²⁺ (aq)',
+      lambdaMax: 460,
+      epsMax: 68,
+      sigma: 36,
+      baseRgb: [210, 75, 35],
+    },
+  };
+
+  const C_MIN = 0;
+  /** Upper stock-style concentration cap (mol/L); slider span is min(this, A_MAX/(ε·b)) for sensitivity */
+  const C_HARD_MAX = 0.1;
+  const A_MAX = 4;
+  const B_MIN = 0.5;
+  const B_MAX = 5;
+
+  /** Max c on the slider so A = εbc can reach A_MAX before hitting C_HARD_MAX */
+  function effectiveCMax() {
+    const sol = getSolution();
+    const eps = epsilonAtLambda(sol, state.lambda);
+    const eb = eps * state.b;
+    if (eb < 1e-12) return C_HARD_MAX;
+    return Math.min(C_HARD_MAX, A_MAX / eb);
+  }
+
+  const state = {
+    solutionId: 'kmno4',
+    c: 0.025,
+    b: 2,
+    lambda: 525,
+    laserOn: true,
+    graphMode: 'off',
+    graphPoints: [],
+    graphLock: null,
+    graphPulseUntil: 0,
+  };
+
+  const mainCanvas = document.getElementById('canvas-main');
+  const photonCanvas = document.getElementById('canvas-photon');
+  const graphCanvas = document.getElementById('canvas-graph');
+  const ctxMain = mainCanvas.getContext('2d');
+  const ctxPh = photonCanvas.getContext('2d');
+  const ctxG = graphCanvas.getContext('2d');
+
+  const mainStage = document.getElementById('main-stage');
+  const photonWrap = document.getElementById('photon-wrap');
+  const readoutsEl = document.getElementById('readouts');
+  const graphBtn = document.getElementById('graph-btn');
+  const gPlot = document.getElementById('g-plot');
+  const gEnd = document.getElementById('g-end');
+  const gAdd = document.getElementById('g-add');
+  const gClose = document.getElementById('g-close');
+  const elGraphLock = document.getElementById('graph-lock-info');
+  const ctrlPath = document.getElementById('ctrl-path');
+  const ctrlLambda = document.getElementById('ctrl-lambda');
+
+  const elReadA = document.getElementById('readout-a');
+  const elReadT = document.getElementById('readout-t');
+  const elConc = document.getElementById('r-conc');
+  const elPath = document.getElementById('r-path');
+  const elLambda = document.getElementById('r-wavelength');
+  const vConc = document.getElementById('v-conc');
+  const vPath = document.getElementById('v-path');
+  const vLambda = document.getElementById('v-lambda');
+  const tabsEl = document.getElementById('sol-tabs');
+  const elReadLaser = document.getElementById('readout-laser');
+
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let laserSwitchRegion = null;
+
+  /** Wavelength (nm) → sRGB 0–1 (visible range approximation) */
+  function wavelengthToRgb(l) {
+    let r = 0, g = 0, b = 0;
+    if (l >= 380 && l < 440) {
+      const t = (l - 380) / (440 - 380);
+      r = -(t - 1) * 0.35 + 0.25 * t;
+      g = 0;
+      b = 1;
+    } else if (l < 490) {
+      const t = (l - 440) / (490 - 440);
+      r = 0;
+      g = t;
+      b = 1;
+    } else if (l < 510) {
+      const t = (l - 490) / (510 - 490);
+      r = 0;
+      g = 1;
+      b = -(t - 1);
+    } else if (l < 580) {
+      const t = (l - 510) / (580 - 510);
+      r = t;
+      g = 1;
+      b = 0;
+    } else if (l < 645) {
+      const t = (l - 580) / (645 - 580);
+      r = 1;
+      g = -(t - 1);
+      b = 0;
+    } else if (l <= 750) {
+      const t = (l - 645) / (750 - 645);
+      r = 1;
+      g = 0;
+      b = 0;
+    } else {
+      r = 0.5; g = 0; b = 0;
+    }
+    // Gamma-ish lift for nicer display
+    const gamma = 0.8;
+    r = Math.pow(Math.max(0, Math.min(1, r)), gamma);
+    g = Math.pow(Math.max(0, Math.min(1, g)), gamma);
+    b = Math.pow(Math.max(0, Math.min(1, b)), gamma);
+    return { r, g, b };
+  }
+
+  function rgbToCss(rgb) {
+    const R = Math.round(rgb.r * 255);
+    const G = Math.round(rgb.g * 255);
+    const B = Math.round(rgb.b * 255);
+    return 'rgb(' + R + ',' + G + ',' + B + ')';
+  }
+
+  function epsilonAtLambda(sol, lambda) {
+    const d = lambda - sol.lambdaMax;
+    return sol.epsMax * Math.exp(-(d * d) / (2 * sol.sigma * sol.sigma));
+  }
+
+  function getSolution() {
+    return SOLUTIONS[state.solutionId];
+  }
+
+  function computeAbsorbance() {
+    const sol = getSolution();
+    const eps = epsilonAtLambda(sol, state.lambda);
+    const raw = eps * state.b * state.c;
+    return Math.min(A_MAX, raw);
+  }
+
+  function resizeMain() {
+    const rect = mainCanvas.getBoundingClientRect();
+    const w = Math.max(1, Math.floor(rect.width * dpr));
+    const h = Math.max(1, Math.floor(rect.height * dpr));
+    if (mainCanvas.width !== w || mainCanvas.height !== h) {
+      mainCanvas.width = w;
+      mainCanvas.height = h;
+    }
+  }
+
+  function resizePhoton() {
+    const rect = photonCanvas.getBoundingClientRect();
+    const w = Math.max(1, Math.floor(rect.width * dpr));
+    const h = Math.max(1, Math.floor(rect.height * dpr));
+    if (photonCanvas.width !== w || photonCanvas.height !== h) {
+      photonCanvas.width = w;
+      photonCanvas.height = h;
+    }
+  }
+
+  function syncSlidersFromState() {
+    const cHi = effectiveCMax();
+    const span = Math.max(1e-15, cHi - C_MIN);
+    state.c = Math.min(Math.max(C_MIN, state.c), cHi);
+    elConc.value = String(Math.min(1000, Math.max(0, Math.round((state.c - C_MIN) / span * 1000))));
+    elPath.value = String(Math.round((state.b - B_MIN) / (B_MAX - B_MIN) * (500 - 50) + 50));
+    elLambda.value = String(Math.round(state.lambda));
+    updateValueLabels();
+  }
+
+  function updateValueLabels() {
+    vConc.textContent = state.c.toFixed(3);
+    vPath.textContent = state.b.toFixed(2);
+    vLambda.textContent = String(Math.round(state.lambda));
+  }
+
+  function readSliders() {
+    state.b = B_MIN + ((Number(elPath.value) - 50) / (500 - 50)) * (B_MAX - B_MIN);
+    state.lambda = Number(elLambda.value);
+    if (state.graphMode !== 'off' && state.graphLock) {
+      state.b = state.graphLock.b;
+      state.lambda = state.graphLock.lambda;
+      state.solutionId = state.graphLock.solutionId;
+      elPath.value = String(Math.round((state.b - B_MIN) / (B_MAX - B_MIN) * (500 - 50) + 50));
+      elLambda.value = String(Math.round(state.lambda));
+      document.querySelectorAll('.sol-tab').forEach(function (t) {
+        t.classList.toggle('active', t.dataset.id === state.solutionId);
+      });
+    }
+    const cHi = effectiveCMax();
+    const span = Math.max(1e-15, cHi - C_MIN);
+    state.c = C_MIN + (Number(elConc.value) / 1000) * span;
+    if (state.c > cHi) state.c = cHi;
+    updateValueLabels();
+  }
+
+  /** Rounded-rect path (broad browser support) */
+  function roundRectPath(ctx, x, y, w, h, r) {
+    r = Math.max(0, Math.min(r, w * 0.5, h * 0.5));
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  /** Post-cuvette wave visibility: keeps a readable “signal” on the detector for moderate A */
+  function beamWaveDisplayAlpha(transmittance, absorb) {
+    const T = Math.max(transmittance, 1e-9);
+    let a = 0.05 + 0.9 * Math.pow(T, 0.36);
+    if (absorb <= A_MAX) {
+      a = Math.max(a, 0.1 + 0.65 * T);
+    }
+    return Math.min(0.98, a);
+  }
+
+  function leastSquaresFit(points) {
+    const n = points.length;
+    if (n < 2) return null;
+    let sx = 0, sy = 0, sxx = 0, sxy = 0;
+    for (let i = 0; i < n; i++) {
+      const x = points[i].c;
+      const y = points[i].A;
+      sx += x;
+      sy += y;
+      sxx += x * x;
+      sxy += x * y;
+    }
+    const den = n * sxx - sx * sx;
+    if (Math.abs(den) < 1e-14) return null;
+    const m = (n * sxy - sx * sy) / den;
+    const b = (sy - m * sx) / n;
+    return { m: m, b: b };
+  }
+
+  function updateGraphLockChip() {
+    if (!elGraphLock || !state.graphLock) return;
+    const sol = SOLUTIONS[state.graphLock.solutionId];
+    elGraphLock.textContent =
+      'λ ' + Math.round(state.graphLock.lambda) + ' nm · b ' + state.graphLock.b.toFixed(2) + ' cm · ' + (sol ? sol.label : '');
+  }
+
+  function updateGraphActions() {
+    const plotting = state.graphMode === 'plotting';
+    const fitted = state.graphMode === 'fitted';
+    gPlot.hidden = !plotting;
+    gEnd.hidden = !plotting;
+    gEnd.disabled = state.graphPoints.length < 2;
+    gAdd.hidden = !fitted;
+  }
+
+  function updateTabDisabled() {
+    const dis = state.graphMode !== 'off';
+    document.querySelectorAll('.sol-tab').forEach(function (t) {
+      t.disabled = dis;
+    });
+  }
+
+  function openGraph() {
+    if (state.graphMode !== 'off') return;
+    state.graphMode = 'plotting';
+    state.graphPoints = [];
+    state.graphLock = {
+      solutionId: state.solutionId,
+      lambda: state.lambda,
+      b: state.b,
+    };
+    mainStage.classList.add('graph-active');
+    photonWrap.classList.add('split');
+    readoutsEl.classList.add('split');
+    elPath.disabled = true;
+    elLambda.disabled = true;
+    if (ctrlPath) ctrlPath.classList.add('ctrl-locked');
+    if (ctrlLambda) ctrlLambda.classList.add('ctrl-locked');
+    updateGraphLockChip();
+    updateGraphActions();
+    updateTabDisabled();
+  }
+
+  function closeGraph() {
+    state.graphMode = 'off';
+    state.graphPoints = [];
+    state.graphLock = null;
+    state.graphPulseUntil = 0;
+    mainStage.classList.remove('graph-active');
+    photonWrap.classList.remove('split');
+    readoutsEl.classList.remove('split');
+    elPath.disabled = false;
+    elLambda.disabled = false;
+    if (ctrlPath) ctrlPath.classList.remove('ctrl-locked');
+    if (ctrlLambda) ctrlLambda.classList.remove('ctrl-locked');
+    updateGraphActions();
+    updateTabDisabled();
+  }
+
+  function resizeGraphCanvas() {
+    const wrap = document.getElementById('graph-canvas-wrap');
+    if (!wrap || !graphCanvas) return;
+    const rect = wrap.getBoundingClientRect();
+    const w = Math.max(1, Math.floor(rect.width * dpr));
+    const h = Math.max(1, Math.floor(rect.height * dpr));
+    if (graphCanvas.width !== w || graphCanvas.height !== h) {
+      graphCanvas.width = w;
+      graphCanvas.height = h;
+    }
+  }
+
+  function drawGraphPanel() {
+    if (state.graphMode === 'off' || !graphCanvas) return;
+    resizeGraphCanvas();
+    const Wg = graphCanvas.width;
+    const Hg = graphCanvas.height;
+    const cssWg = Wg / dpr;
+    const cssHg = Hg / dpr;
+    const padL = 50;
+    const padR = 14;
+    const padT = 10;
+    const padB = 34;
+    const plotL = padL;
+    const plotR = cssWg - padR;
+    const plotT = padT;
+    const plotB = cssHg - padB;
+    const plotW = plotR - plotL;
+    const plotH = plotB - plotT;
+
+    const pts = state.graphPoints;
+    const cCur = state.c;
+    const aCur = computeAbsorbance();
+    let maxC = 0.01;
+    let i;
+    for (i = 0; i < pts.length; i++) {
+      if (pts[i].c > maxC) maxC = pts[i].c;
+    }
+    if (cCur > maxC) maxC = cCur;
+    const xMax = Math.max(0.01, maxC * 1.15);
+    let maxA = 0.2;
+    for (i = 0; i < pts.length; i++) {
+      if (pts[i].A > maxA) maxA = pts[i].A;
+    }
+    if (aCur > maxA) maxA = aCur;
+    const yMax = Math.min(A_MAX, Math.max(0.12, maxA * 1.15));
+
+    function xToPx(c) {
+      return plotL + (c / xMax) * plotW;
+    }
+    function yToPx(a) {
+      return plotB - (a / yMax) * plotH;
+    }
+
+    ctxG.setTransform(1, 0, 0, 1, 0, 0);
+    ctxG.clearRect(0, 0, Wg, Hg);
+    ctxG.save();
+    ctxG.scale(dpr, dpr);
+
+    ctxG.fillStyle = 'rgba(5, 12, 22, 0.65)';
+    ctxG.fillRect(0, 0, cssWg, cssHg);
+
+    ctxG.strokeStyle = 'rgba(58, 240, 255, 0.08)';
+    ctxG.lineWidth = 1;
+    let gi;
+    for (gi = 0; gi <= 5; gi++) {
+      const x = plotL + (gi / 5) * plotW;
+      ctxG.beginPath();
+      ctxG.moveTo(x, plotT);
+      ctxG.lineTo(x, plotB);
+      ctxG.stroke();
+    }
+    let gj;
+    for (gj = 0; gj <= 4; gj++) {
+      const y = plotT + (gj / 4) * plotH;
+      ctxG.beginPath();
+      ctxG.moveTo(plotL, y);
+      ctxG.lineTo(plotR, y);
+      ctxG.stroke();
+    }
+
+    ctxG.strokeStyle = 'rgba(58, 240, 255, 0.45)';
+    ctxG.lineWidth = 1.5;
+    ctxG.beginPath();
+    ctxG.moveTo(plotL, plotB);
+    ctxG.lineTo(plotR, plotB);
+    ctxG.moveTo(plotL, plotT);
+    ctxG.lineTo(plotL, plotB);
+    ctxG.stroke();
+
+    ctxG.fillStyle = 'rgba(160, 220, 235, 0.75)';
+    ctxG.font = '10px ui-monospace, Consolas, monospace';
+    ctxG.textAlign = 'center';
+    ctxG.fillText('c (mol/L)', (plotL + plotR) * 0.5, cssHg - 6);
+    ctxG.save();
+    ctxG.translate(11, (plotT + plotB) * 0.5);
+    ctxG.rotate(-Math.PI / 2);
+    ctxG.textAlign = 'center';
+    ctxG.fillText('A (absorbance)', 0, 0);
+    ctxG.restore();
+
+    ctxG.font = '9px ui-monospace, Consolas, monospace';
+    ctxG.textAlign = 'center';
+    for (gi = 0; gi <= 4; gi++) {
+      const cv = (gi / 4) * xMax;
+      const x = plotL + (gi / 4) * plotW;
+      ctxG.fillText(cv.toFixed(3), x, plotB + 15);
+    }
+    ctxG.textAlign = 'right';
+    for (gj = 0; gj <= 4; gj++) {
+      const av = (1 - gj / 4) * yMax;
+      const y = plotT + (gj / 4) * plotH;
+      ctxG.fillText(av.toFixed(2), plotL - 5, y + 3);
+    }
+
+    ctxG.save();
+    ctxG.beginPath();
+    ctxG.rect(plotL, plotT, plotW, plotH);
+    ctxG.clip();
+
+    if (state.graphMode === 'fitted' && pts.length >= 2) {
+      const fit = leastSquaresFit(pts);
+      if (fit) {
+        const x0 = 0;
+        const x1 = xMax;
+        let y0 = fit.m * x0 + fit.b;
+        let y1 = fit.m * x1 + fit.b;
+        y0 = Math.max(0, Math.min(yMax, y0));
+        y1 = Math.max(0, Math.min(yMax, y1));
+        ctxG.strokeStyle = 'rgba(58, 240, 255, 0.78)';
+        ctxG.lineWidth = 2;
+        ctxG.beginPath();
+        ctxG.moveTo(xToPx(x0), yToPx(y0));
+        ctxG.lineTo(xToPx(x1), yToPx(y1));
+        ctxG.stroke();
+      }
+    }
+
+    const now = performance.now();
+    for (i = 0; i < pts.length; i++) {
+      const px = xToPx(pts[i].c);
+      const py = yToPx(pts[i].A);
+      const pulse = now < state.graphPulseUntil && i === pts.length - 1;
+      ctxG.shadowColor = 'rgba(58, 240, 255, 0.55)';
+      ctxG.shadowBlur = pulse ? 20 : 12;
+      ctxG.fillStyle = 'rgba(58, 240, 255, 0.95)';
+      ctxG.beginPath();
+      ctxG.arc(px, py, 5, 0, Math.PI * 2);
+      ctxG.fill();
+      ctxG.shadowBlur = 0;
+      ctxG.fillStyle = 'rgba(255, 255, 255, 0.88)';
+      ctxG.beginPath();
+      ctxG.arc(px, py, 2, 0, Math.PI * 2);
+      ctxG.fill();
+    }
+
+    const gxp = xToPx(cCur);
+    const gyp = yToPx(aCur);
+    ctxG.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+    ctxG.lineWidth = 1.5;
+    ctxG.beginPath();
+    ctxG.arc(gxp, gyp, 8, 0, Math.PI * 2);
+    ctxG.stroke();
+
+    ctxG.restore();
+
+    if (state.graphMode === 'fitted' && pts.length >= 2) {
+      const fit2 = leastSquaresFit(pts);
+      if (fit2) {
+        ctxG.fillStyle = 'rgba(180, 235, 255, 0.92)';
+        ctxG.font = '11px ui-monospace, Consolas, monospace';
+        ctxG.textAlign = 'left';
+        ctxG.fillText('slope = ' + fit2.m.toFixed(3) + ' (= ε·b)', plotL + 4, plotT + 14);
+      }
+    }
+
+    ctxG.restore();
+  }
+
+  // ── Spectrophotometer drawing ─────────────────────────────────────────────
+  function drawSpec() {
+    resizeMain();
+    laserSwitchRegion = null;
+    const sol = getSolution();
+    const A = computeAbsorbance();
+    const T = Math.pow(10, -A);
+    const pctT = 100 * T;
+    const laserOn = state.laserOn;
+
+    if (laserOn) {
+      elReadA.textContent = 'A = ' + A.toFixed(3);
+      elReadT.textContent = '%T = ' + pctT.toFixed(1) + '%';
+      if (elReadLaser) elReadLaser.textContent = 'LASER ON';
+    } else {
+      elReadA.textContent = 'A = —';
+      elReadT.textContent = '%T = —';
+      if (elReadLaser) elReadLaser.textContent = 'LASER OFF';
+    }
+
+    const W = mainCanvas.width;
+    const H = mainCanvas.height;
+    const ctx = ctxMain;
+
+    const gBg = ctx.createRadialGradient(W * 0.35, 0, 0, W * 0.5, H * 0.55, Math.max(W, H) * 0.75);
+    gBg.addColorStop(0, '#0c1a2a');
+    gBg.addColorStop(0.45, '#0a1624');
+    gBg.addColorStop(1, '#040a12');
+    ctx.fillStyle = gBg;
+    ctx.fillRect(0, 0, W, H);
+
+    const cssW = W / dpr;
+    const cy = H / dpr;
+    const inGraph = state.graphMode !== 'off';
+    const stageW = inGraph ? cssW * 0.5 : cssW;
+    const ox = inGraph ? cssW * 0.25 : cssW * 0.5;
+    ctx.save();
+    ctx.scale(dpr, dpr);
+
+    ctx.strokeStyle = 'rgba(58, 240, 255, 0.045)';
+    ctx.lineWidth = 1;
+    const gStep = 44;
+    for (let gx = 0; gx < cssW; gx += gStep) {
+      ctx.beginPath();
+      ctx.moveTo(gx, 0);
+      ctx.lineTo(gx, cy);
+      ctx.stroke();
+    }
+    for (let gy = 0; gy < cy; gy += gStep) {
+      ctx.beginPath();
+      ctx.moveTo(0, gy);
+      ctx.lineTo(cssW, gy);
+      ctx.stroke();
+    }
+
+    const midY = cy * 0.43;
+    const pathNorm = (state.b - B_MIN) / (B_MAX - B_MIN);
+    const cuvetteW = stageW * (0.125 + pathNorm * 0.158);
+    const cuvetteH = cy * 0.225;
+    const cuvetteLeft = ox - cuvetteW * 0.5;
+    const cuvetteTop = midY - cuvetteH * 0.5;
+    const cuvetteRight = cuvetteLeft + cuvetteW;
+
+    const gap = stageW * 0.042;
+    const detW = stageW * 0.058;
+    const detH = cy * 0.19;
+    const detX = cuvetteRight + gap;
+
+    const sc = Math.min(1.14, stageW / 760);
+    const barrelW = 148 * sc;
+    const barrelH = 40 * sc;
+    const lampX = cuvetteLeft - gap - barrelW - 5 * sc;
+    const beamY = midY;
+
+    const wlRgb = wavelengthToRgb(state.lambda);
+    const beamRgbStr = rgbToCss(wlRgb);
+    const beamR = wlRgb.r;
+    const beamG = wlRgb.g;
+    const beamB = wlRgb.b;
+
+    const skew = Math.min(22, cuvetteW * 0.128);
+    const drop = Math.min(13, cuvetteH * 0.105);
+    const br = sol.baseRgb[0], bgc = sol.baseRgb[1], bb = sol.baseRgb[2];
+    const fillAlpha = Math.min(0.92, 0.14 + state.c * state.b * 6);
+
+    // Prism — right face
+    ctx.beginPath();
+    ctx.moveTo(cuvetteLeft + cuvetteW, cuvetteTop);
+    ctx.lineTo(cuvetteLeft + cuvetteW + skew, cuvetteTop - drop);
+    ctx.lineTo(cuvetteLeft + cuvetteW + skew, cuvetteTop + cuvetteH - drop * 0.35);
+    ctx.lineTo(cuvetteLeft + cuvetteW, cuvetteTop + cuvetteH);
+    ctx.closePath();
+    const gR = ctx.createLinearGradient(cuvetteLeft + cuvetteW, cuvetteTop, cuvetteLeft + cuvetteW + skew, cuvetteTop);
+    gR.addColorStop(0, 'rgba(42,66,88,0.92)');
+    gR.addColorStop(1, 'rgba(12,22,36,0.98)');
+    ctx.fillStyle = gR;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(58,240,255,0.28)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Prism — top face
+    ctx.beginPath();
+    ctx.moveTo(cuvetteLeft, cuvetteTop);
+    ctx.lineTo(cuvetteLeft + skew, cuvetteTop - drop);
+    ctx.lineTo(cuvetteLeft + cuvetteW + skew, cuvetteTop - drop);
+    ctx.lineTo(cuvetteLeft + cuvetteW, cuvetteTop);
+    ctx.closePath();
+    const gT = ctx.createLinearGradient(0, cuvetteTop - drop, 0, cuvetteTop + 4);
+    gT.addColorStop(0, 'rgba(56,82,102,0.62)');
+    gT.addColorStop(1, 'rgba(30,48,64,0.88)');
+    ctx.fillStyle = gT;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(58,240,255,0.22)';
+    ctx.stroke();
+
+    // Detector housing (beam passes over face)
+    ctx.fillStyle = '#0a121c';
+    ctx.strokeStyle = 'rgba(58,240,255,0.45)';
+    ctx.lineWidth = 1.5;
+    roundRectPath(ctx, detX, midY - detH / 2, detW, detH, 4);
+    ctx.fill();
+    ctx.stroke();
+
+    // Diode laser — rail, barrel, ribs, aperture, hardware toggle
+    const railY = beamY + barrelH * 0.5 + 4 * sc;
+    ctx.fillStyle = '#121e2c';
+    ctx.fillRect(lampX - 4 * sc, railY, barrelW + 26 * sc, 6 * sc);
+
+    const gradB = ctx.createLinearGradient(lampX, 0, lampX + barrelW, 0);
+    gradB.addColorStop(0, '#1a2636');
+    gradB.addColorStop(0.5, '#2e4258');
+    gradB.addColorStop(1, '#141f2c');
+    roundRectPath(ctx, lampX, beamY - barrelH / 2, barrelW, barrelH, barrelH * 0.42);
+    ctx.fillStyle = gradB;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(58,240,255,0.32)';
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(0,0,0,0.32)';
+    ctx.lineWidth = 1;
+    for (let ri = 0; ri < 5; ri++) {
+      const rx = lampX + 14 * sc + ri * 21 * sc;
+      ctx.beginPath();
+      ctx.moveTo(rx, beamY - barrelH * 0.34);
+      ctx.lineTo(rx, beamY + barrelH * 0.34);
+      ctx.stroke();
+    }
+
+    const apX = lampX + barrelW - 2 * sc;
+    ctx.strokeStyle = 'rgba(200,220,240,0.5)';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.arc(apX, beamY, 9.5 * sc, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(apX, beamY, 5.5 * sc, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(16,26,38,0.96)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(58,240,255,0.25)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    const swW = 46 * sc;
+    const swH = 19 * sc;
+    const swX = lampX + barrelW * 0.26;
+    const swY = railY + 8 * sc;
+    laserSwitchRegion = { x: swX, y: swY, w: swW, h: swH };
+    ctx.fillStyle = '#080e18';
+    roundRectPath(ctx, swX, swY, swW, swH, 3);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(58,240,255,0.32)';
+    ctx.stroke();
+    const knobW = 21 * sc;
+    const knobX = laserOn ? swX + swW - knobW - 2.5 * sc : swX + 2.5 * sc;
+    ctx.fillStyle = laserOn ? 'rgba(58,240,255,0.9)' : 'rgba(72,92,112,0.85)';
+    roundRectPath(ctx, knobX, swY + 2.5 * sc, knobW, swH - 5 * sc, 2);
+    ctx.fill();
+
+    ctx.fillStyle = 'rgba(160,200,220,0.55)';
+    ctx.font = '600 ' + Math.max(7, 7 * sc) + 'px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('PWR', swX + swW * 0.5, swY - 2 * sc);
+
+    const beamStart = apX + 8 * sc;
+    const beamInLeft = cuvetteLeft;
+    const beamInRight = cuvetteRight;
+    const beamEnd = detX - 5;
+
+    const wavePeriodPx = 9 + ((state.lambda - 380) / (750 - 380)) * 48;
+    const tSec = performance.now() * 0.001;
+
+    function rgbaBeam(a) {
+      const mix = 0.14;
+      const cr = beamR * (1 - mix);
+      const cg = beamG * (1 - mix) + 0.92 * mix;
+      const cb = beamB * (1 - mix) + 1 * mix;
+      return 'rgba(' + Math.round(cr * 255) + ',' + Math.round(cg * 255) + ',' + Math.round(cb * 255) + ',' + a + ')';
+    }
+
+    function drawWavyBand(x0, x1, alphaScale, phaseExtra) {
+      if (!laserOn || alphaScale <= 0) return;
+      const k = (2 * Math.PI) / wavePeriodPx;
+      const waveAmp = 3.75;
+      const lineCount = 13;
+      const spread = 15;
+      for (let li = 0; li < lineCount; li++) {
+        const off = lineCount === 1 ? 0 : -spread + (2 * spread * li) / (lineCount - 1);
+        const lineAlpha = alphaScale * (0.48 + 0.52 * (1 - Math.abs(off) / (spread + 0.01)));
+        ctx.beginPath();
+        let first = true;
+        for (let x = x0; x <= x1; x += 1.1) {
+          const y = beamY + off + waveAmp * Math.sin(k * x + tSec * 4.2 + off * 0.09 + phaseExtra);
+          if (first) {
+            ctx.moveTo(x, y);
+            first = false;
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+        const la = Math.min(1, lineAlpha);
+        ctx.strokeStyle = rgbaBeam(la);
+        ctx.lineWidth = 1.65;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.shadowColor = 'rgba(58,240,255,0.35)';
+        ctx.shadowBlur = la > 0.2 ? 6 : 0;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    // Front face — solution
+    ctx.fillStyle = 'rgba(' + br + ',' + bgc + ',' + bb + ',' + fillAlpha + ')';
+    roundRectPath(ctx, cuvetteLeft, cuvetteTop, cuvetteW, cuvetteH, 5);
+    ctx.fill();
+    const hi = ctx.createLinearGradient(cuvetteLeft, cuvetteTop, cuvetteLeft + 22, cuvetteTop + cuvetteH);
+    hi.addColorStop(0, 'rgba(255,255,255,0.22)');
+    hi.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = hi;
+    ctx.fillRect(cuvetteLeft + 2, cuvetteTop + 4, 14, cuvetteH - 8);
+    ctx.strokeStyle = 'rgba(58,240,255,0.48)';
+    ctx.lineWidth = 1.5;
+    roundRectPath(ctx, cuvetteLeft, cuvetteTop, cuvetteW, cuvetteH, 5);
+    ctx.stroke();
+
+    if (laserOn) {
+      const slitGlow = ctx.createRadialGradient(apX, beamY, 1, apX, beamY, 20 * sc);
+      slitGlow.addColorStop(0, 'rgba(255,255,255,0.88)');
+      slitGlow.addColorStop(0.5, beamRgbStr.replace(')', ', 0.42)').replace('rgb', 'rgba'));
+      slitGlow.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = slitGlow;
+      ctx.beginPath();
+      ctx.arc(apX, beamY, 19 * sc, 0, Math.PI * 2);
+      ctx.fill();
+
+      drawWavyBand(beamStart, beamInLeft, 0.94, 0);
+      ctx.save();
+      roundRectPath(ctx, cuvetteLeft, cuvetteTop, cuvetteW, cuvetteH, 5);
+      ctx.clip();
+      drawWavyBand(beamInLeft - 8, beamInRight + 8, 0.94, 0);
+      const depth = Math.min(0.58, 0.05 + A * 0.2);
+      const absGrad = ctx.createLinearGradient(cuvetteLeft, 0, cuvetteRight, 0);
+      absGrad.addColorStop(0, 'rgba(0, 8, 18, 0)');
+      absGrad.addColorStop(0.25, 'rgba(0, 10, 22, ' + (depth * 0.16) + ')');
+      absGrad.addColorStop(1, 'rgba(0, 6, 16, ' + (depth * 0.68) + ')');
+      ctx.fillStyle = absGrad;
+      ctx.fillRect(cuvetteLeft - 3, cuvetteTop - 3, cuvetteW + 6, cuvetteH + 6);
+      ctx.restore();
+
+      const waveDetAlpha = beamWaveDisplayAlpha(T, A);
+      drawWavyBand(beamInRight, beamEnd, waveDetAlpha, 0);
+    }
+
+    ctx.strokeStyle = 'rgba(58,240,255,0.22)';
+    ctx.lineWidth = 1;
+    roundRectPath(ctx, cuvetteLeft - 1, cuvetteTop - 1, cuvetteW + 2, cuvetteH + 2, 5);
+    ctx.stroke();
+
+    const barH = detH * 0.65;
+    const barW = detW * 0.35;
+    const barX = detX + detW * 0.32;
+    const barBottom = midY + barH * 0.35;
+    ctx.fillStyle = 'rgba(0,0,0,0.38)';
+    ctx.fillRect(barX, midY - barH * 0.5, barW, barH);
+    const Tdisp = laserOn ? T : 0;
+    const fillH = barH * Tdisp;
+    if (fillH > 0.5) {
+      const gradBar = ctx.createLinearGradient(0, barBottom - fillH, 0, barBottom);
+      gradBar.addColorStop(0, beamRgbStr);
+      gradBar.addColorStop(1, beamRgbStr.replace(')', ', 0.45)').replace('rgb', 'rgba'));
+      ctx.fillStyle = gradBar;
+      ctx.fillRect(barX, barBottom - fillH, barW, fillH);
+    }
+
+    ctx.textAlign = 'left';
+    ctx.restore();
+  }
+
+  // ── Photon simulation ─────────────────────────────────────────────────────
+  const photons = [];
+  const flashes = [];
+  let molecules = [];
+  const MOL_R = 7.2;
+
+  function rebuildMolecules() {
+    const W = photonCanvas.width / dpr || 200;
+    const H = photonCanvas.height / dpr || 120;
+    const cHi = effectiveCMax();
+    const cNorm = cHi > 0 ? state.c / cHi : 0;
+
+    const marginX = W * 0.1;
+    const marginY = H * 0.16;
+    const left = marginX;
+    const right = W - marginX;
+    const topY = marginY;
+    const botY = H - marginY;
+    const minD = MOL_R * 2.95;
+    const area = (right - left) * (botY - topY);
+    const approxCap = Math.max(2, Math.floor(area / (minD * minD * 1.2)));
+    let nWant = Math.round(cNorm * approxCap);
+    nWant = Math.max(0, Math.min(approxCap, nWant));
+
+    molecules = [];
+    if (nWant <= 0) return;
+
+    const maxAttempts = Math.max(400, nWant * 120);
+    let attempts = 0;
+    while (molecules.length < nWant && attempts < maxAttempts) {
+      attempts++;
+      const px = left + Math.random() * (right - left);
+      const py = topY + Math.random() * (botY - topY);
+      let ok = true;
+      for (let m = 0; m < molecules.length; m++) {
+        const dx = px - molecules[m].x;
+        const dy = py - molecules[m].y;
+        if (dx * dx + dy * dy < minD * minD) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) {
+        molecules.push({ x: px, y: py, r: MOL_R });
+      }
+    }
+  }
+
+  let lastMolKey = '';
+
+  function drawPhotonView() {
+    resizePhoton();
+    if (!state.laserOn) {
+      photons.length = 0;
+    }
+    const sol = getSolution();
+    const key = state.solutionId + '|' + state.c + '|' + state.b;
+    if (key !== lastMolKey) {
+      lastMolKey = key;
+      rebuildMolecules();
+    }
+
+    const W = photonCanvas.width;
+    const H = photonCanvas.height;
+    const cw = W / dpr;
+    const ch = H / dpr;
+
+    const eps = epsilonAtLambda(sol, state.lambda);
+    const epsRatio = sol.epsMax > 0 ? Math.min(1, eps / sol.epsMax) : 0;
+    const wlRgb = wavelengthToRgb(state.lambda);
+
+    ctxPh.save();
+    ctxPh.scale(dpr, dpr);
+
+    const bg0 = '#050c18';
+    const bg1 = '#0a1626';
+    const g = ctxPh.createLinearGradient(0, 0, cw, ch);
+    g.addColorStop(0, bg0);
+    g.addColorStop(1, bg1);
+    ctxPh.fillStyle = g;
+    ctxPh.fillRect(0, 0, cw, ch);
+
+    ctxPh.strokeStyle = 'rgba(58,240,255,0.12)';
+    ctxPh.lineWidth = 1;
+    for (let gx = 0; gx < cw; gx += 36) {
+      ctxPh.beginPath();
+      ctxPh.moveTo(gx, 0);
+      ctxPh.lineTo(gx, ch);
+      ctxPh.stroke();
+    }
+
+    // Chamber outline (cuvette interior)
+    ctxPh.strokeStyle = 'rgba(58,240,255,0.38)';
+    ctxPh.lineWidth = 1.5;
+    ctxPh.strokeRect(10, 10, cw - 20, ch - 20);
+
+    // Molecules
+    const br = sol.baseRgb[0], bgc = sol.baseRgb[1], bb = sol.baseRgb[2];
+    for (const m of molecules) {
+      ctxPh.beginPath();
+      ctxPh.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+      const grd = ctxPh.createRadialGradient(m.x - m.r * 0.3, m.y - m.r * 0.3, 1, m.x, m.y, m.r);
+      grd.addColorStop(0, 'rgba(' + (br + 40) + ',' + (bgc + 30) + ',' + (bb + 40) + ',0.95)');
+      grd.addColorStop(1, 'rgba(' + br + ',' + bgc + ',' + bb + ',0.75)');
+      ctxPh.fillStyle = grd;
+      ctxPh.fill();
+      ctxPh.strokeStyle = 'rgba(58,240,255,0.25)';
+      ctxPh.lineWidth = 1;
+      ctxPh.stroke();
+    }
+
+    // Spawn photons (only when bench laser is on)
+    if (state.laserOn && photons.length < 55 && Math.random() < 0.65) {
+      photons.push({
+        x: 18,
+        y: 18 + Math.random() * (ch - 36),
+        vx: 2.8 + Math.random() * 1.8,
+        r: 2.2,
+        alive: true,
+      });
+    }
+
+    for (let i = photons.length - 1; i >= 0; i--) {
+      const p = photons[i];
+      if (!p.alive) {
+        photons.splice(i, 1);
+        continue;
+      }
+      p.x += p.vx;
+
+      let absorbed = false;
+      for (const m of molecules) {
+        const dx = p.x - m.x;
+        const dy = p.y - m.y;
+        if (dx * dx + dy * dy < (p.r + m.r) * (p.r + m.r)) {
+          const pAbs = 0.08 + 0.88 * epsRatio;
+          if (Math.random() < pAbs) {
+            flashes.push({ x: m.x, y: m.y, t: 0, max: 14 });
+            absorbed = true;
+            break;
+          }
+        }
+      }
+
+      if (absorbed) {
+        photons.splice(i, 1);
+        continue;
+      }
+
+      if (p.x > cw + 8) {
+        photons.splice(i, 1);
+        continue;
+      }
+
+      ctxPh.fillStyle = rgbToCss(wlRgb);
+      ctxPh.shadowColor = rgbToCss(wlRgb);
+      ctxPh.shadowBlur = 6;
+      ctxPh.beginPath();
+      ctxPh.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctxPh.fill();
+      ctxPh.shadowBlur = 0;
+    }
+
+    for (let i = flashes.length - 1; i >= 0; i--) {
+      const f = flashes[i];
+      f.t++;
+      const life = 1 - f.t / f.max;
+      if (life <= 0) {
+        flashes.splice(i, 1);
+        continue;
+      }
+      const rad = 8 + (1 - life) * 22;
+      const glow = ctxPh.createRadialGradient(f.x, f.y, 0, f.x, f.y, rad);
+      glow.addColorStop(0, 'rgba(255,255,220,' + (0.55 * life) + ')');
+      glow.addColorStop(0.4, 'rgba(255,200,120,' + (0.22 * life) + ')');
+      glow.addColorStop(1, 'rgba(255,200,120,0)');
+      ctxPh.fillStyle = glow;
+      ctxPh.beginPath();
+      ctxPh.arc(f.x, f.y, rad, 0, Math.PI * 2);
+      ctxPh.fill();
+    }
+
+    ctxPh.restore();
+  }
+
+  function loop() {
+    readSliders();
+    drawSpec();
+    drawPhotonView();
+    if (state.graphMode !== 'off') {
+      drawGraphPanel();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // Build tabs
+  for (const id of Object.keys(SOLUTIONS)) {
+    const s = SOLUTIONS[id];
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sol-tab' + (state.solutionId === id ? ' active' : '');
+    btn.textContent = s.label;
+    btn.dataset.id = id;
+    btn.addEventListener('click', function () {
+      if (state.graphMode !== 'off') return;
+      state.solutionId = id;
+      document.querySelectorAll('.sol-tab').forEach(function (t) {
+        t.classList.toggle('active', t.dataset.id === id);
+      });
+      lastMolKey = '';
+      photons.length = 0;
+    });
+    tabsEl.appendChild(btn);
+  }
+
+  mainCanvas.addEventListener('mousemove', function (ev) {
+    const rect = mainCanvas.getBoundingClientRect();
+    const cssW = mainCanvas.width / dpr;
+    const cssH = mainCanvas.height / dpr;
+    const sx = ((ev.clientX - rect.left) / rect.width) * cssW;
+    const sy = ((ev.clientY - rect.top) / rect.height) * cssH;
+    const r = laserSwitchRegion;
+    mainCanvas.style.cursor = (r && sx >= r.x && sx <= r.x + r.w && sy >= r.y && sy <= r.y + r.h) ? 'pointer' : 'default';
+  });
+
+  mainCanvas.addEventListener('click', function (ev) {
+    const rect = mainCanvas.getBoundingClientRect();
+    const cssW = mainCanvas.width / dpr;
+    const cssH = mainCanvas.height / dpr;
+    const sx = ((ev.clientX - rect.left) / rect.width) * cssW;
+    const sy = ((ev.clientY - rect.top) / rect.height) * cssH;
+    if (laserSwitchRegion &&
+        sx >= laserSwitchRegion.x && sx <= laserSwitchRegion.x + laserSwitchRegion.w &&
+        sy >= laserSwitchRegion.y && sy <= laserSwitchRegion.y + laserSwitchRegion.h) {
+      state.laserOn = !state.laserOn;
+      photons.length = 0;
+    }
+  });
+
+  ['input', 'change'].forEach(function (ev) {
+    elConc.addEventListener(ev, function () { readSliders(); });
+    elPath.addEventListener(ev, function () { readSliders(); });
+    elLambda.addEventListener(ev, function () { readSliders(); });
+  });
+
+  window.addEventListener('resize', function () {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    lastMolKey = '';
+  });
+
+  graphBtn.addEventListener('click', openGraph);
+
+  gPlot.addEventListener('click', function () {
+    if (state.graphMode !== 'plotting') return;
+    const A = computeAbsorbance();
+    const c = state.c;
+    let dup = false;
+    for (let i = 0; i < state.graphPoints.length; i++) {
+      if (Math.abs(state.graphPoints[i].c - c) < 1e-4) {
+        dup = true;
+        break;
+      }
+    }
+    if (!dup) {
+      state.graphPoints.push({ c: c, A: A });
+      state.graphPulseUntil = performance.now() + 400;
+    }
+    updateGraphActions();
+  });
+
+  gEnd.addEventListener('click', function () {
+    if (state.graphMode !== 'plotting' || state.graphPoints.length < 2) return;
+    state.graphMode = 'fitted';
+    updateGraphActions();
+  });
+
+  gAdd.addEventListener('click', function () {
+    if (state.graphMode !== 'fitted') return;
+    state.graphMode = 'plotting';
+    updateGraphActions();
+  });
+
+  gClose.addEventListener('click', closeGraph);
+
+  syncSlidersFromState();
+  updateGraphActions();
+  loop();
+})();
+</script>
+</body>
+</html>
