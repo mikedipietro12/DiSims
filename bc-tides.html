@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BC Tide — White Rock &amp; Jericho Beach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#071a26; --bg2:#0b2433; --panel:#0e2c3d; --panel2:#12384c;
+  --line:#1d4a63; --ink:#e7f1f5; --ink-dim:#9db8c6; --ink-faint:#6a8b9c;
+  --tide:#4a9cc9; --tide-deep:#2b6f97; --tide-fill:#1c4e6b;
+  --amber:#e8b04b; --amber-soft:#f0c877; --moon:#e9f1f6; --coral:#ff6b5e;
+  --flood:#5fc9a6; --ebb:#e8955a;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --body:'Space Grotesk',system-ui,sans-serif;
+  --disp:'Fraunces',Georgia,serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:radial-gradient(1200px 700px at 70% -10%,#0d2c3e 0%,var(--bg) 60%);
+  color:var(--ink); font-family:var(--body); line-height:1.45;
+  min-height:100vh; padding:clamp(14px,2.5vw,30px);
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto}
+header{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:18px}
+.brand h1{font-family:var(--disp);font-weight:800;font-size:clamp(28px,4.4vw,46px);line-height:.98;margin:0;letter-spacing:-.01em}
+.brand h1 em{font-style:italic;font-weight:400;color:var(--amber-soft)}
+.brand p{margin:6px 0 0;color:var(--ink-dim);font-size:13px;font-family:var(--mono);letter-spacing:.02em}
+.sitesel{display:inline-flex;align-items:center;gap:8px;margin-bottom:10px}
+.sitesel label{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+.sitesel select{font-family:var(--body);font-weight:500;font-size:14px;color:var(--ink);
+  background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 30px 7px 12px;cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'><path d='M1 1l5 5 5-5' fill='none' stroke='%239db8c6' stroke-width='1.6'/></svg>");
+  background-repeat:no-repeat;background-position:right 10px center;background-size:11px}
+.sitesel select:hover{border-color:#2b6f97}
+.sitesel select:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.clock{text-align:right}
+.clock .t{font-family:var(--mono);font-size:clamp(15px,2vw,19px);font-weight:500;color:var(--ink)}
+.clock .d{font-family:var(--mono);font-size:12px;color:var(--ink-faint);margin-top:2px}
+.state-chip{display:inline-flex;align-items:center;gap:7px;margin-top:8px;padding:5px 11px;border:1px solid var(--line);border-radius:100px;font-size:12.5px;font-family:var(--mono);background:var(--panel)}
+.state-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--flood)}
+
+.hero{background:linear-gradient(180deg,var(--panel) 0%,var(--bg2) 100%);border:1px solid var(--line);border-radius:16px;padding:14px 14px 6px;position:relative;overflow:hidden}
+.hero h2,.card h2{font-family:var(--mono);font-weight:500;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin:2px 4px 10px}
+.canvas-holder{position:relative;width:100%}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#tideCanvas{height:clamp(230px,34vw,320px);cursor:crosshair}
+
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:14px 0 20px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 15px}
+button.ctrl{font-family:var(--body);font-weight:500;font-size:13.5px;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 14px;cursor:pointer;transition:.15s}
+button.ctrl:hover{background:#17455c;border-color:#2b6f97}
+button.ctrl:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button.ctrl.accent{background:var(--amber);color:#3a2a08;border-color:var(--amber);font-weight:700}
+button.ctrl.accent:hover{background:var(--amber-soft)}
+.scrub{flex:1 1 260px;display:flex;align-items:center;gap:11px;min-width:200px}
+.scrub input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:5px;border-radius:5px;background:linear-gradient(90deg,var(--tide-deep),var(--tide));outline-offset:4px}
+.scrub input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--amber);border:2px solid #3a2a08;cursor:grab}
+.scrub input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--amber);border:2px solid #3a2a08;cursor:grab}
+.scrub .lab{font-family:var(--mono);font-size:11px;color:var(--ink-faint);white-space:nowrap}
+.speed{display:flex;gap:4px}
+.speed button{padding:6px 9px;font-size:12px;font-family:var(--mono)}
+.speed button.on{background:var(--tide-deep);border-color:var(--tide)}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:linear-gradient(180deg,var(--panel) 0%,var(--bg2) 100%);border:1px solid var(--line);border-radius:16px;padding:14px 14px 12px;overflow:hidden}
+#moonCanvas,#beachCanvas{height:clamp(300px,32vw,360px)}
+.legend{display:flex;flex-wrap:wrap;gap:12px 18px;margin-top:10px;padding:0 4px}
+.legend span{font-family:var(--mono);font-size:11px;color:var(--ink-dim);display:inline-flex;align-items:center;gap:6px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+.readouts{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:16px 0 4px}
+.ro{background:var(--panel);padding:12px 14px}
+.ro .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-faint)}
+.ro .v{font-family:var(--disp);font-size:clamp(17px,2.3vw,22px);font-weight:600;margin-top:3px;color:var(--ink)}
+.ro .v small{font-family:var(--mono);font-size:12px;font-weight:400;color:var(--ink-dim)}
+
+footer{margin-top:22px;color:var(--ink-faint);font-size:12px;font-family:var(--mono);line-height:1.6;border-top:1px solid var(--line);padding-top:14px}
+footer b{color:var(--ink-dim);font-weight:500}
+@media(max-width:720px){.grid{grid-template-columns:1fr}.readouts{grid-template-columns:repeat(2,1fr)}.clock{text-align:left}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="sitesel">
+        <label for="siteSel">Beach</label>
+        <select id="siteSel">
+          <option value="whiterock">White Rock</option>
+          <option value="jericho">Jericho Beach</option>
+        </select>
+      </div>
+      <h1 id="siteTitle">White Rock <em>Tide</em></h1>
+      <p id="siteMeta">—</p>
+    </div>
+    <div class="clock">
+      <div class="t" id="clockTime">—</div>
+      <div class="d" id="clockDate">—</div>
+      <div class="state-chip"><span class="dot" id="stateDot"></span><span id="stateText">—</span></div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h2>Tide height · next days</h2>
+    <div class="canvas-holder"><canvas id="tideCanvas"></canvas></div>
+  </section>
+
+  <div class="controls">
+    <button class="ctrl accent" id="nowBtn">Now</button>
+    <button class="ctrl" id="playBtn">▶ Play</button>
+    <div class="speed" id="speedGroup">
+      <button data-mult="6" class="on">6×</button>
+      <button data-mult="60">1 min/s</button>
+      <button data-mult="1800">30 min/s</button>
+    </div>
+    <div class="scrub">
+      <span class="lab">−15d</span>
+      <input type="range" id="scrub" min="-21600" max="21600" value="0" step="1" aria-label="Scrub through time">
+      <span class="lab">+15d</span>
+    </div>
+  </div>
+
+  <div class="readouts" id="readouts">
+    <div class="ro"><div class="k">Tide height</div><div class="v" id="roHeight">—</div></div>
+    <div class="ro"><div class="k">Moon phase</div><div class="v" id="roPhase">—</div></div>
+    <div class="ro"><div class="k">Range today</div><div class="v" id="roRange">—</div></div>
+    <div class="ro"><div class="k">Moon distance</div><div class="v" id="roDist">—</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Moon &amp; Earth · why the tide moves</h2>
+      <div class="canvas-holder"><canvas id="moonCanvas"></canvas></div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--amber)"></i><span id="legendSite">White Rock</span></span>
+        <span><i class="sw" style="background:var(--tide)"></i>Equilibrium bulge</span>
+        <span><i class="sw" style="background:var(--moon)"></i>Moon</span>
+        <span><i class="sw" style="background:var(--amber-soft)"></i>Sun direction</span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>The beach · waterline &amp; current</h2>
+      <div class="canvas-holder"><canvas id="beachCanvas"></canvas></div>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--flood)"></i>Flood (water in)</span>
+        <span><i class="sw" style="background:var(--ebb)"></i>Ebb (water out)</span>
+        <span style="color:var(--ink-faint)">current strength ∝ how fast the tide is changing</span>
+      </div>
+    </div>
+  </div>
+
+  <footer id="foot">
+    <b>How this works.</b> Each beach has its own harmonic tide model &mdash; 8 astronomical constituents plus a few shallow-water overtones &mdash; fit to <span id="fitNote">published predictions</span>, with K2 and P1 inferred from S2 and K1. The Moon's position, phase and distance come from a low-precision lunar ephemeris. The Moon&ndash;Earth panel is the <b>equilibrium</b> picture: the bulges point at the Moon, which is the tidal <em>forcing</em>. The real ocean lags &mdash; high water here arrives roughly 4&frac12; hours after the Moon is overhead &mdash; so the chart peaks well after the beach rotates past the bulge. The dot's glow tracks its actual tide height so you can see that delay.
+    <br><br>
+    <b>Accuracy.</b> Jericho Beach uses the Vancouver (Burrard Inlet) station about 7&nbsp;km away, so expect a few extra minutes of timing offset there. ~8&ndash;10 cm typical in the fitting window, drifting to ~15–25 cm and up to an hour of timing error months away from spring 2026. Good for seeing the tide and planning a beach walk — <b>not for navigation.</b> The beach view and tidal-current arrow are schematic: the current direction and strength come from the rate the tide is changing (fastest mid-tide, slack at the turns), not a current meter.
+  </footer>
+</div>
+
+<script>
+"use strict";
+const D2R=Math.PI/180, R2D=180/Math.PI;
+const mod=(x,m)=>((x%m)+m)%m;
+const clamp=(x,a,b)=>x<a?a:x>b?b:x;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const S=d=>Math.sin(d*D2R), C=d=>Math.cos(d*D2R);
+
+/* ---------- TIME BASE ---------- */
+const TREF=Date.UTC(2026,0,1,0,0,0);         // constituent reference epoch
+const jd=ms=>ms/86400000+2440587.5;
+const LAND=[[[107.0,77.0],[114.1,75.8],[109.4,74.2],[127.0,73.6],[131.3,70.8],[132.3,71.8],[139.9,71.5],[139.1,72.4],[140.5,72.8],[169.6,68.7],[170.5,70.1],[175.7,69.9],[180,69.0],[180,65.0],[177.4,64.6],[179.2,62.3],[170.3,59.9],[163.5,59.9],[162.0,58.2],[163.2,57.6],[162.1,54.9],[156.8,51.0],[155.9,56.8],[164.5,62.6],[160.1,60.5],[159.3,61.8],[156.7,61.4],[154.2,59.8],[155.0,59.1],[142.2,59.0],[135.1,54.7],[139.9,54.2],[141.4,52.2],[138.2,46.3],[127.5,39.8],[129.1,35.1],[126.5,34.4],[126.9,36.9],[124.7,38.1],[125.3,39.6],[121.1,38.9],[121.6,40.9],[118.0,39.2],[118.9,37.4],[122.4,37.5],[119.2,34.9],[121.9,31.7],[121.7,28.2],[115.9,22.8],[110.4,20.3],[108.5,21.7],[105.9,19.8],[109.3,13.4],[109.2,11.7],[105.2,8.6],[100.1,13.4],[99.2,9.2],[103.0,5.5],[104.2,1.3],[101.4,2.8],[98.3,7.8],[97.2,16.9],[94.2,16.0],[94.3,18.2],[91.4,22.8],[87.0,21.5],[80.3,15.9],[79.9,10.4],[77.5,8.0],[73.5,16.0],[72.6,21.4],[70.5,20.9],[66.4,25.4],[53.5,26.8],[48.9,30.3],[48.4,28.6],[51.8,24.0],[54.0,24.1],[56.4,26.4],[56.8,24.2],[59.8,22.3],[55.3,17.2],[44.2,12.6],[38.5,23.7],[34.6,28.1],[34.9,29.5],[33.9,27.6],[32.3,29.8],[37.5,18.6],[42.7,11.7],[44.6,10.4],[51.1,12.0],[48.6,5.3],[42.9,0.0],[9.2,0.0],[9.8,3.1],[8.5,4.8],[5.9,4.3],[2.7,6.3],[-8.0,4.4],[-16.6,12.2],[-17.6,14.7],[-16.1,18.1],[-17.0,21.9],[-5.9,35.8],[-2.2,35.2],[9.5,37.4],[11.1,36.9],[10.3,33.8],[19.1,30.3],[21.5,32.8],[33.8,31.0],[36.2,36.7],[27.6,36.7],[26.2,39.5],[33.5,42.0],[41.6,41.5],[36.7,45.2],[39.1,47.3],[35.0,46.3],[36.3,45.1],[33.9,44.4],[32.5,45.3],[33.3,46.1],[30.7,46.6],[27.7,42.6],[28.8,41.1],[22.6,40.3],[24.0,37.7],[22.5,36.4],[19.5,41.7],[13.1,45.7],[12.6,44.1],[18.5,40.2],[16.9,40.4],[16.1,38.0],[15.4,40.0],[8.9,44.4],[3.1,43.1],[-2.1,36.7],[-8.9,36.9],[-9.4,43.0],[-1.4,44.0],[-1.2,46.0],[-4.6,48.7],[-1.6,48.6],[-1.9,49.8],[8.1,53.5],[8.5,57.1],[10.6,57.7],[9.7,55.5],[10.9,54.0],[19.7,54.4],[21.3,55.2],[21.6,57.4],[24.1,57.0],[23.3,59.2],[29.1,60.0],[21.3,60.7],[21.5,63.2],[25.4,65.1],[23.9,66.0],[17.8,62.7],[17.1,61.3],[18.8,60.1],[15.9,56.1],[12.9,55.4],[10.4,59.5],[5.7,58.6],[5.0,62.0],[14.8,67.8],[28.2,71.2],[41.1,67.5],[38.4,66.0],[33.2,66.6],[37.0,63.8],[37.2,65.1],[39.6,64.5],[42.1,66.5],[43.9,66.1],[43.5,68.6],[46.3,68.3],[46.3,66.7],[53.7,68.9],[59.9,68.3],[60.6,69.9],[68.5,68.1],[66.7,71.0],[69.9,73.0],[72.8,72.2],[71.8,71.4],[73.7,68.4],[71.3,66.3],[72.4,66.2],[75.1,67.8],[73.1,71.4],[74.7,72.8],[76.4,71.2],[77.6,72.3],[81.5,71.8],[80.5,73.6],[86.8,73.9],[86.0,74.5],[87.2,75.1],[104.4,77.7],[107.0,77.0]],[[-90.5,69.5],[-87.4,67.2],[-85.5,69.9],[-82.6,69.7],[-81.3,67.6],[-85.8,66.6],[-93.2,62.0],[-94.7,58.9],[-92.3,57.1],[-82.3,55.1],[-79.9,51.2],[-78.6,52.6],[-79.8,54.7],[-76.5,56.5],[-78.5,58.8],[-77.3,59.9],[-78.1,62.3],[-73.8,62.4],[-69.6,61.1],[-69.3,59.0],[-67.6,58.2],[-64.6,60.3],[-61.8,56.3],[-57.3,54.6],[-55.7,52.1],[-60.0,50.2],[-66.4,50.2],[-71.1,46.8],[-65.1,49.2],[-64.5,46.2],[-61.5,45.9],[-60.5,47.0],[-59.8,45.9],[-65.4,43.5],[-66.2,44.5],[-64.4,45.3],[-67.1,45.1],[-70.7,43.0],[-70.0,41.6],[-75.5,39.5],[-75.9,37.2],[-76.3,39.2],[-75.7,35.6],[-81.3,31.4],[-80.4,25.2],[-84.1,30.1],[-93.8,29.7],[-97.4,27.4],[-97.2,20.6],[-94.4,18.1],[-87.1,21.5],[-88.9,15.9],[-83.4,15.3],[-83.8,11.1],[-82.2,9.0],[-76.8,8.6],[-71.8,12.4],[-71.7,9.1],[-69.9,12.2],[-68.2,10.6],[-61.9,10.7],[-62.4,9.9],[-57.1,6.0],[-51.3,4.2],[-50.5,0.0],[-80.2,0.0],[-77.1,3.8],[-78.2,8.3],[-79.6,8.9],[-80.9,7.2],[-85.7,9.9],[-87.5,13.3],[-103.5,18.3],[-105.5,19.9],[-106.0,22.8],[-114.8,31.8],[-109.4,23.2],[-112.2,24.7],[-117.3,33.0],[-120.6,34.6],[-124.4,40.3],[-124.7,48.2],[-122.6,47.1],[-122.8,49.0],[-127.4,50.8],[-134.1,58.1],[-147.1,60.9],[-151.7,59.2],[-150.6,61.3],[-158.4,56.0],[-164.8,54.4],[-157.0,58.9],[-162.0,58.7],[-166.1,61.5],[-160.8,64.8],[-168.1,65.7],[-161.7,66.1],[-166.8,68.4],[-156.6,71.4],[-136.5,68.9],[-128.1,70.5],[-108.9,67.4],[-106.2,68.8],[-101.5,67.6],[-97.7,68.6],[-96.1,67.3],[-94.2,69.1],[-96.5,70.1],[-95.2,71.9],[-90.5,69.5]],[[-27.1,83.5],[-20.8,82.7],[-31.9,82.2],[-12.2,81.3],[-20.0,80.2],[-17.7,80.1],[-19.7,78.8],[-18.5,77.0],[-21.7,76.6],[-19.8,76.1],[-20.7,75.2],[-19.4,74.3],[-23.6,73.3],[-22.3,72.2],[-24.8,72.3],[-21.8,70.7],[-25.5,71.4],[-26.4,70.2],[-22.3,70.1],[-39.8,65.5],[-42.8,62.7],[-43.4,60.1],[-48.3,60.9],[-51.6,63.6],[-54.0,67.2],[-50.9,69.9],[-54.7,69.6],[-54.4,70.8],[-51.4,70.6],[-55.8,71.7],[-54.7,72.6],[-58.6,75.5],[-68.5,76.1],[-71.4,77.0],[-66.8,77.4],[-73.3,78.0],[-65.7,79.4],[-68.0,80.1],[-62.7,81.8],[-44.5,81.7],[-46.8,82.6],[-27.1,83.5]],[[-86.6,73.2],[-82.3,73.8],[-80.7,72.1],[-72.2,71.6],[-67.0,69.2],[-68.8,68.7],[-61.9,66.9],[-63.9,65.0],[-68.0,66.3],[-64.7,63.4],[-68.8,63.7],[-66.2,61.9],[-74.8,64.7],[-77.7,64.2],[-77.9,65.3],[-74.0,65.5],[-72.9,67.7],[-79.0,70.2],[-89.9,71.2],[-89.4,73.1],[-85.8,73.8],[-86.6,73.2]],[[-3.0,58.6],[-4.1,57.6],[-2.0,57.7],[-3.1,56.0],[1.7,52.7],[1.4,51.3],[-5.2,50.0],[-3.4,51.4],[-5.3,52.0],[-4.6,53.5],[-2.9,54.0],[-6.1,56.8],[-5.0,58.6],[-3.0,58.6]],[[-68.5,83.1],[-61.9,82.6],[-76.9,79.3],[-75.4,78.5],[-80.6,76.2],[-89.5,76.5],[-88.3,77.9],[-85.0,77.5],[-88.0,78.4],[-85.1,79.3],[-86.9,80.3],[-81.8,80.5],[-91.6,81.9],[-68.5,83.1]],[[141.0,37.1],[140.3,35.1],[135.8,33.5],[135.1,34.6],[131.0,33.9],[132.0,33.1],[130.2,31.4],[129.4,33.3],[132.6,35.4],[135.7,35.5],[141.4,41.4],[141.0,37.1]],[[117.9,1.8],[119.0,0.9],[117.5,0.0],[109.0,0.0],[109.7,2.0],[113.0,3.1],[116.7,6.9],[119.2,5.4],[117.3,3.2],[117.9,1.8]],[[-114.2,73.1],[-108.2,71.7],[-108.4,73.1],[-106.5,73.1],[-101.1,69.6],[-113.3,68.5],[-117.3,70.0],[-112.4,70.4],[-119.4,71.6],[-114.2,73.1]],[[-14.5,66.5],[-13.6,65.1],[-18.7,63.5],[-22.8,64.0],[-21.8,64.4],[-24.0,64.9],[-22.2,65.4],[-24.3,65.6],[-14.5,66.5]],[[-56.1,50.7],[-56.8,49.8],[-53.5,49.2],[-53.1,46.7],[-54.2,47.8],[-59.3,47.6],[-55.4,51.6],[-56.1,50.7]],[[121.3,18.5],[122.5,17.1],[121.7,14.3],[124.0,13.8],[124.1,12.5],[120.1,15.0],[121.3,18.5]],[[143.6,50.7],[144.7,49.0],[143.2,49.3],[143.5,46.1],[142.1,46.0],[142.2,54.2],[143.6,50.7]],[[-175.0,66.6],[-169.9,66.0],[-173.0,64.3],[-178.7,66.1],[-180,65.0],[-180,69.0],[-175.0,66.6]],[[-100.4,73.8],[-97.4,73.8],[-96.7,71.7],[-102.5,72.5],[-100.4,72.7],[-101.5,73.4],[-100.4,73.8]],[[57.5,70.7],[51.5,72.0],[55.6,75.1],[68.9,76.5],[58.5,74.3],[55.4,72.4],[57.5,70.7]],[[126.4,8.4],[125.4,5.6],[123.6,7.8],[121.9,7.2],[125.4,9.8],[126.4,8.4]],[[-79.7,22.8],[-74.2,20.3],[-77.8,19.9],[-81.8,22.6],[-85.0,21.9],[-79.7,22.8]],[[-6.8,52.3],[-10.0,51.8],[-9.7,53.9],[-6.7,55.2],[-5.7,54.6],[-6.8,52.3]],[[-120.5,71.4],[-125.9,71.9],[-123.9,73.7],[-124.9,74.3],[-115.5,73.5],[-120.5,71.4]],[[-108.2,76.2],[-105.7,75.5],[-112.2,74.4],[-117.7,75.2],[-115.4,76.5],[-108.2,76.2]],[[-87.0,79.7],[-85.8,79.3],[-90.8,78.2],[-96.7,80.2],[-92.4,81.3],[-87.0,79.7]],[[81.2,6.2],[79.9,6.8],[80.1,9.8],[81.8,7.5],[81.2,6.2]],[[-72.6,19.9],[-68.3,18.6],[-74.5,18.3],[-72.3,18.7],[-72.6,19.9]],[[121.2,22.8],[120.7,22.0],[120.1,23.6],[121.5,25.3],[121.2,22.8]],[[143.9,44.2],[145.5,43.3],[140.0,41.6],[142.0,45.6],[143.9,44.2]],[[-93.2,72.8],[-95.4,72.1],[-96.0,73.4],[-90.5,73.9],[-93.2,72.8]],[[-94.7,77.1],[-79.8,74.9],[-89.8,74.5],[-97.1,76.8],[-94.7,77.1]],[[18.3,79.7],[21.5,79.0],[15.9,76.8],[10.4,79.7],[18.3,79.7]],[[125.2,1.4],[119.8,0.0],[120.9,1.3],[125.2,1.4]],[[99.5,0.0],[95.3,5.5],[97.5,5.2],[103.8,0.0]],[[118.5,9.3],[117.2,8.4],[119.5,11.4],[118.5,9.3]],[[15.5,38.2],[15.1,36.6],[12.4,37.6],[15.5,38.2]],[[-85.2,65.7],[-80.1,63.7],[-87.2,63.5],[-85.2,65.7]],[[-98.5,76.7],[-98.2,75],[-102.5,75.6],[-98.5,76.7]],[[105.1,78.3],[99.4,77.9],[102.1,79.3],[105.1,78.3]],[[25.4,80.4],[27.4,80.1],[17.4,80.3],[25.4,80.4]],[[99.9,78.9],[91.2,80.3],[95.9,81.3],[99.9,78.9]]];
+
+/* ---------- SITES: constituents fit to published predictions per station ---------- */
+const SITES={
+  whiterock:{
+    key:"whiterock", name:"White Rock", water:"Semiahmoo Bay",
+    lat:49.02, lon:-122.80, datum:"chart datum", lagH:"4.5",
+    fitNote:"published White Rock predictions, Apr\u2013Jun 2026",
+    Z0:2.9053,
+    groups:[
+      {H:0.7511,g:317.36,mem:[["M2",1]]},
+      {H:0.1827,g:32.03 ,mem:[["S2",1],["K2",0.272]]},
+      {H:0.2348,g:296.74,mem:[["N2",1]]},
+      {H:0.9091,g:273.58,mem:[["K1",1],["P1",0.33]]},
+      {H:0.4181,g:201.12,mem:[["O1",1]]},
+      {H:0.1307,g:216.12,mem:[["Q1",1]]},
+      {H:0.0447,g:74.39 ,mem:[["M4",1]]},
+      {H:0.0150,g:273.41,mem:[["MS4",1]]},
+      {H:0.0688,g:268.03,mem:[["MN4",1]]},
+      {H:0.0354,g:156.92,mem:[["M6",1]]},
+      {H:0.0490,g:31.59 ,mem:[["MK3",1]]}
+    ],
+    beach:{ view:"view SW across Semiahmoo Bay", lowY:0.02, pier:true, freighters:false, skyline:false,
+      terrain:[ {type:"cone",amp:0.10,peak:0.72,alpha:0.7,shade:0},
+                {type:"cone",amp:0.16,peak:0.30,alpha:0.9,shade:1,label:"Mt Baker"} ] }
+  },
+  jericho:{
+    key:"jericho", name:"Jericho Beach", water:"English Bay",
+    lat:49.272, lon:-123.196, datum:"chart datum", lagH:"4.7",
+    fitNote:"published Vancouver (Burrard Inlet) predictions, May\u2013Jul 2026",
+    Z0:3.0583,
+    groups:[
+      {H:0.9853,g:332.10,mem:[["M2",1]]},
+      {H:0.1543,g:57.23 ,mem:[["S2",1],["K2",0.272]]},
+      {H:0.2653,g:309.26,mem:[["N2",1]]},
+      {H:0.8829,g:281.45,mem:[["K1",1],["P1",0.33]]},
+      {H:0.4205,g:206.44,mem:[["O1",1]]},
+      {H:0.1097,g:210.24,mem:[["Q1",1]]},
+      {H:0.0703,g:184.89,mem:[["M4",1]]},
+      {H:0.0659,g:305.12,mem:[["MS4",1]]},
+      {H:0.0628,g:257.08,mem:[["MN4",1]]},
+      {H:0.0415,g:130.20,mem:[["M6",1]]},
+      {H:0.0438,g:88.35 ,mem:[["MK3",1]]}
+    ],
+    beach:{ view:"view N across English Bay", lowY:0.17, pier:false, freighters:true, skyline:true,
+      terrain:[ {type:"ridge",amp:0.30,alpha:0.92,shade:1,label:"North Shore Mountains"} ] }
+  }
+};
+let SITE=SITES.whiterock;
+const SPEED={M2:28.9841042,S2:30.0,N2:28.4397295,K2:30.0821373,K1:15.0410686,
+  O1:13.9430356,P1:14.9589314,Q1:13.3986609,M4:57.9682084,MS4:58.9841042,
+  MN4:57.4238337,M6:86.9523127,MK3:44.0251729};
+function nodeDeg(ms){const T=(jd(ms)-2451545.0)/36525.0;
+  return mod(125.04452-1934.136261*T+0.0020708*T*T+T*T*T/450000.0,360);}
+function nodal(name,ms){
+  const N=nodeDeg(ms), cN=C(N),c2N=C(2*N),c3N=C(3*N),sN=S(N),s2N=S(2*N),s3N=S(3*N);
+  const fm=1.0004-0.0373*cN+0.0002*c2N, um=-2.14*sN;
+  switch(name){
+    case "M2":case "N2": return [fm,um];
+    case "S2": return [1,0];
+    case "K2": return [1.0241+0.2863*cN+0.0083*c2N-0.0015*c3N,-17.74*sN+0.68*s2N-0.04*s3N];
+    case "K1": return [1.0060+0.1150*cN-0.0088*c2N+0.0006*c3N,-8.86*sN+0.68*s2N-0.07*s3N];
+    case "O1":case "Q1": return [1.0089+0.1871*cN-0.0147*c2N+0.0014*c3N,10.80*sN-1.34*s2N+0.19*s3N];
+    case "P1": return [1,0];
+    case "M4":case "MN4":case "MS4": return [fm*fm,2*um];
+    case "M6": return [fm*fm*fm,3*um];
+    case "MK3":{const fk=1.0060+0.1150*cN-0.0088*c2N;return [fm*fk,um-8.86*sN];}
+    default: return [1,0];
+  }
+}
+function tideHeight(ms){
+  const hours=(ms-TREF)/3600000; let h=SITE.Z0;
+  for(const grp of SITE.groups){const gr=grp.g*D2R;
+    for(const [nm,r] of grp.mem){
+      const nu=nodal(nm,ms), th=(SPEED[nm]*hours+nu[1])*D2R;
+      h+=r*nu[0]*grp.H*Math.cos(th-gr);
+    }}
+  return h;
+}
+const HMIN=-0.35, HMAX=5.15;                 // display span, m MLLW
+const tideRate=ms=>(tideHeight(ms+300000)-tideHeight(ms-300000))/(1/6); // m per hour
+
+// find extrema in [a,b] ms
+function extrema(a,b){
+  const step=180000, out=[]; let pm=tideHeight(a-step), p=tideHeight(a);
+  for(let t=a;t<=b;t+=step){const nx=tideHeight(t+step);
+    if((p-pm)>=0!==(nx-p)>=0){ // slope changed sign -> extremum in (t-step, t+step)
+      const rising=(p-pm)>0;   // rising before the turn => this is a high
+      let lo=t-step,hi=t+step;
+      for(let k=0;k<24;k++){const m1=(lo+hi)/2; if((tideRate(m1)>0)===rising)lo=m1;else hi=m1;}
+      const tt=(lo+hi)/2; out.push({t:tt,h:tideHeight(tt),high:rising});
+    } pm=p;p=nx;}
+  return out;
+}
+
+/* ---------- MOON + SUN ---------- */
+function moon(ms){
+  const d=jd(ms)-2451545.0;
+  const L=218.316+13.176396*d, M=134.963+13.064993*d, F=93.272+13.229350*d,
+        Ms=357.529+0.98560028*d, Dm=297.850+12.190749*d;
+  const lonD=L+6.289*S(M)+1.274*S(2*Dm-M)+0.658*S(2*Dm)+0.214*S(2*M)-0.186*S(Ms)-0.114*S(2*F);
+  const latD=5.128*S(F)+0.281*S(M+F)+0.278*S(M-F)+0.173*S(2*Dm-F);
+  const dist=385001-20905*C(M)-3699*C(2*Dm-M)-2956*C(2*Dm);
+  const ep=23.439-0.0000004*d;
+  const lon=lonD*D2R, lat=latD*D2R;
+  const ra=Math.atan2(Math.sin(lon)*C(ep)-Math.tan(lat)*S(ep),Math.cos(lon));
+  const dec=Math.asin(Math.sin(lat)*C(ep)+Math.cos(lat)*S(ep)*Math.sin(lon));
+  const slonD=280.459+0.98564736*d+1.915*S(Ms)+0.020*S(2*Ms);
+  const slon=slonD*D2R;
+  const elong=Math.acos(Math.cos(lat)*Math.cos(lon-slon));
+  const phase=(1-Math.cos(elong))/2;
+  const waxing=mod(lonD-slonD,360)<180;
+  const raSun=Math.atan2(C(ep)*Math.sin(slon),Math.cos(slon));
+  const decSun=Math.asin(S(ep)*Math.sin(slon));
+  return {raDeg:mod(ra*R2D,360),decDeg:dec*R2D,dist,phase,waxing,
+          raSunDeg:mod(raSun*R2D,360),decSunDeg:decSun*R2D};
+}
+const gmstDeg=ms=>mod(280.46061837+360.98564736629*(jd(ms)-2451545.0),360);
+const lstDeg=ms=>mod(gmstDeg(ms)+SITE.lon,360);
+function sunAlt(ms,mo){ // solar altitude at the selected beach
+  const ha=mod(lstDeg(ms)-mo.raSunDeg,360);
+  return Math.asin(S(SITE.lat)*S(mo.decSunDeg)+C(SITE.lat)*C(mo.decSunDeg)*C(ha))*R2D;
+}
+function phaseName(mo){
+  const p=mo.phase;
+  if(p<0.04) return "New moon";
+  if(p>0.96) return "Full moon";
+  if(Math.abs(p-0.5)<0.06) return mo.waxing?"First quarter":"Last quarter";
+  if(p<0.5) return mo.waxing?"Waxing crescent":"Waning crescent";
+  return mo.waxing?"Waxing gibbous":"Waning gibbous";
+}
+
+/* ---------- STATE ---------- */
+const loadMs=Date.now();
+let currentMs=loadMs;
+let playing=false, speedMult=6, lastFrame=performance.now();
+const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const fmtT=ms=>new Date(ms).toLocaleTimeString("en-CA",{hour:"2-digit",minute:"2-digit",timeZone:"America/Vancouver"});
+const fmtD=ms=>new Date(ms).toLocaleDateString("en-CA",{weekday:"short",month:"short",day:"numeric",timeZone:"America/Vancouver"});
+
+/* ---------- CANVAS SETUP ---------- */
+function setup(id){
+  const cv=document.getElementById(id), ctx=cv.getContext("2d");
+  function resize(){const r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);
+    cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);cv._w=r.width;cv._h=r.height;}
+  new ResizeObserver(resize).observe(cv); resize();
+  return {cv,ctx};
+}
+const tideC=setup("tideCanvas"), moonC=setup("moonCanvas"), beachC=setup("beachCanvas");
+
+/* ---------- TIDE CHART ---------- */
+const PAST=1.0*864e5, FUT=2.6*864e5;
+function drawTide(){
+  const {ctx,cv}=tideC, w=cv._w, h=cv._h; if(!w)return;
+  ctx.clearRect(0,0,w,h);
+  const padL=38,padR=12,padT=14,padB=26, gw=w-padL-padR, gh=h-padT-padB;
+  const t0=currentMs-PAST, t1=currentMs+FUT;
+  const X=t=>padL+(t-t0)/(t1-t0)*gw;
+  const Y=hh=>padT+(1-(hh-HMIN)/(HMAX-HMIN))*gh;
+
+  // night shading via sun altitude
+  const mo0=moon(currentMs);
+  const cols=Math.floor(gw);
+  for(let i=0;i<cols;i++){const t=t0+(i/cols)*(t1-t0);
+    const alt=sunAlt(t,moon(t));
+    if(alt<0){const k=clamp((-alt)/8,0,1);ctx.fillStyle=`rgba(3,14,22,${0.28+0.26*k})`;ctx.fillRect(padL+i,padT,1.3,gh);}}
+
+  // horizontal grid + y labels (m)
+  ctx.font="11px 'IBM Plex Mono',monospace";ctx.textBaseline="middle";
+  for(let m=0;m<=5;m++){const y=Y(m);
+    ctx.strokeStyle="rgba(120,160,180,.13)";ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
+    ctx.fillStyle="#6a8b9c";ctx.textAlign="right";ctx.fillText(m+"m",padL-6,y);}
+
+  // day gridlines (local midnight) + labels
+  const dayStart=new Date(t0);dayStart.setHours(0,0,0,0);
+  for(let d=0;d<7;d++){const dt=new Date(dayStart);dt.setDate(dt.getDate()+d);const t=dt.getTime();
+    if(t<t0||t>t1)continue;const x=X(t);
+    ctx.strokeStyle="rgba(120,160,180,.22)";ctx.setLineDash([2,4]);ctx.beginPath();ctx.moveTo(x,padT);ctx.lineTo(x,padT+gh);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="#9db8c6";ctx.textAlign="left";ctx.textBaseline="top";
+    ctx.fillText(dt.toLocaleDateString("en-CA",{weekday:"short",day:"numeric",timeZone:"America/Vancouver"}),x+4,padT+2);
+    ctx.textBaseline="middle";}
+
+  // tide curve (filled)
+  ctx.beginPath();let first=true;
+  const N=Math.max(120,Math.floor(gw));
+  for(let i=0;i<=N;i++){const t=t0+(i/N)*(t1-t0);const x=X(t),y=Y(tideHeight(t));
+    if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);}
+  const lineTop=[];for(let i=0;i<=N;i++){const t=t0+(i/N)*(t1-t0);lineTop.push([X(t),Y(tideHeight(t))]);}
+  ctx.lineTo(X(t1),Y(HMIN));ctx.lineTo(X(t0),Y(HMIN));ctx.closePath();
+  const grad=ctx.createLinearGradient(0,padT,0,padT+gh);
+  grad.addColorStop(0,"rgba(74,156,201,.55)");grad.addColorStop(1,"rgba(28,78,107,.10)");
+  ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();lineTop.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));
+  ctx.strokeStyle="#6fbbe0";ctx.lineWidth=2;ctx.stroke();
+
+  // hi/lo markers
+  const ex=extrema(t0,t1);
+  ctx.font="10.5px 'IBM Plex Mono',monospace";
+  for(const e of ex){const x=X(e.t),y=Y(e.h);
+    ctx.fillStyle=e.high?"#bfe4f2":"#7fa6b8";ctx.beginPath();ctx.arc(x,y,2.6,0,7);ctx.fill();
+    ctx.fillStyle=e.high?"#dff0f7":"#a9c6d4";ctx.textAlign="center";
+    ctx.textBaseline=e.high?"bottom":"top";
+    ctx.fillText(e.h.toFixed(1)+"m",x,y+(e.high?-6:6));
+    ctx.fillStyle="#6a8b9c";ctx.fillText(fmtT(e.t).replace(/^0/,""),x,y+(e.high?-18:16));}
+
+  // NOW / selected line
+  const xN=X(currentMs),yN=Y(tideHeight(currentMs));
+  ctx.strokeStyle="rgba(255,107,94,.85)";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(xN,padT);ctx.lineTo(xN,padT+gh);ctx.stroke();
+  ctx.fillStyle="#ff6b5e";ctx.beginPath();ctx.arc(xN,yN,5,0,7);ctx.fill();
+  ctx.strokeStyle="rgba(255,255,255,.5)";ctx.lineWidth=1.5;ctx.stroke();
+}
+// click / drag to set time
+function tidePick(e){
+  const {cv}=tideC,r=cv.getBoundingClientRect();
+  const px=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+  const padL=38,padR=12,gw=cv._w-padL-padR;
+  const frac=clamp((px-padL)/gw,0,1);
+  setTime(currentMs-PAST+frac*(PAST+FUT)); }
+let tdrag=false;
+tideC.cv.addEventListener("pointerdown",e=>{tdrag=true;tideC.cv.setPointerCapture(e.pointerId);tidePick(e);});
+tideC.cv.addEventListener("pointermove",e=>{if(tdrag)tidePick(e);});
+tideC.cv.addEventListener("pointerup",()=>tdrag=false);
+
+/* ---------- MOON & EARTH (top-down from N pole, inertial RA frame) ---------- */
+let earthSpin=0;
+function drawLand(ctx,cx,cy,Re,ms){
+  const g=gmstDeg(ms);
+  ctx.save();ctx.beginPath();ctx.arc(cx,cy,Re,0,7);ctx.clip();
+  ctx.fillStyle="#5c7f52";ctx.strokeStyle="rgba(28,54,34,.55)";ctx.lineWidth=0.6;ctx.lineJoin="round";
+  for(const ring of LAND){
+    ctx.beginPath();
+    for(let i=0;i<ring.length;i++){
+      const ang=g+ring[i][0], r=Re*C(ring[i][1]);
+      const x=cx+r*C(ang), y=cy-r*S(ang);
+      if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+    }
+    ctx.closePath();ctx.fill();ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawMoon(){
+  const {ctx,cv}=moonC,w=cv._w,h=cv._h;if(!w)return;
+  ctx.clearRect(0,0,w,h);
+  const cx=w*0.44,cy=h*0.5,Re=Math.min(w,h)*0.17;
+  const mo=moon(currentMs);
+  const pt=(deg,rad)=>[cx+rad*C(deg),cy-rad*S(deg)];
+
+  // Sun direction arrow (long, faint) toward raSun
+  const [sx,sy]=pt(mo.raSunDeg,Re*2.7);
+  ctx.strokeStyle="rgba(240,200,119,.5)";ctx.lineWidth=1.6;ctx.setLineDash([4,4]);
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(sx,sy);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle="rgba(240,200,119,.85)";ctx.font="11px 'IBM Plex Mono',monospace";ctx.textAlign="center";ctx.textBaseline="middle";
+  const [slx,sly]=pt(mo.raSunDeg,Re*2.98);ctx.fillText("☀ to Sun",slx,sly);
+
+  // tidal-bulge water envelope (ellipse elongated toward moon RA)
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(-mo.raDeg*D2R);
+  const bulge=Re*0.34, water=Re*1.14;
+  const wg=ctx.createRadialGradient(0,0,Re*0.6,0,0,water+bulge);
+  wg.addColorStop(0,"rgba(74,156,201,.05)");wg.addColorStop(0.7,"rgba(74,156,201,.22)");wg.addColorStop(1,"rgba(74,156,201,.05)");
+  ctx.fillStyle=wg;ctx.beginPath();ctx.ellipse(0,0,water+bulge,water-bulge*0.5,0,0,7);ctx.fill();
+  ctx.strokeStyle="rgba(111,187,224,.35)";ctx.lineWidth=1;ctx.stroke();
+  ctx.restore();
+
+  // Earth disk
+  const eg=ctx.createRadialGradient(cx-Re*0.3,cy-Re*0.3,Re*0.2,cx,cy,Re);
+  eg.addColorStop(0,"#1c4a63");eg.addColorStop(1,"#0c2a3a");
+  ctx.fillStyle=eg;ctx.beginPath();ctx.arc(cx,cy,Re,0,7);ctx.fill();
+  ctx.strokeStyle="#2b6f97";ctx.lineWidth=1;ctx.stroke();
+  drawLand(ctx,cx,cy,Re,currentMs);
+  ctx.save();ctx.beginPath();ctx.arc(cx,cy,Re,0,7);ctx.clip();
+  const icg=ctx.createRadialGradient(cx,cy,0,cx,cy,Re*0.24);
+  icg.addColorStop(0,"rgba(233,241,246,.8)");icg.addColorStop(1,"rgba(233,241,246,0)");
+  ctx.fillStyle=icg;ctx.beginPath();ctx.arc(cx,cy,Re*0.24,0,7);ctx.fill();
+  ctx.restore();
+  // graticule
+  ctx.strokeStyle="rgba(120,170,195,.16)";ctx.lineWidth=1;
+  for(let rr=0.33;rr<1;rr+=0.33){ctx.beginPath();ctx.arc(cx,cy,Re*rr,0,7);ctx.stroke();}
+  // day/night terminator: night is hemisphere opposite the sun
+  ctx.save();ctx.beginPath();ctx.arc(cx,cy,Re,0,7);ctx.clip();
+  ctx.translate(cx,cy);ctx.rotate(-mo.raSunDeg*D2R);
+  ctx.fillStyle="rgba(3,12,20,.5)";ctx.fillRect(-Re,-Re,Re,2*Re); // sun toward +x, so -x is night
+  ctx.restore();
+  ctx.strokeStyle="rgba(120,180,220,.30)";ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,Re+1.5,0,7);ctx.stroke();
+
+  // beach latitude ring + rotating dot (angle = LST)
+  const wrR=Re*C(SITE.lat);
+  ctx.strokeStyle="rgba(232,176,75,.25)";ctx.setLineDash([2,3]);ctx.beginPath();ctx.arc(cx,cy,wrR,0,7);ctx.stroke();ctx.setLineDash([]);
+  const wrAng=lstDeg(currentMs);
+  const [wx,wy]=pt(wrAng,wrR);
+  // glow scales with White Rock's OWN current tide height -> it lights up at its high water,
+  // which visibly arrives after it has rotated past the bulge (the ~5 h lag)
+  const wrFrac=clamp((tideHeight(currentMs)-HMIN)/(HMAX-HMIN),0,1);
+  const gR=lerp(6,22,wrFrac);
+  const gg=ctx.createRadialGradient(wx,wy,0,wx,wy,gR);
+  gg.addColorStop(0,`rgba(232,176,75,${lerp(0.18,0.75,wrFrac)})`);gg.addColorStop(1,"rgba(232,176,75,0)");
+  ctx.fillStyle=gg;ctx.beginPath();ctx.arc(wx,wy,gR,0,7);ctx.fill();
+  ctx.fillStyle="#e8b04b";ctx.beginPath();ctx.arc(wx,wy,5,0,7);ctx.fill();
+  ctx.strokeStyle="#fff";ctx.lineWidth=1.4;ctx.stroke();
+  ctx.fillStyle="#f0c877";ctx.textAlign=wx>cx?"left":"right";ctx.textBaseline="middle";
+  ctx.fillText(SITE.name,wx+(wx>cx?9:-9),wy);
+  // little radial tick from centre to WR to show meridian
+  ctx.strokeStyle="rgba(232,176,75,.35)";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(wx,wy);ctx.stroke();
+
+  // Earth–Moon line + Moon disk (scaled distance)
+  const dScale=lerp(Re*1.95,Re*2.5,clamp((mo.dist-356000)/(407000-356000),0,1));
+  const [mx,my]=pt(mo.raDeg,dScale);
+  ctx.strokeStyle="rgba(233,241,246,.3)";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(mx,my);ctx.stroke();
+  const mr=Re*0.28;
+  ctx.fillStyle="#0a1a24";ctx.beginPath();ctx.arc(mx,my,mr,0,7);ctx.fill();
+  drawMoonPhase(ctx,mx,my,mr,mo);
+  ctx.strokeStyle="rgba(233,241,246,.5)";ctx.lineWidth=1;ctx.beginPath();ctx.arc(mx,my,mr,0,7);ctx.stroke();
+  ctx.fillStyle="#cfe0ea";ctx.textAlign="center";ctx.textBaseline="top";ctx.fillText("Moon",mx,my+mr+5);
+
+  // caption
+  ctx.fillStyle="#6a8b9c";ctx.font="10px 'IBM Plex Mono',monospace";ctx.textAlign="left";ctx.textBaseline="bottom";
+  ctx.fillText("Top-down from the North Pole. Equilibrium bulges point at the Moon (idealized).",10,h-18);
+  ctx.fillText("Real high water lags the Moon overhead by ≈"+SITE.lagH+" h — the dot peaks past the bulge.",10,h-6);
+}
+// clean crescent/gibbous shading. Sun faces +x in the local frame, so the lit
+// hemisphere is always +x; rotation handles waxing vs waning automatically.
+function drawMoonPhase(ctx,mx,my,mr,mo){
+  ctx.save();ctx.translate(mx,my);ctx.rotate(-mo.raSunDeg*D2R);
+  ctx.fillStyle="#eef4f8";ctx.beginPath();ctx.arc(0,0,mr,0,7);ctx.fill();   // full lit disk
+  const f=clamp(mo.phase,0,1);
+  const rx=mr*(1-2*f);                      // >0 crescent (dark large), <0 gibbous (dark small)
+  ctx.fillStyle="#0d2230";
+  ctx.beginPath();
+  ctx.arc(0,0,mr,-Math.PI/2,Math.PI/2,true);            // always-dark left limb: (0,-mr)->(0,mr) via -x
+  ctx.ellipse(0,0,Math.abs(rx),mr,0,Math.PI/2,-Math.PI/2,rx>0); // terminator back to (0,-mr)
+  ctx.closePath();ctx.fill();
+  ctx.restore();
+}
+
+/* ---------- BEACH WEBCAM ---------- */
+let waveT=0;
+function drawBeach(){
+  const {ctx,cv}=beachC,w=cv._w,h=cv._h;if(!w)return;
+  const mo=moon(currentMs), alt=sunAlt(currentMs,mo);
+  const day=clamp((alt+6)/14,0,1);
+  ctx.clearRect(0,0,w,h);
+  // sky gradient day<->night
+  const sky=ctx.createLinearGradient(0,0,0,h*0.62);
+  const top=[lerp(9,120,day),lerp(24,178,day),lerp(40,214,day)];
+  const bot=[lerp(30,214,day),lerp(58,224,day),lerp(78,210,day)];
+  sky.addColorStop(0,`rgb(${top[0]|0},${top[1]|0},${top[2]|0})`);
+  sky.addColorStop(1,`rgb(${bot[0]|0},${bot[1]|0},${bot[2]|0})`);
+  ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+  // stars at night
+  if(day<0.4){ctx.fillStyle=`rgba(255,255,255,${(0.4-day)/0.4*0.7})`;
+    for(let i=0;i<40;i++){const sx=(i*89.7)%w,sy=(i*53.3)%(h*0.4);ctx.fillRect(sx,sy,1.4,1.4);}}
+  const horizon=h*0.44;
+  const B=SITE.beach;
+  // --- distant terrain: smooth cone (a stratovolcano) or jagged ridge (a coast range) ---
+  function terrainY(t,layer){
+    if(layer.type==="cone")
+      return Math.exp(-Math.pow((t-layer.peak)/0.28,2))+0.22*Math.sin(t*7.0);
+    // ridge: several summits plus fine sawtooth relief
+    return 0.50
+      +0.30*Math.exp(-Math.pow((t-0.20)/0.10,2))
+      +0.44*Math.exp(-Math.pow((t-0.44)/0.065,2))
+      +0.38*Math.exp(-Math.pow((t-0.515)/0.055,2))
+      +0.28*Math.exp(-Math.pow((t-0.74)/0.12,2))
+      +0.05*Math.sin(t*47.0)+0.04*Math.sin(t*23.0+1.3)+0.028*Math.sin(t*89.0+0.4);
+  }
+  for(const layer of B.terrain){
+    const amp=h*layer.amp, sh=layer.shade;
+    const r=lerp(sh?14:20,sh?96:150,day)|0, g2=lerp(sh?26:35,sh?120:168,day)|0, b2=lerp(sh?40:55,sh?150:190,day)|0;
+    ctx.fillStyle=`rgba(${r},${g2},${b2},${layer.alpha})`;
+    ctx.beginPath();ctx.moveTo(0,horizon);
+    let topY=horizon, topX=w*0.5;
+    for(let x=0;x<=w;x+=4){const t=x/w;const y=horizon-amp*terrainY(t,layer);
+      if(y<topY){topY=y;topX=x;} ctx.lineTo(x,y);}
+    ctx.lineTo(w,horizon);ctx.closePath();ctx.fill();
+    if(layer.label){
+      ctx.fillStyle=`rgba(${lerp(200,255,day)|0},${lerp(210,255,day)|0},${lerp(220,255,day)|0},.55)`;
+      ctx.font="10px 'IBM Plex Mono',monospace";ctx.textAlign="center";ctx.textBaseline="bottom";
+      ctx.fillText(layer.label,clamp(topX,44,w-44),topY-4);
+    }
+  }
+  // downtown skyline tucked to the right (Jericho looks NE toward the city)
+  if(B.skyline){
+    ctx.fillStyle=`rgba(${lerp(16,70,day)|0},${lerp(28,92,day)|0},${lerp(44,116,day)|0},.85)`;
+    for(let i=0;i<14;i++){
+      const bx2=w*0.80+i*(w*0.017), bh2=h*(0.030+0.030*Math.abs(Math.sin(i*2.3)));
+      ctx.fillRect(bx2,horizon-bh2,w*0.013,bh2);
+    }
+    if(day<0.45){ctx.fillStyle=`rgba(255,214,140,${(0.45-day)/0.45*0.75})`;
+      for(let i=0;i<26;i++){const bx2=w*0.802+((i*7)%14)*(w*0.017), by2=horizon-h*0.008-((i*11)%5)*h*0.010;
+        ctx.fillRect(bx2+w*0.003,by2,1.6,1.6);}}
+  }
+
+  // waterline position from tide height
+  const hgt=tideHeight(currentMs);
+  const rate=tideRate(currentMs);
+  // waterline: near the horizon at low tide, advancing toward the viewer at high tide
+  const frac=clamp((hgt-HMIN)/(HMAX-HMIN),0,1);
+  const wl=lerp(horizon+2+(h-horizon)*B.lowY,h*0.99,frac);
+  // exposed beach / wet flats below the waterline
+  const sand=ctx.createLinearGradient(0,wl,0,h);
+  sand.addColorStop(0,`rgba(${lerp(66,150,day)|0},${lerp(80,148,day)|0},${lerp(84,138,day)|0},1)`);
+  sand.addColorStop(1,`rgba(${lerp(54,198,day)|0},${lerp(62,184,day)|0},${lerp(60,150,day)|0},1)`);
+  ctx.fillStyle=sand;ctx.fillRect(0,wl,w,h-wl);
+  // ripple lines on the wet flats
+  ctx.strokeStyle=`rgba(${lerp(40,120,day)|0},${lerp(70,150,day)|0},${lerp(90,150,day)|0},.30)`;ctx.lineWidth=1;
+  for(let k=1;k<6;k++){const ry=wl+(h-wl)*k/7;ctx.beginPath();
+    for(let x=0;x<=w;x+=6)ctx.lineTo(x,ry+Math.sin(x*0.03+k)*2);ctx.stroke();}
+  // sea: from the horizon down to the waterline
+  const water=ctx.createLinearGradient(0,horizon,0,wl);
+  water.addColorStop(0,`rgba(${lerp(24,96,day)|0},${lerp(70,150,day)|0},${lerp(104,182,day)|0},.97)`);
+  water.addColorStop(1,`rgba(${lerp(34,86,day)|0},${lerp(96,166,day)|0},${lerp(128,196,day)|0},.97)`);
+  ctx.fillStyle=water;ctx.fillRect(0,horizon,w,Math.max(0,wl-horizon));
+  // glints on the sea
+  ctx.fillStyle=`rgba(255,255,255,${0.06+0.06*day})`;
+  for(let i=0;i<9;i++){const gy=lerp(horizon+6,wl-4,i/9);const gx=(i*97.3+(reduceMotion?0:waveT*8))%w;ctx.fillRect(gx,gy,16,1);}
+  // freighters at anchor (English Bay)
+  if(B.freighters && wl-horizon>14){
+    const shipCol=`rgba(${lerp(14,42,day)|0},${lerp(22,54,day)|0},${lerp(34,70,day)|0},.9)`;
+    for(const s of [[0.18,0.30,1.0],[0.52,0.55,0.8],[0.70,0.18,0.65]]){
+      const sy=horizon+(wl-horizon)*s[1]*0.55+3, sw=w*0.10*s[2], sh2=Math.max(2.5,h*0.012*s[2]);
+      const sx=w*s[0];
+      ctx.fillStyle=shipCol;
+      ctx.fillRect(sx,sy,sw,sh2);                       // hull
+      ctx.fillRect(sx+sw*0.72,sy-sh2*1.5,sw*0.17,sh2*1.5); // superstructure
+      ctx.fillRect(sx+sw*0.80,sy-sh2*2.4,sw*0.03,sh2*0.9); // funnel/mast
+    }
+  }
+  // wavelets right at the waterline
+  ctx.strokeStyle=`rgba(255,255,255,${0.3+0.2*day})`;ctx.lineWidth=1.5;ctx.beginPath();
+  for(let x=0;x<=w;x+=4){const y=wl+Math.sin(x*0.05+waveT)*1.7+Math.sin(x*0.11-waveT*1.4)*1.1;if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+  ctx.stroke();
+
+  // White Rock pier (long, receding to the right)
+  if(B.pier){
+  const pierBaseX=w*0.66;
+  ctx.strokeStyle=`rgba(${lerp(30,60,day)|0},${lerp(28,50,day)|0},${lerp(26,44,day)|0},.95)`;
+  ctx.lineWidth=3;
+  const pierEndX=w*0.98, pierEndY=horizon+6;
+  ctx.beginPath();ctx.moveTo(pierBaseX,h*0.99);ctx.lineTo(pierEndX,pierEndY);ctx.stroke(); // deck line
+  ctx.lineWidth=4.5;ctx.beginPath();ctx.moveTo(pierBaseX+18,h*0.99);ctx.lineTo(pierEndX+6,pierEndY+2);ctx.stroke();
+  // pilings
+  ctx.strokeStyle=`rgba(${lerp(24,44,day)|0},${lerp(22,38,day)|0},${lerp(20,32,day)|0},.9)`;ctx.lineWidth=1.6;
+  for(let i=0;i<=12;i++){const tt=i/12;const dx=lerp(pierBaseX+9,pierEndX+3,tt);const dy=lerp(h*0.99,pierEndY+1,tt);
+    ctx.beginPath();ctx.moveTo(dx,dy);ctx.lineTo(dx,Math.min(dy+ (h-dy)*0.5, h));ctx.stroke();}
+  }
+
+  // ---- current / flood-ebb HUD ----
+  const flooding=rate>0.02, ebbing=rate<-0.02;
+  const strength=clamp(Math.abs(rate)/0.9,0,1); // ~0.9 m/hr ≈ strong
+  const bx=14,by=14,bw=Math.min(210,w-28),bh=64;
+  ctx.fillStyle="rgba(6,20,30,.62)";roundRect(ctx,bx,by,bw,bh,10);ctx.fill();
+  ctx.strokeStyle="rgba(120,160,180,.25)";ctx.stroke();
+  const col=flooding?"#5fc9a6":ebbing?"#e8955a":"#9db8c6";
+  const label=flooding?"Flood — water coming in":ebbing?"Ebb — water going out":"Slack water";
+  ctx.fillStyle=col;ctx.font="600 12.5px 'Space Grotesk',sans-serif";ctx.textAlign="left";ctx.textBaseline="top";
+  ctx.fillText(label,bx+12,by+9);
+  ctx.fillStyle="#9db8c6";ctx.font="10.5px 'IBM Plex Mono',monospace";
+  ctx.fillText(`${hgt.toFixed(2)} m · ${rate>=0?"+":""}${rate.toFixed(2)} m/hr`,bx+12,by+27);
+  // arrow: landward(→ into scene) flood, seaward(←) ebb
+  const ay=by+50, ax0=bx+12, aLen=(bw-24)*(0.25+0.75*strength), dir=flooding?1:ebbing?-1:0;
+  ctx.strokeStyle=col;ctx.lineWidth=2.4;ctx.beginPath();
+  if(dir>=0){ctx.moveTo(ax0,ay);ctx.lineTo(ax0+aLen,ay);ctx.moveTo(ax0+aLen-7,ay-4);ctx.lineTo(ax0+aLen,ay);ctx.lineTo(ax0+aLen-7,ay+4);}
+  else{ctx.moveTo(ax0+aLen,ay);ctx.lineTo(ax0,ay);ctx.moveTo(ax0+7,ay-4);ctx.lineTo(ax0,ay);ctx.lineTo(ax0+7,ay+4);}
+  ctx.stroke();
+  ctx.fillStyle="#6a8b9c";ctx.textAlign="right";ctx.fillText(dir>0?"landward":dir<0?"seaward":"—",bx+bw-12,ay-6);
+
+  ctx.fillStyle="rgba(160,190,205,.5)";ctx.font="10px 'IBM Plex Mono',monospace";ctx.textAlign="right";ctx.textBaseline="bottom";
+  ctx.fillText(SITE.beach.view,w-8,h-6);
+}
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+/* ---------- READOUTS ---------- */
+function updateReadouts(){
+  const mo=moon(currentMs), hgt=tideHeight(currentMs), rate=tideRate(currentMs);
+  document.getElementById("clockTime").textContent=fmtT(currentMs)+" PDT";
+  document.getElementById("clockDate").textContent=fmtD(currentMs)+
+    (Math.abs(currentMs-loadMs)<6e4?" · now":"");
+  const rising=rate>0.02, falling=rate<-0.02;
+  document.getElementById("stateDot").style.background=rising?"var(--flood)":falling?"var(--ebb)":"var(--ink-faint)";
+  document.getElementById("stateText").textContent=rising?"Rising · flood":falling?"Falling · ebb":"Slack";
+  document.getElementById("roHeight").innerHTML=hgt.toFixed(2)+' <small>m MLLW</small>';
+  document.getElementById("roPhase").innerHTML=phaseName(mo)+' <small>'+Math.round(mo.phase*100)+'%</small>';
+  // today's range
+  const dayA=new Date(currentMs);dayA.setHours(0,0,0,0);
+  const ex=extrema(dayA.getTime(),dayA.getTime()+864e5);
+  if(ex.length){const hs=ex.map(e=>e.h);const rng=Math.max(...hs)-Math.min(...hs);
+    const springF=Math.abs(2*mo.phase-1);
+    const tag=springF>0.7?"spring":springF<0.35?"neap":"moderate";
+    document.getElementById("roRange").innerHTML=rng.toFixed(1)+' <small>m · '+tag+'</small>';}
+  const dtag=mo.dist<368000?"perigee":mo.dist>402000?"apogee":"";
+  document.getElementById("roDist").innerHTML=Math.round(mo.dist/1000)+'k <small>km'+(dtag?" · "+dtag:"")+'</small>';
+}
+
+/* ---------- CONTROLS ---------- */
+function setTime(ms){currentMs=clamp(ms,loadMs-22*864e5,loadMs+22*864e5);
+  document.getElementById("scrub").value=Math.round((currentMs-loadMs)/60000);}
+document.getElementById("scrub").addEventListener("input",e=>{currentMs=loadMs+(+e.target.value)*60000;});
+document.getElementById("nowBtn").addEventListener("click",()=>setTime(Date.now()));
+const playBtn=document.getElementById("playBtn");
+playBtn.addEventListener("click",()=>{playing=!playing;playBtn.textContent=playing?"❚❚ Pause":"▶ Play";lastFrame=performance.now();});
+document.querySelectorAll("#speedGroup button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("#speedGroup button").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");speedMult=+b.dataset.mult;}));
+
+/* ---------- SITE SWITCHING ---------- */
+function applySite(key){
+  SITE=SITES[key]||SITES.whiterock;
+  document.getElementById("siteTitle").innerHTML=SITE.name+' <em>Tide</em>';
+  document.getElementById("siteMeta").textContent=
+    SITE.water+" · "+Math.abs(SITE.lat).toFixed(2)+"°N "+Math.abs(SITE.lon).toFixed(2)+"°W · "+SITE.datum;
+  document.getElementById("legendSite").textContent=SITE.name;
+  document.getElementById("fitNote").textContent=SITE.fitNote;
+  document.title="BC Tide — "+SITE.name;
+}
+const siteSel=document.getElementById("siteSel");
+siteSel.addEventListener("change",e=>applySite(e.target.value));
+applySite(siteSel.value);
+
+/* ---------- LOOP ---------- */
+function frame(now){
+  const dt=(now-lastFrame)/1000;lastFrame=now;
+  if(!reduceMotion)waveT+=dt*1.6;
+  if(playing){setTime(currentMs+dt*speedMult*60000);
+    if(currentMs>=loadMs+22*864e5){playing=false;playBtn.textContent="▶ Play";}}
+  drawTide();drawMoon();drawBeach();updateReadouts();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
