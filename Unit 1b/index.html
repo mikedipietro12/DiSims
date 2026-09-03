@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Unit 1b — Atomic Structure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════
+   DESIGN TOKENS — §7 (paste identically everywhere)
+   ═══════════════════════════════════════════════════ */
+:root{
+  --void:#0a0912;
+  --void-2:#0c0b1c;
+  --panel:#151330;
+  --panel-edge:#2a2660;
+  --grid:#211d47;
+  --phosphor:#3fe0cf;
+  --phosphor-dim:#1c6b66;
+  --ember:#ffb24d;
+  --signal:#b579ff;
+  --ink:#e9e7fb;
+  --dim:#797597;
+}
+
+/* ═══════════════════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;-webkit-text-size-adjust:100%;}
+body{
+  background:var(--void);
+  color:var(--ink);
+  font-family:'IBM Plex Mono',monospace;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  line-height:1.6;
+}
+
+/* noise grain overlay */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  z-index:9999;
+  pointer-events:none;
+  opacity:0.045;
+  mix-blend-mode:screen;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat:repeat;
+  background-size:256px 256px;
+}
+
+/* ═══════════════════════════════════════════════════
+   HUB LAYOUT
+   ═══════════════════════════════════════════════════ */
+.hub{
+  max-width:680px;
+  width:100%;
+  padding:2.5rem 1.5rem 4rem;
+}
+
+/* header */
+.hub-header{
+  text-align:center;
+  margin-bottom:3rem;
+}
+.hub-header .unit-tag{
+  font-family:'Press Start 2P',monospace;
+  font-size:0.6rem;
+  letter-spacing:0.15em;
+  color:var(--signal);
+  text-transform:uppercase;
+  margin-bottom:0.75rem;
+  display:block;
+}
+.hub-header h1{
+  font-family:'Press Start 2P',monospace;
+  font-size:1.05rem;
+  color:var(--phosphor);
+  text-shadow:0 0 18px rgba(63,224,207,0.4);
+  line-height:1.5;
+  margin-bottom:0.75rem;
+}
+.hub-header .subtitle{
+  color:var(--dim);
+  font-size:0.85rem;
+  max-width:480px;
+  margin:0 auto;
+}
+
+/* module path */
+.path{
+  list-style:none;
+  position:relative;
+}
+/* vertical connector line */
+.path::before{
+  content:'';
+  position:absolute;
+  left:18px;
+  top:0;bottom:0;
+  width:2px;
+  background:var(--panel-edge);
+}
+
+.path li{
+  position:relative;
+  padding-left:52px;
+  margin-bottom:0;
+}
+
+.path li a{
+  display:block;
+  text-decoration:none;
+  color:inherit;
+  padding:1.1rem 1.25rem;
+  border:1px solid var(--panel-edge);
+  border-radius:4px;
+  background:var(--panel);
+  transition:border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  position:relative;
+}
+.path li a:hover,
+.path li a:focus-visible{
+  border-color:var(--phosphor-dim);
+  box-shadow:0 0 20px rgba(63,224,207,0.08);
+  background:var(--void-2);
+  outline:none;
+}
+
+/* node dot on the timeline */
+.path li::before{
+  content:'';
+  position:absolute;
+  left:12px;
+  top:50%;
+  transform:translateY(-50%);
+  width:14px;height:14px;
+  border-radius:50%;
+  border:2px solid var(--panel-edge);
+  background:var(--void);
+  z-index:1;
+  transition:border-color 0.3s, box-shadow 0.3s, background 0.3s;
+}
+/* visited state */
+.path li.visited::before{
+  border-color:var(--phosphor);
+  background:var(--phosphor);
+  box-shadow:0 0 10px rgba(63,224,207,0.5);
+}
+
+/* spacer between cards */
+.path li + li{
+  margin-top:0.6rem;
+}
+
+/* module number */
+.mod-num{
+  font-family:'Press Start 2P',monospace;
+  font-size:0.55rem;
+  color:var(--dim);
+  letter-spacing:0.1em;
+  margin-bottom:0.3rem;
+  display:block;
+}
+.mod-title{
+  font-family:'Press Start 2P',monospace;
+  font-size:0.72rem;
+  color:var(--ink);
+  line-height:1.6;
+  margin-bottom:0.35rem;
+}
+.mod-teaser{
+  font-size:0.8rem;
+  color:var(--dim);
+  line-height:1.5;
+}
+
+/* back link */
+.back-link{
+  display:inline-block;
+  margin-bottom:1.5rem;
+  font-size:0.75rem;
+  color:var(--dim);
+  text-decoration:none;
+  transition:color 0.2s;
+}
+.back-link:hover{color:var(--phosphor);}
+
+/* responsive */
+@media(max-width:520px){
+  .hub{padding:1.5rem 1rem 3rem;}
+  .hub-header h1{font-size:0.8rem;}
+  .path li a{padding:0.9rem 1rem;}
+}
+</style>
+</head>
+<body>
+<div class="hub">
+  <a href="../index.html" class="back-link">← All Sims</a>
+  <header class="hub-header">
+    <span class="unit-tag">Unit 1b</span>
+    <h1>Atomic Structure</h1>
+    <p class="subtitle">Eight instruments. Build the atom from what you measure.</p>
+  </header>
+
+  <ol class="path" id="modulePath">
+    <li data-module="01">
+      <a href="01-nucleus-isotopes.html">
+        <span class="mod-num">Module 01</span>
+        <span class="mod-title">Nucleus &amp; Isotopes</span>
+        <span class="mod-teaser">Build atoms. Mix isotopes. Watch the average shift.</span>
+      </a>
+    </li>
+    <li data-module="02">
+      <a href="02-coulomb-ionization.html">
+        <span class="mod-num">Module 02</span>
+        <span class="mod-title">Coulomb &amp; Ionization</span>
+        <span class="mod-teaser">Two charges on a track. Feel the energy well.</span>
+      </a>
+    </li>
+    <li data-module="03">
+      <a href="03-shell-core-charge.html">
+        <span class="mod-num">Module 03</span>
+        <span class="mod-title">Shell Model &amp; Core Charge</span>
+        <span class="mod-teaser">IE data hides a pattern. Find the jumps.</span>
+      </a>
+    </li>
+    <li data-module="04">
+      <a href="04-atomic-size.html">
+        <span class="mod-num">Module 04</span>
+        <span class="mod-title">Atomic Size</span>
+        <span class="mod-teaser">Line up atoms. Watch them shrink — or grow.</span>
+      </a>
+    </li>
+    <li data-module="05">
+      <a href="05-light-energy.html">
+        <span class="mod-num">Module 05</span>
+        <span class="mod-title">Light &amp; Energy</span>
+        <span class="mod-teaser">A wave, a slider. How does colour carry energy?</span>
+      </a>
+    </li>
+    <li data-module="06">
+      <a href="06-photoelectron-spectroscopy.html">
+        <span class="mod-num">Module 06</span>
+        <span class="mod-title">Photoelectron Spectroscopy</span>
+        <span class="mod-teaser">The spectrometer shows what the shell model missed.</span>
+      </a>
+    </li>
+    <li data-module="07">
+      <a href="07-electron-configurations.html">
+        <span class="mod-num">Module 07</span>
+        <span class="mod-title">Electron Configurations</span>
+        <span class="mod-teaser">Read the peaks. Fill the subshells. Derive the config.</span>
+      </a>
+    </li>
+    <li data-module="08">
+      <a href="08-electron-spin.html">
+        <span class="mod-num">Module 08</span>
+        <span class="mod-title">Electron Spin</span>
+        <span class="mod-teaser">Place the arrows. The magnet knows if you're wrong.</span>
+      </a>
+    </li>
+  </ol>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   VISITED STATE (localStorage)
+   ═══════════════════════════════════════════════════ */
+(function(){
+  const KEY = 'unit1b_visited';
+  let visited = {};
+  try { visited = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){}
+
+  document.querySelectorAll('#modulePath li').forEach(li => {
+    const mod = li.dataset.module;
+    if(visited[mod]) li.classList.add('visited');
+
+    li.querySelector('a').addEventListener('click', () => {
+      visited[mod] = true;
+      try { localStorage.setItem(KEY, JSON.stringify(visited)); } catch(e){}
+    });
+  });
+})();
+</script>
+</body>
+</html>

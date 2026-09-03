@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>02 — Coulomb &amp; Ionization</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#0a0912;
+  --void-2:#0c0b1c;
+  --panel:#151330;
+  --panel-edge:#2a2660;
+  --grid:#211d47;
+  --phosphor:#3fe0cf;
+  --phosphor-dim:#1c6b66;
+  --ember:#ffb24d;
+  --signal:#b579ff;
+  --ink:#e9e7fb;
+  --dim:#797597;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--void);color:var(--ink);font-family:'IBM Plex Mono',monospace;min-height:100vh;}
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  pointer-events:none;
+  opacity:0.045;
+  mix-blend-mode:screen;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.module-wrap{max-width:900px;margin:0 auto;padding:1.5rem 1rem 3rem;}
+.back-link{
+  display:inline-block;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.8rem;
+  color:var(--dim);
+  text-decoration:none;
+  margin-bottom:1.2rem;
+  transition:color 0.2s;
+}
+.back-link:hover{color:var(--phosphor);}
+.mod-tag{
+  font-family:'Press Start 2P',monospace;
+  font-size:0.55rem;
+  color:var(--dim);
+  text-transform:uppercase;
+  letter-spacing:0.15em;
+  margin-bottom:0.5rem;
+}
+h1{
+  font-family:'Press Start 2P',monospace;
+  font-size:0.9rem;
+  color:var(--phosphor);
+  text-shadow:0 0 12px rgba(63,224,207,0.4),0 0 30px rgba(63,224,207,0.15);
+  margin-bottom:0.75rem;
+  line-height:1.6;
+}
+.framing{
+  font-family:'IBM Plex Mono',monospace;
+  color:var(--dim);
+  font-style:italic;
+  font-size:0.85rem;
+  line-height:1.6;
+  margin-bottom:0.5rem;
+}
+.viewport{
+  position:relative;
+  background:var(--void-2);
+  border:2px solid var(--panel-edge);
+  border-radius:4px;
+  box-shadow:
+    0 0 0 4px var(--void),
+    0 0 0 6px var(--panel-edge),
+    0 0 30px rgba(63,224,207,0.06);
+  padding:0;
+  margin:1.5rem 0;
+  overflow:hidden;
+}
+#simCanvas{width:100%;display:block;}
+.controls{/* placeholder for simulation controls */}
+.hud{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.7rem;
+  color:var(--dim);
+  padding:0.5rem 0.75rem;
+  border-top:1px solid var(--panel-edge);
+  background:var(--panel);
+}
+[data-gate]{opacity:0;transition:opacity 0.6s;pointer-events:none;}
+[data-gate].discovered{opacity:1;pointer-events:auto;}
+#stuckBtn{
+  background:none;
+  border:1px solid var(--signal);
+  color:var(--signal);
+  font-family:'IBM Plex Mono',monospace;
+  font-size:0.8rem;
+  padding:0.5rem 1.2rem;
+  border-radius:4px;
+  cursor:pointer;
+  transition:background 0.2s,color 0.2s;
+  margin-top:1rem;
+}
+#stuckBtn:hover{background:rgba(181,121,255,0.1);}
+#stuckBtn:focus-visible{outline:2px solid var(--signal);outline-offset:2px;}
+.help-panel{
+  opacity:0;
+  max-height:0;
+  overflow:hidden;
+  transition:opacity 0.3s,max-height 0.3s;
+  border:1px solid var(--signal);
+  background:var(--panel);
+  border-radius:4px;
+  padding:0 1.2rem;
+  margin-top:0.75rem;
+  color:var(--dim);
+  font-size:0.85rem;
+  line-height:1.6;
+}
+.help-panel.open{
+  opacity:1;
+  max-height:200px;
+  padding:1rem 1.2rem;
+}
+</style>
+</head>
+<body>
+<div class="module-wrap">
+  <a href="index.html" class="back-link">← Unit 1b</a>
+  <header>
+    <div class="mod-tag">Module 02</div>
+    <h1>Coulomb &amp; Ionization</h1>
+    <p class="framing">Two charges on a track. Slide them closer and feel the pull.</p>
+  </header>
+
+  <div class="viewport">
+    <canvas id="simCanvas"></canvas>
+    <div class="hud">— standby —</div>
+  </div>
+
+  <div class="controls"><!-- simulation controls will go here --></div>
+
+  <button id="stuckBtn">Stuck?</button>
+  <div class="help-panel" id="helpPanel">
+    <p>Make the charges the same sign, then opposite. What flips?</p>
+    <p style="margin-top:0.5rem;">Slide d toward zero. Which way does V run off?</p>
+  </div>
+</div>
+
+<script>
+// === CANVAS ENGINE ===
+const canvas = document.getElementById('simCanvas');
+const ctx = canvas.getContext('2d');
+let W, H, dpr;
+
+function resize() {
+  dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  W = rect.width;
+  H = Math.min(W * 0.6, 500);
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+// === REDUCED MOTION ===
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// === GLOW HELPERS ===
+function glowLine(x1, y1, x2, y2, color, width = 2) {
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 12;
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = 0.3;
+  ctx.lineWidth = width + 4;
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
+  ctx.lineWidth = width;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function glowCircle(x, y, r, color) {
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 15;
+  ctx.fillStyle = color;
+  ctx.globalAlpha = 0.2;
+  ctx.beginPath(); ctx.arc(x,y,r+4,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function drawGrid(spacing = 40, color = 'rgba(33,29,71,0.6)') {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+  for(let x = 0; x < W; x += spacing){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for(let y = 0; y < H; y += spacing){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  ctx.restore();
+}
+
+// === DISCOVERY GATE SYSTEM ===
+const gates = {};
+function setGate(name, val) {
+  gates[name] = val;
+  document.querySelectorAll('[data-gate]').forEach(el => {
+    const required = el.dataset.gate.split(',');
+    const unlocked = required.every(g => gates[g.trim()]);
+    el.classList.toggle('discovered', unlocked);
+  });
+}
+
+// === HELP SYSTEM ===
+const stuckBtn = document.getElementById('stuckBtn');
+const helpPanel = document.getElementById('helpPanel');
+if(stuckBtn && helpPanel) {
+  stuckBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    helpPanel.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    if(!helpPanel.contains(e.target) && e.target !== stuckBtn) {
+      helpPanel.classList.remove('open');
+    }
+  });
+}
+
+// === REFERENCE DATA ===
+const DATA = {
+  constants: {
+    k: 8.988e9,
+    e: 1.602e-19,
+    c: 3.00e8,
+    h: 6.626e-34
+  }
+};
+
+// === DISCOVERY GATE INIT ===
+setGate('hasPulledApart', false);
+
+// === STANDBY ANIMATION: Pulsing force-field rings ===
+const ringCount = 8;
+
+function drawStandby(t) {
+  ctx.clearRect(0, 0, W, H);
+  drawGrid();
+
+  const cx = W / 2;
+  const cy = H / 2;
+  const baseSpacing = Math.min(W, H) / (ringCount + 2);
+  const pulse = Math.sin(t * 0.001) * 6;
+
+  for(let i = ringCount; i >= 1; i--) {
+    const r = i * baseSpacing + pulse * (i / ringCount);
+    const alpha = 0.12 - (i / ringCount) * 0.08;
+    ctx.save();
+    ctx.shadowColor = '#ffb24d';
+    ctx.shadowBlur = 10;
+    ctx.strokeStyle = '#ffb24d';
+    ctx.globalAlpha = Math.max(0.02, alpha);
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, Math.max(1, r), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  glowCircle(cx, cy, 4, '#ffb24d');
+}
+
+/* === SIMULATION LOGIC — TO BE DESIGNED === */
+
+function loop(t) {
+  drawStandby(t);
+  if(!prefersReduced) requestAnimationFrame(loop);
+}
+
+if(prefersReduced) {
+  drawStandby(0);
+} else {
+  requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>
