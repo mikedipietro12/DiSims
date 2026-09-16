@@ -6,154 +6,1327 @@
 <title>05 — Light &amp; Energy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --void:#0a0912;
-  --void-2:#0c0b1c;
-  --panel:#151330;
-  --panel-edge:#2a2660;
-  --grid:#211d47;
-  --phosphor:#3fe0cf;
-  --phosphor-dim:#1c6b66;
-  --ember:#ffb24d;
-  --signal:#b579ff;
-  --ink:#e9e7fb;
-  --dim:#797597;
+  --paper:#e6e1cf;
+  --paper-2:#d8d2bc;
+  --paper-3:#c9c2a8;
+  --void:#050505;
+  --void-2:#0c0c0c;
+  --panel:#efe9d4;
+  --panel-edge:#1a1810;
+  --grid:#cfc8ae;
+  --phosphor:#5c6b28;
+  --ember:#a85a32;
+  --signal:#1a6aa3;
+  --ink:#16140e;
+  --ink-soft:#33301f;
+  --dim:#55513f;
+  --faint:#6f6b59;
+  --proton:#a85a32;
+  --neutron:#7e8c45;
+  --electron:#c4a35a;
+  --success:#4f5a28;
+  --error:#a85a32;
+  --neon:#c4a35a;
+  --olive:#7e8c45;
+  --olive-deep:#4f5a28;
+  --mustard:#c4a35a;
+  --plate:#050505;
+  --plate-ink:#e8e6d9;
+
+  --font-display:'Archivo Black',Helvetica,sans-serif;
+  --font-body:Barlow,Helvetica,Univers,'Helvetica Neue',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  --label-xs:0.72rem;
+  --label-sm:0.78rem;
+  --label-md:0.85rem;
+  --track-wide:0.13em;
+  --track-tight:0.08em;
+
+  /* Module 05 — photon packet visualization (not a suite-wide token) */
+  --photon:#6b4a78;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;-webkit-text-size-adjust:100%;}
 body{
-  background:var(--void);
+  background-color:var(--paper);
   color:var(--ink);
-  font-family:'IBM Plex Mono',monospace;
+  font-family:var(--font-body);
+  font-size:1.0625rem;
   min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+.mono-label,
+.back-link,.mod-meta,.task-kicker,.hud,.debrief-kicker,.briefing-kicker,#stuckBtn,.btn,.mod-tag,.viewport::before,
+.slider-label,.hud-item .k,.source-callout,.act-meta,.eq-reveal,.ie-meter-label,.ie-meter-val,.ie-meter-tick-label,
+.eq-bridge-kicker,.eq-bridge-note,.eq-line,.eq-plug-cue,.eq-readout,.photon-caption,.energy-eq .eq,.why-footnote{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
 }
 body::before{
   content:'';
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   z-index:9999;
   pointer-events:none;
-  opacity:0.045;
-  mix-blend-mode:screen;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:0.14;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:256px 256px;
 }
-.module-wrap{
-  max-width:900px;
-  margin:0 auto;
-  padding:2rem 1.5rem;
+.module-wrap{max-width:920px;margin:0 auto;padding:1.35rem 1.35rem 3.5rem;position:relative;z-index:1;}
+.top-nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap;border-bottom:1px solid var(--ink);padding-bottom:0.7rem;}
+.back-link{font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color 0.2s;}
+.back-link:hover{color:var(--olive-deep);}
+.mod-meta{font-size:var(--label-xs);font-weight:600;color:var(--ink);letter-spacing:var(--track-wide);text-transform:uppercase;}
+
+.task-kicker,.mod-tag{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--olive-deep);
+  margin-bottom:0.7rem;
 }
-.back-link{
-  display:inline-block;
-  color:var(--dim);
-  text-decoration:none;
-  font-size:0.85rem;
-  margin-bottom:1.5rem;
-  transition:color 0.2s;
+.task-kicker::before,.mod-tag::before{
+  content:'';
+  width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);
+  flex:none;
+  transform:translateY(-0.12em);
 }
-.back-link:hover{color:var(--phosphor);}
-.mod-tag{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.55rem;
-  color:var(--dim);
-  text-transform:uppercase;
-  letter-spacing:0.15em;
-  margin-bottom:0.5rem;
-}
-h1{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.9rem;
-  color:var(--phosphor);
-  text-shadow:0 0 12px rgba(63,224,207,0.4),0 0 30px rgba(63,224,207,0.15);
-  margin-bottom:0.75rem;
-  line-height:1.6;
+h1,.task-title{
+  font-family:var(--font-display);
+  font-size:clamp(1.9rem,4.7vw,2.75rem);
+  font-weight:400;
+  letter-spacing:-0.025em;
+  line-height:0.98;
+  color:var(--ink);
+  margin-bottom:0.7rem;
 }
 .framing{
-  font-family:'IBM Plex Mono',monospace;
-  color:var(--dim);
-  font-style:italic;
-  font-size:0.85rem;
-  line-height:1.6;
-  margin-bottom:1rem;
+  font-size:1.15rem;
+  font-weight:400;
+  line-height:1.5;
+  color:var(--ink-soft);
+  max-width:none;
+  text-wrap:pretty;
+  margin-bottom:0.85rem;
 }
+.student-q{color:var(--signal);font-weight:700;}
+.act-prompts{
+  margin:-0.35rem 0 1rem;
+  padding:0;
+}
+.act-prompts[hidden]{display:none !important;}
+.act-prompts .student-q{
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  line-height:1.5;
+  margin:0.45rem 0;
+  text-wrap:pretty;
+}
+.act-prompts .prompt-kicker{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin:0 0 0.35rem;
+}
+.act-meta{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:0.45rem;
+}
+
 .viewport{
   position:relative;
-  background:var(--void-2);
-  border:2px solid var(--panel-edge);
-  border-radius:4px;
-  box-shadow:
-    0 0 0 4px var(--void),
-    0 0 0 6px var(--panel-edge),
-    0 0 30px rgba(63,224,207,0.06);
+  background:transparent;
+  border:3px solid var(--ink);
+  border-radius:0;
   padding:0;
-  margin:1.5rem 0;
+  margin:0.35rem 0 0;
   overflow:hidden;
+  user-select:none;-webkit-user-select:none;
+  box-shadow:none;
 }
-#simCanvas{width:100%;display:block;}
-.controls{/* placeholder for simulation controls */}
-.hud{
+.viewport.bridge-open{
+  overflow:visible;
+  z-index:6;
+}
+.viewport::before{
+  content:attr(data-fig);
+  display:block;
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--ink);
+  background:transparent;
+  padding:0.55rem 1rem 0.42rem;
+  border-bottom:2px solid var(--ink);
+}
+.viewport:not([data-fig])::before{display:none;}
+#simCanvas{width:100%;display:block;position:relative;z-index:0;background:transparent;}
+
+.viewport-stage{
+  position:relative;
+}
+.ie-meter{
+  display:none;
+  position:absolute;
+  top:2.6rem;
+  right:0.85rem;
+  bottom:1rem;
+  flex-direction:column;
+  align-items:center;
+  gap:0.45rem;
+  width:3.2rem;
+  z-index:2;
+  pointer-events:none;
+}
+.viewport-stage.act-ionize .ie-meter{display:flex;}
+.ie-meter-label{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--ember);
+  text-align:center;
+}
+.ie-meter-track{
+  position:relative;
+  flex:1;
+  width:1.35rem;
+  min-height:8rem;
+  border:1px solid var(--ink);
+  background:transparent;
+}
+.ie-meter-fill{
+  position:absolute;
+  left:0;right:0;bottom:0;
+  height:0%;
+  background:var(--ember);
+  opacity:0.85;
+}
+.ie-meter-tick{
+  position:absolute;
+  left:-0.35rem;right:-0.35rem;
+  top:7.4%;
+  height:0;
+  border-top:2px solid var(--ink);
+  pointer-events:none;
+}
+.ie-meter-tick-label{
+  position:absolute;
+  right:calc(100% + 0.4rem);
+  top:0;
+  transform:translateY(-50%);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--ember);
+  white-space:nowrap;
+}
+.ie-meter-val{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
   color:var(--dim);
-  font-size:0.75rem;
-  padding:0.75rem 0;
-  min-height:1.5rem;
+  text-align:center;
+  min-height:1.2em;
 }
+
+.source-callout{
+  position:absolute;
+  left:1rem;
+  bottom:1.65rem;
+  z-index:3;
+  max-width:min(22rem,70%);
+  padding:0.35rem 0.55rem;
+  background:rgba(230,225,207,0.92);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.25s ease;
+  color:var(--ink);
+}
+.source-callout.visible{opacity:1;}
+.source-callout .source-kicker{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin-bottom:0.2rem;
+}
+.source-callout .source-name{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:var(--track-tight);
+  text-transform:uppercase;
+  color:var(--ink);
+}
+.source-callout .source-detail{
+  margin-top:0.15rem;
+  font-size:var(--label-xs);
+  font-weight:500;
+  letter-spacing:var(--track-tight);
+  text-transform:none;
+  color:var(--dim);
+}
+@media (prefers-reduced-motion: reduce){
+  .source-callout{transition:none;}
+}
+
+.controls{
+  margin:0;
+  padding:0.85rem 0 0.35rem;
+  border:1px solid var(--ink);
+  border-top:none;
+  border-bottom:none;
+  background:transparent;
+}
+.slider-row{
+  display:grid;
+  grid-template-columns:7.5rem 1fr 8.5rem;
+  gap:0.65rem 0.85rem;
+  align-items:center;
+  padding:0.45rem 1rem;
+}
+.slider-row[hidden]{display:none;}
+.slider-label{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.slider-label .sym{text-transform:none;letter-spacing:0;}
+.slider-val{
+  font-family:var(--font-mono);
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:var(--track-tight);
+  text-transform:none;
+  color:var(--ink);
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+input[type="range"]{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%;
+  height:2px;
+  background:var(--ink);
+  border-radius:0;
+  outline:none;
+  cursor:pointer;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:14px;height:14px;
+  background:var(--paper);
+  border:2px solid var(--ink);
+  border-radius:0;
+  cursor:pointer;
+}
+input[type="range"]::-moz-range-thumb{
+  width:14px;height:14px;
+  background:var(--paper);
+  border:2px solid var(--ink);
+  border-radius:0;
+  cursor:pointer;
+}
+input[type="range"]:focus-visible{
+  outline:2px solid var(--olive-deep);
+  outline-offset:4px;
+}
+@media(max-width:640px){
+  .slider-row{grid-template-columns:1fr;gap:0.25rem 0;}
+  .slider-val{text-align:left;}
+}
+
+.hud{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.55rem 1.35rem;
+  font-size:var(--label-sm);
+  font-weight:500;
+  letter-spacing:var(--track-tight);
+  text-transform:uppercase;
+  color:var(--ink);
+  padding:0.7rem 1rem;
+  border:1px solid var(--ink);
+  border-top:2px solid var(--ink);
+  background:transparent;
+  position:relative;z-index:1;
+  margin-bottom:0.75rem;
+}
+.hud-item .k{color:var(--dim);margin-right:0.35rem;}
+.hud-item .k.sym{text-transform:none;letter-spacing:0;}
+.hud-item .v{color:var(--ink);font-weight:600;text-transform:none;}
+.hud-item.energy .v{color:var(--photon);}
+.hud-item.atom .v{text-transform:none;letter-spacing:0.04em;}
+.hud-item[hidden]{display:none;}
+
+/* Live energy equation — variables scale with value (module 02 pattern) */
+.energy-eq{
+  display:none;
+  margin:0 0 0.85rem;
+  padding:0.85rem 1rem 1rem;
+  border:1px solid var(--ink);
+  border-top:3px solid var(--photon);
+  background:transparent;
+}
+.module-wrap.act-energy .hud-item.energy{display:none;}
+.module-wrap.act-energy:not(.photon-intro) .energy-eq{display:block;}
+.module-wrap.act-energy.photon-intro .controls,
+.module-wrap.act-energy.photon-intro .hud,
+.module-wrap.act-energy.photon-intro .energy-eq,
+.module-wrap.act-energy.photon-intro .eq-reveal{
+  opacity:0;
+  pointer-events:none;
+  max-height:0;
+  overflow:hidden;
+  margin:0;
+  padding:0;
+  border:none;
+}
+.module-wrap.act-energy:not(.photon-intro) .controls,
+.module-wrap.act-energy:not(.photon-intro) .hud{
+  opacity:1;
+  pointer-events:auto;
+  transition:opacity 0.65s ease;
+}
+.eq{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:0.55rem 0.75rem;
+  font-family:var(--font-mono);
+  font-size:clamp(1.15rem,2.6vw,1.5rem);
+  font-weight:500;
+  color:var(--ink);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+  min-height:5.5rem;
+}
+.eq .eq-var,
+.eq .eq-chrome{
+  display:inline-block;
+  line-height:1;
+  transition:font-size 0.25s ease,color 0.25s ease;
+}
+.eq .eq-var{font-weight:600;}
+.eq-frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;}
+.eq-num{
+  display:flex;
+  align-items:baseline;
+  gap:0.35rem;
+  padding:0 0.45rem 0.28rem;
+  border-bottom:2px solid var(--ink);
+}
+.eq-den{display:flex;align-items:baseline;padding-top:0.28rem;}
+.eq-sep{
+  display:inline-block;
+  margin:0 0.15rem;
+  color:var(--faint);
+  font-weight:500;
+}
+.eq-e{color:var(--photon);}
+.eq-f{color:var(--signal);}
+.eq-lam{color:var(--olive-deep);}
+.eq-readout{
+  margin-top:0.55rem;
+  text-align:center;
+  font-family:var(--font-mono);
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:var(--track-tight);
+  text-transform:none;
+  color:var(--photon);
+  font-variant-numeric:tabular-nums;
+}
+.photon-caption{
+  display:none;
+  position:absolute;
+  left:1rem;
+  right:1rem;
+  bottom:2.4rem;
+  z-index:4;
+  text-align:center;
+  font-family:var(--font-mono);
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:var(--track-tight);
+  text-transform:uppercase;
+  color:var(--ink);
+  background:rgba(230,225,207,0.92);
+  padding:0.55rem 0.75rem;
+  pointer-events:none;
+}
+.module-wrap.photon-intro .photon-caption{display:block;}
+.module-wrap.photon-intro.photon-paused .photon-caption{display:none;}
+.photon-aside{
+  display:none;
+  position:absolute;
+  left:1rem;
+  right:1rem;
+  top:2.6rem;
+  z-index:5;
+  max-width:28rem;
+  margin:0 auto;
+  padding:0.85rem 1rem;
+  border:1px solid var(--ink);
+  border-left:3px solid var(--photon);
+  background:rgba(230,225,207,0.96);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:0.98rem;
+  font-weight:500;
+  line-height:1.5;
+  text-wrap:pretty;
+  pointer-events:none;
+}
+.photon-aside .aside-kicker{
+  display:block;
+  margin-bottom:0.35rem;
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--photon);
+}
+.module-wrap.photon-intro.photon-paused .photon-aside{display:block;}
+@media (prefers-reduced-motion: reduce){
+  .module-wrap.act-energy:not(.photon-intro) .controls,
+  .module-wrap.act-energy:not(.photon-intro) .hud{transition:none;}
+  .eq .eq-var,.eq .eq-chrome{transition:none;}
+}
+
+.eq-reveal{
+  margin:0 0 0.85rem;
+  padding:0.65rem 0 0;
+  border-top:1px solid var(--paper-3);
+  font-size:var(--label-md);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:none;
+  color:var(--ember);
+  display:none;
+}
+.eq-reveal.visible{display:block;}
+
+/* Act 1 live wave equation — below HUD; λ and f scale with sliders */
+.wave-eq{
+  display:none;
+  margin:0 0 0.85rem;
+  padding:0.85rem 1rem 1rem;
+  border:1px solid var(--ink);
+  border-top:3px solid var(--olive-deep);
+  background:transparent;
+  position:relative;z-index:1;
+}
+.module-wrap.act-wave .wave-eq{display:block;}
+.wave-eq .eq{min-height:4.5rem;}
+.eq-c{color:var(--phosphor);}
+.wave-eq-q{
+  margin:0.65rem 0 0;
+  padding-top:0.7rem;
+  border-top:1px solid var(--paper-3);
+  font-family:var(--font-body);
+  font-size:1.02rem;
+  line-height:1.45;
+  text-wrap:pretty;
+}
+
+/* Bridge: c = λf → E = hc/λ between Act 1 and Act 2 */
+.eq-bridge{
+  position:absolute;
+  inset:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:1.25rem;
+  background:rgba(230,225,207,0.94);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.35s ease;
+  overflow:visible;
+}
+.eq-bridge[hidden]{display:none !important;}
+.eq-bridge.active{
+  opacity:1;
+  pointer-events:auto;
+}
+.eq-bridge-inner{
+  width:min(36rem,100%);
+  text-align:center;
+  overflow:visible;
+  position:relative;
+  z-index:1;
+}
+.eq-bridge-kicker{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin-bottom:1.15rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.7rem;
+}
+.eq-bridge-kicker::before,
+.eq-bridge-kicker::after{
+  content:'';
+  width:1.4rem;
+  height:0.22rem;
+  background:var(--olive-deep);
+}
+.bridge-why[hidden],
+.bridge-algebra[hidden]{display:none !important;}
+.bridge-why{
+  text-align:left;
+}
+.bridge-why .eq-bridge-kicker{
+  justify-content:flex-start;
+}
+.bridge-why .eq-bridge-kicker::after{display:none;}
+.why-lead{
+  font-family:var(--font-body);
+  font-size:1.08rem;
+  font-weight:400;
+  line-height:1.55;
+  color:var(--ink-soft);
+  margin:0 0 0.85rem;
+  text-wrap:pretty;
+}
+.why-lead + .why-lead{margin-top:0;}
+.why-lead .why-sym{
+  font-family:var(--font-mono);
+  font-weight:700;
+  color:var(--signal);
+  font-variant-numeric:tabular-nums;
+}
+.why-lead .fn-mark{
+  font-family:var(--font-mono);
+  font-size:0.85em;
+  font-weight:600;
+  color:var(--olive-deep);
+  margin-left:0.1em;
+}
+.why-footnote{
+  margin:1.15rem 0 0;
+  padding-top:0.75rem;
+  border-top:1px solid var(--paper-3);
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:500;
+  letter-spacing:var(--track-tight);
+  line-height:1.45;
+  color:var(--faint);
+  text-wrap:pretty;
+}
+.why-footnote .fn-mark{
+  color:var(--olive-deep);
+  font-weight:600;
+}
+.bridge-why-actions{
+  margin-top:1.25rem;
+  text-align:right;
+}
+.bridge-why-actions .btn{margin-top:0;}
+.eq-stack{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.85rem;
+  min-height:14rem;
+  justify-content:center;
+  position:relative;
+  overflow:visible;
+}
+.bridge-algebra{
+  overflow:visible;
+}
+.eq-line{
+  position:relative;
+  font-size:clamp(1.1rem,2.9vw,1.4rem);
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--ink);
+  opacity:0;
+  transform:translateY(0.4rem);
+  transition:opacity 0.55s ease, transform 0.55s ease, color 0.45s ease;
+  line-height:1.45;
+  cursor:help;
+}
+.eq-line.show{
+  opacity:1;
+  transform:translateY(0);
+}
+.eq-line.show.emphasis{
+  color:var(--ember);
+  font-size:clamp(1.25rem,3.3vw,1.65rem);
+}
+.eq-line .hl{
+  color:var(--signal);
+  font-weight:700;
+}
+.eq-line .hl-ember{
+  color:var(--ember);
+  font-weight:700;
+}
+.eq-line:focus-visible{
+  outline:2px solid var(--olive-deep);
+  outline-offset:4px;
+}
+.eq-hover-tip{
+  position:absolute;
+  left:50%;
+  bottom:calc(100% + 0.5rem);
+  transform:translateX(-50%) translateY(0.2rem);
+  width:min(22rem,78vw);
+  padding:0.7rem 0.85rem;
+  background:var(--plate);
+  color:var(--plate-ink);
+  border:1px solid var(--plate-ink);
+  text-align:left;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.18s ease, transform 0.18s ease;
+  z-index:40;
+  font-family:var(--font-body);
+  font-size:0.92rem;
+  font-weight:400;
+  letter-spacing:0;
+  line-height:1.4;
+  text-transform:none;
+}
+.eq-line.show:hover,
+.eq-line.show:focus-visible{
+  z-index:41;
+}
+.eq-line.show:hover .eq-hover-tip,
+.eq-line.show:focus-visible .eq-hover-tip{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+.eq-hover-tip .tip-says{
+  color:var(--plate-ink);
+  margin:0 0 0.55rem;
+  font-weight:500;
+}
+.eq-hover-tip .tip-vars{
+  list-style:none;
+  margin:0;
+  padding:0;
+  border-top:1px solid rgba(232,230,217,0.28);
+  padding-top:0.5rem;
+}
+.eq-hover-tip .tip-vars li{
+  margin:0.28rem 0;
+  color:rgba(232,230,217,0.88);
+  font-size:0.88rem;
+  line-height:1.35;
+}
+.eq-hover-tip .tip-vars .sym{
+  font-family:var(--font-mono);
+  font-weight:700;
+  color:var(--mustard);
+  margin-right:0.25rem;
+}
+.eq-hover-tip .tip-vars .unit{
+  font-family:var(--font-mono);
+  font-size:0.82em;
+  color:rgba(232,230,217,0.55);
+}
+.plug-source{
+  display:inline-block;
+  padding:0.08em 0.28em;
+  border:1.5px solid transparent;
+  transition:border-color 0.35s ease, background 0.35s ease, color 0.35s ease;
+}
+.eq-bridge.cue-source .plug-source{
+  border-color:var(--signal);
+  background:rgba(26,106,163,0.1);
+  color:var(--signal);
+}
+.plug-slot{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  vertical-align:baseline;
+  min-width:4.8em;
+  min-height:1.55em;
+  padding:0.12em 0.4em;
+  margin:0 0.05em;
+  border:1.5px dashed var(--signal);
+  background:rgba(26,106,163,0.06);
+  transition:border-color 0.4s ease, background 0.4s ease, border-style 0.4s ease;
+}
+.eq-bridge.slot-ready .plug-slot{
+  border-style:solid;
+  background:rgba(26,106,163,0.12);
+}
+.eq-bridge.plugged .plug-slot{
+  border-color:var(--ember);
+  border-style:solid;
+  background:rgba(168,90,50,0.1);
+}
+.slot-f,.slot-sub{
+  display:inline-block;
+  transition:opacity 0.45s ease, transform 0.45s ease;
+}
+.slot-f{
+  color:var(--signal);
+  font-weight:700;
+}
+.slot-sub{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  opacity:0;
+  color:var(--ember);
+  font-weight:700;
+  white-space:nowrap;
+  pointer-events:none;
+}
+.eq-bridge.plugged .slot-f{
+  opacity:0;
+  transform:scale(0.55);
+}
+.eq-bridge.plugged .slot-sub{
+  opacity:1;
+}
+.eq-plug-cue{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--signal);
+  opacity:0;
+  transform:translateY(0.2rem);
+  transition:opacity 0.45s ease, transform 0.45s ease;
+  min-height:1.1em;
+}
+.eq-plug-cue.show{
+  opacity:1;
+  transform:translateY(0);
+}
+.plug-ghost{
+  position:fixed;
+  z-index:20;
+  pointer-events:none;
+  font-family:var(--font-mono);
+  font-size:clamp(1.05rem,2.8vw,1.35rem);
+  font-weight:700;
+  letter-spacing:0.04em;
+  color:var(--signal);
+  padding:0.1em 0.35em;
+  border:1.5px solid var(--signal);
+  background:rgba(230,225,207,0.96);
+  transition:transform 1.15s cubic-bezier(0.22,0.8,0.28,1), opacity 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+  will-change:transform;
+}
+.plug-ghost.landed{
+  color:var(--ember);
+  border-color:var(--ember);
+}
+.eq-bridge-note{
+  margin-top:1.15rem;
+  font-size:var(--label-sm);
+  font-weight:500;
+  letter-spacing:var(--track-tight);
+  text-transform:uppercase;
+  color:var(--dim);
+  opacity:0;
+  transition:opacity 0.55s ease;
+}
+.eq-bridge-note.show{opacity:1;}
+.planck-note{
+  margin:0.85rem 0 0;
+  font-family:var(--font-body);
+  font-size:0.98rem;
+  font-weight:400;
+  line-height:1.5;
+  color:var(--ink-soft);
+  text-align:left;
+  max-width:32rem;
+  margin-left:auto;
+  margin-right:auto;
+  opacity:0;
+  transform:translateY(0.3rem);
+  transition:opacity 0.5s ease, transform 0.5s ease;
+  text-wrap:pretty;
+}
+.planck-note.show{
+  opacity:1;
+  transform:translateY(0);
+}
+.planck-note .planck-sym{
+  font-family:var(--font-mono);
+  font-weight:700;
+  color:var(--ember);
+}
+.planck-note .fn-mark{
+  font-family:var(--font-mono);
+  font-size:0.85em;
+  font-weight:600;
+  color:var(--olive-deep);
+  margin-left:0.1em;
+}
+.planck-footnote{
+  display:block;
+  margin:0.55rem 0 0;
+  padding-top:0.55rem;
+  border-top:1px solid var(--paper-3);
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:500;
+  letter-spacing:var(--track-tight);
+  line-height:1.45;
+  color:var(--faint);
+  text-wrap:pretty;
+}
+.planck-footnote a{
+  color:var(--olive-deep);
+  text-decoration:underline;
+  text-underline-offset:0.12em;
+}
+.planck-footnote a:hover{color:var(--ink);}
+.planck-footnote a:focus-visible{
+  outline:2px solid var(--olive-deep);
+  outline-offset:2px;
+}
+.bridge-algebra-actions{
+  margin-top:1.15rem;
+  text-align:right;
+}
+.bridge-algebra-actions[hidden]{display:none !important;}
+.bridge-algebra-actions .btn{margin-top:0;margin-right:0;}
+@media (prefers-reduced-motion: reduce){
+  .eq-bridge,.eq-line,.eq-bridge-note,.eq-plug-cue,.planck-note,
+  .slot-f,.slot-sub,.plug-source,.plug-ghost{transition:none;}
+  .eq-line,.eq-plug-cue,.planck-note{transform:none;}
+}
+
+.act-nav,
+.module-footer{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;
+  column-gap:0.75rem;
+  row-gap:0.5rem;
+  width:100%;
+  margin-top:1.25rem;
+  min-height:2.6rem;
+}
+.module-footer[hidden],
+.act-nav[hidden]{display:none !important;}
+.module-footer-back,
+.module-footer-help,
+.module-footer-fwd{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:0.5rem;
+  min-width:0;
+}
+.module-footer-back{justify-self:start;justify-content:flex-start;}
+.module-footer-help{justify-self:center;justify-content:center;}
+.module-footer-fwd{justify-self:end;justify-content:flex-end;}
+.module-footer .btn,
+.module-footer #stuckBtn,
+.act-nav .btn,
+.ion-aftermath .btn{margin:0;}
+.module-footer #stuckBtn[hidden],
+.module-footer .btn[hidden],
+.act-nav .btn[hidden]{display:none !important;}
+@media (max-width:520px){
+  .module-footer,
+  .act-nav{
+    grid-template-columns:1fr 1fr;
+    grid-template-areas:
+      "back fwd"
+      "help help";
+  }
+  .module-footer-back{grid-area:back;}
+  .module-footer-help{grid-area:help;}
+  .module-footer-fwd{grid-area:fwd;}
+}
+.ion-aftermath{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  align-items:center;
+  justify-content:flex-end;
+}
+.ion-aftermath[hidden]{display:none !important;}
+
 [data-gate]{opacity:0;transition:opacity 0.6s;pointer-events:none;}
 [data-gate].discovered{opacity:1;pointer-events:auto;}
 
-#stuckBtn{
-  background:none;
-  border:1px solid var(--signal);
-  color:var(--signal);
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.8rem;
-  padding:0.5rem 1.2rem;
-  border-radius:4px;
-  cursor:pointer;
-  transition:background 0.2s,color 0.2s;
-  margin-top:1rem;
-}
-#stuckBtn:hover{background:rgba(181,121,255,0.1);}
-#stuckBtn:focus-visible{outline:2px solid var(--signal);outline-offset:2px;}
+.btn{background:transparent;border:1px solid var(--ink);color:var(--ink);font-size:var(--label-md);letter-spacing:0.09em;text-transform:uppercase;font-weight:600;padding:0.65rem 1.3rem;border-radius:0;cursor:pointer;transition:background 0.15s,color 0.15s;margin-right:0.5rem;margin-top:0.4rem;}
+.btn:hover{background:var(--ink);color:var(--paper);}
+.btn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.btn.submit{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+.btn.submit:hover{background:var(--olive-deep);border-color:var(--olive-deep);}
+.btn:disabled{opacity:0.35;cursor:not-allowed;}
+.btn:disabled:hover{background:transparent;color:var(--ink);}
+.btn.submit:disabled:hover{background:var(--ink);color:var(--paper);}
 
-.help-panel{
-  opacity:0;
-  max-height:0;
-  overflow:hidden;
-  transition:opacity 0.3s,max-height 0.3s;
-  border:1px solid var(--signal);
-  background:var(--panel);
-  border-radius:4px;
-  padding:0 1.2rem;
-  margin-top:0.75rem;
-  color:var(--dim);
-  font-size:0.85rem;
-  line-height:1.6;
+#stuckBtn{background:none;border:1px solid var(--ink);color:var(--ink);font-size:var(--label-sm);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:0.55rem 1.2rem;border-radius:0;cursor:pointer;transition:background 0.15s,color 0.15s;margin:0;}
+#stuckBtn:hover{background:var(--ink);color:var(--paper);}
+#stuckBtn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.help-panel{opacity:0;max-height:0;overflow:hidden;transition:opacity 0.3s,max-height 0.3s;border:1px solid transparent;background:var(--plate);border-radius:0;padding:0 1.2rem;margin-top:0.75rem;color:var(--plate-ink);font-size:1.05rem;line-height:1.6;max-width:none;text-wrap:pretty;}
+.help-panel.open{opacity:1;max-height:320px;padding:1rem 1.2rem;border-color:var(--neon);}
+
+.briefing{margin:0 0 0.5rem;padding:0.2rem 0 0;width:100%;}
+.briefing[hidden]{display:none;}
+.module-wrap:has(#briefing:not([hidden])){max-width:1120px;padding-left:clamp(1.35rem,4vw,2.75rem);padding-right:clamp(1.35rem,4vw,2.75rem);}
+.briefing-kicker{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.7rem;
 }
-.help-panel.open{
-  opacity:1;
-  max-height:200px;
-  padding:1rem 1.2rem;
+.briefing-kicker::before{
+  content:'';width:1.6rem;height:0.28rem;background:var(--olive-deep);flex:none;
+  transform:translateY(-0.12em);
+}
+.briefing h1{
+  font-family:var(--font-display);font-size:clamp(1.85rem,4.5vw,2.55rem);
+  font-weight:400;letter-spacing:-0.025em;line-height:1.02;color:var(--ink);
+  margin-bottom:0.55rem;
+}
+.briefing-lead{font-size:1.15rem;line-height:1.55;color:var(--ink-soft);max-width:none;margin:0 0 1.5rem;text-wrap:pretty;}
+.briefing-columns{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.75rem 2.5rem;
+  align-items:start;
+}
+.briefing-actions{
+  display:flex;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  margin-top:1.75rem;
+  padding-top:1.25rem;
+  border-top:1px solid var(--ink);
+}
+.briefing .btn.submit{margin-top:0;}
+#moduleStage[hidden]{display:none;}
+
+.debrief{margin:0.25rem 0 1.25rem;padding:1.2rem 0 0;border-top:1px solid var(--ink);}
+.debrief[hidden]{display:none;}
+.briefing h2,
+.debrief h2{font-family:var(--font-display);font-size:1.5rem;font-weight:400;letter-spacing:-0.02em;line-height:1.1;color:var(--ink);margin-bottom:0.35rem;}
+.debrief-lead{font-size:1.05rem;line-height:1.5;color:var(--dim);max-width:none;margin:0 0 1.15rem;text-wrap:pretty;}
+.briefing-block,
+.debrief-block{border-left:4px solid var(--olive);padding:0.1rem 0 0.1rem 1.05rem;margin-bottom:1.15rem;}
+.briefing-block{margin-bottom:0;}
+.briefing-block:last-of-type,
+.debrief-block:last-child{margin-bottom:0;}
+.briefing-block.cc,
+.debrief-block.cc{border-left-color:var(--signal);}
+.debrief-kicker{font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.5rem;}
+.briefing-block.cc .debrief-kicker,
+.debrief-block.cc .debrief-kicker{color:var(--signal);}
+.briefing ul,
+.debrief ul{list-style:none;margin:0;padding:0;}
+.briefing li,
+.debrief li{position:relative;padding-left:1.6rem;margin:0.45rem 0;font-size:1rem;line-height:1.5;color:var(--ink-soft);max-width:none;text-wrap:pretty;}
+.briefing li{font-size:1.05rem;line-height:1.55;margin:0.55rem 0;}
+.briefing-li li::before{content:'\25B8';position:absolute;left:0;color:var(--olive-deep);}
+.debrief-li li::before{content:'\2713';position:absolute;left:0;color:var(--olive-deep);font-weight:700;}
+.briefing-li li.elsewhere::before,
+.debrief-li li.elsewhere::before{content:'\270E';color:var(--ember);}
+.debrief-tag{font-family:var(--font-mono);font-size:var(--label-xs);letter-spacing:0.1em;text-transform:uppercase;color:var(--ember);white-space:nowrap;}
+.debrief-revisit{
+  display:block;margin:0.35rem 0 0;padding:0;
+  border:none;background:none;cursor:pointer;text-align:left;
+  font-family:var(--font-mono);font-size:var(--label-sm);font-weight:600;
+  letter-spacing:var(--track-tight);text-transform:uppercase;
+  color:var(--signal);line-height:1.4;
+}
+.debrief-revisit:hover{color:var(--olive-deep);text-decoration:underline;}
+.debrief-revisit:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.briefing-cc li::before,
+.debrief-cc li::before{content:'\25B8';position:absolute;left:0;color:var(--signal);}
+.briefing-cc .cc-name,
+.debrief-cc .cc-name{display:block;font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--signal);margin-bottom:0.15rem;}
+@media(max-width:760px){
+  .briefing-columns{grid-template-columns:1fr;gap:1.35rem;}
+}
+@media print{
+  .debrief{break-inside:avoid;border-top-color:#000;}
+  .briefing h1,.briefing h2,.briefing li,.debrief h2,.debrief li,.debrief-kicker,.briefing-cc .cc-name,.debrief-cc .cc-name,.debrief-tag{color:#000;}
+  #stuckBtn,.module-footer,.controls,input[type="range"],.eq-bridge{display:none;}
 }
 </style>
 </head>
 <body>
 <div class="module-wrap">
-  <a href="index.html" class="back-link">← Unit 1b</a>
+  <div class="top-nav">
+    <a href="index.html" class="back-link">← Unit 1b</a>
+    <div class="mod-meta">Module 05 · Light &amp; Energy</div>
+  </div>
+
+  <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
+    <div class="briefing-kicker"><span>Before you begin</span></div>
+    <h1 id="briefingTitle">Light &amp; Energy</h1>
+    <p class="briefing-lead">Read what this module is aiming for. Then open the instrument and work through it.</p>
+    <div class="briefing-columns">
+      <div class="briefing-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="briefing-li" id="briefingIntentions"></ul>
+      </div>
+      <div class="briefing-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="briefing-cc" id="briefingCompetencies"></ul>
+      </div>
+    </div>
+    <div class="briefing-actions">
+      <button type="button" class="btn submit" id="briefingNext">Next → Start simulation</button>
+    </div>
+  </section>
+
+  <div id="moduleStage" hidden>
   <div class="mod-tag">Module 05</div>
+  <div class="act-meta" id="actMeta">Act 1 of 3 · Wave</div>
   <h1>Light &amp; Energy</h1>
-  <p class="framing">A wave. A slider. Shorter wavelength, higher frequency — but what about energy?</p>
-
-  <div class="viewport">
-    <canvas id="simCanvas"></canvas>
+  <p class="framing" id="framing" aria-live="polite">A wave on the plate. Drag wavelength or frequency — watch what stays fixed and what moves.</p>
+  <div class="act-prompts" id="actPrompts" hidden>
+    <div class="prompt-kicker">As you explore</div>
+    <p class="student-q">What do you notice?</p>
+    <p class="student-q">Reminder: How is wavelength related to energy?</p>
+    <p class="student-q">How is energy related to removing an electron?</p>
+    <p class="student-q">What if we replaced the sodium atom with a bromine atom — how would the simulation change?</p>
   </div>
 
-  <div class="controls"><!-- simulation controls go here --></div>
-  <div class="hud"><!-- live readout values --></div>
+  <div class="viewport viewport-stage" id="viewport" data-fig="FIG. 05  ·  WAVE &amp; SPECTRUM">
+    <canvas id="simCanvas" aria-label="Electromagnetic wave and spectrum"></canvas>
+    <div class="source-callout" id="sourceCallout" aria-live="polite">
+      <div class="source-kicker">Familiar source</div>
+      <div class="source-name" id="sourceName"></div>
+      <div class="source-detail" id="sourceDetail"></div>
+    </div>
+    <div class="ie-meter" id="ieMeter" aria-label="Photon energy relative to ionization">
+      <div class="ie-meter-label" id="ieMeterLabel">Energy in</div>
+      <div class="ie-meter-track" id="ieMeterTrack">
+        <div class="ie-meter-fill" id="ieMeterFill"></div>
+        <div class="ie-meter-tick" id="ieMeterTick">
+          <span class="ie-meter-tick-label" id="ieMeterTickLabel">IE</span>
+        </div>
+      </div>
+      <div class="ie-meter-val" id="ieMeterVal">0.00</div>
+    </div>
+    <div class="eq-bridge" id="eqBridge" hidden aria-live="polite" aria-atomic="true">
+      <div class="eq-bridge-inner">
+        <div class="bridge-why" id="bridgeWhy">
+          <div class="eq-bridge-kicker">Why connect waves to photons?</div>
+          <p class="why-lead">
+            You just treated light as a wave — wavelength and frequency locked together by
+            <span class="why-sym">c</span>.
+            That describes how light travels. It does not yet say how much energy light can deliver when it meets an atom.
+          </p>
+          <p class="why-lead">
+            To knock an electron loose, what matters is the energy in each interaction — not only the continuous wave picture.
+            Treating light as a stream of energy packets (photons) lets us link the wave quantities you measured
+            (<span class="why-sym">λ</span>, <span class="why-sym">f</span>)
+            to that packet energy. That link is how ionization by light becomes measurable — and it is the tool the next modules use.<sup class="fn-mark">1</sup>
+          </p>
+          <p class="why-footnote" id="whyFootnote">
+            <span class="fn-mark">1</span>
+            Moog, R. S., &amp; Farrell, J. J. (2015). <em>Chemistry: A Guided Inquiry</em> (5th ed.). ChemActivity 7 — Light, Waves, Electrons. The workbook develops photon energy from the wave quantities, then uses that energy to probe atoms.
+          </p>
+          <div class="bridge-why-actions">
+            <button type="button" class="btn submit" id="whyContinueBtn">Continue → Connect the equations</button>
+          </div>
+        </div>
+        <div class="bridge-algebra" id="bridgeAlgebra" hidden>
+          <div class="eq-bridge-kicker">From the wave to the photon</div>
+          <div class="eq-stack" id="eqStack">
+            <div class="eq-line" id="eqL1" tabindex="0" aria-describedby="tipL1">
+              c = <span class="hl">λ</span> · <span class="hl">f</span>
+              <div class="eq-hover-tip" id="tipL1" role="tooltip">
+                <p class="tip-says">Light travels at speed <strong>c</strong>: wavelength times frequency.</p>
+                <ul class="tip-vars">
+                  <li><span class="sym">c</span> speed of light <span class="unit">m/s</span></li>
+                  <li><span class="sym">λ</span> wavelength <span class="unit">m (or nm)</span></li>
+                  <li><span class="sym">f</span> frequency <span class="unit">s⁻¹ (Hz)</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="eq-line" id="eqL2" tabindex="0" aria-describedby="tipL2">
+              <span class="hl">f</span> = <span class="plug-source" id="plugSource">c / <span class="hl">λ</span></span>
+              <div class="eq-hover-tip" id="tipL2" role="tooltip">
+                <p class="tip-says">Same wave equation, solved for frequency — shorter wavelength means higher frequency.</p>
+                <ul class="tip-vars">
+                  <li><span class="sym">f</span> frequency <span class="unit">s⁻¹ (Hz)</span></li>
+                  <li><span class="sym">c</span> speed of light <span class="unit">m/s</span></li>
+                  <li><span class="sym">λ</span> wavelength <span class="unit">m (or nm)</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="eq-plug-cue" id="eqPlugCue">↓ plug into E</div>
+            <div class="eq-line" id="eqL3" tabindex="0" aria-describedby="tipL3">
+              <span class="hl-ember">E</span> = h ·
+              <span class="plug-slot" id="plugSlot">
+                <span class="slot-f" id="slotF">f</span>
+                <span class="slot-sub" id="slotSub">(c / λ)</span>
+              </span>
+              <div class="eq-hover-tip" id="tipL3" role="tooltip">
+                <p class="tip-says">Photon energy equals Planck’s constant times frequency — each packet’s energy tracks how rapidly the wave oscillates. Substituting <strong>f = c/λ</strong> plugs the wave picture into energy.</p>
+                <ul class="tip-vars">
+                  <li><span class="sym">E</span> energy per photon <span class="unit">J (or MJ/mol)</span></li>
+                  <li><span class="sym">h</span> Planck’s constant <span class="unit">J·s</span></li>
+                  <li><span class="sym">f</span> frequency <span class="unit">s⁻¹ (Hz)</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="eq-line" id="eqL5" tabindex="0" aria-describedby="tipL5">
+              <span class="hl-ember">E</span> = hc / <span class="hl">λ</span>
+              <div class="eq-hover-tip" id="tipL5" role="tooltip">
+                <p class="tip-says">Photon energy written in terms of wavelength — shorter λ means more energy per photon.</p>
+                <ul class="tip-vars">
+                  <li><span class="sym">E</span> energy per photon <span class="unit">J (or MJ/mol)</span></li>
+                  <li><span class="sym">h</span> Planck’s constant <span class="unit">J·s</span></li>
+                  <li><span class="sym">c</span> speed of light <span class="unit">m/s</span></li>
+                  <li><span class="sym">λ</span> wavelength <span class="unit">m (or nm)</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <p class="planck-note" id="planckNote">
+            <span class="planck-sym">h</span> is Planck’s constant — a fixed conversion factor
+            (6.626 × 10⁻³⁴ J·s) that turns frequency into energy per photon.<sup class="fn-mark">2</sup>
+            <span class="planck-footnote">
+              <span class="fn-mark">2</span>
+              PBS NOVA.
+              <a href="https://www.pbs.org/wgbh/nova/article/plancks-constant/" target="_blank" rel="noopener noreferrer">Planck’s Constant</a>.
+            </span>
+          </p>
+          <p class="eq-bridge-note" id="eqBridgeNote">Shorter wavelength → higher frequency → more energy per photon</p>
+          <div class="bridge-algebra-actions" id="algebraActions" hidden>
+            <button type="button" class="btn submit" id="algebraNextBtn">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="photon-caption" id="photonCaption" aria-live="polite"></div>
+    <aside class="photon-aside" id="photonAside" hidden aria-live="polite">
+      <span class="aside-kicker">About these orbs</span>
+      This simulation shows the packets of energy as orbs. The orbs shrink and grow based on their energy. This is meant to be a visualization — in reality we can’t see any of this!
+    </aside>
+  </div>
 
-  <button id="stuckBtn">Stuck?</button>
+  <div class="controls" id="controls">
+    <div class="slider-row" id="rowLambda">
+      <label class="slider-label" for="lambdaSlider">Wavelength (<span class="sym">λ</span>)</label>
+      <input type="range" id="lambdaSlider" min="0" max="1000" step="1" value="458" aria-label="Wavelength (λ)">
+      <div class="slider-val" id="lambdaVal">989 nm</div>
+    </div>
+    <div class="slider-row" id="rowFreq">
+      <label class="slider-label" for="freqSlider">Frequency (<span class="sym">f</span>)</label>
+      <input type="range" id="freqSlider" min="0" max="1000" step="1" value="542" aria-label="Frequency (f)">
+      <div class="slider-val" id="freqVal">3.03 × 10¹⁴ Hz</div>
+    </div>
+  </div>
+
+  <div class="energy-eq" id="energyEq" aria-live="polite">
+    <div class="eq" id="eq" aria-hidden="false">
+      <span class="eq-var eq-e" id="eqE">E</span>
+      <span class="eq-chrome">=</span>
+      <span class="eq-chrome">h</span>
+      <span class="eq-chrome">·</span>
+      <span class="eq-var eq-f" id="eqF">f</span>
+      <span class="eq-sep">=</span>
+      <span class="eq-frac">
+        <span class="eq-num">
+          <span class="eq-chrome">h c</span>
+        </span>
+        <span class="eq-den"><span class="eq-var eq-lam" id="eqLam">λ</span></span>
+      </span>
+    </div>
+    <div class="eq-readout" id="eqReadout">—</div>
+  </div>
+
+  <div class="hud" id="hud">
+    <div class="hud-item"><span class="k sym">λ</span><span class="v" id="hudLambda">989 nm</span></div>
+    <div class="hud-item"><span class="k sym">f</span><span class="v" id="hudFreq">3.03 × 10¹⁴ s⁻¹</span></div>
+    <div class="hud-item"><span class="k sym">c</span><span class="v" id="hudC">3.00 × 10⁸ m/s</span></div>
+    <div class="hud-item"><span class="k">Band</span><span class="v" id="hudBand">Visible</span></div>
+    <div class="hud-item energy" id="hudEnergyItem" hidden><span class="k sym">E</span><span class="v" id="hudEnergy">—</span></div>
+    <div class="hud-item atom" id="hudAtomItem" hidden><span class="k">Atom</span><span class="v" id="hudAtomVal">Na · IE₁ 0.50 MJ/mol</span></div>
+  </div>
+
+  <div class="wave-eq" id="waveEq" aria-live="polite">
+    <div class="eq" id="waveEqLine" aria-hidden="false">
+      <span class="eq-var eq-c" id="waveEqC">c</span>
+      <span class="eq-chrome">=</span>
+      <span class="eq-var eq-lam" id="waveEqLam">λ</span>
+      <span class="eq-chrome">·</span>
+      <span class="eq-var eq-f" id="waveEqF">f</span>
+    </div>
+    <p class="wave-eq-q student-q">What type of relationship do the variables have with one another? Why?</p>
+  </div>
+
+  <div class="eq-reveal" id="eqReveal" hidden>h = 6.626 × 10⁻³⁴ J·s</div>
+
+  <nav class="module-footer" aria-label="Section navigation">
+    <div class="module-footer-back">
+      <button type="button" class="btn" id="backBtn" hidden>← Back</button>
+    </div>
+    <div class="module-footer-help">
+      <button type="button" id="stuckBtn">Stuck?</button>
+    </div>
+    <div class="module-footer-fwd">
+      <button type="button" class="btn submit" id="continueBtn" disabled>Continue →</button>
+      <div class="ion-aftermath" id="ionAftermath" hidden>
+        <button type="button" class="btn" id="ionResetBtn">Reset</button>
+        <button type="button" class="btn" id="ionNextAtomBtn">Try another atom</button>
+        <button type="button" class="btn submit" id="ionFinishBtn">Finish</button>
+      </div>
+    </div>
+  </nav>
   <div class="help-panel" id="helpPanel">
-    <p>Halve the wavelength. What happens to how many cycles pass X each second?</p>
+    <p id="helpText">Halve the wavelength. What happens to how many cycles pass X each second?</p>
   </div>
+
+  <section class="debrief" id="debrief" hidden aria-labelledby="debriefTitle">
+    <h2 id="debriefTitle">What this was for</h2>
+    <p class="debrief-lead">The intentions behind this module, and the competencies you just practised. Read each competency statement and decide honestly how well it fits you right now.</p>
+    <div class="debrief-block">
+      <div class="debrief-kicker">Learning intentions</div>
+      <ul class="debrief-li" id="debriefIntentions"></ul>
+    </div>
+    <div class="debrief-block cc">
+      <div class="debrief-kicker">Curricular competencies</div>
+      <ul class="debrief-cc" id="debriefCompetencies"></ul>
+    </div>
+  </section>
+  </div><!-- /#moduleStage -->
 </div>
 
 <script>
@@ -164,54 +1337,97 @@ let W, H, dpr;
 function resize(){
   dpr = window.devicePixelRatio || 1;
   const rect = canvas.parentElement.getBoundingClientRect();
-  W = rect.width;
-  H = Math.min(W * 0.6, 500);
+  W = Math.max(280, rect.width);
+  H = Math.min(W * 0.55, 460);
   canvas.width = W * dpr;
   canvas.height = H * dpr;
   canvas.style.height = H + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-window.addEventListener('resize', resize);
+window.addEventListener('resize', () => { resize(); drawFrame(); });
 resize();
 
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function glowLine(x1, y1, x2, y2, color, width = 2){
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 12;
-  ctx.strokeStyle = color;
-  ctx.globalAlpha = 0.3;
-  ctx.lineWidth = width + 4;
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.lineWidth = width;
-  ctx.stroke();
-  ctx.restore();
-}
+const INK = {
+  paper: '#e6e1cf',
+  ink: '#16140e',
+  inkSoft: 'rgba(22,20,14,0.55)',
+  inkLine: 'rgba(22,20,14,0.35)',
+  phosphor: '#5c6b28',
+  ember: '#a85a32',
+  signal: '#1a6aa3',
+  olive: '#7e8c45',
+  mustard: '#c4a35a',
+  photon: '#6b4a78',
+  proton: '#a85a32',
+  dim: '#55513f',
+  grid: 'rgba(207,200,174,0.55)'
+};
 
-function glowCircle(x, y, r, color){
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 15;
-  ctx.fillStyle = color;
-  ctx.globalAlpha = 0.2;
-  ctx.beginPath(); ctx.arc(x,y,r+4,0,Math.PI*2); ctx.fill();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-  ctx.restore();
-}
+/* ---------- REFERENCE DATA (§8.5) ---------- */
+const DATA = {
+  c: 3.00e8,
+  h: 6.626e-34,
+  NA: 6.02214076e23,
+  // λ slider span in nm (log): microwave oven ↔ dental X-ray
+  lambdaMinNm: 0.05,
+  lambdaMaxNm: 1.2e8,
+  spectrum: [
+    { band: 'Radio',     minNm: 3e8,   maxNm: Infinity, fill: 'rgba(126,140,69,0.22)' },
+    { band: 'Microwave', minNm: 1e6,   maxNm: 3e8,      fill: 'rgba(126,140,69,0.32)' },
+    { band: 'IR',        minNm: 800,   maxNm: 1e6,      fill: 'rgba(168,90,50,0.28)' },
+    { band: 'Visible',   minNm: 400,   maxNm: 800,      fill: null },
+    { band: 'UV',        minNm: 10,    maxNm: 400,      fill: 'rgba(26,106,163,0.28)' },
+    { band: 'X-ray',     minNm: 0.1,   maxNm: 10,       fill: 'rgba(26,106,163,0.38)' },
+    { band: 'Gamma',     minNm: 0,     maxNm: 0.1,      fill: 'rgba(22,20,14,0.28)' }
+  ],
+  // Named sources — windows in nm; best match wins
+  sources: [
+    { id: 'microwave', name: 'Microwave oven',     lambdaNm: 1.2e8, minNm: 5e7,  maxNm: 2e8,  label: '12 cm' },
+    { id: 'red',       name: 'Red laser pointer',  lambdaNm: 700,   minNm: 650,  maxNm: 750,  label: '700 nm' },
+    { id: 'blue',      name: 'Blue light',         lambdaNm: 400,   minNm: 380,  maxNm: 430,  label: '400 nm' },
+    { id: 'tanning',   name: 'Tanning lamp',       lambdaNm: 365,   minNm: 320,  maxNm: 380,  label: '365 nm' },
+    { id: 'xray',      name: 'Dental X-ray',       lambdaNm: 0.1,   minNm: 0.05, maxNm: 0.5,  label: '0.1 nm' }
+  ],
+  naIE: 0.50, // MJ/mol — starter atom (kept for reference)
+  // Act 3 ionization targets (§8.3 first IE). shells = inner → valence counts.
+  starterAtom: { sym: 'Na', ie: 0.50, shells: [2, 8, 1] },
+  altAtoms: [
+    { sym: 'Cl', ie: 1.25, shells: [2, 8, 7] },
+    { sym: 'C', ie: 1.09, shells: [2, 4] },
+    { sym: 'Ne', ie: 2.08, shells: [2, 8] }
+  ]
+};
 
-function drawGrid(spacing = 40, color = 'rgba(33,29,71,0.6)'){
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1;
-  for(let x = 0; x < W; x += spacing){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for(let y = 0; y < H; y += spacing){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-  ctx.restore();
-}
+const HELP = {
+  1: 'Halve the wavelength. What happens to how many cycles pass X each second?',
+  2: 'Raise the frequency. Which equation terms grow? Which shrink?',
+  3: 'Keep raising the frequency. When does the electron finally leave?'
+};
+
+const FRAMING = {
+  1: 'A wave on the plate. Drag wavelength or frequency — watch what stays fixed and what moves.',
+  2: 'Same light, now as photons. Sweep frequency and watch how the equation terms grow and shrink.',
+  3: 'Aim light at an atom. Turn the frequency up and see when the electron leaves.'
+};
+
+const PHOTON_INTRO = {
+  captions: [
+    'Light arrives in packets — photons.',
+    'Each photon carries energy set by the frequency.',
+    'Shorter λ → higher f → each packet carries more energy.'
+  ],
+  // Step-driven (Next →); last step runs a gentle red→blue sweep
+  lastStep: 3,
+  sweepSec: 5
+};
+
+const FIG = {
+  1: 'FIG. 05  ·  WAVE & SPECTRUM',
+  2: 'FIG. 05  ·  PHOTON ENERGY',
+  3: 'FIG. 05  ·  PHOTON & IONIZATION'
+};
 
 const gates = {};
 function setGate(name, val){
@@ -221,10 +1437,12 @@ function setGate(name, val){
     const unlocked = required.every(g => gates[g.trim()]);
     el.classList.toggle('discovered', unlocked);
   });
+  if(name === 'moduleComplete' && val) revealDebrief();
 }
 
 const stuckBtn = document.getElementById('stuckBtn');
 const helpPanel = document.getElementById('helpPanel');
+const helpText = document.getElementById('helpText');
 if(stuckBtn && helpPanel){
   stuckBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -237,94 +1455,1564 @@ if(stuckBtn && helpPanel){
   });
 }
 
-/* ---------- REFERENCE DATA ---------- */
-const DATA = {
-  constants: {
-    c: 3.00e8,
-    h: 6.626e-34,
-    nm_to_m: 1e-9
-  },
-  spectrum: [
-    {band:'Radio', min:1e6, max:Infinity, color:'#ff4444'},
-    {band:'IR', min:800, max:1e6, color:'#ff8844'},
-    {band:'Visible', min:400, max:800, color:'#44ff44'},
-    {band:'UV', min:10, max:400, color:'#8844ff'},
-    {band:'X-ray', min:0.1, max:10, color:'#4444ff'},
-    {band:'Gamma', min:0, max:0.1, color:'#ff44ff'}
+/* ---------- STATE ---------- */
+const STATE = {
+  act: 1,
+  lambdaNm: 989,
+  syncing: false,
+  hasSwept: false,
+  lambdaMinSeen: 989,
+  lambdaMaxSeen: 989,
+  energySeenMin: null,
+  energySeenMax: null,
+  namedE: false,
+  ejected: false,
+  namedIE: false,
+  eMode: 'bound', // bound | fling | gone
+  eOffset: 0,
+  eVel: 0,
+  atom: { sym: 'Na', ie: 0.50, shells: [2, 8, 1] },
+  altAtomIndex: -1,
+  phase: 0,
+  packetShift: 0,
+  running: false,
+  bridging: false,
+  bridgePhase: null, // null | 'why' | 'algebra'
+  photonIntro: false,
+  introStep: 0,
+  introT: 0,
+  introSweeping: false,
+  introPaused: false,
+  introFocus: null // { px, py, r } locked orb during pause
+};
+
+/* ---------- MATH HELPERS ---------- */
+function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+function lambdaToSlider(nm){
+  const lo = Math.log10(DATA.lambdaMinNm);
+  const hi = Math.log10(DATA.lambdaMaxNm);
+  return clamp(((Math.log10(nm) - lo) / (hi - lo)) * 1000, 0, 1000);
+}
+function sliderToLambda(s){
+  const lo = Math.log10(DATA.lambdaMinNm);
+  const hi = Math.log10(DATA.lambdaMaxNm);
+  return Math.pow(10, lo + (s / 1000) * (hi - lo));
+}
+function freqFromLambda(nm){
+  return DATA.c / (nm * 1e-9);
+}
+function lambdaFromFreq(f){
+  return (DATA.c / f) / 1e-9;
+}
+function energyJ(nm){
+  return DATA.h * freqFromLambda(nm);
+}
+function energyMJmol(nm){
+  return energyJ(nm) * DATA.NA / 1e6;
+}
+function lambdaFromEnergyMJmol(mj){
+  const f = (mj * 1e6) / (DATA.h * DATA.NA);
+  return lambdaFromFreq(f);
+}
+
+function formatSci(x, digits = 2){
+  if(!isFinite(x) || x === 0) return '0';
+  const exp = Math.floor(Math.log10(Math.abs(x)));
+  const mant = x / Math.pow(10, exp);
+  const expStr = String(exp).replace('-', '⁻')
+    .replace(/0/g,'⁰').replace(/1/g,'¹').replace(/2/g,'²').replace(/3/g,'³')
+    .replace(/4/g,'⁴').replace(/5/g,'⁵').replace(/6/g,'⁶').replace(/7/g,'⁷')
+    .replace(/8/g,'⁸').replace(/9/g,'⁹');
+  return mant.toFixed(digits) + ' × 10' + expStr;
+}
+
+function formatLambda(nm){
+  if(nm >= 1e9) return (nm / 1e9).toFixed(2) + ' m';
+  if(nm >= 1e7) return (nm / 1e7).toFixed(2) + ' cm';
+  if(nm >= 1e6) return (nm / 1e6).toFixed(2) + ' mm';
+  if(nm >= 1000) return (nm / 1000).toFixed(2) + ' μm';
+  if(nm >= 1) return nm.toFixed(nm >= 100 ? 0 : 1) + ' nm';
+  if(nm >= 0.01) return nm.toFixed(2) + ' nm';
+  return formatSci(nm, 2) + ' nm';
+}
+
+function formatFreq(f){
+  return formatSci(f, 2) + ' s⁻¹';
+}
+
+function formatEnergy(nm){
+  const ej = energyJ(nm);
+  const mj = energyMJmol(nm);
+  if(mj >= 0.01) return formatSci(ej, 2) + ' J · ' + mj.toFixed(2) + ' MJ/mol';
+  return formatSci(ej, 2) + ' J · ' + mj.toFixed(3) + ' MJ/mol';
+}
+
+function bandFor(nm){
+  for(const b of DATA.spectrum){
+    if(nm >= b.minNm && nm < b.maxNm) return b.band;
+  }
+  return DATA.spectrum[DATA.spectrum.length - 1].band;
+}
+
+function sourceFor(nm){
+  let best = null;
+  let bestDist = Infinity;
+  for(const s of DATA.sources){
+    if(nm >= s.minNm && nm <= s.maxNm){
+      const d = Math.abs(Math.log10(nm) - Math.log10(s.lambdaNm));
+      if(d < bestDist){ bestDist = d; best = s; }
+    }
+  }
+  return best;
+}
+
+/** Map real λ to a drawable crest spacing (px). */
+function displayWavelengthPx(nm){
+  const t = (Math.log10(nm) - Math.log10(DATA.lambdaMinNm)) /
+            (Math.log10(DATA.lambdaMaxNm) - Math.log10(DATA.lambdaMinNm));
+  return 18 + t * 160;
+}
+
+/** Approx spectral colour for visible λ; quiet tints outside. */
+/** Approx spectral RGB for visible λ (380–780 nm). Returns null outside. */
+function wavelengthToRgb(nm){
+  if(nm < 380 || nm > 780) return null;
+  let r = 0, g = 0, b = 0;
+  if(nm < 440){ r = -(nm - 440) / (440 - 380); b = 1; }
+  else if(nm < 490){ g = (nm - 440) / (490 - 440); b = 1; }
+  else if(nm < 510){ g = 1; b = -(nm - 510) / (510 - 490); }
+  else if(nm < 580){ r = (nm - 510) / (580 - 510); g = 1; }
+  else if(nm < 645){ r = 1; g = -(nm - 645) / (645 - 580); }
+  else { r = 1; }
+  let factor = 1;
+  if(nm > 700) factor = 0.35 + 0.65 * (780 - nm) / 80;
+  else if(nm < 420) factor = 0.35 + 0.65 * (nm - 380) / 40;
+  return {
+    r: Math.round(clamp(r * factor, 0, 1) * 255),
+    g: Math.round(clamp(g * factor, 0, 1) * 255),
+    b: Math.round(clamp(b * factor, 0, 1) * 255)
+  };
+}
+
+function rgbCss(rgb, a = 1){
+  return `rgba(${rgb.r},${rgb.g},${rgb.b},${a})`;
+}
+
+/** Soft printed wash: spectral colour mixed onto paper. */
+function plateWashColor(nm){
+  const rgb = wavelengthToRgb(nm);
+  if(!rgb) return null;
+  // Blend toward paper so type/grid stay readable (printed plate, not neon glow)
+  const paper = { r: 230, g: 225, b: 207 };
+  const t = 0.42;
+  return {
+    r: Math.round(paper.r * (1 - t) + rgb.r * t),
+    g: Math.round(paper.g * (1 - t) + rgb.g * t),
+    b: Math.round(paper.b * (1 - t) + rgb.b * t)
+  };
+}
+
+function waveColor(nm){
+  const rgb = wavelengthToRgb(nm);
+  if(rgb){
+    // Darken spectral colour so the sine stays crisp on a tinted plate
+    const k = 0.45;
+    return `rgb(${Math.round(rgb.r * k)},${Math.round(rgb.g * k)},${Math.round(rgb.b * k)})`;
+  }
+  if(nm > 800) return INK.ember;
+  if(nm >= 10) return INK.signal;
+  return INK.ink;
+}
+
+/* ---------- DOM ---------- */
+const els = {
+  framing: document.getElementById('framing'),
+  actMeta: document.getElementById('actMeta'),
+  viewport: document.getElementById('viewport'),
+  lambdaSlider: document.getElementById('lambdaSlider'),
+  freqSlider: document.getElementById('freqSlider'),
+  lambdaVal: document.getElementById('lambdaVal'),
+  freqVal: document.getElementById('freqVal'),
+  rowLambda: document.getElementById('rowLambda'),
+  rowFreq: document.getElementById('rowFreq'),
+  hudLambda: document.getElementById('hudLambda'),
+  hudFreq: document.getElementById('hudFreq'),
+  hudBand: document.getElementById('hudBand'),
+  hudEnergy: document.getElementById('hudEnergy'),
+  hudEnergyItem: document.getElementById('hudEnergyItem'),
+  hudAtomItem: document.getElementById('hudAtomItem'),
+  hudAtomVal: document.getElementById('hudAtomVal'),
+  sourceCallout: document.getElementById('sourceCallout'),
+  sourceName: document.getElementById('sourceName'),
+  sourceDetail: document.getElementById('sourceDetail'),
+  eqReveal: document.getElementById('eqReveal'),
+  continueBtn: document.getElementById('continueBtn'),
+  backBtn: document.getElementById('backBtn'),
+  ionAftermath: document.getElementById('ionAftermath'),
+  ionResetBtn: document.getElementById('ionResetBtn'),
+  ionNextAtomBtn: document.getElementById('ionNextAtomBtn'),
+  ionFinishBtn: document.getElementById('ionFinishBtn'),
+  ieMeterFill: document.getElementById('ieMeterFill'),
+  ieMeterVal: document.getElementById('ieMeterVal'),
+  ieMeterLabel: document.getElementById('ieMeterLabel'),
+  ieMeterTick: document.getElementById('ieMeterTick'),
+  eqBridge: document.getElementById('eqBridge'),
+  eqBridgeNote: document.getElementById('eqBridgeNote'),
+  bridgeWhy: document.getElementById('bridgeWhy'),
+  bridgeAlgebra: document.getElementById('bridgeAlgebra'),
+  whyContinueBtn: document.getElementById('whyContinueBtn'),
+  eqE: document.getElementById('eqE'),
+  eqF: document.getElementById('eqF'),
+  eqLam: document.getElementById('eqLam'),
+  eqReadout: document.getElementById('eqReadout'),
+  waveEqC: document.getElementById('waveEqC'),
+  waveEqLam: document.getElementById('waveEqLam'),
+  waveEqF: document.getElementById('waveEqF'),
+  photonCaption: document.getElementById('photonCaption'),
+  photonAside: document.getElementById('photonAside'),
+  moduleWrap: document.querySelector('.module-wrap')
+};
+
+function setLambda(nm, from){
+  nm = clamp(nm, DATA.lambdaMinNm, DATA.lambdaMaxNm);
+  STATE.lambdaNm = nm;
+  STATE.lambdaMinSeen = Math.min(STATE.lambdaMinSeen, nm);
+  STATE.lambdaMaxSeen = Math.max(STATE.lambdaMaxSeen, nm);
+
+  const ratio = STATE.lambdaMaxSeen / STATE.lambdaMinSeen;
+  if(ratio >= 3 || Math.abs(Math.log10(STATE.lambdaMaxSeen) - Math.log10(STATE.lambdaMinSeen)) >= 0.5){
+    STATE.hasSwept = true;
+  }
+
+  if(STATE.act >= 2 && !STATE.photonIntro){
+    const e = energyMJmol(nm);
+    if(STATE.energySeenMin == null){
+      STATE.energySeenMin = e;
+      STATE.energySeenMax = e;
+    } else {
+      STATE.energySeenMin = Math.min(STATE.energySeenMin, e);
+      STATE.energySeenMax = Math.max(STATE.energySeenMax, e);
+    }
+    if(STATE.energySeenMax / Math.max(STATE.energySeenMin, 1e-9) >= 1.5 ||
+       (STATE.energySeenMax - STATE.energySeenMin) >= 0.05){
+      if(!STATE.namedE){
+        STATE.namedE = true;
+        els.eqReveal.hidden = false;
+        els.eqReveal.classList.add('visible');
+      }
+    }
+  }
+
+  if(STATE.act === 3){
+    updateIonization();
+  }
+
+  STATE.syncing = true;
+  if(from !== 'lambda') els.lambdaSlider.value = String(Math.round(lambdaToSlider(nm)));
+  if(from !== 'freq'){
+    // freq slider is inverted visually: higher f = higher slider
+    const f = freqFromLambda(nm);
+    const fMin = freqFromLambda(DATA.lambdaMaxNm);
+    const fMax = freqFromLambda(DATA.lambdaMinNm);
+    const t = (Math.log10(f) - Math.log10(fMin)) / (Math.log10(fMax) - Math.log10(fMin));
+    els.freqSlider.value = String(Math.round(clamp(t * 1000, 0, 1000)));
+  }
+  STATE.syncing = false;
+
+  updateReadouts();
+  updateContinue();
+}
+
+function energyBarPct(nm){
+  // Log scale across the slider span so microwave→X-ray fills meaningfully
+  const e = energyMJmol(nm);
+  const eMin = energyMJmol(DATA.lambdaMaxNm);
+  const eMax = energyMJmol(DATA.lambdaMinNm);
+  const t = (Math.log10(Math.max(e, eMin)) - Math.log10(eMin)) /
+            (Math.log10(eMax) - Math.log10(eMin));
+  return clamp(t * 100, 0, 100);
+}
+
+// Live equation: variables grow/shrink with their values (module 02 pattern)
+function fScale(f){
+  const fMin = freqFromLambda(DATA.lambdaMaxNm);
+  const fMax = freqFromLambda(DATA.lambdaMinNm);
+  const t = (Math.log10(f) - Math.log10(fMin)) / (Math.log10(fMax) - Math.log10(fMin));
+  return 0.7 + 0.95 * clamp(t, 0, 1); // 0.7–1.65 em
+}
+function lamScale(nm){
+  const lo = Math.log10(DATA.lambdaMinNm);
+  const hi = Math.log10(DATA.lambdaMaxNm);
+  const t = (Math.log10(nm) - lo) / (hi - lo);
+  return 0.7 + 0.95 * clamp(t, 0, 1); // long λ → larger λ glyph
+}
+function eScale(nm){
+  const t = energyBarPct(nm) / 100;
+  return 0.65 + 1.15 * Math.sqrt(t); // 0.65–1.8 em
+}
+
+function updateLiveEquation(nm){
+  if(!els.eqE) return;
+  const f = freqFromLambda(nm);
+  els.eqE.style.fontSize = eScale(nm) + 'em';
+  els.eqF.style.fontSize = fScale(f) + 'em';
+  els.eqLam.style.fontSize = lamScale(nm) + 'em';
+  const mj = energyMJmol(nm);
+  const ej = energyJ(nm);
+  els.eqReadout.textContent =
+    (mj >= 0.01 ? mj.toFixed(2) : mj.toFixed(3)) + ' MJ/mol  ·  ' +
+    formatSci(ej, 2) + ' J / photon';
+}
+
+function updateWaveEquation(nm){
+  if(!els.waveEqLam) return;
+  const f = freqFromLambda(nm);
+  // c is constant — fixed type size; λ and f trade off so the product holds
+  if(els.waveEqC) els.waveEqC.style.fontSize = '1em';
+  els.waveEqLam.style.fontSize = lamScale(nm) + 'em';
+  els.waveEqF.style.fontSize = fScale(f) + 'em';
+}
+
+function updateReadouts(){
+  const nm = STATE.lambdaNm;
+  const f = freqFromLambda(nm);
+  const lamStr = formatLambda(nm);
+  const fStr = formatFreq(f);
+
+  els.lambdaVal.textContent = lamStr;
+  els.freqVal.textContent = formatSci(f, 2) + ' Hz';
+  els.hudLambda.textContent = lamStr;
+  els.hudFreq.textContent = fStr;
+  els.hudBand.textContent = bandFor(nm);
+
+  if(STATE.act === 1){
+    updateWaveEquation(nm);
+  }
+
+  if(STATE.act >= 2){
+    els.hudEnergyItem.hidden = false;
+    els.hudEnergy.textContent = formatEnergy(nm);
+    updateLiveEquation(nm);
+  } else {
+    els.hudEnergyItem.hidden = true;
+  }
+
+  // Source callout — HTML chrome; one match at a time (sandbox only)
+  const src = (STATE.act <= 2 && !STATE.photonIntro) ? sourceFor(nm) : null;
+  if(src){
+    els.sourceName.textContent = src.name;
+    if(STATE.act >= 2){
+      const mj = energyMJmol(nm);
+      els.sourceDetail.textContent = formatLambda(nm) + ' · E ≈ ' +
+        (mj >= 0.01 ? mj.toFixed(2) : mj.toFixed(3)) + ' MJ/mol';
+    } else {
+      els.sourceDetail.textContent = src.label + ' · ' + bandFor(nm);
+    }
+    els.sourceCallout.classList.add('visible');
+  } else {
+    els.sourceCallout.classList.remove('visible');
+    els.sourceName.textContent = '';
+    els.sourceDetail.textContent = '';
+  }
+}
+
+function updateAtomHud(){
+  const a = STATE.atom;
+  if(els.hudAtomVal){
+    els.hudAtomVal.textContent = a.sym + ' · IE₁ ' + a.ie.toFixed(2) + ' MJ/mol';
+  }
+}
+
+function updateIonAftermath(){
+  if(!els.ionAftermath) return;
+  els.ionAftermath.hidden = !(STATE.act === 3 && STATE.ejected);
+}
+
+function resetIonBench(){
+  const ie = STATE.atom.ie;
+  // Drop below IE so the electron can rebind and be knocked off again
+  setLambda(lambdaFromEnergyMJmol(ie * 0.55), null);
+  STATE.eMode = 'bound';
+  STATE.eOffset = 0;
+  STATE.eVel = 0;
+  STATE.ejected = false;
+  updateIonAftermath();
+  updateAtomHud();
+  updateIonization();
+  updateContinue();
+  drawFrame();
+}
+
+function tryAnotherAtom(){
+  const list = DATA.altAtoms;
+  STATE.altAtomIndex = (STATE.altAtomIndex + 1) % list.length;
+  STATE.atom = Object.assign({}, list[STATE.altAtomIndex]);
+  els.framing.textContent =
+    'Same setup, new atom — ' + STATE.atom.sym +
+    '. Raise the frequency until the electron leaves.';
+  resetIonBench();
+}
+
+function updateIonization(){
+  const e = energyMJmol(STATE.lambdaNm);
+  const ie = STATE.atom.ie;
+  const maxScale = Math.max(ie * 1.08, e * 1.02, 0.6);
+  const pct = clamp((e / maxScale) * 100, 0, 100);
+  els.ieMeterFill.style.height = pct + '%';
+  els.ieMeterVal.textContent = e.toFixed(2);
+  els.ieMeterLabel.textContent = STATE.namedIE ? 'IE' : 'Energy in';
+  // tick at IE / maxScale from top: top = maxScale, bottom = 0
+  els.ieMeterTick.style.top = ((1 - ie / maxScale) * 100) + '%';
+
+  if(STATE.ejected) return;
+
+  if(e >= ie - 0.001 && STATE.eMode === 'bound'){
+    startEject();
+  } else if(e < ie - 0.02 && STATE.eMode === 'gone'){
+    // allow re-bind if they turn frequency back down
+    STATE.eMode = 'bound';
+    STATE.eOffset = 0;
+    STATE.eVel = 0;
+  }
+}
+
+function startEject(){
+  STATE.namedIE = true;
+  els.ieMeterLabel.textContent = 'IE';
+  if(prefersReduced){
+    STATE.eMode = 'gone';
+    STATE.eOffset = 80;
+    onEjected();
+    return;
+  }
+  STATE.eMode = 'fling';
+  STATE.eVel = 2.4;
+}
+
+function onEjected(){
+  if(STATE.ejected) return;
+  STATE.ejected = true;
+  // Stay on the plate — debrief waits for Finish
+  updateIonAftermath();
+  updateContinue();
+  els.framing.textContent =
+    'The electron left ' + STATE.atom.sym +
+    '. Reset to try again, swap atoms, or finish when you’re ready.';
+}
+
+els.lambdaSlider.addEventListener('input', () => {
+  if(STATE.syncing) return;
+  setLambda(sliderToLambda(+els.lambdaSlider.value), 'lambda');
+});
+els.freqSlider.addEventListener('input', () => {
+  if(STATE.syncing) return;
+  const t = +els.freqSlider.value / 1000;
+  const fMin = freqFromLambda(DATA.lambdaMaxNm);
+  const fMax = freqFromLambda(DATA.lambdaMinNm);
+  const f = Math.pow(10, Math.log10(fMin) + t * (Math.log10(fMax) - Math.log10(fMin)));
+  setLambda(lambdaFromFreq(f), 'freq');
+});
+
+/* ---------- DRAWING ---------- */
+function drawGrid(){
+  ctx.save();
+  ctx.strokeStyle = INK.grid;
+  ctx.lineWidth = 1;
+  for(let x = 0; x < W; x += 40){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for(let y = 0; y < H; y += 40){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  ctx.restore();
+}
+
+function stripXForLambda(nm){
+  const pad = 40;
+  const lo = Math.log10(DATA.lambdaMinNm);
+  const hi = Math.log10(DATA.lambdaMaxNm);
+  const t = (Math.log10(clamp(nm, DATA.lambdaMinNm, DATA.lambdaMaxNm)) - lo) / (hi - lo);
+  // strip: long λ on left, short on right (energy increases rightward)
+  return pad + (1 - t) * (W - pad * 2);
+}
+
+function drawSpectrumStrip(){
+  const stripH = STATE.act >= 2 ? 18 : 14;
+  const y = STATE.act >= 2 ? H * 0.82 : H * 0.78;
+  const pad = 40;
+  const width = W - pad * 2;
+
+  // band fills (long λ left → short right)
+  const edges = [DATA.lambdaMaxNm, 3e8, 1e6, 800, 400, 10, 0.1, DATA.lambdaMinNm];
+  const fills = [
+    'rgba(126,140,69,0.18)',
+    'rgba(126,140,69,0.30)',
+    'rgba(168,90,50,0.26)',
+    null, // visible — painted as gradient
+    'rgba(26,106,163,0.26)',
+    'rgba(26,106,163,0.36)',
+    'rgba(22,20,14,0.22)'
+  ];
+
+  for(let i = 0; i < fills.length; i++){
+    const x0 = stripXForLambda(edges[i]);
+    const x1 = stripXForLambda(edges[i + 1]);
+    const left = Math.min(x0, x1);
+    const w = Math.abs(x1 - x0);
+    if(fills[i] == null){
+      // visible rainbow restrained
+      const g = ctx.createLinearGradient(left, 0, left + w, 0);
+      g.addColorStop(0, 'rgba(168,90,50,0.55)');
+      g.addColorStop(0.35, 'rgba(92,107,40,0.55)');
+      g.addColorStop(0.65, 'rgba(26,106,163,0.45)');
+      g.addColorStop(1, 'rgba(58,74,138,0.5)');
+      ctx.fillStyle = g;
+    } else {
+      ctx.fillStyle = fills[i];
+    }
+    ctx.fillRect(left, y, w, stripH);
+  }
+
+  ctx.strokeStyle = INK.inkLine;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(pad, y, width, stripH);
+
+  // current marker
+  const mx = stripXForLambda(STATE.lambdaNm);
+  ctx.save();
+  ctx.strokeStyle = STATE.act >= 2 ? INK.ember : INK.ink;
+  ctx.lineWidth = STATE.act >= 2 ? 2 : 1.5;
+  ctx.beginPath();
+  ctx.moveTo(mx, y - 4);
+  ctx.lineTo(mx, y + stripH + 4);
+  ctx.stroke();
+  ctx.restore();
+
+  // axis hints
+  ctx.fillStyle = INK.dim;
+  ctx.font = '600 10px "IBM Plex Mono", monospace';
+  ctx.textAlign = 'left';
+  if(STATE.act >= 2){
+    ctx.fillText('LOW E', pad, y + stripH + 14);
+    ctx.textAlign = 'right';
+    ctx.fillText('HIGH E →', pad + width, y + stripH + 14);
+  } else {
+    ctx.fillText('LONG λ', pad, y + stripH + 14);
+    ctx.textAlign = 'right';
+    ctx.fillText('SHORT λ', pad + width, y + stripH + 14);
+  }
+}
+
+function drawWave(){
+  const isEnergy = STATE.act >= 2;
+  const waveY = isEnergy ? H * 0.42 : H * 0.38;
+  const amp = isEnergy ? H * 0.12 : H * 0.14;
+  const wl = displayWavelengthPx(STATE.lambdaNm);
+  const color = waveColor(STATE.lambdaNm);
+
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = isEnergy ? 1.35 : 1.6;
+  ctx.globalAlpha = isEnergy ? 0.55 : 1;
+  ctx.beginPath();
+  for(let x = 0; x <= W; x += 2){
+    const yy = waveY + amp * Math.sin((x / wl) * Math.PI * 2 - STATE.phase);
+    x === 0 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy);
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  if(!isEnergy){
+    // Marker X — count cycles (Act 1 only)
+    const xMark = W * 0.72;
+    ctx.save();
+    ctx.strokeStyle = INK.ink;
+    ctx.lineWidth = 1.25;
+    ctx.beginPath();
+    ctx.moveTo(xMark, waveY - amp - 10);
+    ctx.lineTo(xMark, waveY + amp + 10);
+    ctx.stroke();
+    ctx.fillStyle = INK.ink;
+    ctx.font = '700 12px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('X', xMark, waveY - amp - 16);
+    ctx.restore();
+    return;
+  }
+
+  // Act 2: traveling photon packets along the wave (size ∝ energy)
+  drawTravelingPhotons(waveY, amp, wl);
+}
+
+function drawSoftPacket(px, py, r, opts){
+  const focused = opts && opts.focused;
+  const grad = ctx.createRadialGradient(px - r * 0.3, py - r * 0.3, r * 0.08, px, py, r);
+  grad.addColorStop(0, 'rgba(236,228,242,0.96)');
+  grad.addColorStop(0.42, 'rgba(107,74,120,0.9)');
+  grad.addColorStop(1, 'rgba(107,74,120,0.18)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(px, py, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = focused ? INK.photon : INK.inkSoft;
+  ctx.lineWidth = focused ? 1.6 : 1;
+  ctx.stroke();
+  if(focused){
+    ctx.beginPath();
+    ctx.arc(px, py, r + 7, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(107,74,120,0.55)';
+    ctx.lineWidth = 1.25;
+    ctx.setLineDash([3, 3]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+function packetLayout(waveY, amp, wl){
+  const pct = energyBarPct(STATE.lambdaNm) / 100;
+  const r = 4.5 + pct * 11;
+  const spacing = Math.max(wl, r * 3.2);
+  const packets = [];
+  for(let x = -spacing; x < W + spacing; x += spacing){
+    const px = x + (STATE.packetShift % spacing);
+    if(px < -r || px > W + r) continue;
+    const py = waveY + amp * Math.sin((px / wl) * Math.PI * 2 - STATE.phase);
+    packets.push({ px, py, r });
+  }
+  return packets;
+}
+
+function drawIntroFocusCallout(focus){
+  if(!focus) return;
+  // Leader from the aside region down to the circled orb
+  const tipX = focus.px;
+  const tipY = focus.py - focus.r - 10;
+  const fromX = clamp(focus.px, W * 0.28, W * 0.72);
+  const fromY = H * 0.22;
+  ctx.save();
+  ctx.strokeStyle = INK.photon;
+  ctx.fillStyle = INK.photon;
+  ctx.lineWidth = 1.35;
+  ctx.beginPath();
+  ctx.moveTo(fromX, fromY);
+  ctx.lineTo(tipX, tipY);
+  ctx.stroke();
+  // Arrowhead
+  const ang = Math.atan2(tipY - fromY, tipX - fromX);
+  ctx.beginPath();
+  ctx.moveTo(tipX, tipY);
+  ctx.lineTo(tipX - 8 * Math.cos(ang - 0.4), tipY - 8 * Math.sin(ang - 0.4));
+  ctx.lineTo(tipX - 8 * Math.cos(ang + 0.4), tipY - 8 * Math.sin(ang + 0.4));
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawTravelingPhotons(waveY, amp, wl){
+  const packets = packetLayout(waveY, amp, wl);
+  const focus = STATE.introPaused ? STATE.introFocus : null;
+
+  ctx.save();
+  packets.forEach(p => {
+    const focused = focus && Math.abs(p.px - focus.px) < 1.5 && Math.abs(p.py - focus.py) < 1.5;
+    drawSoftPacket(p.px, p.py, p.r, { focused });
+  });
+
+  if(focus) drawIntroFocusCallout(focus);
+
+  // Quiet label once during intro / sandbox
+  ctx.fillStyle = INK.photon;
+  ctx.font = '600 10px "IBM Plex Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText('PHOTONS', 16, 22);
+  if(STATE.photonIntro && !STATE.introPaused){
+    const mj = energyMJmol(STATE.lambdaNm);
+    ctx.fillStyle = INK.ink;
+    ctx.font = '600 16px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(
+      formatLambda(STATE.lambdaNm) + '  ·  E ≈ ' +
+      (mj >= 0.01 ? mj.toFixed(2) : mj.toFixed(3)) + ' MJ/mol',
+      W - 16, 28
+    );
+  }
+  ctx.restore();
+}
+
+function ionShellRadii(nShells){
+  if(nShells <= 1) return [54];
+  if(nShells === 2) return [30, 54];
+  // 3 shells (Na, Cl): nest inner → valence
+  return [26, 40, 58];
+}
+
+function drawElectronMarker(x, y, r){
+  const eg = ctx.createRadialGradient(x - 2, y - 2, 1, x, y, r);
+  eg.addColorStop(0, 'rgba(232,226,200,0.95)');
+  eg.addColorStop(0.45, 'rgba(196,163,90,0.9)');
+  eg.addColorStop(1, 'rgba(196,163,90,0.25)');
+  ctx.fillStyle = eg;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = INK.inkSoft;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
+function drawIonScene(){
+  const cx = W * 0.55;
+  const cy = H * 0.42;
+  const coreR = 22;
+  const shells = (STATE.atom.shells && STATE.atom.shells.length)
+    ? STATE.atom.shells
+    : [1];
+  const radii = ionShellRadii(shells.length);
+  const shellR = radii[radii.length - 1];
+  const valenceN = shells[shells.length - 1] || 1;
+  const innerTotal = shells.slice(0, -1).reduce((a, b) => a + b, 0);
+  const ejecting = STATE.eMode === 'fling' || STATE.eMode === 'gone';
+  // Active (ejected) electron sits on the beam-facing side of the valence shell
+  const valenceStart = 0;
+
+  // Laser beam from left
+  const beamColor = waveColor(STATE.lambdaNm);
+  ctx.save();
+  ctx.strokeStyle = beamColor;
+  ctx.globalAlpha = 0.55;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(16, cy);
+  ctx.lineTo(cx - shellR - 8, cy);
+  ctx.stroke();
+  ctx.globalAlpha = 0.2;
+  ctx.lineWidth = 10;
+  ctx.beginPath();
+  ctx.moveTo(16, cy);
+  ctx.lineTo(cx - shellR - 8, cy);
+  ctx.stroke();
+  ctx.restore();
+
+  // Soft mustard core wash when inner-shell electrons are present
+  if(innerTotal > 0){
+    const rCore = (radii[Math.max(0, radii.length - 2)] || 30) + 10;
+    const cg = ctx.createRadialGradient(cx, cy, coreR * 0.4, cx, cy, rCore);
+    cg.addColorStop(0, 'rgba(196,163,90,0.28)');
+    cg.addColorStop(0.55, 'rgba(196,163,90,0.12)');
+    cg.addColorStop(1, 'rgba(196,163,90,0)');
+    ctx.fillStyle = cg;
+    ctx.beginPath();
+    ctx.arc(cx, cy, rCore, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Soft-shaded nucleus (Module 03 default)
+  const g = ctx.createRadialGradient(cx - 4, cy - 4, 2, cx, cy, coreR);
+  g.addColorStop(0, '#e8b48a');
+  g.addColorStop(0.45, '#a85a32');
+  g.addColorStop(1, '#5a2c16');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(cx, cy, coreR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = INK.inkSoft;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.fillStyle = INK.paper;
+  ctx.font = '700 12px "IBM Plex Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(STATE.atom.sym, cx, cy + 4);
+
+  // Concentric shell rings + static electron markers (no orbits)
+  shells.forEach((count, i) => {
+    const r = radii[i];
+    const isValence = i === shells.length - 1;
+    ctx.strokeStyle = INK.inkLine;
+    ctx.lineWidth = 1.25;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.stroke();
+
+    if(count <= 0) return;
+    const markerR = count >= 6 ? 5.5 : 7;
+    const startAng = isValence ? valenceStart : (-Math.PI / 2 + i * 0.35);
+    for(let k = 0; k < count; k++){
+      // Active valence electron (k = 0) is drawn separately — it may fling off
+      if(isValence && k === 0) continue;
+      const ang = startAng + (k * 2 * Math.PI) / count;
+      drawElectronMarker(cx + r * Math.cos(ang), cy + r * Math.sin(ang), markerR);
+    }
+  });
+
+  // One valence electron: on the shell (bound) or leaving (fling / gone)
+  {
+    const markerR = valenceN >= 6 ? 5.5 : 7;
+    let ex = cx + shellR;
+    let ey = cy;
+    if(ejecting){
+      ex = cx + shellR + STATE.eOffset;
+      ey = cy - STATE.eOffset * 0.15;
+    }
+    drawElectronMarker(ex, ey, markerR);
+  }
+
+  // Mini wave annotation near beam
+  const wl = displayWavelengthPx(STATE.lambdaNm) * 0.35;
+  ctx.save();
+  ctx.strokeStyle = beamColor;
+  ctx.lineWidth = 1.25;
+  ctx.beginPath();
+  const wy = cy - 28;
+  for(let x = 24; x < cx - shellR - 20; x += 2){
+    const yy = wy + 6 * Math.sin((x / wl) * Math.PI * 2 - STATE.phase);
+    x === 24 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawPlateBackground(){
+  ctx.clearRect(0, 0, W, H);
+  // Visible λ: wash the whole plate with that light's colour
+  if(STATE.act !== 3){
+    const wash = plateWashColor(STATE.lambdaNm);
+    if(wash){
+      ctx.fillStyle = rgbCss(wash);
+      ctx.fillRect(0, 0, W, H);
+      return;
+    }
+  }
+  // Outside visible (or ionize act): leave paper-transparent; grid alone
+}
+
+function drawFrame(){
+  drawPlateBackground();
+  drawGrid();
+  if(STATE.act === 3){
+    drawIonScene();
+  } else {
+    drawWave();
+    drawSpectrumStrip();
+  }
+}
+
+function tick(){
+  if(!STATE.running) return;
+  if(!prefersReduced){
+    const freezeMotion = STATE.photonIntro && STATE.introPaused;
+    if(!freezeMotion){
+      // phase speed ∝ frequency (display-scaled)
+      const fNorm = (Math.log10(freqFromLambda(STATE.lambdaNm)) - 12) / 8;
+      STATE.phase += 0.04 + clamp(fNorm, 0, 1) * 0.12;
+      // packets drift with the wave
+      const wl = displayWavelengthPx(STATE.lambdaNm);
+      STATE.packetShift += (0.6 + clamp(fNorm, 0, 1) * 1.8) * (wl / 40);
+    }
+
+    if(STATE.photonIntro && STATE.introSweeping){
+      updateIntroSweep();
+    }
+
+    if(STATE.eMode === 'fling'){
+      STATE.eOffset += STATE.eVel;
+      STATE.eVel += 0.35;
+      if(STATE.eOffset > W * 0.35){
+        STATE.eMode = 'gone';
+        onEjected();
+      }
+    }
+  }
+  drawFrame();
+  requestAnimationFrame(tick);
+}
+
+/* ---------- ACT NAV ---------- */
+function updateContinue(){
+  const btn = els.continueBtn;
+  if(STATE.photonIntro){
+    btn.hidden = false;
+    btn.disabled = false;
+    btn.textContent = 'Next →';
+    els.backBtn.hidden = false;
+    return;
+  }
+  if(STATE.bridging){
+    // In-bridge buttons (whyContinue / algebraNext) own progression
+    btn.hidden = true;
+    els.backBtn.hidden = true;
+    return;
+  }
+  if(STATE.act === 1){
+    btn.hidden = false;
+    btn.disabled = !STATE.hasSwept;
+    btn.textContent = 'Continue →';
+  } else if(STATE.act === 2){
+    btn.hidden = false;
+    btn.disabled = !STATE.namedE;
+    btn.textContent = 'Continue →';
+  } else {
+    // Act 3 — aftermath buttons own the exit; no auto-continue
+    btn.hidden = true;
+  }
+  els.backBtn.hidden = STATE.act === 1;
+  updateIonAftermath();
+}
+
+let bridgeTimers = [];
+function clearBridgeTimers(){
+  bridgeTimers.forEach(clearTimeout);
+  bridgeTimers = [];
+}
+
+function removePlugGhost(){
+  document.querySelectorAll('.plug-ghost').forEach(el => el.remove());
+}
+
+function resetBridgeLines(){
+  ['eqL1','eqL2','eqL3','eqL5'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.classList.remove('show', 'dim', 'emphasis');
+  });
+  if(els.eqBridge){
+    els.eqBridge.classList.remove('cue-source', 'slot-ready', 'plugged');
+  }
+  const source = document.getElementById('plugSource');
+  if(source) source.style.opacity = '';
+  const cue = document.getElementById('eqPlugCue');
+  if(cue){
+    cue.classList.remove('show');
+    cue.textContent = '↓ plug into E';
+  }
+  if(els.eqBridgeNote) els.eqBridgeNote.classList.remove('show');
+  const planck = document.getElementById('planckNote');
+  if(planck) planck.classList.remove('show');
+  const algebraActions = document.getElementById('algebraActions');
+  if(algebraActions) algebraActions.hidden = true;
+  removePlugGhost();
+}
+
+function hideEqBridge(){
+  clearBridgeTimers();
+  if(!els.eqBridge) return;
+  els.eqBridge.classList.remove('active');
+  els.eqBridge.hidden = true;
+  if(els.viewport) els.viewport.classList.remove('bridge-open');
+  resetBridgeLines();
+  STATE.bridging = false;
+  STATE.bridgePhase = null;
+  if(els.bridgeWhy) els.bridgeWhy.hidden = false;
+  if(els.bridgeAlgebra) els.bridgeAlgebra.hidden = true;
+  if(els.lambdaSlider) els.lambdaSlider.disabled = false;
+  if(els.freqSlider) els.freqSlider.disabled = false;
+}
+
+/** Fly (c/λ) from the rearranged wave line into the f-slot of E = h·f */
+function animatePlugIn(onDone){
+  const source = document.getElementById('plugSource');
+  const slot = document.getElementById('plugSlot');
+  if(!source || !slot){
+    if(els.eqBridge) els.eqBridge.classList.add('plugged');
+    onDone();
+    return;
+  }
+
+  const s = source.getBoundingClientRect();
+  const t = slot.getBoundingClientRect();
+  const ghost = document.createElement('span');
+  ghost.className = 'plug-ghost';
+  ghost.textContent = '(c / λ)';
+  ghost.style.left = s.left + 'px';
+  ghost.style.top = s.top + 'px';
+  document.body.appendChild(ghost);
+
+  source.style.opacity = '0.2';
+  els.eqBridge.classList.add('cue-source', 'slot-ready');
+
+  void ghost.offsetWidth;
+  const dx = (t.left + t.width / 2) - (s.left + s.width / 2);
+  const dy = (t.top + t.height / 2) - (s.top + s.height / 2);
+  ghost.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+
+  const land = () => {
+    ghost.classList.add('landed');
+    els.eqBridge.classList.add('plugged');
+    els.eqBridge.classList.remove('cue-source');
+    source.style.opacity = '';
+    bridgeTimers.push(setTimeout(() => {
+      removePlugGhost();
+      onDone();
+    }, 380));
+  };
+
+  bridgeTimers.push(setTimeout(land, 1200));
+}
+
+let bridgeDoneCallback = null;
+
+function playEqBridge(done){
+  if(!els.eqBridge){
+    done();
+    return;
+  }
+  clearBridgeTimers();
+  resetBridgeLines();
+  bridgeDoneCallback = done;
+  STATE.bridging = true;
+  STATE.bridgePhase = 'why';
+  els.lambdaSlider.disabled = true;
+  els.freqSlider.disabled = true;
+  updateContinue();
+  els.sourceCallout.classList.remove('visible');
+  els.framing.textContent = 'First — why link the wave picture to photons at all?';
+  els.actMeta.textContent = 'Connecting · Why photons?';
+
+  if(els.bridgeWhy) els.bridgeWhy.hidden = false;
+  if(els.bridgeAlgebra) els.bridgeAlgebra.hidden = true;
+
+  els.eqBridge.hidden = false;
+  void els.eqBridge.offsetWidth;
+  els.eqBridge.classList.add('active');
+  if(els.viewport) els.viewport.classList.add('bridge-open');
+
+  if(els.whyContinueBtn) els.whyContinueBtn.focus();
+}
+
+function playAlgebraBridge(){
+  if(!els.eqBridge) return;
+  clearBridgeTimers();
+  resetBridgeLines();
+  STATE.bridgePhase = 'algebra';
+  els.framing.textContent = 'Watch how the wave equation feeds into photon energy.';
+  els.actMeta.textContent = 'Connecting · Wave → Energy';
+  updateContinue();
+
+  if(els.bridgeWhy) els.bridgeWhy.hidden = true;
+  if(els.bridgeAlgebra) els.bridgeAlgebra.hidden = false;
+
+  const L = (id) => document.getElementById(id);
+  const cue = document.getElementById('eqPlugCue');
+  const planck = document.getElementById('planckNote');
+  const algebraActions = document.getElementById('algebraActions');
+  const algebraNextBtn = document.getElementById('algebraNextBtn');
+  const wait = (ms, fn) => {
+    bridgeTimers.push(setTimeout(fn, ms));
+  };
+
+  const showReady = () => {
+    STATE.bridgePhase = 'algebra-ready';
+    if(algebraActions) algebraActions.hidden = false;
+    updateContinue();
+    if(algebraNextBtn) algebraNextBtn.focus();
+  };
+
+  if(prefersReduced){
+    L('eqL1').classList.add('show');
+    L('eqL2').classList.add('show');
+    L('eqL3').classList.add('show');
+    els.eqBridge.classList.add('plugged');
+    L('eqL5').classList.add('show', 'emphasis');
+    if(planck) planck.classList.add('show');
+    els.eqBridgeNote.classList.add('show');
+    showReady();
+    return;
+  }
+
+  wait(400, () => L('eqL1').classList.add('show'));
+
+  wait(2800, () => {
+    L('eqL2').classList.add('show');
+  });
+
+  wait(5200, () => {
+    L('eqL3').classList.add('show');
+    els.eqBridge.classList.add('slot-ready');
+    if(planck) planck.classList.add('show');
+  });
+
+  wait(8200, () => {
+    els.eqBridge.classList.add('cue-source');
+    if(cue){
+      cue.textContent = '↓ plug c / λ into f';
+      cue.classList.add('show');
+    }
+  });
+
+  wait(9400, () => {
+    animatePlugIn(() => {
+      if(cue) cue.classList.remove('show');
+      wait(1600, () => {
+        L('eqL5').classList.add('show', 'emphasis');
+        els.eqBridgeNote.classList.add('show');
+        showReady();
+      });
+    });
+  });
+}
+
+function finishAlgebraBridge(){
+  if(STATE.bridgePhase !== 'algebra-ready') return;
+  const cb = bridgeDoneCallback;
+  bridgeDoneCallback = null;
+  els.lambdaSlider.disabled = false;
+  els.freqSlider.disabled = false;
+  hideEqBridge();
+  if(cb) cb();
+}
+
+if(els.whyContinueBtn){
+  els.whyContinueBtn.addEventListener('click', () => {
+    if(STATE.bridgePhase !== 'why') return;
+    playAlgebraBridge();
+  });
+}
+
+const algebraNextBtnEl = document.getElementById('algebraNextBtn');
+if(algebraNextBtnEl){
+  algebraNextBtnEl.addEventListener('click', finishAlgebraBridge);
+}
+
+function setPhotonCaption(i){
+  if(els.photonCaption){
+    els.photonCaption.textContent = PHOTON_INTRO.captions[i] || '';
+  }
+}
+
+function setPhotonAside(show){
+  STATE.introPaused = !!show;
+  if(els.moduleWrap){
+    els.moduleWrap.classList.toggle('photon-paused', !!show);
+  }
+  if(els.photonAside){
+    els.photonAside.hidden = !show;
+  }
+  if(!show){
+    STATE.introFocus = null;
+  }
+}
+
+function lockIntroFocusOrb(){
+  const waveY = H * 0.42;
+  const amp = H * 0.12;
+  const wl = displayWavelengthPx(STATE.lambdaNm);
+  const packets = packetLayout(waveY, amp, wl);
+  if(!packets.length){
+    STATE.introFocus = { px: W * 0.45, py: waveY, r: 10 };
+    return;
+  }
+  // Prefer a packet in the left-center of the plate (under the aside)
+  let best = packets[0];
+  let bestScore = Infinity;
+  packets.forEach(p => {
+    const score = Math.abs(p.px - W * 0.42) + Math.abs(p.py - waveY) * 0.25;
+    if(score < bestScore){
+      bestScore = score;
+      best = p;
+    }
+  });
+  STATE.introFocus = { px: best.px, py: best.py, r: best.r };
+}
+
+function updateIntroSweep(){
+  STATE.introT += 1 / 60;
+  const u = clamp(STATE.introT / PHOTON_INTRO.sweepSec, 0, 1);
+  const eased = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+  setLambda(700 + (400 - 700) * eased, null);
+  if(u >= 1) STATE.introSweeping = false;
+}
+
+/** Step 0 packets → 1 orb aside → 2 energy caption → 3 sweep; Next finishes */
+function applyPhotonIntroStep(step){
+  STATE.introStep = step;
+  STATE.introT = 0;
+  STATE.introSweeping = false;
+
+  if(step === 0){
+    setPhotonAside(false);
+    setPhotonCaption(0);
+    setLambda(700, null);
+  } else if(step === 1){
+    setLambda(700, null);
+    lockIntroFocusOrb();
+    setPhotonAside(true);
+  } else if(step === 2){
+    setPhotonAside(false);
+    setPhotonCaption(1);
+    setLambda(700, null);
+  } else {
+    setPhotonAside(false);
+    setPhotonCaption(2);
+    if(prefersReduced){
+      setLambda(400, null);
+    } else {
+      setLambda(700, null);
+      STATE.introSweeping = true;
+    }
+  }
+  updateContinue();
+  drawFrame();
+}
+
+function advancePhotonIntro(){
+  if(!STATE.photonIntro) return;
+  if(STATE.introStep >= PHOTON_INTRO.lastStep){
+    finishPhotonIntro();
+    return;
+  }
+  applyPhotonIntroStep(STATE.introStep + 1);
+}
+
+function retreatPhotonIntro(){
+  if(!STATE.photonIntro) return;
+  if(STATE.introStep <= 0){
+    clearBridgeTimers();
+    STATE.photonIntro = false;
+    STATE.introPaused = false;
+    STATE.introSweeping = false;
+    STATE.introFocus = null;
+    if(els.moduleWrap) els.moduleWrap.classList.remove('photon-intro', 'photon-paused');
+    if(els.photonAside) els.photonAside.hidden = true;
+    setAct(1);
+    return;
+  }
+  applyPhotonIntroStep(STATE.introStep - 1);
+}
+
+function startPhotonIntro(){
+  clearBridgeTimers();
+  STATE.photonIntro = true;
+  STATE.introStep = 0;
+  STATE.introT = 0;
+  STATE.introSweeping = false;
+  STATE.introPaused = false;
+  STATE.introFocus = null;
+  if(els.moduleWrap){
+    els.moduleWrap.classList.add('photon-intro');
+    els.moduleWrap.classList.remove('photon-paused');
+  }
+  if(els.photonAside) els.photonAside.hidden = true;
+  els.framing.textContent = 'Before the sliders — step through what a photon is.';
+  els.actMeta.textContent = 'Act 2 of 3 · Photons';
+  els.viewport.setAttribute('data-fig', 'FIG. 05  ·  WHAT IS A PHOTON?');
+  els.sourceCallout.classList.remove('visible');
+  applyPhotonIntroStep(0);
+}
+
+function finishPhotonIntro(){
+  if(!STATE.photonIntro) return;
+  clearBridgeTimers();
+  STATE.photonIntro = false;
+  STATE.introStep = 0;
+  STATE.introT = 0;
+  STATE.introSweeping = false;
+  STATE.introPaused = false;
+  STATE.introFocus = null;
+  STATE.energySeenMin = null;
+  STATE.energySeenMax = null;
+  STATE.namedE = false;
+  if(els.moduleWrap){
+    els.moduleWrap.classList.remove('photon-intro', 'photon-paused');
+  }
+  if(els.photonCaption) els.photonCaption.textContent = '';
+  if(els.photonAside) els.photonAside.hidden = true;
+  els.framing.textContent = FRAMING[2];
+  els.actMeta.textContent = 'Act 2 of 3 · Photon energy';
+  els.viewport.setAttribute('data-fig', FIG[2]);
+  setLambda(550, null);
+  // Planck constant available once the sandbox opens; keep quiet about the rest
+  els.eqReveal.hidden = false;
+  els.eqReveal.classList.add('visible');
+  updateReadouts();
+  updateContinue();
+  drawFrame();
+}
+
+function setAct(n){
+  hideEqBridge();
+  clearBridgeTimers();
+  STATE.photonIntro = false;
+  STATE.introStep = 0;
+  STATE.introT = 0;
+  STATE.introSweeping = false;
+  STATE.introPaused = false;
+  STATE.introFocus = null;
+  if(els.photonCaption) els.photonCaption.textContent = '';
+  if(els.photonAside) els.photonAside.hidden = true;
+  STATE.act = n;
+  helpPanel.classList.remove('open');
+  helpText.textContent = HELP[n];
+  els.framing.textContent = FRAMING[n];
+  els.actMeta.textContent = 'Act ' + n + ' of 3 · ' +
+    (n === 1 ? 'Wave' : n === 2 ? 'Photon energy' : 'Ionization');
+  els.viewport.setAttribute('data-fig', FIG[n]);
+  els.viewport.classList.toggle('act-ionize', n === 3);
+  els.hudAtomItem.hidden = n !== 3;
+  const prompts = document.getElementById('actPrompts');
+  if(prompts) prompts.hidden = n !== 3;
+  if(els.moduleWrap){
+    els.moduleWrap.classList.toggle('act-wave', n === 1);
+    els.moduleWrap.classList.toggle('act-energy', n === 2);
+    els.moduleWrap.classList.toggle('act-ionize-wrap', n === 3);
+    els.moduleWrap.classList.remove('photon-intro', 'photon-paused');
+  }
+  els.viewport.classList.remove('pop-in');
+
+  if(n >= 2 && STATE.namedE){
+    els.eqReveal.hidden = false;
+    els.eqReveal.classList.add('visible');
+  } else if(n === 2){
+    // Live eq is the main surface; constant reveal after they sweep
+    els.eqReveal.classList.remove('visible');
+    els.eqReveal.hidden = true;
+  } else {
+    els.eqReveal.classList.remove('visible');
+    els.eqReveal.hidden = true;
+  }
+
+  if(n === 3){
+    els.sourceCallout.classList.remove('visible');
+    STATE.atom = Object.assign({}, DATA.starterAtom);
+    STATE.altAtomIndex = -1;
+    STATE.ejected = false;
+    STATE.eMode = 'bound';
+    STATE.eOffset = 0;
+    STATE.eVel = 0;
+    updateAtomHud();
+    setLambda(500, null);
+    updateIonization();
+  } else if(els.ionAftermath){
+    els.ionAftermath.hidden = true;
+  }
+
+  updateReadouts();
+  updateContinue();
+  drawFrame();
+
+  if(n === 2){
+    startPhotonIntro();
+  }
+}
+
+els.continueBtn.addEventListener('click', () => {
+  if(STATE.photonIntro){
+    advancePhotonIntro();
+    return;
+  }
+  if(els.continueBtn.disabled || STATE.bridging) return;
+  if(STATE.act === 1){
+    playEqBridge(() => setAct(2));
+    return;
+  }
+  if(STATE.act < 3) setAct(STATE.act + 1);
+});
+els.backBtn.addEventListener('click', () => {
+  if(STATE.bridging) return;
+  if(STATE.photonIntro){
+    retreatPhotonIntro();
+    return;
+  }
+  if(STATE.act === 2){
+    // Replay the packet intro without going through Act 1
+    startPhotonIntro();
+    return;
+  }
+  if(STATE.act > 1) setAct(STATE.act - 1);
+});
+
+if(els.ionResetBtn){
+  els.ionResetBtn.addEventListener('click', () => {
+    if(STATE.act !== 3) return;
+    resetIonBench();
+    els.framing.textContent = FRAMING[3];
+  });
+}
+if(els.ionNextAtomBtn){
+  els.ionNextAtomBtn.addEventListener('click', () => {
+    if(STATE.act !== 3) return;
+    tryAnotherAtom();
+  });
+}
+if(els.ionFinishBtn){
+  els.ionFinishBtn.addEventListener('click', () => {
+    if(STATE.act !== 3 || !STATE.ejected) return;
+    setGate('moduleComplete', true);
+  });
+}
+
+/* ---------- DEBRIEF ---------- */
+const DEBRIEF = {
+  intentions: [
+    { text: "We will review the properties of waves and light.",
+      target: 'act:1', revisit: 'Wave sandbox' },
+    { text: "We will discover how light and energy are related.",
+      target: 'act:2', revisit: 'Photon energy' },
+    { text: "We will calculate the amount of energy associated with different light sources.",
+      target: 'act:2', revisit: 'Photon energy' },
+    { text: "We will see how we can measure IE using photons.",
+      target: 'act:3', revisit: 'Photon ionization' }
+  ],
+  competencies: [
+    { code: "Q&P",
+      name: "Questioning and predicting",
+      text: "Demonstrate curiosity about how light’s properties relate to energy."
+    },
+    { code: "PAI",
+      name: "Processing and analyzing data and information",
+      text: "Describe relationships between variables, perform calculations."
+    },
+    { code: "A&I",
+      name: "Applying and innovating",
+      text: "Use multiple strategies to solve applied and conceptual problems."
+    },
+    { code: "C",
+      name: "Communicating",
+      text: "Construct evidence-based explanations using scientific language."
+    }
   ]
 };
 
-/* Discovery gates */
-gates.hasSweptWavelength = false;
-
-/* === SIMULATION LOGIC — TO BE DESIGNED === */
-
-/* ---------- STANDBY ANIMATION ---------- */
-const spectrumColors = ['#ff4444','#ff6622','#ff8844','#ffcc44','#44ff44','#44ddff','#4444ff','#8844ff','#ff44ff'];
-
-function drawSpectrumStrip(){
-  const stripH = 12;
-  const y = H * 0.78;
-  const grad = ctx.createLinearGradient(40, 0, W - 40, 0);
-  for(let i = 0; i < spectrumColors.length; i++){
-    grad.addColorStop(i / (spectrumColors.length - 1), spectrumColors[i]);
-  }
-  ctx.save();
-  ctx.globalAlpha = 0.35;
-  ctx.fillStyle = grad;
-  ctx.fillRect(40, y, W - 80, stripH);
-  ctx.restore();
-  ctx.save();
-  ctx.strokeStyle = 'rgba(42,38,96,0.5)';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(40, y, W - 80, stripH);
-  ctx.restore();
+function fillIntentionList(ul, items, opts) {
+  if(!ul || ul.childElementCount) return;
+  opts = opts || {};
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.appendChild(document.createTextNode(item.text));
+    if(item.note) {
+      li.className = 'elsewhere';
+      const tag = document.createElement('span');
+      tag.className = 'debrief-tag';
+      tag.textContent = ` — ${item.note}`;
+      li.appendChild(tag);
+    }
+    if(opts.showRevisit && item.target && item.revisit) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'debrief-revisit';
+      btn.dataset.target = item.target;
+      btn.textContent = 'Explore again → ' + item.revisit;
+      li.appendChild(btn);
+    }
+    ul.appendChild(li);
+  });
 }
 
-let t = 0;
-function standbyFrame(){
-  ctx.clearRect(0, 0, W, H);
-  drawGrid();
-
-  const waveY = H * 0.42;
-  const amp = H * 0.15;
-  const baseWL = 120;
-  const wlMod = 60 * Math.sin(t * 0.0004);
-  const wavelength = baseWL + wlMod;
-  const phase = t * 0.002;
-
-  ctx.save();
-  ctx.shadowColor = '#3fe0cf';
-  ctx.shadowBlur = 12;
-  ctx.strokeStyle = '#3fe0cf';
-  ctx.globalAlpha = 0.3;
-  ctx.lineWidth = 6;
-  ctx.beginPath();
-  for(let x = 0; x <= W; x += 2){
-    const y = waveY + amp * Math.sin((x / wavelength) * Math.PI * 2 - phase);
-    x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.restore();
-
-  drawSpectrumStrip();
-
-  if(!prefersReduced){
-    t++;
-    requestAnimationFrame(standbyFrame);
-  }
+function fillCompetencyList(ul, items) {
+  if(!ul || ul.childElementCount) return;
+  items.forEach(item => {
+    const li = document.createElement('li');
+    const name = document.createElement('span');
+    name.className = 'cc-name';
+    name.textContent = item.name;
+    li.appendChild(name);
+    li.appendChild(document.createTextNode(item.text));
+    if(item.note) {
+      const tag = document.createElement('span');
+      tag.className = 'debrief-tag';
+      tag.textContent = ` — ${item.note}`;
+      li.appendChild(tag);
+    }
+    ul.appendChild(li);
+  });
 }
 
-if(prefersReduced){
-  t = 0;
-  standbyFrame();
-} else {
-  requestAnimationFrame(standbyFrame);
+function renderBriefing() {
+  fillIntentionList(document.getElementById('briefingIntentions'), DEBRIEF.intentions);
+  fillCompetencyList(document.getElementById('briefingCompetencies'), DEBRIEF.competencies);
+}
+
+function startModule() {
+  const briefing = document.getElementById('briefing');
+  const stage = document.getElementById('moduleStage');
+  if(briefing) briefing.hidden = true;
+  if(stage) stage.hidden = false;
+  resize();
+  setAct(1);
+  setLambda(989, null);
+  STATE.running = true;
+  requestAnimationFrame(tick);
+  if(prefersReduced) drawFrame();
+}
+
+function renderDebrief() {
+  fillIntentionList(document.getElementById('debriefIntentions'), DEBRIEF.intentions, { showRevisit: true });
+  fillCompetencyList(document.getElementById('debriefCompetencies'), DEBRIEF.competencies);
+}
+
+function enterDebriefStage() {
+  const stage = document.getElementById('moduleStage');
+  const debrief = document.getElementById('debrief');
+  if(!stage || !debrief) return;
+  Array.from(stage.children).forEach(child => {
+    if(child === debrief) return;
+    if(!child.hasAttribute('data-pre-debrief-hidden')) {
+      child.setAttribute('data-pre-debrief-hidden', child.hidden ? '1' : '0');
+    }
+    child.hidden = true;
+  });
+  debrief.hidden = false;
+}
+
+function leaveDebriefStage() {
+  const stage = document.getElementById('moduleStage');
+  const debrief = document.getElementById('debrief');
+  if(!stage) return;
+  Array.from(stage.children).forEach(child => {
+    if(child === debrief) return;
+    if(child.hasAttribute('data-pre-debrief-hidden')) {
+      child.hidden = child.getAttribute('data-pre-debrief-hidden') === '1';
+      child.removeAttribute('data-pre-debrief-hidden');
+    }
+  });
+  if(debrief) debrief.hidden = true;
+}
+
+let debriefRevisitWired = false;
+function wireDebriefRevisit() {
+  if(debriefRevisitWired) return;
+  debriefRevisitWired = true;
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.debrief-revisit');
+    if(!btn || !btn.dataset.target) return;
+    e.preventDefault();
+    leaveDebriefStage();
+    const n = Number(String(btn.dataset.target).replace(/^act:/, '')) || 1;
+    if(n >= 2){ STATE.namedE = true; }
+    if(n >= 3){ STATE.namedIE = true; STATE.ejected = true; }
+    setAct(Math.min(3, Math.max(1, n)));
+    if(els.ionFinishBtn && gates.moduleComplete){
+      els.ionFinishBtn.hidden = false;
+      els.ionFinishBtn.textContent = 'What this was for →';
+    }
+    if(els.continueBtn && gates.moduleComplete && n < 3){
+      els.continueBtn.textContent = 'Continue →';
+    }
+    window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
+  });
+}
+
+function revealDebrief() {
+  const section = document.getElementById('debrief');
+  if(!section) return;
+  renderDebrief();
+  wireDebriefRevisit();
+  enterDebriefStage();
+  section.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+}
+
+setGate('moduleComplete', false);
+renderBriefing();
+const briefingNext = document.getElementById('briefingNext');
+if(briefingNext) briefingNext.addEventListener('click', startModule);
+
+const _qs = new URLSearchParams(location.search);
+if(_qs.has('debrief') || _qs.has('start')) {
+  startModule();
+  if(_qs.has('debrief')) {
+    STATE.act = 3;
+    STATE.ejected = true;
+    STATE.namedE = true;
+    STATE.namedIE = true;
+    setAct(3);
+    setGate('moduleComplete', true);
+  }
 }
 </script>
 </body>

@@ -6,149 +6,1111 @@
 <title>02 — Coulomb &amp; Ionization</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --void:#0a0912;
-  --void-2:#0c0b1c;
-  --panel:#151330;
-  --panel-edge:#2a2660;
-  --grid:#211d47;
-  --phosphor:#3fe0cf;
-  --phosphor-dim:#1c6b66;
-  --ember:#ffb24d;
-  --signal:#b579ff;
-  --ink:#e9e7fb;
-  --dim:#797597;
+  --paper:#e6e1cf;
+  --paper-2:#d8d2bc;
+  --paper-3:#c9c2a8;
+  --void:#050505;
+  --void-2:#0c0c0c;
+  --panel:#efe9d4;
+  --panel-edge:#1a1810;
+  --grid:#cfc8ae;
+  --phosphor:#5c6b28;
+  --ember:#a85a32;
+  --signal:#1a6aa3;
+  --ink:#16140e;
+  --ink-soft:#33301f;
+  --dim:#55513f;
+  --faint:#6f6b59;
+  --proton:#a85a32;
+  --neutron:#7e8c45;
+  --electron:#c4a35a;
+  --success:#4f5a28;
+  --error:#a85a32;
+  --neon:#c4a35a;
+  --olive:#7e8c45;
+  --olive-deep:#4f5a28;
+  --mustard:#c4a35a;
+  --plate:#050505;
+  --plate-ink:#e8e6d9;
+
+  --font-display:'Archivo Black',Helvetica,sans-serif;
+  --font-body:Barlow,Helvetica,Univers,'Helvetica Neue',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  --label-xs:0.72rem;
+  --label-sm:0.78rem;
+  --label-md:0.85rem;
+  --track-wide:0.13em;
+  --track-tight:0.08em;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--void);color:var(--ink);font-family:'IBM Plex Mono',monospace;min-height:100vh;}
+html{font-size:16px;-webkit-text-size-adjust:100%;}
+body{
+  background-color:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:1.0625rem;
+  min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+.mono-label,
+.back-link,.mod-meta,.dev-skip,.task-kicker,.debrief-kicker,.briefing-kicker,.btn,.mod-tag,.eq,
+.ie-meter-label,.ie-meter-val,.ie-meter-tick-label,.ion-hint{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+}
 body::before{
   content:'';
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   z-index:9999;
   pointer-events:none;
-  opacity:0.045;
-  mix-blend-mode:screen;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:0.14;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:256px 256px;
 }
-.module-wrap{max-width:900px;margin:0 auto;padding:1.5rem 1rem 3rem;}
-.back-link{
-  display:inline-block;
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.8rem;
-  color:var(--dim);
-  text-decoration:none;
-  margin-bottom:1.2rem;
-  transition:color 0.2s;
+.module-wrap{max-width:920px;margin:0 auto;padding:1.35rem 1.35rem 3.5rem;position:relative;z-index:1;}
+.top-nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap;border-bottom:1px solid var(--ink);padding-bottom:0.7rem;}
+.back-link{font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color 0.2s;}
+.back-link:hover{color:var(--olive-deep);}
+/* DEV-ONLY-SKIP — delete this rule before publish */
+.dev-skip{
+  font-size:0.68rem;font-weight:500;letter-spacing:var(--track-tight);text-transform:uppercase;
+  background:transparent;border:1px dashed var(--ember);
+  color:var(--ember);padding:0.25rem 0.55rem;border-radius:0;cursor:pointer;
 }
-.back-link:hover{color:var(--phosphor);}
-.mod-tag{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.55rem;
-  color:var(--dim);
-  text-transform:uppercase;
-  letter-spacing:0.15em;
-  margin-bottom:0.5rem;
+.dev-skip:hover{background:rgba(168,90,50,0.1);}
+.mod-meta{font-size:var(--label-xs);font-weight:600;color:var(--ink);letter-spacing:var(--track-wide);text-transform:uppercase;}
+
+.task-kicker,.mod-tag{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--olive-deep);
+  margin-bottom:0.7rem;
 }
-h1{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.9rem;
-  color:var(--phosphor);
-  text-shadow:0 0 12px rgba(63,224,207,0.4),0 0 30px rgba(63,224,207,0.15);
-  margin-bottom:0.75rem;
-  line-height:1.6;
+.task-kicker::before,.mod-tag::before{
+  content:'';
+  width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);
+  flex:none;
+  transform:translateY(-0.12em);
+}
+h1,.task-title{
+  font-family:var(--font-display);
+  font-size:clamp(1.9rem,4.7vw,2.75rem);
+  font-weight:400;
+  letter-spacing:-0.025em;
+  line-height:0.98;
+  color:var(--ink);
+  margin-bottom:0.7rem;
 }
 .framing{
-  font-family:'IBM Plex Mono',monospace;
-  color:var(--dim);
-  font-style:italic;
-  font-size:0.85rem;
-  line-height:1.6;
-  margin-bottom:0.5rem;
+  font-size:1.15rem;
+  font-weight:400;
+  line-height:1.5;
+  color:var(--ink-soft);
+  max-width:none;
+  text-wrap:pretty;
+  margin-bottom:0.85rem;
 }
+
 .viewport{
   position:relative;
-  background:var(--void-2);
-  border:2px solid var(--panel-edge);
-  border-radius:4px;
-  box-shadow:
-    0 0 0 4px var(--void),
-    0 0 0 6px var(--panel-edge),
-    0 0 30px rgba(63,224,207,0.06);
+  background:transparent;
+  border:none;
+  border-radius:0;
   padding:0;
-  margin:1.5rem 0;
-  overflow:hidden;
+  margin:1.25rem 0 0;
+  overflow:visible;
+  user-select:none;-webkit-user-select:none;
+  box-shadow:none;
+  width:100%;
+  align-self:stretch;
 }
-#simCanvas{width:100%;display:block;}
-.controls{/* placeholder for simulation controls */}
-.hud{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.7rem;
+#simCanvas{width:100%;display:block;position:relative;z-index:0;background:transparent;cursor:grab;}
+#simCanvas.dragging{cursor:grabbing;}
+#simCanvas:focus-visible{outline:2px solid var(--olive-deep);outline-offset:-5px;}
+
+.playground{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1.1rem;
+  margin-top:0.5rem;
+  width:100%;
+  transition:opacity 0.75s ease;
+}
+.playground.is-leaving{
+  opacity:0;
+  pointer-events:none;
+}
+.playground[hidden]{display:none;}
+/* live equation — stacked fraction, variables scale with their values */
+.eq{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.85rem;
+  font-family:var(--font-mono);
+  font-size:clamp(1.15rem,2.6vw,1.5rem);
+  font-weight:500;
+  color:var(--ink);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+  min-height:8.25rem;
+}
+.eq .eq-var,
+.eq .eq-chrome{
+  display:inline-block;
+  line-height:1;
+  transition:font-size 0.25s ease,color 0.25s ease;
+}
+.eq-frac{display:inline-flex;flex-direction:column;align-items:center;}
+.eq-num{
+  display:flex;
+  align-items:baseline;
+  gap:0.5rem;
+  padding:0 0.6rem 0.35rem;
+  border-bottom:2px solid transparent;
+  transition:border-bottom-color 0.3s ease;
+}
+.eq-num.eq-bar-on{border-bottom-color:var(--ink);}
+.eq-den{display:flex;align-items:baseline;padding-top:0.35rem;}
+
+/* charge buttons pinned under each particle */
+.p-ctrl{
+  position:absolute;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:0.3rem;
+}
+.p-ctrl button{
+  background:transparent;
+  border:1px solid var(--ink);
+  color:var(--ink);
+  font-family:var(--font-mono);
+  font-size:1.05rem;
+  font-weight:600;
+  width:2.1rem;
+  height:2.1rem;
+  line-height:1;
+  cursor:pointer;
+  border-radius:0;
+  transition:background 0.15s,color 0.15s;
+}
+.p-ctrl button:hover{background:var(--ink);color:var(--paper);}
+.p-ctrl button:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.p-ctrl .q-val{
+  font-family:var(--font-mono);
+  font-size:var(--label-sm);
+  font-weight:600;
+  min-width:2.1rem;
+  text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+.p-ctrl.left .q-val{color:var(--signal);}
+.p-ctrl.right .q-val{color:var(--mustard);}
+
+/* distance slider */
+.d-control{
+  display:flex;
+  align-items:center;
+  gap:0.85rem;
+  width:min(460px,86%);
+  font-family:var(--font-mono);
+}
+.d-control label{
+  font-size:var(--label-sm);
+  font-weight:600;
+  text-transform:none;
   color:var(--dim);
-  padding:0.5rem 0.75rem;
-  border-top:1px solid var(--panel-edge);
-  background:var(--panel);
 }
+.d-control input[type=range]{
+  flex:1;
+  accent-color:var(--olive-deep);
+  cursor:pointer;
+}
+.d-control input[type=range]:focus-visible{outline:2px solid var(--olive-deep);outline-offset:3px;}
+
+/* intro reveal — equation builds with the plate; controls wait */
+.playground.intro-active .p-ctrl,
+.playground.intro-active .d-control{
+  opacity:0;
+  pointer-events:none;
+  transition:none;
+}
+.playground.intro-active .eq{pointer-events:none;}
+.playground.intro-done .p-ctrl,
+.playground.intro-done .d-control{
+  opacity:1;
+  pointer-events:auto;
+  transition:opacity 0.7s ease;
+}
+@media (prefers-reduced-motion: reduce){
+  .playground.intro-done .p-ctrl,
+  .playground.intro-done .d-control{transition:none;}
+}
+
 [data-gate]{opacity:0;transition:opacity 0.6s;pointer-events:none;}
 [data-gate].discovered{opacity:1;pointer-events:auto;}
-#stuckBtn{
-  background:none;
-  border:1px solid var(--signal);
+
+.btn{background:transparent;border:1px solid var(--ink);color:var(--ink);font-size:var(--label-md);letter-spacing:0.09em;text-transform:uppercase;font-weight:600;padding:0.65rem 1.3rem;border-radius:0;cursor:pointer;transition:background 0.15s,color 0.15s;margin-right:0.5rem;margin-top:0.4rem;}
+.btn:hover{background:var(--ink);color:var(--paper);}
+.btn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.btn.submit{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+.btn.submit:hover{background:var(--olive-deep);border-color:var(--olive-deep);}
+
+/* module briefing — intentions & competencies before the sim */
+.briefing{margin:0 0 0.5rem;padding:0.2rem 0 0;width:100%;}
+.briefing[hidden]{display:none;}
+.module-wrap:has(#briefing:not([hidden])){max-width:1120px;padding-left:clamp(1.35rem,4vw,2.75rem);padding-right:clamp(1.35rem,4vw,2.75rem);}
+.briefing-kicker{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.7rem;
+}
+.briefing-kicker::before{
+  content:'';width:1.6rem;height:0.28rem;background:var(--olive-deep);flex:none;
+  transform:translateY(-0.12em);
+}
+.briefing h1{
+  font-family:var(--font-display);font-size:clamp(1.85rem,4.5vw,2.55rem);
+  font-weight:400;letter-spacing:-0.025em;line-height:1.02;color:var(--ink);
+  margin-bottom:0.55rem;
+}
+.briefing-lead{font-size:1.15rem;line-height:1.55;color:var(--ink-soft);max-width:none;margin:0 0 1.5rem;text-wrap:pretty;}
+.briefing-columns{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.75rem 2.5rem;
+  align-items:start;
+}
+.briefing-actions{
+  display:flex;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  margin-top:1.75rem;
+  padding-top:1.25rem;
+  border-top:1px solid var(--ink);
+}
+.briefing .btn.submit{margin-top:0;}
+#moduleStage[hidden]{display:none;}
+
+/* module debrief — learning intentions & curricular competencies */
+.debrief{margin:0.25rem 0 1.25rem;padding:1.2rem 0 0;border-top:1px solid var(--ink);}
+.debrief[hidden]{display:none;}
+.briefing h2,
+.debrief h2{font-family:var(--font-display);font-size:1.5rem;font-weight:400;letter-spacing:-0.02em;line-height:1.1;color:var(--ink);margin-bottom:0.35rem;}
+.debrief-lead{font-size:1.05rem;line-height:1.5;color:var(--dim);max-width:none;margin:0 0 1.15rem;text-wrap:pretty;}
+.briefing-block,
+.debrief-block{border-left:4px solid var(--olive);padding:0.1rem 0 0.1rem 1.05rem;margin-bottom:1.15rem;}
+.briefing-block{margin-bottom:0;}
+.briefing-block:last-of-type,
+.debrief-block:last-child{margin-bottom:0;}
+.briefing-block.cc,
+.debrief-block.cc{border-left-color:var(--signal);}
+.debrief-block.practice{border-left-color:var(--ember);}
+.debrief-kicker{font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.5rem;}
+.briefing-block.cc .debrief-kicker,
+.debrief-block.cc .debrief-kicker{color:var(--signal);}
+.debrief-block.practice .debrief-kicker{color:var(--ember);}
+.briefing ul,
+.debrief ul{list-style:none;margin:0;padding:0;}
+.briefing li,
+.debrief li{position:relative;padding-left:1.6rem;margin:0.45rem 0;font-size:1rem;line-height:1.5;color:var(--ink-soft);max-width:none;text-wrap:pretty;}
+.briefing li{font-size:1.05rem;line-height:1.55;margin:0.55rem 0;}
+.briefing-li li::before{content:'\25B8';position:absolute;left:0;color:var(--olive-deep);}
+.debrief-li li::before{content:'\2713';position:absolute;left:0;color:var(--olive-deep);font-weight:700;}
+.briefing-li li.elsewhere::before,
+.debrief-li li.elsewhere::before{content:'\270E';color:var(--ember);}
+.debrief-tag{font-family:var(--font-mono);font-size:var(--label-xs);letter-spacing:0.1em;text-transform:uppercase;color:var(--ember);white-space:nowrap;}
+.debrief-revisit{
+  display:block;margin:0.35rem 0 0;padding:0;
+  border:none;background:none;cursor:pointer;text-align:left;
+  font-family:var(--font-mono);font-size:var(--label-sm);font-weight:600;
+  letter-spacing:var(--track-tight);text-transform:uppercase;
+  color:var(--signal);line-height:1.4;
+}
+.debrief-revisit:hover{color:var(--olive-deep);text-decoration:underline;}
+.debrief-revisit:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.briefing-cc li::before,
+.debrief-cc li::before{content:'\25B8';position:absolute;left:0;color:var(--signal);}
+.briefing-cc .cc-name,
+.debrief-cc .cc-name{display:block;font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--signal);margin-bottom:0.15rem;}
+.practice-prompt{
+  font-size:1.05rem;
+  line-height:1.55;
   color:var(--signal);
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.8rem;
-  padding:0.5rem 1.2rem;
-  border-radius:4px;
-  cursor:pointer;
-  transition:background 0.2s,color 0.2s;
-  margin-top:1rem;
+  font-weight:700;
+  margin:0 0 0.85rem;
+  max-width:52rem;
+  text-wrap:pretty;
 }
-#stuckBtn:hover{background:rgba(181,121,255,0.1);}
-#stuckBtn:focus-visible{outline:2px solid var(--signal);outline-offset:2px;}
-.help-panel{
-  opacity:0;
-  max-height:0;
-  overflow:hidden;
-  transition:opacity 0.3s,max-height 0.3s;
-  border:1px solid var(--signal);
-  background:var(--panel);
-  border-radius:4px;
-  padding:0 1.2rem;
-  margin-top:0.75rem;
+.practice-line{
+  display:block;
+  width:100%;
+  max-width:28rem;
+  height:auto;
+  margin:0.35rem 0 0.15rem;
+}
+.practice-line .track{stroke:var(--ink);stroke-width:1.25;fill:none;}
+.practice-line .dist-label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.08em;
+  fill:var(--olive-deep);
+  text-anchor:middle;
+}
+.practice-line .charge-label{
+  font-family:var(--font-mono);
+  font-size:12px;
+  font-weight:600;
+  fill:var(--plate-ink);
+  text-anchor:middle;
+  dominant-baseline:central;
+}
+.practice-he{
+  margin-top:1.35rem;
+  padding-top:1.15rem;
+  border-top:1px solid var(--paper-3);
+}
+.practice-he-fig{
+  display:block;
+  width:100%;
+  max-width:16rem;
+  height:auto;
+  margin:0.15rem 0 1rem;
+}
+.practice-he-fig .track{stroke:var(--ink);stroke-width:1.1;fill:none;stroke-dasharray:3 3;}
+.practice-he-fig .dist-label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.08em;
+  fill:var(--olive-deep);
+  text-anchor:middle;
+}
+.practice-he-fig .charge-label{
+  font-family:var(--font-mono);
+  font-size:12px;
+  font-weight:600;
+  fill:var(--plate-ink);
+  text-anchor:middle;
+  dominant-baseline:central;
+}
+.practice-he-fig .fig-caption{
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  fill:var(--dim);
+  text-anchor:middle;
+}
+.practice-qs{
+  margin:0 0 1rem;
+  padding:0 0 0 1.25rem;
+  max-width:52rem;
+}
+.practice-qs li{
+  position:static;
+  padding-left:0;
+  margin:0.65rem 0;
+  font-size:1.05rem;
+  line-height:1.55;
+  color:var(--signal);
+  font-weight:700;
+  text-wrap:pretty;
+}
+.practice-qs li::before{content:none;}
+.practice-answers{
+  margin:0.85rem 0 0;
+  padding:0.85rem 0 0;
+  border-top:1px solid var(--paper-3);
+  max-width:52rem;
+}
+.practice-answers[hidden]{display:none;}
+.practice-answers .ans-label{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--ember);
+  margin:0 0 0.55rem;
+}
+.practice-answers ol{
+  margin:0;
+  padding:0 0 0 1.25rem;
+}
+.practice-answers li{
+  position:static;
+  padding-left:0;
+  margin:0.55rem 0;
+  font-size:1rem;
+  line-height:1.55;
+  color:var(--ink-soft);
+  text-wrap:pretty;
+}
+.practice-answers li::before{content:none;}
+.practice-answers .eq-inline{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+@media(max-width:760px){
+  .briefing-columns{grid-template-columns:1fr;gap:1.35rem;}
+}
+
+/* explore → maximize / minimize challenge prompt */
+.challenge{
+  position:relative;
+  width:100%;
+  max-width:36rem;
+  margin:0.25rem auto 0;
+  min-height:0;
+  text-align:center;
+}
+.challenge[hidden]{display:none;}
+.challenge-text{
+  font-family:var(--font-body);
+  font-size:clamp(1.2rem,2.8vw,1.45rem);
+  font-weight:500;
+  line-height:1.45;
+  color:var(--ink-soft);
+  text-wrap:pretty;
+  margin:0;
+}
+.challenge-text .challenge-v{
+  font-family:var(--font-mono);
+  font-weight:600;
+  color:var(--ember);
+}
+.challenge-pe{
+  display:inline-block;
+  font-weight:600;
+  color:var(--ember);
+  transform-origin:center bottom;
+  transition:font-size 0.55s ease,color 0.35s ease;
+}
+.challenge-pe.is-low{color:var(--olive-deep);}
+.challenge-note{
+  margin:0.65rem 0 0;
+  font-family:var(--font-body);
+  font-size:0.92rem;
+  font-weight:400;
+  line-height:1.45;
   color:var(--dim);
-  font-size:0.85rem;
-  line-height:1.6;
+  text-wrap:pretty;
 }
-.help-panel.open{
+.challenge-note[hidden]{display:none;}
+.challenge-note .eq-v{
+  font-family:var(--font-mono);
+  font-weight:600;
+  color:var(--ember);
+  font-variant-numeric:tabular-nums;
+}
+/* keyword slot — holds maximize / minimize without shifting the sentence */
+.challenge-kw-slot{
+  display:inline-grid;
+  vertical-align:baseline;
+  justify-items:center;
+  min-width:9.2ch;
+}
+.challenge-kw{
+  grid-area:1/1;
+  display:inline-block;
+  font-weight:700;
+  letter-spacing:-0.01em;
+  transform-origin:center 70%;
+  will-change:transform,opacity;
+}
+.challenge-kw.is-max{color:var(--ember);}
+.challenge-kw.is-min{color:var(--olive-deep);}
+.challenge-kw.is-fading{
+  animation:kwFadeOut 0.4s ease forwards;
+}
+.challenge-kw.is-entering{
+  animation:kwPopIn 0.85s cubic-bezier(0.18,0.9,0.28,1) forwards;
+}
+@keyframes kwFadeOut{
+  from{opacity:1;transform:scale(1);}
+  to{opacity:0;transform:scale(0.72);}
+}
+@keyframes kwPopIn{
+  0%{opacity:0;transform:scale(2.05);}
+  55%{opacity:1;transform:scale(1.05);}
+  100%{opacity:1;transform:scale(0.9);} /* settles slightly under the sentence size */
+}
+.challenge-actions{
+  display:flex;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  margin-top:0.85rem;
+  min-height:2.6rem;
+}
+.challenge-actions .btn{margin:0;}
+.challenge-actions .btn[hidden]{display:none;}
+/* post-discovery bridge — quieter body copy under the live equation */
+.challenge.is-bridge{
+  max-width:38rem;
+  text-align:left;
+}
+.challenge-bridge{
+  margin:0;
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  font-weight:400;
+  line-height:1.55;
+  color:var(--ink-soft);
+  text-wrap:pretty;
+}
+.challenge-bridge + .challenge-bridge{margin-top:0.85rem;}
+.challenge-bridge .eq-v,
+.challenge-bridge .eq-sym{
+  font-family:var(--font-mono);
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+}
+.challenge-bridge .eq-v{color:var(--ember);}
+.challenge-bridge .eq-sym{color:var(--ink);}
+#part2[hidden]{display:none;}
+.part2{
+  margin-top:0.5rem;
+  padding-top:0;
+  border-top:none;
+  opacity:0;
+  transition:opacity 0.85s ease;
+}
+.part2.is-live{opacity:1;}
+.part2 .framing{
+  margin-top:0.85rem;
+  margin-bottom:0;
+  opacity:0;
+  transition:opacity 0.8s ease;
+  text-align:center;
+  max-width:none;
+}
+.part2 .framing.is-shown{opacity:1;}
+
+/* Part 2 — ionization stage */
+.ion-stage{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:0.75rem 1rem;
+  align-items:center;
+  justify-items:center;
+  margin-top:0.35rem;
+  width:100%;
+  opacity:0;
+  transition:opacity 0.9s ease;
+}
+.ion-stage.is-live{opacity:1;}
+.ion-stage.has-chrome{
+  grid-template-columns:minmax(7.5rem,0.9fr) minmax(0,2.2fr) minmax(4.2rem,0.55fr);
+  justify-items:stretch;
+  position:relative;
+}
+.ion-eq-wrap{
+  display:none;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:0.55rem;
+  min-width:0;
+  opacity:0;
+  transform:translateX(-0.6rem);
+  transition:opacity 0.7s ease,transform 0.7s ease;
+  z-index:2;
+  pointer-events:none;
+}
+.ion-stage.has-chrome .ion-eq-wrap{
+  display:flex;
+  grid-column:1;
+  grid-row:1;
+  align-self:center;
+}
+.ion-stage.eq-in .ion-eq-wrap{
   opacity:1;
-  max-height:200px;
-  padding:1rem 1.2rem;
+  transform:none;
+}
+.ion-eq{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:0.35rem;
+  font-family:var(--font-mono);
+  font-size:clamp(0.95rem,2.1vw,1.2rem);
+  font-weight:500;
+  color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+.ion-eq .eq-row{
+  display:flex;
+  align-items:center;
+  gap:0.55rem;
+}
+.ion-eq .eq-frac{display:inline-flex;flex-direction:column;align-items:center;}
+.ion-eq .eq-num{
+  display:flex;align-items:baseline;gap:0.35rem;
+  padding:0 0.35rem 0.25rem;
+  border-bottom:2px solid var(--ink);
+}
+.ion-eq .eq-den{padding-top:0.25rem;}
+.ion-eq .eq-v{color:var(--ember);font-weight:600;}
+.ion-eq .eq-q1{color:var(--proton);font-weight:600;}
+.ion-eq .eq-q2{color:var(--electron);font-weight:600;text-shadow:0 0 0 transparent;}
+.ion-eq .eq-d{color:var(--olive-deep);font-weight:600;}
+.ion-eq .eq-k{color:var(--faint);}
+.ion-eq-wrap.no-eq .ion-eq{display:none;}
+.ion-v-readout{
+  font-size:var(--label-sm);
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.ion-v-readout strong{
+  color:var(--ember);
+  font-weight:600;
+  letter-spacing:0.04em;
+  text-transform:none;
+  font-size:1.05em;
+}
+#ionCanvas{
+  width:100%;
+  max-width:40rem;
+  display:block;
+  margin:0 auto;
+  background:transparent;
+  border:none;
+  cursor:default;
+  touch-action:none;
+  z-index:1;
+}
+.ion-stage.has-chrome #ionCanvas{
+  max-width:none;
+  grid-column:1 / -1;
+  grid-row:1;
+  width:100%;
+  margin:0;
+}
+#ionCanvas.is-grab{cursor:grab;}
+#ionCanvas.is-dragging{cursor:grabbing;}
+#ionCanvas:focus-visible{outline:2px solid var(--olive-deep);outline-offset:3px;}
+
+.ie-meter{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:0.45rem;
+  height:100%;
+  min-height:12rem;
+  opacity:0;
+  transform:translateX(0.6rem);
+  transition:opacity 0.7s ease,transform 0.7s ease;
+  z-index:2;
+  pointer-events:none;
+}
+.ion-stage.has-chrome .ie-meter{
+  display:flex;
+  grid-column:3;
+  grid-row:1;
+  align-self:stretch;
+  justify-self:end;
+}
+.ion-stage.meter-in .ie-meter{
+  opacity:1;
+  transform:none;
+}
+.ie-meter-label{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--ember);
+  text-align:center;
+}
+.ie-meter-track{
+  position:relative;
+  flex:1;
+  width:1.35rem;
+  min-height:10rem;
+  border:1px solid var(--ink);
+  background:transparent;
+}
+.ie-meter-fill{
+  position:absolute;
+  left:0;right:0;bottom:0;
+  height:0%;
+  background:var(--ember);
+  opacity:0.85;
+  transition:none;
+}
+.ie-meter-tick{
+  position:absolute;
+  left:-0.35rem;right:-0.35rem;
+  height:0;
+  border-top:2px solid var(--ink);
+  pointer-events:none;
+}
+.ie-meter-tick-label{
+  position:absolute;
+  right:calc(100% + 0.45rem);
+  top:0;
+  transform:translateY(-50%);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--ember);
+  white-space:nowrap;
+}
+.ie-meter-val{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--dim);
+  text-align:center;
+  min-height:1.2em;
+}
+.ion-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:0.5rem;
+  margin-top:1rem;
+  min-height:2.6rem;
+}
+.ion-actions .btn{margin:0;}
+.ion-actions .btn[hidden]{display:none;}
+.ion-hint{
+  margin-top:0.65rem;
+  text-align:center;
+  font-size:var(--label-sm);
+  font-weight:500;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--faint);
+  min-height:1.2em;
+}
+
+/* Part 2 — branched finale (H → He → two Li arrangements) */
+.ion-compare{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:1.15rem;
+  margin:0.85rem auto 0;
+  max-width:40rem;
+  width:100%;
+  text-align:center;
+}
+.ion-stage.is-compare ~ .ion-compare,
+.part2.is-comparing .ion-compare{display:flex;}
+.finale-text{
+  margin:0;
+  max-width:38rem;
+  font-size:clamp(1.05rem,2.4vw,1.28rem);
+  line-height:1.5;
+  color:var(--ink);
+  text-wrap:pretty;
+  opacity:0;
+  transform:translateY(0.4rem);
+  transition:opacity 0.9s ease,transform 0.9s ease;
+  pointer-events:none;
+}
+.student-q,
+.finale-text.student-q{
+  color:var(--signal);
+  font-weight:700;
+}
+.finale-text strong{
+  color:var(--ember);
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+.finale-text.student-q strong{
+  color:var(--ember);
+}
+.finale-text.is-in{
+  opacity:1;
+  transform:none;
+}
+.finale-text[hidden]{display:none;}
+.ion-stage.is-compare #ionCanvas{
+  cursor:default;
+}
+.ion-stage.is-compare{
+  grid-template-columns:minmax(0,1fr);
+  justify-items:center;
+}
+.ion-stage.is-compare .ion-eq-wrap,
+.ion-stage.is-compare .ie-meter{display:none;}
+.ion-stage.is-compare #ionCanvas{
+  grid-column:1;
+  grid-row:1;
+  max-width:52rem;
+  width:100%;
+  margin:0 auto;
+}
+@media (max-width:720px){
+  .ion-stage.has-chrome{
+    grid-template-columns:1fr auto;
+    grid-template-rows:auto auto;
+  }
+  .ion-stage.has-chrome .ion-eq-wrap{grid-column:1 / -1;grid-row:1;}
+  .ion-stage.has-chrome #ionCanvas{grid-column:1 / -1;grid-row:1 / span 2;}
+  .ion-stage.has-chrome .ie-meter{grid-column:2;grid-row:2;min-height:11rem;}
+  .ion-stage.is-compare.has-chrome{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto;
+  }
+  .ion-stage.is-compare.has-chrome #ionCanvas{grid-row:1;}
+}
+@media (prefers-reduced-motion: reduce){
+  .challenge-pe{transition:none;}
+  .challenge-kw.is-fading,
+  .challenge-kw.is-entering{animation:none;}
+  .challenge-kw.is-entering{opacity:1;transform:scale(0.9);}
+  .playground,
+  .part2,
+  .part2 .framing,
+  .ion-stage,
+  .ion-eq-wrap,
+  .ie-meter,
+  .finale-text{transition:none;}
+}
+@media print{
+  .debrief{break-inside:avoid;border-top-color:#000;}
+  .briefing h1,.briefing h2,.briefing li,.debrief h2,.debrief li,.debrief-kicker,.briefing-cc .cc-name,.debrief-cc .cc-name,.debrief-tag,.practice-prompt,.practice-qs li,.practice-answers li,.practice-answers .ans-label{color:#000;}
+  .practice-line .dist-label,.practice-he-fig .dist-label,.practice-he-fig .fig-caption{fill:#000;}
+  .practice-answers[hidden]{display:block;}
 }
 </style>
 </head>
 <body>
 <div class="module-wrap">
-  <a href="index.html" class="back-link">← Unit 1b</a>
-  <header>
-    <div class="mod-tag">Module 02</div>
-    <h1>Coulomb &amp; Ionization</h1>
-    <p class="framing">Two charges on a track. Slide them closer and feel the pull.</p>
-  </header>
-
-  <div class="viewport">
-    <canvas id="simCanvas"></canvas>
-    <div class="hud">— standby —</div>
+  <div class="top-nav">
+    <a href="index.html" class="back-link">← Unit 1b</a>
+    <button type="button" class="dev-skip" id="devSkipPart2">DEV skip → Part 2</button>
   </div>
 
-  <div class="controls"><!-- simulation controls will go here --></div>
+  <!-- Briefing — read intentions & competencies before the sim -->
+  <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
+    <div class="briefing-kicker"><span>Before you begin</span></div>
+    <h1 id="briefingTitle">Coulomb &amp; Ionization</h1>
+    <p class="briefing-lead">Read what this module is aiming for. Then open the instrument and work through it.</p>
+    <div class="briefing-columns">
+      <div class="briefing-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="briefing-li" id="briefingIntentions"></ul>
+      </div>
+      <div class="briefing-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="briefing-cc" id="briefingCompetencies"></ul>
+      </div>
+    </div>
+    <div class="briefing-actions">
+      <button type="button" class="btn submit" id="briefingNext">Next → Start simulation</button>
+    </div>
+  </section>
 
-  <button id="stuckBtn">Stuck?</button>
-  <div class="help-panel" id="helpPanel">
-    <p>Make the charges the same sign, then opposite. What flips?</p>
-    <p style="margin-top:0.5rem;">Slide d toward zero. Which way does V run off?</p>
+  <div id="moduleStage" hidden>
+  <div class="playground intro-active" id="playground">
+    <div class="viewport">
+      <canvas id="simCanvas" aria-label="Two charged particles on a track. Drag a particle or use the distance slider to change their separation."></canvas>
+      <div class="p-ctrl left" id="ctrl1">
+        <button type="button" id="q1Minus" aria-label="Decrease left particle charge">−</button>
+        <span class="q-val" id="q1Val">0</span>
+        <button type="button" id="q1Plus" aria-label="Increase left particle charge">+</button>
+      </div>
+      <div class="p-ctrl right" id="ctrl2">
+        <button type="button" id="q2Minus" aria-label="Decrease right particle charge">−</button>
+        <span class="q-val" id="q2Val">0</span>
+        <button type="button" id="q2Plus" aria-label="Increase right particle charge">+</button>
+      </div>
+    </div>
+    <div class="d-control">
+      <label for="dSlider">d</label>
+      <input type="range" id="dSlider" min="1" max="10" step="0.1" value="5" aria-label="Distance between the two particles">
+    </div>
+    <div class="eq" id="eq" aria-hidden="true">
+      <span class="eq-var eq-chrome" id="eqV">V</span>
+      <span class="eq-chrome" id="eqEq">=</span>
+      <span class="eq-frac">
+        <span class="eq-num" id="eqNum"><span class="eq-chrome" id="eqK">k</span><span class="eq-var" id="eqQ1">q₁</span><span class="eq-var" id="eqQ2">q₂</span></span>
+        <span class="eq-den"><span class="eq-var" id="eqD">d</span></span>
+      </span>
+    </div>
+    <div class="challenge" id="challenge" hidden aria-live="polite">
+      <div class="challenge-text" id="challengeText"></div>
+      <p class="challenge-note" id="challengeNote" hidden>
+        In this model, a highly negative <span class="eq-v">V</span> is a <em>high</em> coulombic potential energy — and a highly positive <span class="eq-v">V</span> is a <em>low</em> one.
+      </p>
+      <div class="challenge-actions">
+        <button type="button" class="btn submit" id="sandboxNext" hidden>Next →</button>
+      </div>
+    </div>
   </div>
+
+  <!-- Part 2 — V → ionization: pull the electron free -->
+  <section class="part2" id="part2" hidden aria-label="Pulling them apart">
+
+    <div class="ion-stage" id="ionStage">
+      <div class="ion-eq-wrap" id="ionEqWrap">
+        <div class="ion-eq" id="ionEq" aria-hidden="true">
+          <div class="eq-row">
+            <span class="eq-v" id="ionEqV">V</span>
+            <span>=</span>
+            <span class="eq-frac">
+              <span class="eq-num">
+                <span class="eq-k">k</span>
+                <span class="eq-q1" id="ionEqQ1">q₁</span>
+                <span class="eq-q2" id="ionEqQ2">−1</span>
+              </span>
+              <span class="eq-den"><span class="eq-d" id="ionEqD">d</span></span>
+            </span>
+          </div>
+        </div>
+        <div class="ion-v-readout" id="ionVReadout"><span class="eq-v">V</span> = <strong id="ionVValue">—</strong> MJ/mol</div>
+      </div>
+
+      <canvas id="ionCanvas" tabindex="0" aria-label="Hydrogen atom. Grab the electron and drag it away from the nucleus."></canvas>
+
+      <div class="ie-meter" id="ieMeter" aria-label="Energy put in to remove the electron">
+        <div class="ie-meter-label" id="ieMeterLabel">Energy in</div>
+        <div class="ie-meter-track" id="ieMeterTrack">
+          <div class="ie-meter-fill" id="ieMeterFill"></div>
+          <div class="ie-meter-tick" id="ieMeterTick">
+            <span class="ie-meter-tick-label" id="ieMeterTickLabel">V</span>
+          </div>
+        </div>
+        <div class="ie-meter-val" id="ieMeterVal">0.00</div>
+      </div>
+    </div>
+
+    <p class="framing" id="ionFraming" aria-live="polite"></p>
+    <p class="ion-hint" id="ionHint" aria-live="polite"></p>
+
+    <div class="ion-compare" id="ionCompare" hidden aria-live="polite">
+      <p class="finale-text" id="finaleTextQ" hidden>
+        As we’ve seen in this simulation, as the “Q” value of the nucleus increases, the “pull” on the electron also increases, meaning the energy required to remove that electron also increases. The required energy to remove an electron to an “infinite distance away” is called ionization energy. <span class="student-q">Why do you think it’s called that?</span>
+      </p>
+      <p class="finale-text student-q" id="finaleTextLi" hidden>
+        The experimental value for the ionization energy of lithium is actually <strong>0.52&nbsp;MJ/mol</strong>. What does that tell us about the organization of the electrons in lithium?
+      </p>
+    </div>
+
+    <div class="ion-actions" id="ionActions">
+      <button type="button" class="btn" id="ionReset" hidden>Reset</button>
+      <button type="button" class="btn submit" id="ionNext" hidden>Next →</button>
+      <button type="button" class="btn submit" id="ionFinish" hidden>Finish</button>
+    </div>
+  </section>
+
+  <!-- Debrief — learning intentions & curricular competencies (§11) -->
+  <section class="debrief" id="debrief" hidden aria-labelledby="debriefTitle">
+    <h2 id="debriefTitle">What this was for</h2>
+    <p class="debrief-lead">The intentions behind this module, and the competencies you just practised. Read each competency statement and decide honestly how well it fits you right now.</p>
+    <div class="debrief-block">
+      <div class="debrief-kicker">Learning intentions</div>
+      <ul class="debrief-li" id="debriefIntentions"></ul>
+    </div>
+    <div class="debrief-block cc">
+      <div class="debrief-kicker">Curricular competencies</div>
+      <ul class="debrief-cc" id="debriefCompetencies"></ul>
+    </div>
+    <div class="debrief-block practice">
+      <div class="debrief-kicker">Practice</div>
+      <p class="practice-prompt student-q">Write all of the IE equations for the particles on this line. Do not solve the equations — just think about the values of q<sub>1</sub>, q<sub>2</sub>, and d.</p>
+      <svg class="practice-line" viewBox="16 0 340 88" role="img" aria-label="Three particles on a line: charge plus 2, then distance d to charge plus 1, then distance one-half d to charge minus 1.">
+        <defs>
+          <radialGradient id="practiceGradPlus" cx="35%" cy="32%" r="68%">
+            <stop offset="0%" stop-color="#d4a07a"/>
+            <stop offset="45%" stop-color="#a85a32"/>
+            <stop offset="100%" stop-color="#4a2614"/>
+          </radialGradient>
+          <radialGradient id="practiceGradMinus" cx="35%" cy="32%" r="68%">
+            <stop offset="0%" stop-color="#e0c98a"/>
+            <stop offset="45%" stop-color="#c4a35a"/>
+            <stop offset="100%" stop-color="#5a4820"/>
+          </radialGradient>
+        </defs>
+        <!-- track: +2 at 48, +1 at 48+168=216 (gap d), −1 at 216+84=300 (gap ½d) -->
+        <line class="track" x1="48" y1="44" x2="300" y2="44"/>
+        <text class="dist-label" x="132" y="28">d</text>
+        <text class="dist-label" x="258" y="28">½d</text>
+        <circle cx="48" cy="44" r="22" fill="url(#practiceGradPlus)"/>
+        <text class="charge-label" x="48" y="44">+2</text>
+        <circle cx="216" cy="44" r="20" fill="url(#practiceGradPlus)"/>
+        <text class="charge-label" x="216" y="44">+1</text>
+        <circle cx="300" cy="44" r="20" fill="url(#practiceGradMinus)"/>
+        <text class="charge-label" x="300" y="45">−1</text>
+      </svg>
+
+      <div class="practice-he" id="practiceHe">
+        <svg class="practice-he-fig" viewBox="0 0 220 150" role="img" aria-label="Figure 2. Helium atom model: nucleus charge plus 2 at the center, with two electrons of charge minus 1 on opposite sides. Each electron is distance d from the nucleus; the electrons are 2d apart.">
+          <defs>
+            <radialGradient id="heGradNucleus" cx="35%" cy="32%" r="68%">
+              <stop offset="0%" stop-color="#d4a07a"/>
+              <stop offset="45%" stop-color="#a85a32"/>
+              <stop offset="100%" stop-color="#4a2614"/>
+            </radialGradient>
+            <radialGradient id="heGradElectron" cx="35%" cy="32%" r="68%">
+              <stop offset="0%" stop-color="#e0c98a"/>
+              <stop offset="45%" stop-color="#c4a35a"/>
+              <stop offset="100%" stop-color="#5a4820"/>
+            </radialGradient>
+          </defs>
+          <text class="fig-caption" x="110" y="14">Figure 2</text>
+          <line class="track" x1="40" y1="78" x2="180" y2="78"/>
+          <text class="dist-label" x="75" y="68">d</text>
+          <text class="dist-label" x="145" y="68">d</text>
+          <text class="dist-label" x="110" y="108">2d</text>
+          <circle cx="40" cy="78" r="16" fill="url(#heGradElectron)"/>
+          <text class="charge-label" x="40" y="79">−1</text>
+          <circle cx="110" cy="78" r="20" fill="url(#heGradNucleus)"/>
+          <text class="charge-label" x="110" y="79">+2</text>
+          <circle cx="180" cy="78" r="16" fill="url(#heGradElectron)"/>
+          <text class="charge-label" x="180" y="79">−1</text>
+          <text class="fig-caption" x="110" y="138">He</text>
+        </svg>
+        <ol class="practice-qs" type="a">
+          <li>Write the three Coulombic Potential Energy terms for the helium atom model in Figure&nbsp;2. Assume that the distance between each electron and the nucleus is <em>d</em> and that the distance between the two electrons is 2<em>d</em>.</li>
+          <li>Based on your answer to part&nbsp;a) explain why the IE of He is slightly less than twice the IE of H even though both atoms are about the same size.</li>
+        </ol>
+        <button type="button" class="btn" id="practiceReveal" aria-expanded="false" aria-controls="practiceAnswers">Click to reveal answers</button>
+        <div class="practice-answers" id="practiceAnswers" hidden>
+          <div class="ans-label">Model answers</div>
+          <ol type="a">
+            <li>
+              Nucleus–electron&nbsp;1:
+              <span class="eq-inline">V = k(+2)(−1)/d = −2k/d</span><br>
+              Nucleus–electron&nbsp;2:
+              <span class="eq-inline">V = k(+2)(−1)/d = −2k/d</span><br>
+              Electron–electron:
+              <span class="eq-inline">V = k(−1)(−1)/(2d) = +k/(2d)</span>
+            </li>
+            <li>
+              The electron–electron term is positive (repulsive), so it raises the total potential energy and makes each electron a little easier to remove. Without that repulsion you would expect IE(He) ≈ 2 × IE(H) at the same size; the repulsion is why helium’s IE is slightly less than twice hydrogen’s.
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+  </div><!-- /#moduleStage -->
 </div>
 
 <script>
@@ -159,59 +1121,219 @@ let W, H, dpr;
 
 function resize() {
   dpr = window.devicePixelRatio || 1;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  W = rect.width;
-  H = Math.min(W * 0.6, 500);
+  const parent = canvas.parentElement;
+  const rect = parent.getBoundingClientRect();
+  // Flex shrink can report 0 before layout settles — fall back to wrap width
+  W = rect.width || parent.clientWidth || canvas.clientWidth;
+  if (W < 80) {
+    const wrap = document.querySelector('.module-wrap');
+    W = wrap ? wrap.clientWidth : 640;
+  }
+  H = Math.min(Math.max(W * 0.38, 220), 380);
   canvas.width = W * dpr;
   canvas.height = H * dpr;
+  canvas.style.width = '100%';
   canvas.style.height = H + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawPlate();
 }
 window.addEventListener('resize', resize);
-resize();
 
-// === REDUCED MOTION ===
-const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const INK_LINE = 'rgba(22,20,14,0.78)';
+const INK_MID = 'rgba(22,20,14,0.52)';
+const CHARGE_HEX = { left: '#1a6aa3', right: '#c4a35a' };
+const EMBER = '#a85a32';
+const OLIVE = '#7e8c45';
+const MUSTARD = '#c4a35a';
 
-// === GLOW HELPERS ===
-function glowLine(x1, y1, x2, y2, color, width = 2) {
+function hexToRgb(hex) {
+  const h = String(hex).replace('#', '');
+  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+}
+function mixRgb(a, b, t) {
+  return a.map((v, i) => Math.round(v + (b[i] - v) * t));
+}
+function rgbCss(rgb, a) {
+  return a == null ? `rgb(${rgb[0]},${rgb[1]},${rgb[2]})` : `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`;
+}
+
+function chargeLabel(q) {
+  if (q === 0) return '0';
+  return (q > 0 ? '+' : '−') + Math.abs(q);
+}
+
+function drawSphere(x, y, r, hex, q, alpha = 1) {
+  if (alpha <= 0.01) return;
+  const rgb = hexToRgb(hex);
+  const light = mixRgb(rgb, [255, 246, 220], 0.58);
+  const mid = rgb;
+  const dark = mixRgb(rgb, [18, 14, 8], 0.48);
+  // radius grows with |q| so charge magnitude is visible on the plate
+  const drawR = r * (0.7 + 0.15 * Math.abs(q));
+
   ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 12;
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.arc(x, y, drawR, 0, Math.PI * 2);
+  const grad = ctx.createRadialGradient(
+    x - drawR * 0.32, y - drawR * 0.38, drawR * 0.08,
+    x + drawR * 0.08, y + drawR * 0.14, drawR
+  );
+  grad.addColorStop(0, rgbCss(light));
+  grad.addColorStop(0.45, rgbCss(mid));
+  grad.addColorStop(1, rgbCss(dark));
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  const gloss = ctx.createRadialGradient(
+    x - drawR * 0.32, y - drawR * 0.38, 0,
+    x - drawR * 0.32, y - drawR * 0.38, drawR * 0.55
+  );
+  gloss.addColorStop(0, 'rgba(255,250,230,0.5)');
+  gloss.addColorStop(0.55, 'rgba(255,250,230,0.1)');
+  gloss.addColorStop(1, 'rgba(255,250,230,0)');
+  ctx.fillStyle = gloss;
+  ctx.fill();
+
+  // charge printed on the sphere
+  ctx.font = `600 ${Math.max(11, drawR * 0.62)}px 'IBM Plex Mono',monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(232,230,217,0.95)';
+  ctx.fillText(chargeLabel(q), x, y + 1);
+  ctx.restore();
+}
+
+function inkLine(x1, y1, x2, y2, color, width = 1.25, alpha = 1) {
+  if (alpha <= 0.01) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
   ctx.strokeStyle = color;
-  ctx.globalAlpha = 0.3;
-  ctx.lineWidth = width + 4;
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
   ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
   ctx.stroke();
   ctx.restore();
 }
 
-function glowCircle(x, y, r, color) {
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 15;
-  ctx.fillStyle = color;
-  ctx.globalAlpha = 0.2;
-  ctx.beginPath(); ctx.arc(x,y,r+4,0,Math.PI*2); ctx.fill();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-  ctx.restore();
+function fillPlate() {
+  ctx.clearRect(0, 0, W, H);
 }
 
-function drawGrid(spacing = 40, color = 'rgba(33,29,71,0.6)') {
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1;
-  for(let x = 0; x < W; x += spacing){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for(let y = 0; y < H; y += spacing){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-  ctx.restore();
+function particleHex(which) {
+  return which === 1 ? CHARGE_HEX.left : CHARGE_HEX.right;
 }
 
-// === DISCOVERY GATE SYSTEM ===
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const INTRO = {
+  active: true,
+  done: false,
+  // staged opacities — blank plate until the reveal starts
+  q1: 0,
+  q2: 0,
+  track: 0,
+  eqChrome: 0 // V, =, k, fraction bar
+};
+
+function easeOut(t) {
+  return 1 - Math.pow(1 - t, 2.8);
+}
+
+function fadeTo(setter, duration) {
+  return new Promise(resolve => {
+    if (prefersReduced || duration <= 0) {
+      setter(1);
+      if (ION.active) drawIon();
+      else drawPlate();
+      resolve();
+      return;
+    }
+    const t0 = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - t0) / duration);
+      setter(easeOut(t));
+      if (ION.active) drawIon();
+      else drawPlate();
+      if (t < 1) requestAnimationFrame(frame);
+      else resolve();
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+function wait(ms) {
+  return new Promise(resolve => {
+    if (prefersReduced) resolve();
+    else setTimeout(resolve, ms);
+  });
+}
+
+function waitFrames(n = 2) {
+  return new Promise(resolve => {
+    let left = n;
+    function tick() {
+      if (--left <= 0) resolve();
+      else requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+/** Size the ion canvas only after the final chrome grid is laid out. */
+async function ionLayoutReady(opts = {}) {
+  const useChrome = opts.chrome !== false;
+  if (ionStage) {
+    if (useChrome) ionStage.classList.add('has-chrome');
+    else ionStage.classList.remove('has-chrome');
+  }
+  void (ionStage && ionStage.offsetWidth);
+  await waitFrames(2);
+  ionResize();
+  await waitFrames(1);
+  ionResize();
+}
+
+async function playIntroReveal() {
+  if (prefersReduced) {
+    finishIntro();
+    return;
+  }
+
+  INTRO.active = true;
+  INTRO.done = false;
+  INTRO.q1 = INTRO.q2 = INTRO.track = INTRO.eqChrome = 0;
+  drawPlate();
+
+  // blank → q₁ → q₂ → d → then the rest of the equation fills in
+  await wait(900);
+  await fadeTo(v => { INTRO.q1 = v; }, 1600);
+  await wait(550);
+  await fadeTo(v => { INTRO.q2 = v; }, 1600);
+  await wait(550);
+  await fadeTo(v => { INTRO.track = v; }, 1700);
+  await wait(500);
+  await fadeTo(v => { INTRO.eqChrome = v; }, 1400);
+  await wait(350);
+
+  finishIntro();
+}
+
+function finishIntro() {
+  INTRO.q1 = INTRO.q2 = INTRO.track = INTRO.eqChrome = 1;
+  INTRO.active = false;
+  INTRO.done = true;
+  const playground = document.getElementById('playground');
+  if (playground) {
+    playground.classList.remove('intro-active');
+    playground.classList.add('intro-done');
+  }
+  CLOUD.key = ''; // force rebuild once layout is live
+  drawPlate();
+  kickCloudAnim();
+}
+
 const gates = {};
 function setGate(name, val) {
   gates[name] = val;
@@ -220,77 +1342,2715 @@ function setGate(name, val) {
     const unlocked = required.every(g => gates[g.trim()]);
     el.classList.toggle('discovered', unlocked);
   });
+  if (name === 'moduleComplete' && val) revealDebrief();
 }
 
-// === HELP SYSTEM ===
-const stuckBtn = document.getElementById('stuckBtn');
-const helpPanel = document.getElementById('helpPanel');
-if(stuckBtn && helpPanel) {
-  stuckBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    helpPanel.classList.toggle('open');
+const Q_MIN = -3;
+const Q_MAX = 3;
+const D_MIN = 1;
+const D_MAX = 10;
+const DEFAULTS = { q1: 0, q2: 0, d: 5 };
+
+const STATE = {
+  q1: DEFAULTS.q1,
+  q2: DEFAULTS.q2,
+  d: DEFAULTS.d,
+  dragging: null,
+  didDrag: false
+};
+
+let layout = { x1: 0, x2: 0, y: 0, r: 22, trackL: 0, trackR: 0 };
+
+// signed potential V = q1·q2/d (k folded into the display scale)
+function potential() {
+  return (STATE.q1 * STATE.q2) / STATE.d;
+}
+// Perceptual |V| in 0…1. Coulomb is 1/d — keep that inverse so the d slider
+// is a ~10× move, not the 1/√d the old sqrt map compressed it into.
+// Charge product sets the envelope (with a floor) so ±1 charges still sweep
+// most of the size range; the numeric value of V stays exact.
+function vMag(v) {
+  if (!v) return 0;
+  const product = Math.abs(STATE.q1 * STATE.q2);
+  if (product === 0) return 0;
+  const qN = 0.42 + 0.58 * (product / 9); // 1×1 → 0.48, 3×3 → 1
+  const invD = D_MIN / STATE.d;           // d=1 → 1, d=10 → 0.1
+  return Math.min(1, qN * invD);
+}
+
+function updateLayout() {
+  const pad = Math.max(36, W * 0.08);
+  const r = Math.max(18, Math.min(28, W * 0.038));
+  const trackL = pad;
+  const trackR = W - pad;
+  const maxSpan = trackR - trackL - r * 2.2;
+  const minSpan = maxSpan * 0.16;
+  const t = (STATE.d - D_MIN) / (D_MAX - D_MIN);
+  const span = minSpan + t * (maxSpan - minSpan);
+  const mid = W / 2;
+  const y = H * 0.42; /* leave room for the charge buttons below the track */
+  layout = {
+    x1: mid - span / 2,
+    x2: mid + span / 2,
+    y,
+    r,
+    trackL,
+    trackR
+  };
+}
+
+function dFromSpan(spanPx) {
+  const pad = Math.max(36, W * 0.08);
+  const r = layout.r;
+  const trackL = pad;
+  const trackR = W - pad;
+  const maxSpan = trackR - trackL - r * 2.2;
+  const minSpan = maxSpan * 0.16;
+  const clamped = Math.max(minSpan, Math.min(maxSpan, spanPx));
+  const t = (clamped - minSpan) / (maxSpan - minSpan || 1);
+  return Math.round((D_MIN + t * (D_MAX - D_MIN)) * 10) / 10;
+}
+
+function drawTrack() {
+  const { x1, x2, y } = layout;
+  const a = INTRO.track;
+  // span only between the two charges — grows and shrinks with d
+  inkLine(x1, y, x2, y, INK_LINE, 1.5, a);
+  inkLine(x1, y - 6, x1, y + 6, INK_MID, 1.25, a);
+  inkLine(x2, y - 6, x2, y + 6, INK_MID, 1.25, a);
+}
+
+function hashSeed(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+function mulberry32(a) {
+  return function () {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// attraction: one smooth oval wrapping both particles
+function inAttractCloud(px, py, mid, y, rx, ry) {
+  const nx = (px - mid) / rx;
+  const ny = (py - y) / ry;
+  return nx * nx + ny * ny <= 1;
+}
+
+// repulsion: hourglass / bi-concave — waist pinches harder as the gap grows
+function inBiconcaveCloud(px, py, x1, x2, y, r, halfHMax, pinch) {
+  const left = x1 + r * 0.7;
+  const right = x2 - r * 0.7;
+  if (px < left || px > right) return false;
+  const t = (px - left) / (right - left || 1); // 0 at left particle → 1 at right
+  // sin peaks at mid-gap → minimum height there; pinch ∈ [0,1] scales how narrow
+  const halfH = halfHMax * (1 - pinch * Math.sin(Math.PI * t));
+  return Math.abs(py - y) <= halfH;
+}
+
+function pathAttractOval(mid, y, rx, ry) {
+  ctx.beginPath();
+  ctx.ellipse(mid, y, rx, ry, 0, 0, Math.PI * 2);
+}
+
+function pathBiconcaveWash(x1, x2, y, r, halfHMax, pinch) {
+  const left = x1 + r * 0.7;
+  const right = x2 - r * 0.7;
+  const N = 48;
+  ctx.beginPath();
+  // top edge left → right
+  for (let i = 0; i <= N; i++) {
+    const t = i / N;
+    const px = left + t * (right - left);
+    const halfH = halfHMax * (1 - pinch * Math.sin(Math.PI * t));
+    const py = y - halfH;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  // bottom edge right → left
+  for (let i = N; i >= 0; i--) {
+    const t = i / N;
+    const px = left + t * (right - left);
+    const halfH = halfHMax * (1 - pinch * Math.sin(Math.PI * t));
+    ctx.lineTo(px, y + halfH);
+  }
+  ctx.closePath();
+}
+
+function fillFadedAttract(mid, y, rx, ry, rgb, washA) {
+  ctx.save();
+  ctx.translate(mid, y);
+  ctx.scale(rx, ry);
+  const grad = ctx.createRadialGradient(0, 0, 0.2, 0, 0, 1);
+  grad.addColorStop(0, rgbCss(rgb, washA));
+  grad.addColorStop(0.55, rgbCss(rgb, washA * 0.55));
+  grad.addColorStop(0.82, rgbCss(rgb, washA * 0.18));
+  grad.addColorStop(1, rgbCss(rgb, 0));
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(0, 0, 1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+function fillFadedBiconcave(x1, x2, y, r, halfHMax, pinch, rgb, washA) {
+  const mid = (x1 + x2) / 2;
+  const rx = Math.max(8, (x2 - x1) / 2);
+  ctx.save();
+  pathBiconcaveWash(x1, x2, y, r, halfHMax, pinch);
+  ctx.clip();
+  const grad = ctx.createRadialGradient(mid, y, 0, mid, y, Math.max(rx, halfHMax));
+  grad.addColorStop(0, rgbCss(rgb, washA));
+  grad.addColorStop(0.5, rgbCss(rgb, washA * 0.5));
+  grad.addColorStop(0.85, rgbCss(rgb, washA * 0.15));
+  grad.addColorStop(1, rgbCss(rgb, 0));
+  ctx.fillStyle = grad;
+  ctx.fillRect(x1 - 4, y - halfHMax - 4, (x2 - x1) + 8, halfHMax * 2 + 8);
+  ctx.restore();
+}
+
+const CLOUD = {
+  dots: [],
+  key: '',
+  animId: null,
+  t0: performance.now()
+};
+
+function cloudGeom() {
+  const product = STATE.q1 * STATE.q2;
+  if (!INTRO.done || product === 0) return null;
+  const { x1, x2, y, r } = layout;
+  const sN = vMag(potential());
+  const mid = (x1 + x2) / 2;
+  const gap = x2 - x1;
+
+  if (product < 0) {
+    // oval covers both spheres; thickness and halo track 1/d (sN)
+    const rx = gap / 2 + r * (0.75 + sN * 0.85);
+    const ry = r * (0.7 + sN * 1.55);
+    const padX = rx + 4;
+    const padY = ry + 4;
+    return {
+      mode: 'attract',
+      rgb: hexToRgb(EMBER),
+      sN, x1, x2, y, r, mid, rx, ry,
+      bounds: { x0: mid - padX, y0: y - padY, x1: mid + padX, y1: y + padY },
+      test: (px, py) => inAttractCloud(px, py, mid, y, rx, ry)
+    };
+  }
+
+  // gap fraction across the track — waist pinches as particles stretch apart
+  const minSpan = layout.trackR && layout.trackL
+    ? (layout.trackR - layout.trackL) * 0.12
+    : gap * 0.3;
+  const maxSpan = layout.trackR && layout.trackL
+    ? (layout.trackR - layout.trackL) * 0.85
+    : gap;
+  const gapN = Math.max(0, Math.min(1, (gap - minSpan) / (maxSpan - minSpan || 1)));
+  const halfHMax = 8 + sN * 52;
+  const pinch = 0.2 + gapN * 0.7; // close → mild waist; far → deep hourglass
+  const padY = halfHMax + 6;
+  return {
+    mode: 'repel',
+    rgb: hexToRgb(OLIVE),
+    sN, x1, x2, y, r, mid, halfHMax, pinch,
+    bounds: { x0: x1 + r * 0.4, y0: y - padY, x1: x2 - r * 0.4, y1: y + padY },
+    test: (px, py) => inBiconcaveCloud(px, py, x1, x2, y, r, halfHMax, pinch)
+  };
+}
+
+function rebuildCloudDots() {
+  const g = cloudGeom();
+  const key = g
+    ? `${g.mode}:${STATE.q1}:${STATE.q2}:${STATE.d}:${Math.round(layout.x1)}:${Math.round(layout.x2)}`
+    : '';
+  if (key === CLOUD.key) return;
+  CLOUD.key = key;
+  CLOUD.dots = [];
+  if (!g) return;
+
+  const rand = mulberry32(hashSeed(key));
+  const { x0, y0, x1, y1 } = g.bounds;
+  const w = x1 - x0;
+  const h = y1 - y0;
+  // denser as |V| climbs — shape fill reads through the wash + flecks
+  const target = Math.floor(70 + g.sN * 570);
+  let placed = 0;
+  let attempts = 0;
+  const maxAttempts = target * 8;
+  while (placed < target && attempts < maxAttempts) {
+    attempts++;
+    const bx = x0 + rand() * w;
+    const by = y0 + rand() * h;
+    if (!g.test(bx, by)) continue;
+    CLOUD.dots.push({
+      bx, by,
+      phase: rand() * Math.PI * 2,
+      amp: 1.2 + rand() * (2.2 + g.sN * 2.5),
+      spin: 0.55 + rand() * 1.1
+    });
+    placed++;
+  }
+}
+
+function kickCloudAnim() {
+  const want = !prefersReduced && INTRO.done && STATE.q1 * STATE.q2 !== 0;
+  if (want && CLOUD.animId == null) {
+    CLOUD.t0 = performance.now();
+    CLOUD.animId = requestAnimationFrame(cloudLoop);
+  } else if (!want && CLOUD.animId != null) {
+    cancelAnimationFrame(CLOUD.animId);
+    CLOUD.animId = null;
+  }
+}
+
+function cloudLoop() {
+  CLOUD.animId = null;
+  drawPlate();
+  if (!prefersReduced && INTRO.done && STATE.q1 * STATE.q2 !== 0) {
+    CLOUD.animId = requestAnimationFrame(cloudLoop);
+  }
+}
+
+// wash shape underneath + uniform drifting stipple on top (density ↔ |V|)
+function drawPotentialCloud() {
+  const g = cloudGeom();
+  if (!g) return;
+  rebuildCloudDots();
+
+  const { mode, rgb, sN, x1, x2, y, r } = g;
+  const washA = 0.08 + sN * 0.52;
+  const dotA = 0.28 + sN * 0.55;
+  const DOT_R = 1.35; // fixed fleck size so density carries strength
+  const t = prefersReduced ? 0 : (performance.now() - CLOUD.t0) / 1000;
+  const energy = 0.55 + sN * 1.35; // drift speed climbs with |V|
+
+  ctx.save();
+
+  // 1) faded silhouette — shape reads without looking like stacked circles
+  if (mode === 'attract') {
+    fillFadedAttract(g.mid, y, g.rx, g.ry, rgb, washA);
+  } else {
+    fillFadedBiconcave(x1, x2, y, r, g.halfHMax, g.pinch, rgb, washA);
+  }
+
+  // 2) stipple on top — same size, drifting to read as energy
+  const mid = g.mid;
+  ctx.fillStyle = rgbCss(rgb, dotA);
+  for (let i = 0; i < CLOUD.dots.length; i++) {
+    const d = CLOUD.dots[i];
+    let px, py;
+    if (mode === 'attract') {
+      // orbit / shimmer — energy swirling around the pair
+      const ang = t * energy * d.spin + d.phase;
+      px = d.bx + Math.cos(ang) * d.amp;
+      py = d.by + Math.sin(ang) * d.amp * 0.85;
+    } else {
+      // pulse outward from the mid-gap
+      const outward = Math.sign(d.bx - mid) || 1;
+      const pulse = 0.5 + 0.5 * Math.sin(t * energy * d.spin + d.phase);
+      px = d.bx + outward * pulse * d.amp * 0.9;
+      py = d.by + Math.cos(t * energy * d.spin * 0.8 + d.phase) * d.amp * 0.45;
+    }
+    if (!g.test(px, py)) {
+      px = d.bx;
+      py = d.by;
+    }
+    ctx.beginPath();
+    ctx.arc(px, py, DOT_R, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  if (mode === 'repel') {
+    // outward chevrons so repulsion is not carried by colour alone
+    ctx.strokeStyle = rgbCss(rgb, 0.4 + sN * 0.4);
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
+    const reach = 14 + sN * 22;
+    for (const dir of [-1, 1]) {
+      const baseX = dir < 0 ? x1 - r * 0.9 : x2 + r * 0.9;
+      for (let i = 0; i < 3; i++) {
+        const px = baseX + dir * (4 + (0.25 + i * 0.28) * reach);
+        const spread = 5 + sN * 6 + i * 2;
+        ctx.beginPath();
+        ctx.moveTo(px - dir * 3, y - spread);
+        ctx.lineTo(px, y);
+        ctx.lineTo(px - dir * 3, y + spread);
+        ctx.stroke();
+      }
+    }
+  }
+
+  ctx.restore();
+}
+
+function drawCharges() {
+  const { x1, x2, y, r } = layout;
+  drawSphere(x1, y, r, particleHex(1), STATE.q1, INTRO.q1);
+  drawSphere(x2, y, r, particleHex(2), STATE.q2, INTRO.q2);
+}
+
+const ctrl1 = document.getElementById('ctrl1');
+const ctrl2 = document.getElementById('ctrl2');
+const q1Val = document.getElementById('q1Val');
+const q2Val = document.getElementById('q2Val');
+const dSlider = document.getElementById('dSlider');
+const eqV = document.getElementById('eqV');
+const eqEq = document.getElementById('eqEq');
+const eqK = document.getElementById('eqK');
+const eqNum = document.getElementById('eqNum');
+const eqQ1 = document.getElementById('eqQ1');
+const eqQ2 = document.getElementById('eqQ2');
+const eqD = document.getElementById('eqD');
+
+function positionControls() {
+  const { x1, x2, y, r } = layout;
+  const top = y + r * 1.25 + 14;
+  if (ctrl1) { ctrl1.style.left = x1 + 'px'; ctrl1.style.top = top + 'px'; }
+  if (ctrl2) { ctrl2.style.left = x2 + 'px'; ctrl2.style.top = top + 'px'; }
+}
+
+// equation variables grow and shrink with their current values
+function qScale(q) { return 0.72 + 0.26 * Math.abs(q); }        // |q| 0…3 → 0.72–1.5 em
+function dScale(d) { return 0.72 + 0.1 * d; }                    // d 1…10 → 0.82–1.72 em
+// Signed PE: very negative → LARGE (high PE); very positive → SMALL (low PE).
+// Wide span so 1/d is readable in type — attractive ~3.2em close → ~1.3em far.
+function vScale(v) {
+  const t = -Math.sign(v) * vMag(v); // +1 high PE, −1 low PE
+  return Math.max(0.4, 1.12 + 2.05 * t);
+}
+
+function setEqOpacity(el, a) {
+  if (!el) return;
+  el.style.opacity = String(a);
+}
+
+function syncIntroEquation() {
+  setEqOpacity(eqV, INTRO.eqChrome);
+  setEqOpacity(eqEq, INTRO.eqChrome);
+  setEqOpacity(eqK, INTRO.eqChrome);
+  if (eqNum) eqNum.classList.toggle('eq-bar-on', INTRO.eqChrome > 0.15);
+  setEqOpacity(eqQ1, INTRO.q1);
+  setEqOpacity(eqQ2, INTRO.q2);
+  setEqOpacity(eqD, INTRO.track);
+}
+
+function updateHud() {
+  if (q1Val) q1Val.textContent = chargeLabel(STATE.q1);
+  if (q2Val) q2Val.textContent = chargeLabel(STATE.q2);
+  if (dSlider && Number(dSlider.value) !== STATE.d) dSlider.value = STATE.d;
+
+  syncIntroEquation();
+
+  const v = potential();
+  if (eqQ1) {
+    eqQ1.style.fontSize = qScale(STATE.q1) + 'em';
+    eqQ1.style.color = (!INTRO.done || STATE.q1 !== 0) ? 'var(--signal)' : 'var(--faint)';
+  }
+  if (eqQ2) {
+    eqQ2.style.fontSize = qScale(STATE.q2) + 'em';
+    eqQ2.style.color = (!INTRO.done || STATE.q2 !== 0) ? 'var(--mustard)' : 'var(--faint)';
+  }
+  if (eqD) eqD.style.fontSize = dScale(STATE.d) + 'em';
+  if (eqV) {
+    eqV.style.fontSize = vScale(v) + 'em';
+    if (!INTRO.done || v === 0) {
+      eqV.style.color = 'var(--faint)';
+    } else if (v < 0) {
+      eqV.style.color = 'var(--ember)'; // attractive — high PE
+    } else {
+      eqV.style.color = 'var(--olive-deep)'; // repulsive — low PE
+    }
+  }
+  syncChallengePe(v);
+}
+
+function drawPlate() {
+  if (!W || !H) return;
+  fillPlate();
+  updateLayout();
+  drawTrack();
+  drawPotentialCloud();
+  drawCharges();
+  updateHud();
+  if (INTRO.done) positionControls();
+}
+
+function peScale(v) {
+  // tracks signed V inside the challenge copy (gentler than the equation V)
+  const t = -Math.sign(v) * vMag(v);
+  return Math.max(0.55, 1 + 0.9 * t);
+}
+
+function syncChallengePe(v) {
+  const pe = document.querySelector('#challengeText .challenge-pe');
+  if (!pe) return;
+  const val = v == null ? potential() : v;
+  pe.style.fontSize = peScale(val) + 'em';
+  pe.classList.toggle('is-low', val > 0);
+}
+
+function challengePromptHtml(kwClass, kwWord, kwStyle) {
+  const styleAttr = kwStyle ? ` style="${kwStyle}"` : '';
+  return `Can you <span class="challenge-kw-slot"><span class="challenge-kw ${kwClass}"${styleAttr}>${kwWord}</span></span> the coulombic <span class="challenge-pe">potential energy</span>?`;
+}
+
+function setState(partial) {
+  if (partial.q1 != null) STATE.q1 = Math.max(Q_MIN, Math.min(Q_MAX, partial.q1 | 0));
+  if (partial.q2 != null) STATE.q2 = Math.max(Q_MIN, Math.min(Q_MAX, partial.q2 | 0));
+  if (partial.d != null) {
+    STATE.d = Math.round(Math.max(D_MIN, Math.min(D_MAX, partial.d)) * 10) / 10;
+  }
+  CLOUD.key = ''; // geometry may have changed
+  drawPlate();
+  kickCloudAnim();
+  checkChallengeGoals();
+}
+
+// --- Explore → maximize → minimize → bridge → hydrogen ---
+// After 8 control actions, ask them to push V to its extremes.
+// Then name Coulomb's law and bridge into the atom stage.
+const CHALLENGE = {
+  phase: 'explore', // explore | maximize | minimize | done
+  bridgeStep: 0, // 0 = law explainer, 1 = atom bridge
+  interactions: 0,
+  need: 8
+};
+
+const challengeEl = document.getElementById('challenge');
+const challengeText = document.getElementById('challengeText');
+const sandboxNext = document.getElementById('sandboxNext');
+const part2 = document.getElementById('part2');
+
+const BRIDGE_LAW = `<p class="challenge-bridge">According to Coulomb’s law, the potential energy (<span class="eq-v">V</span>) of two stationary charged particles is given by the equation seen here. <span class="eq-sym">q<sub>1</sub></span> and <span class="eq-sym">q<sub>2</sub></span> represent the charges on the particles and <span class="eq-sym">d</span> is the distance between them.</p>`;
+const BRIDGE_ATOM = `<p class="challenge-bridge">We can apply this concept to an atom as well, looking at the attraction of an electron to a nucleus.</p>`;
+
+function isMaximizeTarget() {
+  // opposite extremes at closest approach → most negative V (reads as largest / high PE)
+  return Math.abs(STATE.q1) === Q_MAX
+    && Math.abs(STATE.q2) === Q_MAX
+    && STATE.q1 * STATE.q2 < 0
+    && STATE.d <= D_MIN + 0.001;
+}
+
+function isMinimizeTarget() {
+  // same-sign extremes at farthest separation → V nearest zero (low PE)
+  return Math.abs(STATE.q1) === Q_MAX
+    && Math.abs(STATE.q2) === Q_MAX
+    && STATE.q1 * STATE.q2 > 0
+    && STATE.d >= D_MAX - 0.001;
+}
+
+function setChallengeNote(visible) {
+  const note = document.getElementById('challengeNote');
+  if (note) note.hidden = !visible;
+}
+
+function renderMaximizePrompt() {
+  challengeText.innerHTML = challengePromptHtml('is-max', 'maximize');
+  setChallengeNote(true);
+  syncChallengePe();
+}
+
+async function swapToMinimizePrompt() {
+  const slot = challengeText.querySelector('.challenge-kw-slot');
+  const oldKw = challengeText.querySelector('.challenge-kw');
+  setChallengeNote(true);
+  if (!slot || !oldKw || !oldKw.classList.contains('is-max')) {
+    challengeText.innerHTML = challengePromptHtml('is-min', 'minimize', 'transform:scale(0.9)');
+    syncChallengePe();
+    return;
+  }
+
+  if (prefersReduced) {
+    oldKw.textContent = 'minimize';
+    oldKw.className = 'challenge-kw is-min';
+    oldKw.style.transform = 'scale(0.9)';
+    syncChallengePe();
+    return;
+  }
+
+  oldKw.classList.add('is-fading');
+  await wait(400);
+  if (CHALLENGE.phase !== 'minimize') return;
+
+  const next = document.createElement('span');
+  next.className = 'challenge-kw is-min is-entering';
+  next.textContent = 'minimize';
+  slot.appendChild(next);
+  // keep fading maximize underneath until pop-in finishes, then remove it
+  await wait(850);
+  if (CHALLENGE.phase !== 'minimize') return;
+  oldKw.remove();
+  next.classList.remove('is-entering');
+  next.style.transform = 'scale(0.9)';
+  syncChallengePe();
+}
+
+function renderBridgeStep(step) {
+  if (!challengeEl || !challengeText) return;
+  CHALLENGE.bridgeStep = step;
+  challengeEl.classList.add('is-bridge');
+  setChallengeNote(false);
+  if (step === 0) {
+    challengeText.innerHTML = BRIDGE_LAW;
+    if (sandboxNext) {
+      sandboxNext.hidden = false;
+      sandboxNext.textContent = 'Next →';
+    }
+  } else {
+    challengeText.innerHTML = BRIDGE_ATOM;
+    if (sandboxNext) {
+      sandboxNext.hidden = false;
+      sandboxNext.textContent = 'Next → Hydrogen';
+    }
+  }
+}
+
+function showChallenge(phase) {
+  if (!challengeEl || !challengeText) return;
+  const prev = CHALLENGE.phase;
+  if (prev === phase) return;
+  CHALLENGE.phase = phase;
+  challengeEl.hidden = false;
+  challengeEl.classList.toggle('phase-min', phase === 'minimize' || phase === 'done');
+  challengeEl.classList.toggle('is-bridge', phase === 'done');
+
+  if (phase === 'maximize') {
+    renderMaximizePrompt();
+    if (sandboxNext) sandboxNext.hidden = true;
+  } else if (phase === 'minimize') {
+    if (prev === 'maximize') {
+      swapToMinimizePrompt();
+    } else {
+      challengeText.innerHTML = challengePromptHtml('is-min', 'minimize', 'transform:scale(0.9)');
+      setChallengeNote(true);
+      syncChallengePe();
+    }
+    if (sandboxNext) sandboxNext.hidden = true;
+  } else if (phase === 'done') {
+    renderBridgeStep(0);
+  }
+
+  // if they already sit on the target when the prompt appears, advance once
+  checkChallengeGoals();
+}
+
+function onSandboxNext() {
+  if (sandboxNext && sandboxNext.dataset.returnDebrief === '1') {
+    delete sandboxNext.dataset.returnDebrief;
+    revealDebrief();
+    return;
+  }
+  if (CHALLENGE.phase === 'done' && CHALLENGE.bridgeStep === 0) {
+    renderBridgeStep(1);
+    return;
+  }
+  goToPart2();
+}
+
+function noteInteraction() {
+  if (!INTRO.done) return;
+  if (CHALLENGE.phase !== 'explore') return;
+  CHALLENGE.interactions += 1;
+  if (CHALLENGE.interactions >= CHALLENGE.need) {
+    showChallenge('maximize');
+  }
+}
+
+function checkChallengeGoals() {
+  if (CHALLENGE.phase === 'maximize' && isMaximizeTarget()) {
+    showChallenge('minimize');
+  } else if (CHALLENGE.phase === 'minimize' && isMinimizeTarget()) {
+    showChallenge('done');
+  }
+}
+
+async function goToPart2() {
+  if (!part2) return;
+  const playground = document.getElementById('playground');
+  if (playground && !playground.hidden) {
+    if (!prefersReduced) {
+      playground.classList.add('is-leaving');
+      await wait(750);
+    }
+    playground.hidden = true;
+    stopIonLoop(); // no-op if not running; keeps part1 cloud from fighting focus
+    if (CLOUD.animId != null) {
+      cancelAnimationFrame(CLOUD.animId);
+      CLOUD.animId = null;
+    }
+  }
+  if (sandboxNext) sandboxNext.hidden = true;
+  if (challengeEl) challengeEl.hidden = true;
+  part2.hidden = false;
+  part2.classList.remove('is-live');
+  if (ionFraming) {
+    ionFraming.textContent = '';
+    ionFraming.classList.remove('is-shown');
+  }
+  // force reflow so the opacity transition runs
+  void part2.offsetWidth;
+  part2.classList.add('is-live');
+  if (!prefersReduced) await wait(120);
+  part2.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+  await startIonStage('H');
+}
+
+document.getElementById('q1Minus').addEventListener('click', () => {
+  noteInteraction();
+  setState({ q1: STATE.q1 - 1 });
+});
+document.getElementById('q1Plus').addEventListener('click', () => {
+  noteInteraction();
+  setState({ q1: STATE.q1 + 1 });
+});
+document.getElementById('q2Minus').addEventListener('click', () => {
+  noteInteraction();
+  setState({ q2: STATE.q2 - 1 });
+});
+document.getElementById('q2Plus').addEventListener('click', () => {
+  noteInteraction();
+  setState({ q2: STATE.q2 + 1 });
+});
+if (dSlider) {
+  // one drag / click on the track counts as one poke, not every input tick
+  let dGestureCounted = false;
+  dSlider.addEventListener('pointerdown', () => { dGestureCounted = false; });
+  dSlider.addEventListener('input', () => {
+    if (!dGestureCounted) {
+      noteInteraction();
+      dGestureCounted = true;
+    }
+    setState({ d: Number(dSlider.value) });
   });
+}
+if (sandboxNext) sandboxNext.addEventListener('click', onSandboxNext);
+
+function canvasPoint(e) {
+  const rect = canvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: (clientX - rect.left) * (W / rect.width),
+    y: (clientY - rect.top) * (H / rect.height)
+  };
+}
+
+function hitCharge(pt) {
+  const { x1, x2, y, r } = layout;
+  const hitR = r + 10;
+  if (Math.hypot(pt.x - x1, pt.y - y) <= hitR) return 1;
+  if (Math.hypot(pt.x - x2, pt.y - y) <= hitR) return 2;
+  return null;
+}
+
+function onPointerDown(e) {
+  if (!INTRO.done) return;
+  updateLayout();
+  const pt = canvasPoint(e);
+  const hit = hitCharge(pt);
+  if (!hit) return;
+  STATE.dragging = hit;
+  STATE.didDrag = false;
+  canvas.classList.add('dragging');
+  if (e.cancelable) e.preventDefault();
+}
+
+function onPointerMove(e) {
+  if (!STATE.dragging) return;
+  STATE.didDrag = true;
+  const pt = canvasPoint(e);
+  const mid = W / 2;
+  const span = Math.abs(pt.x - mid) * 2;
+  setState({ d: dFromSpan(span) });
+  if (e.cancelable) e.preventDefault();
+}
+
+function onPointerUp() {
+  STATE.dragging = null;
+  STATE.didDrag = false;
+  canvas.classList.remove('dragging');
+}
+
+canvas.addEventListener('mousedown', onPointerDown);
+window.addEventListener('mousemove', onPointerMove);
+window.addEventListener('mouseup', onPointerUp);
+canvas.addEventListener('touchstart', onPointerDown, { passive: false });
+window.addEventListener('touchmove', onPointerMove, { passive: false });
+window.addEventListener('touchend', onPointerUp);
+
+canvas.tabIndex = 0;
+canvas.addEventListener('keydown', (e) => {
+  if (!INTRO.done) return;
+  if (e.key === 'ArrowLeft') {
+    setState({ d: STATE.d - 0.2 });
+    e.preventDefault();
+  } else if (e.key === 'ArrowRight') {
+    setState({ d: STATE.d + 0.2 });
+    e.preventDefault();
+  }
+});
+
+// =============================================================================
+// Part 2 — ionization stage (pull electron free; IE meter ↔ |V|)
+// =============================================================================
+const ionCanvas = document.getElementById('ionCanvas');
+const ictx = ionCanvas ? ionCanvas.getContext('2d') : null;
+const ionStage = document.getElementById('ionStage');
+const ionFraming = document.getElementById('ionFraming');
+const ionHint = document.getElementById('ionHint');
+const ionReset = document.getElementById('ionReset');
+const ionNext = document.getElementById('ionNext');
+const ieMeterFill = document.getElementById('ieMeterFill');
+const ieMeterVal = document.getElementById('ieMeterVal');
+const ieMeterTick = document.getElementById('ieMeterTick');
+const ieMeterTickLabel = document.getElementById('ieMeterTickLabel');
+const ieMeterLabel = document.getElementById('ieMeterLabel');
+const ionVValue = document.getElementById('ionVValue');
+const ionEqQ1 = document.getElementById('ionEqQ1');
+const ionEqWrap = document.getElementById('ionEqWrap');
+const ionCompare = document.getElementById('ionCompare');
+const ionFinish = document.getElementById('ionFinish');
+const finaleTextQ = document.getElementById('finaleTextQ');
+const finaleTextLi = document.getElementById('finaleTextLi');
+
+// §8.3 first ionization energies (MJ/mol) for H / He.
+// Li pull-stage is the hypothetical same-shell arrangement (not measured Li IE).
+const ION_ATOMS = {
+  H: {
+    id: 'H',
+    name: 'hydrogen',
+    Z: 1,
+    ie: 1.31,
+    protons: 1,
+    orbitR: 0.32,
+    omega: 0.48,
+    stiff: 1.15,
+    sharedElectrons: 1,
+    framing: 'Here is a hydrogen atom. Grab the electron and see what it takes to pull it free.',
+    aria: 'Hydrogen atom. Grab the electron and drag it away from the nucleus.',
+    nextLabel: 'Next → Helium'
+  },
+  He: {
+    id: 'He',
+    name: 'helium',
+    Z: 2,
+    ie: 2.37,
+    protons: 2,
+    orbitR: 0.24,
+    omega: 0.42,
+    stiff: 1.55,
+    // both electrons share one shell — one grabable, one decorative
+    sharedElectrons: 2,
+    framing: 'Now helium. Two electrons share the same shell — grab one and feel how the energy compares.',
+    aria: 'Helium atom with two electrons in the same shell. Grab one electron and drag it away from the nucleus.',
+    nextLabel: 'Next →'
+  },
+  Li: {
+    id: 'Li',
+    name: 'lithium',
+    Z: 3,
+    // pedagogical barrier for the same-shell arrangement (not §8.3 Li IE)
+    ie: 3.50,
+    protons: 3,
+    orbitR: 0.18,
+    omega: 0.38,
+    stiff: 1.65,
+    sharedElectrons: 3,
+    hypo: true,
+    framing: 'Three electrons around a +3 nucleus, all at the same distance. Grab one.',
+    aria: 'Lithium arrangement with three electrons in the same shell. Grab one electron and drag it away from the nucleus.',
+    nextLabel: null
+  }
+};
+
+const ION = {
+  active: false,
+  atomId: 'H',
+  // reveal opacities
+  fadeAtom: 0,
+  fadeOval: 0,
+  fadeEq: 0,
+  fadeMeter: 0,
+  // geometry (css px)
+  iW: 0,
+  iH: 0,
+  cx: 0,
+  cy: 0,
+  // outer (valence) electron
+  angle: -Math.PI * 0.35,
+  shellAngle: -Math.PI * 0.35,
+  ex: 0,
+  ey: 0,
+  evx: 0,
+  evy: 0,
+  rNow: 0,
+  // inner-shell electrons (Li only) — decorative, not interactive
+  innerAngle: Math.PI * 0.15,
+  // interaction
+  mode: 'idle', // idle | drag | snap | fling | gone | finale
+  phase: 'pull', // pull | finale
+  pointer: null, // {x,y} while dragging
+  energy: 0, // MJ/mol put in
+  namedIE: false,
+  doneH: false,
+  doneHe: false,
+  doneLi: false,
+  comparePlaying: false,
+  // branched finale opacities / layout
+  finFadeH: 0,
+  finFadeHe: 0,
+  finFadeLiA: 0,
+  finFadeLiB: 0,
+  finFadeArrows: 0,
+  finFadeEqH: 0,
+  finFadeEqHe: 0,
+  finFadeEqLiA: 0,
+  finFadeEqLiB: 0,
+  finPairT: 0, // 0 = branch positions, 1 = side-by-side Lis
+  finAngH: -Math.PI * 0.35,
+  finAngHe: -Math.PI * 0.2,
+  finAngA: -Math.PI * 0.4,
+  finAngB: -Math.PI * 0.35,
+  animId: null,
+  lastT: 0,
+  actionTimer: null,
+  idleTimer: null,
+  sawInteract: false,
+  instructionShown: false,
+  // failed pull-backs before coaching text (Hydrogen stays quiet at first)
+  pullAttempts: 0,
+  // true while settling layout / fading in — ignore ResizeObserver snaps
+  layoutLock: false
+};
+
+const ION_CLOUD = {
+  dots: [],
+  key: '',
+  t0: performance.now()
+};
+
+// Li inner-shell density — soft orb around nucleus + 1s pair (not the attract oval)
+const ION_SHELL = {
+  dots: [],
+  key: '',
+  t0: performance.now()
+};
+
+function atomDef() {
+  return ION_ATOMS[ION.atomId] || ION_ATOMS.H;
+}
+
+function ionResize() {
+  if (!ionCanvas || !ictx) return;
+  const d = window.devicePixelRatio || 1;
+  const parent = ionCanvas.parentElement;
+
+  // Read the CSS box after width:100% / max-width layout — never size the
+  // backing store from the unconstrained parent (that squashes the atom
+  // while max-width:40rem is clamping the display).
+  ionCanvas.style.width = '100%';
+  ionCanvas.style.height = ionCanvas.style.height || '360px';
+  void ionCanvas.offsetWidth; // flush layout
+  let w = Math.round(ionCanvas.getBoundingClientRect().width);
+  if (!w || w < 80) {
+    w = Math.round((parent && parent.clientWidth) || 420);
+  }
+  if (w < 120) w = 320;
+  const h = ION.phase === 'finale'
+    ? Math.min(Math.max(w * 0.56, 400), 600)
+    : Math.min(Math.max(w * 0.62, 360), 560);
+
+  ION.iW = w;
+  ION.iH = h;
+  ionCanvas.width = Math.round(w * d);
+  ionCanvas.height = Math.round(h * d);
+  // Lock CSS pixels to the drawing coordinate system (no stretch)
+  ionCanvas.style.width = w + 'px';
+  ionCanvas.style.height = h + 'px';
+  ictx.setTransform(d, 0, 0, d, 0, 0);
+  ION.cx = w * 0.5;
+  ION.cy = h * 0.52;
+  if (ION.phase !== 'finale' && (ION.mode === 'idle' || ION.mode === 'snap')) {
+    placeElectronOnOrbit();
+  }
+  ION_CLOUD.key = '';
+  ION_SHELL.key = '';
+  syncIonMeterChrome();
+  drawIon();
+}
+
+function ionEdgeRoom() {
+  // farthest the electron can travel and still stay on the plate
+  return Math.max(
+    40,
+    Math.min(ION.cx, ION.iW - ION.cx, ION.cy, ION.iH - ION.cy) - 16
+  );
+}
+
+function ionPullRadii() {
+  const a = atomDef();
+  const base = Math.min(ION.iW, ION.iH);
+  const r0 = a.orbitR * base;
+  const edge = ionEdgeRoom();
+  // IE is reached before the rim — fight stays on-plate
+  const span = Math.max(28, Math.min(
+    base * (0.2 + a.stiff * 0.08),
+    edge - r0 - 8
+  ));
+  const rFull = r0 + span;
+  const maxR = Math.min(edge, rFull + base * 0.04);
+  return { r0, rFull, maxR };
+}
+
+function placeElectronOnOrbit() {
+  const a = atomDef();
+  const r = a.orbitR * Math.min(ION.iW, ION.iH);
+  ION.rNow = r;
+  ION.ex = ION.cx + Math.cos(ION.angle) * r;
+  ION.ey = ION.cy + Math.sin(ION.angle) * r;
+  ION.evx = 0;
+  ION.evy = 0;
+}
+
+function syncIonMeterChrome() {
+  const a = atomDef();
+  if (ionVValue) ionVValue.textContent = a.ie.toFixed(2);
+  if (ionEqQ1) ionEqQ1.textContent = a.Z === 1 ? '+1' : `+${a.Z}`;
+  // keep the Coulomb fraction visible so q₁ climbing H → He → Li is readable
+  if (ionEqWrap) ionEqWrap.classList.remove('no-eq');
+  if (ieMeterTick) {
+    // tick at IE / maxScale — maxScale is slightly above IE so the bar has headroom
+    const maxScale = a.ie * 1.08;
+    const pct = (a.ie / maxScale) * 100;
+    ieMeterTick.style.bottom = pct + '%';
+  }
+  if (ieMeterTickLabel) ieMeterTickLabel.textContent = `V ${a.ie.toFixed(2)}`;
+  updateIeMeterDom();
+}
+
+function updateIeMeterDom() {
+  const a = atomDef();
+  const maxScale = a.ie * 1.08;
+  const pct = Math.max(0, Math.min(100, (ION.energy / maxScale) * 100));
+  if (ieMeterFill) ieMeterFill.style.height = pct + '%';
+  if (ieMeterVal) ieMeterVal.textContent = ION.energy.toFixed(2);
+  if (ieMeterLabel) {
+    ieMeterLabel.textContent = ION.namedIE ? 'IE' : 'Energy in';
+  }
+}
+
+function drawSoftOrb(x, y, r, hex, alpha = 1) {
+  if (!ictx || alpha <= 0.01) return;
+  const rgb = hexToRgb(hex);
+  const light = mixRgb(rgb, [255, 246, 220], 0.58);
+  const dark = mixRgb(rgb, [18, 14, 8], 0.48);
+  ictx.save();
+  ictx.globalAlpha = alpha;
+  ictx.beginPath();
+  ictx.arc(x, y, r, 0, Math.PI * 2);
+  const grad = ictx.createRadialGradient(
+    x - r * 0.32, y - r * 0.38, r * 0.08,
+    x + r * 0.08, y + r * 0.14, r
+  );
+  grad.addColorStop(0, rgbCss(light));
+  grad.addColorStop(0.45, rgbCss(rgb));
+  grad.addColorStop(1, rgbCss(dark));
+  ictx.fillStyle = grad;
+  ictx.fill();
+  const gloss = ictx.createRadialGradient(
+    x - r * 0.32, y - r * 0.38, 0,
+    x - r * 0.32, y - r * 0.38, r * 0.55
+  );
+  gloss.addColorStop(0, 'rgba(255,250,230,0.5)');
+  gloss.addColorStop(0.55, 'rgba(255,250,230,0.1)');
+  gloss.addColorStop(1, 'rgba(255,250,230,0)');
+  ictx.fillStyle = gloss;
+  ictx.fill();
+  ictx.restore();
+}
+
+function drawNucleus() {
+  const a = atomDef();
+  const alpha = ION.fadeAtom;
+  const base = Math.min(ION.iW, ION.iH);
+  const pR = Math.max(6, base * 0.020);
+  if (a.protons === 1) {
+    drawSoftOrb(ION.cx, ION.cy, pR * 1.35, '#a85a32', alpha);
+    return;
+  }
+  if (a.protons === 2) {
+    const spread = pR * 0.85;
+    drawSoftOrb(ION.cx - spread * 0.55, ION.cy, pR, '#a85a32', alpha);
+    drawSoftOrb(ION.cx + spread * 0.55, ION.cy, pR, '#a85a32', alpha);
+    return;
+  }
+  // lithium — three soft protons clustered
+  const spread = pR * 0.95;
+  const spots = [
+    { x: ION.cx - spread * 0.55, y: ION.cy - spread * 0.35 },
+    { x: ION.cx + spread * 0.55, y: ION.cy - spread * 0.35 },
+    { x: ION.cx, y: ION.cy + spread * 0.55 }
+  ];
+  spots.forEach(s => drawSoftOrb(s.x, s.y, pR, '#a85a32', alpha));
+}
+
+function innerShellGeom() {
+  const a = atomDef();
+  if (!a.innerElectrons || ION.fadeAtom <= 0.01) return null;
+  const base = Math.min(ION.iW, ION.iH);
+  const innerR = (a.innerOrbitR || 0.105) * base;
+  const eR = Math.max(3.8, base * 0.011);
+  // soft orb that just covers nucleus + the two inner electrons
+  const r = innerR + eR * 2.6 + Math.max(7, base * 0.02);
+  const shellA = ION.fadeAtom * 0.95;
+  return { r, shellA, innerR };
+}
+
+function rebuildInnerShellDots(g) {
+  if (!g) {
+    ION_SHELL.dots = [];
+    ION_SHELL.key = '';
+    return;
+  }
+  const key = `${ION.atomId}:${Math.round(g.r)}`;
+  if (key === ION_SHELL.key) return;
+  ION_SHELL.key = key;
+  ION_SHELL.dots = [];
+  const rand = mulberry32(hashSeed(key + ':shell'));
+  // sparse — a hint of a shell, not a solid cloud
+  const target = Math.floor(110 + g.r * 0.85);
+  let placed = 0;
+  let attempts = 0;
+  while (placed < target && attempts < target * 14) {
+    attempts++;
+    const u = rand();
+    const v = rand();
+    // bias density toward the rim (shell-like), leave the nucleus clearer
+    const rr = Math.sqrt(0.22 + u * 0.78);
+    const th = v * Math.PI * 2;
+    const lx = Math.cos(th) * rr;
+    const ly = Math.sin(th) * rr;
+    ION_SHELL.dots.push({
+      lx, ly,
+      phase: rand() * Math.PI * 2,
+      amp: 0.01 + rand() * 0.028,
+      spin: 0.35 + rand() * 0.75
+    });
+    placed++;
+  }
+}
+
+function drawInnerShellCloud() {
+  const g = innerShellGeom();
+  if (!g) return;
+  rebuildInnerShellDots(g);
+
+  // yellowish density — distinct from the ember attract oval
+  const rgb = hexToRgb('#d2b84a');
+  const washA = 0.22;
+  const dotA = 0.4;
+  const DOT_R = 1.1;
+  const t = prefersReduced ? 0 : (performance.now() - ION_SHELL.t0) / 1000;
+  const energy = 0.4;
+
+  // circular wash around the nucleus + inner pair (still quieter than attract oval)
+  ictx.save();
+  ictx.translate(ION.cx, ION.cy);
+  ictx.globalAlpha = g.shellA;
+  const wash = ictx.createRadialGradient(0, 0, g.r * 0.1, 0, 0, g.r);
+  wash.addColorStop(0, rgbCss(rgb, washA * 0.4));
+  wash.addColorStop(0.45, rgbCss(rgb, washA * 0.85));
+  wash.addColorStop(0.72, rgbCss(rgb, washA));
+  wash.addColorStop(1, rgbCss(rgb, 0));
+  ictx.fillStyle = wash;
+  ictx.beginPath();
+  ictx.arc(0, 0, g.r, 0, Math.PI * 2);
+  ictx.fill();
+
+  // flecks — darker, still subordinate to the attract oval
+  ictx.fillStyle = rgbCss(rgb, dotA);
+  for (let i = 0; i < ION_SHELL.dots.length; i++) {
+    const d = ION_SHELL.dots[i];
+    const ang = t * energy * d.spin + d.phase;
+    let lx = d.lx + Math.cos(ang) * d.amp;
+    let ly = d.ly + Math.sin(ang) * d.amp * 0.9;
+    const rr = lx * lx + ly * ly;
+    if (rr > 1) {
+      lx = d.lx;
+      ly = d.ly;
+    }
+    ictx.beginPath();
+    ictx.arc(lx * g.r, ly * g.r, DOT_R, 0, Math.PI * 2);
+    ictx.fill();
+  }
+  ictx.restore();
+}
+
+function drawInnerElectrons() {
+  const a = atomDef();
+  if (!a.innerElectrons || ION.fadeAtom <= 0.01) return;
+  const base = Math.min(ION.iW, ION.iH);
+  const r = (a.innerOrbitR || 0.105) * base;
+  const eR = Math.max(3.8, base * 0.011);
+  const alpha = ION.fadeAtom * 0.95;
+  const n = a.innerElectrons;
+  for (let i = 0; i < n; i++) {
+    const ang = ION.innerAngle + (i * Math.PI * 2) / n;
+    const x = ION.cx + Math.cos(ang) * r;
+    const y = ION.cy + Math.sin(ang) * r;
+    drawSoftOrb(x, y, eR, '#c4a35a', alpha);
+    if (alpha > 0.4) {
+      ictx.save();
+      ictx.globalAlpha = alpha;
+      ictx.fillStyle = 'rgba(12,18,8,0.7)';
+      ictx.font = `600 ${Math.max(9, eR * 0.9)}px 'IBM Plex Mono',monospace`;
+      ictx.textAlign = 'center';
+      ictx.textBaseline = 'middle';
+      ictx.fillText('−', x, y + 0.4);
+      ictx.restore();
+    }
+  }
+}
+
+/** Decorative co-shell electrons (He, same-shell Li) — stay on the home ring. */
+function drawSharedShellElectrons() {
+  const a = atomDef();
+  const n = a.sharedElectrons || 1;
+  if (n <= 1 || ION.fadeAtom <= 0.01) return;
+  const base = Math.min(ION.iW, ION.iH);
+  const r0 = a.orbitR * base;
+  const eR = Math.max(4.2, base * 0.012);
+  const alpha = ION.fadeAtom * 0.92;
+  for (let i = 1; i < n; i++) {
+    const ang = ION.shellAngle + (i * Math.PI * 2) / n;
+    const x = ION.cx + Math.cos(ang) * r0;
+    const y = ION.cy + Math.sin(ang) * r0;
+    drawSoftOrb(x, y, eR, '#c4a35a', alpha);
+    if (alpha > 0.4) {
+      ictx.save();
+      ictx.globalAlpha = alpha;
+      ictx.fillStyle = 'rgba(12,18,8,0.7)';
+      ictx.font = `600 ${Math.max(9, eR * 0.9)}px 'IBM Plex Mono',monospace`;
+      ictx.textAlign = 'center';
+      ictx.textBaseline = 'middle';
+      ictx.fillText('−', x, y + 0.4);
+      ictx.restore();
+    }
+  }
+}
+
+function ionCloudGeom() {
+  if (ION.fadeOval <= 0.01 || ION.mode === 'gone') return null;
+  const a = atomDef();
+  const dx = ION.ex - ION.cx;
+  const dy = ION.ey - ION.cy;
+  const dist = Math.hypot(dx, dy) || 1;
+  const midX = (ION.cx + ION.ex) / 2;
+  const midY = (ION.cy + ION.ey) / 2;
+  const ang = Math.atan2(dy, dx);
+  const base = Math.min(ION.iW, ION.iH);
+  const pR = Math.max(6, base * 0.020) * 1.2;
+  const eR = Math.max(4.5, base * 0.013);
+  // match Part 1 attract oval: covers both spheres with a little padding past each rim
+  const rx = dist / 2 + Math.max(pR, eR) * 1.25;
+  const ry = Math.max(pR, eR) * (1.35 + a.orbitR * 0.35);
+  const energyFrac = Math.min(1, ION.energy / a.ie);
+  const ovalA = ION.fadeOval * (1 - energyFrac * 0.92) * (ION.mode === 'fling' ? 0.15 : 1);
+  if (ovalA <= 0.01) return null;
+  const sN = 0.55 + (1 - energyFrac) * 0.35;
+  return { midX, midY, ang, rx, ry, ovalA, sN, energyFrac };
+}
+
+function rebuildIonCloudDots(g) {
+  if (!g) {
+    ION_CLOUD.dots = [];
+    ION_CLOUD.key = '';
+    return;
+  }
+  const key = `${Math.round(g.rx)}:${Math.round(g.ry)}:${ION.atomId}`;
+  if (key === ION_CLOUD.key) return;
+  ION_CLOUD.key = key;
+  ION_CLOUD.dots = [];
+  const rand = mulberry32(hashSeed(key + ':ion'));
+  const target = Math.floor(180 + g.sN * 320);
+  let placed = 0;
+  let attempts = 0;
+  while (placed < target && attempts < target * 10) {
+    attempts++;
+    // unit disk, then stretch to ellipse
+    const u = rand();
+    const v = rand();
+    const rr = Math.sqrt(u);
+    const th = v * Math.PI * 2;
+    const lx = Math.cos(th) * rr;
+    const ly = Math.sin(th) * rr;
+    if (lx * lx + ly * ly > 1) continue;
+    ION_CLOUD.dots.push({
+      lx, ly,
+      phase: rand() * Math.PI * 2,
+      amp: 0.012 + rand() * (0.02 + g.sN * 0.025),
+      spin: 0.55 + rand() * 1.1
+    });
+    placed++;
+  }
+}
+
+function fillIonAttractWash(g, rgb, washA) {
+  ictx.save();
+  ictx.translate(g.midX, g.midY);
+  ictx.rotate(g.ang);
+  ictx.scale(g.rx, g.ry);
+  ictx.globalAlpha = g.ovalA;
+  const grad = ictx.createRadialGradient(0, 0, 0.2, 0, 0, 1);
+  grad.addColorStop(0, rgbCss(rgb, washA));
+  grad.addColorStop(0.55, rgbCss(rgb, washA * 0.55));
+  grad.addColorStop(0.82, rgbCss(rgb, washA * 0.18));
+  grad.addColorStop(1, rgbCss(rgb, 0));
+  ictx.fillStyle = grad;
+  ictx.beginPath();
+  ictx.arc(0, 0, 1, 0, Math.PI * 2);
+  ictx.fill();
+  ictx.restore();
+}
+
+function drawVOval() {
+  const g = ionCloudGeom();
+  if (!g) return;
+  rebuildIonCloudDots(g);
+
+  const rgb = hexToRgb(EMBER);
+  const washA = 0.04 + g.sN * 0.1;
+  const dotA = 0.1 + g.sN * 0.12;
+  const DOT_R = 1.05;
+  const t = prefersReduced ? 0 : (performance.now() - ION_CLOUD.t0) / 1000;
+  const energy = 0.55 + g.sN * 1.35;
+
+  // faded silhouette — same attract wash as Part 1 (no outline)
+  fillIonAttractWash(g, rgb, washA);
+
+  // drifting flecks, same recipe as Part 1
+  ictx.save();
+  ictx.translate(g.midX, g.midY);
+  ictx.rotate(g.ang);
+  ictx.globalAlpha = g.ovalA;
+  ictx.fillStyle = rgbCss(rgb, dotA);
+  for (let i = 0; i < ION_CLOUD.dots.length; i++) {
+    const d = ION_CLOUD.dots[i];
+    const ang = t * energy * d.spin + d.phase;
+    let lx = d.lx + Math.cos(ang) * d.amp;
+    let ly = d.ly + Math.sin(ang) * d.amp * 0.85;
+    if (lx * lx + ly * ly > 1) {
+      lx = d.lx;
+      ly = d.ly;
+    }
+    ictx.beginPath();
+    ictx.arc(lx * g.rx, ly * g.ry, DOT_R, 0, Math.PI * 2);
+    ictx.fill();
+  }
+  ictx.restore();
+}
+
+function drawIonElectron() {
+  if (ION.mode === 'gone') return;
+  const base = Math.min(ION.iW, ION.iH);
+  const eR = Math.max(4.5, base * 0.013);
+  const alpha = ION.fadeAtom;
+  drawSoftOrb(ION.ex, ION.ey, eR, '#c4a35a', alpha);
+  if (alpha > 0.4) {
+    ictx.save();
+    ictx.globalAlpha = alpha;
+    ictx.fillStyle = 'rgba(12,18,8,0.75)';
+    ictx.font = `600 ${Math.max(11, eR * 0.95)}px 'IBM Plex Mono',monospace`;
+    ictx.textAlign = 'center';
+    ictx.textBaseline = 'middle';
+    ictx.fillText('−', ION.ex, ION.ey + 0.5);
+    ictx.restore();
+  }
+}
+
+/** Soft yellowish density around a finale-plate nucleus (real Li). */
+function drawFinaleShieldCloud(cx, cy, r, alpha) {
+  if (!ictx || alpha <= 0.01 || r <= 0) return;
+  const rgb = hexToRgb('#d2b84a');
+  ictx.save();
+  ictx.translate(cx, cy);
+  ictx.globalAlpha = alpha;
+  const wash = ictx.createRadialGradient(0, 0, r * 0.12, 0, 0, r);
+  wash.addColorStop(0, rgbCss(rgb, 0.12));
+  wash.addColorStop(0.42, rgbCss(rgb, 0.28));
+  wash.addColorStop(0.72, rgbCss(rgb, 0.2));
+  wash.addColorStop(1, rgbCss(rgb, 0));
+  ictx.fillStyle = wash;
+  ictx.beginPath();
+  ictx.arc(0, 0, r, 0, Math.PI * 2);
+  ictx.fill();
+  ictx.restore();
+}
+
+function drawFinaleNucleus(cx, cy, protons, alpha, pR) {
+  if (protons === 1) {
+    drawSoftOrb(cx, cy, pR * 1.35, '#a85a32', alpha);
+    return;
+  }
+  if (protons === 2) {
+    const spread = pR * 0.85;
+    drawSoftOrb(cx - spread * 0.55, cy, pR, '#a85a32', alpha);
+    drawSoftOrb(cx + spread * 0.55, cy, pR, '#a85a32', alpha);
+    return;
+  }
+  const spread = pR * 0.95;
+  const spots = [
+    { x: cx - spread * 0.55, y: cy - spread * 0.35 },
+    { x: cx + spread * 0.55, y: cy - spread * 0.35 },
+    { x: cx, y: cy + spread * 0.55 }
+  ];
+  spots.forEach(s => drawSoftOrb(s.x, s.y, pR, '#a85a32', alpha));
+}
+
+function drawFinaleElectron(x, y, eR, alpha) {
+  drawSoftOrb(x, y, eR, '#c4a35a', alpha);
+  if (alpha > 0.4) {
+    ictx.save();
+    ictx.globalAlpha = alpha;
+    ictx.fillStyle = 'rgba(12,18,8,0.75)';
+    ictx.font = `600 ${Math.max(9, eR * 0.9)}px 'IBM Plex Mono',monospace`;
+    ictx.textAlign = 'center';
+    ictx.textBaseline = 'middle';
+    ictx.fillText('−', x, y + 0.5);
+    ictx.restore();
+  }
+}
+
+/** Specs for the branched finale atoms (radii match pull-stage). */
+const FINALE_ATOMS = {
+  H: { protons: 1, shared: 1, orbitR: 0.32, ie: 1.31, Z: 1, qShow: 1, label: 'H' },
+  He: { protons: 2, shared: 2, orbitR: 0.24, ie: 2.37, Z: 2, qShow: 2, label: 'He' },
+  LiA: {
+    protons: 3,
+    shared: 3,
+    orbitR: 0.18,
+    ie: 3.50,
+    Z: 3,
+    qShow: 3,
+    label: 'hypothetical atom 3',
+    hypo: true
+  },
+  LiB: {
+    protons: 3,
+    shared: 0,
+    inner: 2,
+    orbitR: 0.42,
+    innerR: 0.12,
+    ie: 0.52,
+    Z: 3,
+    qShow: 1,
+    label: 'Li'
+  }
+};
+
+function finaleLayout() {
+  const w = ION.iW;
+  const h = ION.iH;
+  const t = Math.max(0, Math.min(1, ION.finPairT));
+  const cellMain = Math.min(w * 0.155, h * 0.26);
+  const cellLiBranch = Math.min(w * 0.17, h * 0.24);
+  // pair stage: larger atoms, room for IE equations to the right of each
+  const cellLiPair = Math.min(w * 0.34, h * 0.52);
+  const cyMain = h * 0.36;
+
+  const branch = {
+    H: { cx: w * 0.13, cy: cyMain, cell: cellMain },
+    He: { cx: w * 0.34, cy: cyMain, cell: cellMain },
+    fork: { x: w * 0.50, y: cyMain },
+    LiA: { cx: w * 0.78, cy: h * 0.20, cell: cellLiBranch },
+    LiB: { cx: w * 0.78, cy: h * 0.60, cell: cellLiBranch }
+  };
+  const pair = {
+    LiA: { cx: w * 0.22, cy: h * 0.42, cell: cellLiPair },
+    LiB: { cx: w * 0.62, cy: h * 0.42, cell: cellLiPair }
+  };
+  const lerp = (a, b) => a + (b - a) * t;
+  return {
+    H: branch.H,
+    He: branch.He,
+    fork: branch.fork,
+    LiA: {
+      cx: lerp(branch.LiA.cx, pair.LiA.cx),
+      cy: lerp(branch.LiA.cy, pair.LiA.cy),
+      cell: lerp(branch.LiA.cell, pair.LiA.cell)
+    },
+    LiB: {
+      cx: lerp(branch.LiB.cx, pair.LiB.cx),
+      cy: lerp(branch.LiB.cy, pair.LiB.cy),
+      cell: lerp(branch.LiB.cell, pair.LiB.cell)
+    },
+    pairT: t
+  };
+}
+
+function drawFinaleArrow(x1, y1, x2, y2, alpha) {
+  if (alpha <= 0.02) return;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len;
+  const uy = dy / len;
+  // stop short of the atom
+  const tipX = x2 - ux * 10;
+  const tipY = y2 - uy * 10;
+  const head = Math.min(11, len * 0.18);
+  ictx.save();
+  ictx.globalAlpha = alpha;
+  ictx.strokeStyle = 'rgba(22,20,14,0.55)';
+  ictx.fillStyle = 'rgba(22,20,14,0.55)';
+  ictx.lineWidth = 1.25;
+  ictx.beginPath();
+  ictx.moveTo(x1, y1);
+  ictx.lineTo(tipX, tipY);
+  ictx.stroke();
+  ictx.beginPath();
+  ictx.moveTo(tipX, tipY);
+  ictx.lineTo(tipX - ux * head - uy * head * 0.45, tipY - uy * head + ux * head * 0.45);
+  ictx.lineTo(tipX - ux * head + uy * head * 0.45, tipY - uy * head - ux * head * 0.45);
+  ictx.closePath();
+  ictx.fill();
+  ictx.restore();
+}
+
+function drawFinaleBranchArrows(L, alpha) {
+  if (alpha <= 0.02 || L.pairT > 0.92) return;
+  const fade = alpha * (1 - L.pairT);
+  const he = L.He;
+  const heOrbit = FINALE_ATOMS.He.orbitR * he.cell;
+  const aOrbit = FINALE_ATOMS.LiA.orbitR * L.LiA.cell;
+  const bOrbit = FINALE_ATOMS.LiB.orbitR * L.LiB.cell;
+  const startX = he.cx + heOrbit + 10;
+  const startY = he.cy;
+  const fork = L.fork;
+
+  // hairline stem He → fork (no arrowhead — the fork does the pointing)
+  ictx.save();
+  ictx.globalAlpha = fade * 0.85;
+  ictx.strokeStyle = 'rgba(22,20,14,0.55)';
+  ictx.lineWidth = 1.25;
+  ictx.beginPath();
+  ictx.moveTo(startX, startY);
+  ictx.lineTo(fork.x, fork.y);
+  ictx.stroke();
+  ictx.restore();
+
+  // upper branch → same-shell Li
+  drawFinaleArrow(fork.x, fork.y, L.LiA.cx - aOrbit - 8, L.LiA.cy, fade);
+  // lower branch → real Li
+  drawFinaleArrow(fork.x, fork.y, L.LiB.cx - bOrbit - 8, L.LiB.cy, fade);
+}
+
+function drawFinaleIE(cx, baseY, ie, q, alpha) {
+  if (alpha <= 0.02) return;
+  ictx.save();
+  ictx.globalAlpha = alpha;
+  ictx.textAlign = 'center';
+  ictx.textBaseline = 'top';
+  ictx.fillStyle = '#4f5a28';
+  ictx.font = `600 ${Math.max(10, ION.iW * 0.018)}px 'IBM Plex Mono',monospace`;
+  ictx.fillText(`q₁ = +${q}`, cx, baseY);
+  ictx.fillStyle = '#a85a32';
+  ictx.font = `600 ${Math.max(11, ION.iW * 0.02)}px 'IBM Plex Mono',monospace`;
+  ictx.fillText(`IE ≈ ${ie.toFixed(2)}`, cx, baseY + Math.max(14, ION.iW * 0.024));
+  ictx.fillStyle = '#55513f';
+  ictx.font = `500 ${Math.max(9, ION.iW * 0.015)}px 'IBM Plex Mono',monospace`;
+  ictx.fillText('MJ/mol', cx, baseY + Math.max(28, ION.iW * 0.048));
+  ictx.restore();
+}
+
+/** Left-aligned IE block beside a pair-stage atom. */
+function drawFinaleIEBeside(x, cy, ie, q, alpha) {
+  if (alpha <= 0.02) return;
+  const fs = Math.max(12, ION.iW * 0.022);
+  const gap = Math.max(16, fs * 1.25);
+  ictx.save();
+  ictx.globalAlpha = alpha;
+  ictx.textAlign = 'left';
+  ictx.textBaseline = 'middle';
+  ictx.fillStyle = '#4f5a28';
+  ictx.font = `600 ${fs * 0.92}px 'IBM Plex Mono',monospace`;
+  ictx.fillText(`q₁ = +${q}`, x, cy - gap);
+  ictx.fillStyle = '#a85a32';
+  ictx.font = `600 ${fs}px 'IBM Plex Mono',monospace`;
+  ictx.fillText(`IE ≈ ${ie.toFixed(2)}`, x, cy);
+  ictx.fillStyle = '#55513f';
+  ictx.font = `500 ${fs * 0.82}px 'IBM Plex Mono',monospace`;
+  ictx.fillText('MJ/mol', x, cy + gap);
+  ictx.restore();
+}
+
+function drawFinaleAtomLabel(cx, bottomY, label, alpha, cell) {
+  if (alpha <= 0.02) return;
+  const long = label.length > 8;
+  const fs = Math.max(10, cell * (long ? 0.065 : 0.11));
+  ictx.save();
+  ictx.globalAlpha = alpha;
+  ictx.fillStyle = '#4f5a28';
+  ictx.font = `600 ${fs}px 'IBM Plex Mono',monospace`;
+  ictx.textAlign = 'center';
+  ictx.textBaseline = 'bottom';
+  if (label === 'hypothetical atom 3') {
+    ictx.fillText('hypothetical', cx, bottomY - fs * 1.2);
+    ictx.fillText('atom 3', cx, bottomY);
+  } else {
+    ictx.fillText(label, cx, bottomY);
+  }
+  ictx.restore();
+}
+
+function drawFinaleMiniAtom(key, pos, angle, alpha, eqAlpha) {
+  if (alpha <= 0.01 || !pos) return;
+  const spec = FINALE_ATOMS[key];
+  const { cx, cy, cell } = pos;
+  const orbitR = spec.orbitR * cell;
+  const pR = Math.max(4.2, cell * 0.052);
+  const eR = Math.max(3.4, cell * 0.036);
+  const q = spec.qShow != null ? spec.qShow : spec.Z;
+  const pairMode = ION.finPairT > 0.65;
+
+  if (spec.inner) {
+    const innerR = (spec.innerR || 0.12) * cell;
+    const shellR = innerR + eR * 2.3 + Math.max(5, cell * 0.03);
+    drawFinaleShieldCloud(cx, cy, shellR, alpha * 0.95);
+    for (let i = 0; i < spec.inner; i++) {
+      const iAng = ION.innerAngle + (i * Math.PI * 2) / spec.inner;
+      drawFinaleElectron(
+        cx + Math.cos(iAng) * innerR,
+        cy + Math.sin(iAng) * innerR,
+        eR * 0.88,
+        alpha * 0.95
+      );
+    }
+  }
+
+  drawFinaleNucleus(cx, cy, spec.protons, alpha, pR);
+
+  if (spec.shared > 0) {
+    for (let i = 0; i < spec.shared; i++) {
+      const ang = angle + (i * Math.PI * 2) / spec.shared;
+      drawFinaleElectron(
+        cx + Math.cos(ang) * orbitR,
+        cy + Math.sin(ang) * orbitR,
+        eR,
+        alpha
+      );
+    }
+  } else if (spec.inner) {
+    // valence electron on outer shell
+    drawFinaleElectron(
+      cx + Math.cos(angle) * orbitR,
+      cy + Math.sin(angle) * orbitR,
+      eR,
+      alpha
+    );
+  }
+
+  // labels: branch (fade out) or pair (fade in)
+  if (alpha > 0.35) {
+    const labelY = cy - orbitR - eR - Math.max(8, cell * 0.07);
+    if (ION.finPairT < 0.55) {
+      const la = alpha * (1 - Math.max(0, ION.finPairT - 0.2) / 0.35);
+      drawFinaleAtomLabel(cx, labelY, spec.label, la, cell);
+    } else if (pairMode && (key === 'LiA' || key === 'LiB')) {
+      const la = alpha * Math.min(1, (ION.finPairT - 0.65) / 0.25);
+      drawFinaleAtomLabel(cx, labelY, spec.label, la, cell);
+    }
+  }
+
+  if (eqAlpha > 0.02) {
+    if (pairMode && (key === 'LiA' || key === 'LiB')) {
+      const eqX = cx + orbitR + eR + Math.max(14, cell * 0.06);
+      drawFinaleIEBeside(eqX, cy, spec.ie, q, eqAlpha);
+    } else if (!pairMode && !spec.inner) {
+      const baseY = cy + orbitR + eR + Math.max(10, cell * 0.08);
+      drawFinaleIE(cx, baseY, spec.ie, q, eqAlpha);
+    }
+  }
+}
+
+function drawFinalePlate() {
+  if (!ictx || !ION.iW) return;
+  ictx.clearRect(0, 0, ION.iW, ION.iH);
+  const L = finaleLayout();
+  drawFinaleBranchArrows(L, ION.finFadeArrows);
+  drawFinaleMiniAtom('H', L.H, ION.finAngH, ION.finFadeH, ION.finFadeEqH);
+  drawFinaleMiniAtom('He', L.He, ION.finAngHe, ION.finFadeHe, ION.finFadeEqHe);
+  drawFinaleMiniAtom('LiA', L.LiA, ION.finAngA, ION.finFadeLiA, ION.finFadeEqLiA);
+  drawFinaleMiniAtom('LiB', L.LiB, ION.finAngB, ION.finFadeLiB, ION.finFadeEqLiB);
+}
+
+function drawIon() {
+  if (!ictx || !ION.iW) return;
+  if (ION.phase === 'finale') {
+    drawFinalePlate();
+    return;
+  }
+  ictx.clearRect(0, 0, ION.iW, ION.iH);
+  // attract oval first; faint 1s hint over it near the nucleus (still quieter)
+  drawVOval();
+  drawInnerShellCloud();
+  drawNucleus();
+  drawInnerElectrons();
+  drawSharedShellElectrons();
+  drawIonElectron();
+}
+
+function ionEnergyFromPull(dist) {
+  const a = atomDef();
+  const { r0, rFull } = ionPullRadii();
+  const span = Math.max(1, rFull - r0);
+  const t = Math.max(0, Math.min(1, (dist - r0) / span));
+  // ease-in so the last bit of the meter is the hardest — but reachable on-plate
+  const shaped = Math.pow(t, 1.25 + a.stiff * 0.2);
+  return shaped * a.ie;
+}
+
+function beginIonLoop() {
+  if (ION.animId != null) return;
+  ION.lastT = performance.now();
+  ION.animId = requestAnimationFrame(ionFrame);
+}
+
+function stopIonLoop() {
+  if (ION.animId != null) {
+    cancelAnimationFrame(ION.animId);
+    ION.animId = null;
+  }
+}
+
+function ionFrame(now) {
+  ION.animId = null;
+  if (!ION.active) return;
+  const dt = Math.min(0.033, (now - ION.lastT) / 1000);
+  ION.lastT = now;
+  stepIon(dt);
+  drawIon();
+  updateIeMeterDom();
+  ION.animId = requestAnimationFrame(ionFrame);
+}
+
+function stepFinale(dt) {
+  if (prefersReduced) return;
+  ION.finAngH += 0.42 * dt;
+  ION.finAngHe += 0.36 * dt;
+  ION.finAngA += 0.40 * dt;
+  ION.finAngB += 0.30 * dt;
+  ION.innerAngle += 0.55 * dt;
+}
+
+function stepIon(dt) {
+  if (ION.phase === 'finale') {
+    stepFinale(dt);
+    return;
+  }
+
+  const a = atomDef();
+  const { r0, maxR } = ionPullRadii();
+
+  // inner pair keeps drifting whether or not the outer electron is being pulled
+  if (a.innerElectrons && !prefersReduced) {
+    ION.innerAngle += (a.innerOmega || 0.55) * dt;
+  }
+
+  if (ION.mode === 'idle') {
+    if (!prefersReduced) {
+      ION.angle += a.omega * dt;
+      ION.shellAngle = ION.angle;
+    }
+    placeElectronOnOrbit();
+    ION.energy = Math.max(0, ION.energy - a.ie * 1.8 * dt);
+    return;
+  }
+
+  if (ION.mode === 'drag' && ION.pointer) {
+    // lag: cursor leads; nucleus still pulls hard
+    const px = ION.pointer.x;
+    const py = ION.pointer.y;
+    const toCursorX = px - ION.ex;
+    const toCursorY = py - ION.ey;
+    const toNucX = ION.cx - ION.ex;
+    const toNucY = ION.cy - ION.ey;
+    const dist = Math.hypot(ION.ex - ION.cx, ION.ey - ION.cy) || 1;
+
+    // follow lag — stiff atoms lag more (cursor gets farther ahead)
+    const follow = (2.1 / (0.65 + a.stiff)) * dt;
+    ION.ex += toCursorX * follow;
+    ION.ey += toCursorY * follow;
+
+    // attraction toward nucleus (stronger when stiff / close)
+    const pull = (180 * a.stiff) / (dist * dist + 40);
+    ION.ex += (toNucX / dist) * pull * dt * 60;
+    ION.ey += (toNucY / dist) * pull * dt * 60;
+
+    // clamp to on-plate stretch — IE is reached before this rim
+    const nd = Math.hypot(ION.ex - ION.cx, ION.ey - ION.cy) || 1;
+    if (nd > maxR) {
+      ION.ex = ION.cx + (ION.ex - ION.cx) / nd * maxR;
+      ION.ey = ION.cy + (ION.ey - ION.cy) / nd * maxR;
+    }
+
+    const dNow = Math.hypot(ION.ex - ION.cx, ION.ey - ION.cy);
+    ION.energy = ionEnergyFromPull(dNow);
+    ION.angle = Math.atan2(ION.ey - ION.cy, ION.ex - ION.cx);
+    ION.rNow = dNow;
+
+    if (ION.energy >= a.ie - 0.001) {
+      startFling();
+    }
+    return;
+  }
+
+  if (ION.mode === 'snap') {
+    // ease back onto the orbit ring
+    const targetX = ION.cx + Math.cos(ION.angle) * r0;
+    const targetY = ION.cy + Math.sin(ION.angle) * r0;
+    ION.ex += (targetX - ION.ex) * Math.min(1, 5.5 * dt);
+    ION.ey += (targetY - ION.ey) * Math.min(1, 5.5 * dt);
+    ION.energy = Math.max(0, ION.energy - a.ie * 2.4 * dt);
+    const err = Math.hypot(ION.ex - targetX, ION.ey - targetY);
+    if (err < 1.2 && ION.energy < 0.02) {
+      ION.energy = 0;
+      ION.mode = 'idle';
+      placeElectronOnOrbit();
+      if (ionHint && !ION.namedIE) ionHint.textContent = '';
+    }
+    return;
+  }
+
+  if (ION.mode === 'fling') {
+    ION.ex += ION.evx * dt;
+    ION.ey += ION.evy * dt;
+    ION.energy = a.ie;
+    // fade oval already handled in draw
+    if (
+      ION.ex < -100 || ION.ex > ION.iW + 100 ||
+      ION.ey < -100 || ION.ey > ION.iH + 100
+    ) {
+      ION.mode = 'gone';
+      onIonized();
+    }
+  }
+}
+
+function startFling() {
+  const a = atomDef();
+  ION.mode = 'fling';
+  ION.energy = a.ie;
+  // measured IE only for real atoms — hypo same-shell Li stays "Energy in"
+  ION.namedIE = !a.hypo;
+  updateIeMeterDom();
+  setGate('hasPulledApart', true);
+  // fling roughly along the current radial direction, with a bit of tangential kick
+  const dx = ION.ex - ION.cx;
+  const dy = ION.ey - ION.cy;
+  const dist = Math.hypot(dx, dy) || 1;
+  const speed = Math.min(ION.iW, ION.iH) * 1.85;
+  ION.evx = (dx / dist) * speed;
+  ION.evy = (dy / dist) * speed + (Math.random() - 0.5) * speed * 0.15;
+  ionCanvas.classList.remove('is-dragging', 'is-grab');
+  ION.pointer = null;
+  if (ionHint) {
+    ionHint.textContent = a.hypo
+      ? `Energy in ≈ ${a.ie.toFixed(2)} MJ/mol — that arrangement holds tight.`
+      : `IE ≈ ${a.ie.toFixed(2)} MJ/mol — energy to take the electron to ∞`;
+  }
+}
+
+function onIonized() {
+  if (ION.atomId === 'H') ION.doneH = true;
+  if (ION.atomId === 'He') ION.doneHe = true;
+  if (ION.atomId === 'Li') ION.doneLi = true;
+  const a = atomDef();
+  if (ieMeterLabel) ieMeterLabel.textContent = a.hypo ? 'Energy in' : 'IE';
+  if (ionHint) {
+    ionHint.textContent = a.hypo
+      ? `Energy in ≈ ${a.ie.toFixed(2)} MJ/mol — that arrangement holds tight.`
+      : `IE ≈ ${a.ie.toFixed(2)} MJ/mol — energy to take the electron to ∞`;
+  }
+  if (ION.actionTimer) clearTimeout(ION.actionTimer);
+
+  // After same-shell Li: fade to A (same-shell) | B (real Li) compare
+  if (ION.atomId === 'Li' && ION.doneLi) {
+    ION.actionTimer = setTimeout(() => {
+      playCompareFinale();
+    }, prefersReduced ? 0 : 1400);
+    return;
+  }
+
+  ION.actionTimer = setTimeout(() => {
+    if (ionReset) ionReset.hidden = false;
+    if (ionNext) {
+      const cur = atomDef();
+      const canAdvance =
+        (ION.atomId === 'H' && ION.doneH) ||
+        (ION.atomId === 'He' && ION.doneHe);
+      if (cur.nextLabel && canAdvance) {
+        ionNext.hidden = false;
+        ionNext.textContent = cur.nextLabel;
+      } else {
+        ionNext.hidden = true;
+      }
+    }
+  }, prefersReduced ? 0 : 900);
+}
+
+function resetFinaleChrome() {
+  if (ionCompare) ionCompare.hidden = true;
+  if (finaleTextQ) {
+    finaleTextQ.hidden = true;
+    finaleTextQ.classList.remove('is-in');
+  }
+  if (finaleTextLi) {
+    finaleTextLi.hidden = true;
+    finaleTextLi.classList.remove('is-in');
+  }
+  if (part2) part2.classList.remove('is-comparing');
+  if (ionStage) ionStage.classList.remove('is-compare');
+  if (ionFinish) ionFinish.hidden = true;
+  ION.finFadeH = 0;
+  ION.finFadeHe = 0;
+  ION.finFadeLiA = 0;
+  ION.finFadeLiB = 0;
+  ION.finFadeArrows = 0;
+  ION.finFadeEqH = 0;
+  ION.finFadeEqHe = 0;
+  ION.finFadeEqLiA = 0;
+  ION.finFadeEqLiB = 0;
+  ION.finPairT = 0;
+}
+
+function showFinaleText(el) {
+  if (!el) return;
+  el.hidden = false;
+  void el.offsetWidth;
+  el.classList.add('is-in');
+}
+
+function hideFinaleText(el) {
+  if (!el) return;
+  el.classList.remove('is-in');
+}
+
+/** Pause the compare finale until the student clicks Next (replaces timed advance). */
+function waitForFinaleNext() {
+  return new Promise(resolve => {
+    if (!ionNext) {
+      resolve();
+      return;
+    }
+    ionNext.hidden = false;
+    ionNext.textContent = 'Next →';
+    const onClick = () => {
+      ionNext.removeEventListener('click', onClick);
+      ionNext.hidden = true;
+      resolve();
+    };
+    ionNext.addEventListener('click', onClick);
+  });
+}
+
+async function playCompareFinale() {
+  if (ION.comparePlaying && ION.phase === 'finale') return;
+  ION.comparePlaying = true;
+  clearIonIdleTimer();
+  if (ION.actionTimer) {
+    clearTimeout(ION.actionTimer);
+    ION.actionTimer = null;
+  }
+  if (ionReset) ionReset.hidden = true;
+  if (ionNext) ionNext.hidden = true;
+  if (ionFinish) ionFinish.hidden = true;
+  if (ionFraming) {
+    ionFraming.textContent = '';
+    ionFraming.classList.remove('is-shown');
+  }
+
+  // 1) fade the pull-stage chrome + atom away
+  if (ionStage) ionStage.classList.remove('eq-in', 'meter-in');
+  if (ionHint) {
+    ionHint.style.transition = prefersReduced ? 'none' : 'opacity 0.6s ease';
+    ionHint.style.opacity = '0';
+  }
+  await wait(prefersReduced ? 0 : 350);
+  if (ION.fadeAtom > 0.05) {
+    await fadeTo(v => {
+      ION.fadeAtom = 1 - v;
+      ION.fadeOval = 1 - v;
+    }, 900);
+  } else {
+    ION.fadeAtom = 0;
+    ION.fadeOval = 0;
+  }
+  if (ionHint) {
+    ionHint.textContent = '';
+    ionHint.style.opacity = '';
+    ionHint.style.transition = '';
+  }
+
+  // 2) blank beat, then branched H → He → two Lis
+  await wait(prefersReduced ? 0 : 420);
+  ION.phase = 'finale';
+  ION.mode = 'finale';
+  ION.energy = 0;
+  ION.pointer = null;
+  ION.fadeAtom = 0;
+  ION.fadeOval = 0;
+  ION.finFadeH = 0;
+  ION.finFadeHe = 0;
+  ION.finFadeLiA = 0;
+  ION.finFadeLiB = 0;
+  ION.finFadeArrows = 0;
+  ION.finFadeEqH = 0;
+  ION.finFadeEqHe = 0;
+  ION.finFadeEqLiA = 0;
+  ION.finFadeEqLiB = 0;
+  ION.finPairT = 0;
+  ION.finAngH = -Math.PI * 0.35;
+  ION.finAngHe = -Math.PI * 0.2;
+  ION.finAngA = -Math.PI * 0.4;
+  ION.finAngB = -Math.PI * 0.35;
+  ION.innerAngle = Math.PI * 0.2;
+  ION.layoutLock = true;
+
+  if (ionStage) {
+    ionStage.classList.remove('has-chrome', 'eq-in', 'meter-in');
+    ionStage.classList.add('is-live', 'is-compare');
+  }
+  if (part2) part2.classList.add('is-comparing');
+  if (ionCompare) ionCompare.hidden = false;
+  if (finaleTextQ) {
+    finaleTextQ.hidden = true;
+    finaleTextQ.classList.remove('is-in');
+  }
+  if (finaleTextLi) {
+    finaleTextLi.hidden = true;
+    finaleTextLi.classList.remove('is-in');
+  }
+  if (ionCanvas) {
+    ionCanvas.setAttribute(
+      'aria-label',
+      'Hydrogen, helium, then two arrangements branching from helium: hypothetical atom 3 with three electrons in the same shell, and real lithium with an inner pair.'
+    );
+    ionCanvas.classList.remove('is-grab', 'is-dragging');
+    ionCanvas.removeAttribute('tabindex');
+  }
+
+  await ionLayoutReady({ chrome: false });
+  if (ionStage) {
+    ionStage.classList.remove('has-chrome', 'eq-in', 'meter-in');
+    ionStage.classList.add('is-compare', 'is-live');
+  }
+  ION.layoutLock = false;
+
+  // 3) atoms + branch arrows fade in
+  if (prefersReduced) {
+    ION.finFadeH = ION.finFadeHe = ION.finFadeLiA = ION.finFadeLiB = ION.finFadeArrows = 1;
+    drawIon();
+  } else {
+    await fadeTo(v => {
+      ION.finFadeH = v;
+      ION.finFadeHe = v;
+      ION.finFadeLiA = v;
+      ION.finFadeLiB = v;
+      ION.finFadeArrows = v;
+    }, 1300);
+  }
+
+  // 4) beat, then IE readouts under H, He, and same-shell Li
+  await wait(prefersReduced ? 0 : 900);
+  if (prefersReduced) {
+    ION.finFadeEqH = ION.finFadeEqHe = ION.finFadeEqLiA = 1;
+    drawIon();
+  } else {
+    await fadeTo(v => {
+      ION.finFadeEqH = v;
+      ION.finFadeEqHe = v;
+      ION.finFadeEqLiA = v;
+    }, 900);
+  }
+
+  // 5) Q-trend narration — student advances with Next (no timed skip)
+  await wait(prefersReduced ? 0 : 700);
+  showFinaleText(finaleTextQ);
+  await wait(prefersReduced ? 0 : 500);
+  await waitForFinaleNext();
+
+  // 6) fade H, He, eqs, narration; move the two Lis side by side
+  hideFinaleText(finaleTextQ);
+  await wait(prefersReduced ? 0 : 450);
+  if (finaleTextQ) finaleTextQ.hidden = true;
+
+  if (prefersReduced) {
+    ION.finFadeH = 0;
+    ION.finFadeHe = 0;
+    ION.finFadeArrows = 0;
+    ION.finFadeEqH = 0;
+    ION.finFadeEqHe = 0;
+    ION.finFadeEqLiA = 0;
+    ION.finFadeEqLiB = 0;
+    ION.finPairT = 1;
+    drawIon();
+  } else {
+    await fadeTo(v => {
+      const keep = 1 - v;
+      ION.finFadeH = keep;
+      ION.finFadeHe = keep;
+      ION.finFadeArrows = keep;
+      ION.finFadeEqH = keep;
+      ION.finFadeEqHe = keep;
+      ION.finFadeEqLiA = keep;
+      ION.finFadeEqLiB = 0;
+      ION.finPairT = v;
+    }, 1400);
+  }
+
+  // 7) IE equations beside each atom (q = +3 vs +1)
+  await wait(prefersReduced ? 0 : 400);
+  if (prefersReduced) {
+    ION.finFadeEqLiA = 1;
+    ION.finFadeEqLiB = 1;
+    drawIon();
+  } else {
+    await fadeTo(v => {
+      ION.finFadeEqLiA = v;
+      ION.finFadeEqLiB = v;
+    }, 850);
+  }
+
+  // 8) lithium organization question + Finish
+  await wait(prefersReduced ? 0 : 500);
+  showFinaleText(finaleTextLi);
+  await wait(prefersReduced ? 0 : 900);
+  if (ionFinish) ionFinish.hidden = false;
+
+  ION.comparePlaying = false;
+}
+
+function ionCanvasPoint(e) {
+  const rect = ionCanvas.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: (clientX - rect.left) * (ION.iW / rect.width),
+    y: (clientY - rect.top) * (ION.iH / rect.height)
+  };
+}
+
+function hitElectron(pt) {
+  if (ION.mode === 'fling' || ION.mode === 'gone') return false;
+  if (ION.fadeAtom < 0.85) return false;
+  const base = Math.min(ION.iW, ION.iH);
+  const hitR = Math.max(18, base * 0.05);
+  return Math.hypot(pt.x - ION.ex, pt.y - ION.ey) <= hitR;
+}
+
+function onIonPointerDown(e) {
+  if (!ION.active || ION.fadeAtom < 0.95) return;
+  if (ION.phase === 'finale') return;
+  if (ION.mode === 'fling' || ION.mode === 'gone') return;
+  const pt = ionCanvasPoint(e);
+
+  if (!hitElectron(pt)) return;
+  noteIonInteract();
+  ION.mode = 'drag';
+  ION.shellAngle = ION.angle;
+  ION.pointer = pt;
+  ionCanvas.classList.add('is-dragging');
+  ionCanvas.classList.remove('is-grab');
+  setIonCoachHint('Keep pulling — the nucleus still holds on.');
+  if (e.cancelable) e.preventDefault();
+}
+
+function onIonPointerMove(e) {
+  if (!ION.active) return;
+  const pt = ionCanvasPoint(e);
+  if (ION.mode === 'drag') {
+    ION.pointer = pt;
+    if (e.cancelable) e.preventDefault();
+    return;
+  }
+  if (ION.phase === 'finale') {
+    ionCanvas.classList.remove('is-grab');
+    return;
+  }
+  if (ION.mode === 'idle' || ION.mode === 'snap') {
+    ionCanvas.classList.toggle('is-grab', hitElectron(pt));
+  }
+}
+
+function onIonPointerUp() {
+  if (!ION.active) return;
+  if (ION.phase === 'finale') return;
+  if (ION.mode === 'drag') {
+    ION.pointer = null;
+    ionCanvas.classList.remove('is-dragging');
+    // snap back unless already ionizing
+    if (ION.energy < atomDef().ie - 0.001) {
+      ION.mode = 'snap';
+      ION.pullAttempts += 1;
+      if (ionCoachReady()) {
+        if (!ION.instructionShown) showIonInstruction();
+        setIonCoachHint('It snapped back. Put more energy in.');
+      }
+    }
+  }
+}
+
+function onIonKey(e) {
+  if (!ION.active || ION.phase === 'finale' || ION.mode === 'fling' || ION.mode === 'gone') return;
+  const step = Math.min(ION.iW, ION.iH) * 0.04;
+  let dx = 0;
+  let dy = 0;
+  if (e.key === 'ArrowRight') dx = step;
+  else if (e.key === 'ArrowLeft') dx = -step;
+  else if (e.key === 'ArrowUp') dy = -step;
+  else if (e.key === 'ArrowDown') dy = step;
+  else return;
+  e.preventDefault();
+  noteIonInteract();
+
+  ION.mode = 'drag';
+  ION.shellAngle = ION.angle;
+  ION.pointer = { x: ION.ex + dx * 2.4, y: ION.ey + dy * 2.4 };
+}
+
+function onIonKeyUp(e) {
+  if (!ION.active) return;
+  if (!e.key.startsWith('Arrow')) return;
+  if (ION.mode === 'drag') onIonPointerUp();
+}
+
+function clearIonIdleTimer() {
+  if (ION.idleTimer) {
+    clearTimeout(ION.idleTimer);
+    ION.idleTimer = null;
+  }
+}
+
+/** Hydrogen: stay quiet until a couple of snap-backs. He / Li: coach freely. */
+function ionCoachReady() {
+  if (ION.atomId !== 'H') return true;
+  return ION.pullAttempts >= 2;
+}
+
+function showIonInstruction(opts = {}) {
+  if (ION.instructionShown || !ionFraming) return;
+  // Hydrogen stays quiet until a couple of attempts, unless forced (stuck idle)
+  if (ION.atomId === 'H' && !ionCoachReady() && !opts.force) return;
+  const a = atomDef();
+  ION.instructionShown = true;
+  ionFraming.textContent = a.framing;
+  // force reflow so opacity transition plays
+  void ionFraming.offsetWidth;
+  ionFraming.classList.add('is-shown');
+}
+
+function armIonIdleInstruction() {
+  clearIonIdleTimer();
+  ION.sawInteract = false;
+  ION.instructionShown = false;
+  if (ionFraming) {
+    ionFraming.textContent = '';
+    ionFraming.classList.remove('is-shown');
+  }
+  if (prefersReduced && ION.atomId !== 'H') {
+    showIonInstruction();
+    return;
+  }
+  // Hydrogen: long stuck wait only — no early coaching
+  const delay = ION.atomId === 'H' ? 14000 : 9000;
+  ION.idleTimer = setTimeout(() => {
+    ION.idleTimer = null;
+    if (!ION.active || ION.instructionShown) return;
+    if (ION.atomId === 'H') {
+      // only if they never grabbed — once they try, attempts gate the text
+      if (ION.sawInteract) return;
+      showIonInstruction({ force: true });
+      return;
+    }
+    if (ION.sawInteract) return;
+    if (ION.mode !== 'idle' && ION.mode !== 'snap') return;
+    showIonInstruction();
+  }, delay);
+}
+
+function noteIonInteract() {
+  ION.sawInteract = true;
+  clearIonIdleTimer();
+  // once they've grabbed it, the framing instruction can stay if already shown
+}
+
+function setIonCoachHint(text) {
+  if (!ionHint) return;
+  if (!ionCoachReady()) {
+    ionHint.textContent = '';
+    return;
+  }
+  ionHint.textContent = text;
+}
+
+async function playIonIntro() {
+  ION.fadeAtom = ION.fadeOval = 0;
+  ION.mode = 'idle';
+  ION.energy = 0;
+  ION.pointer = null;
+  ION.layoutLock = true;
+  ION_CLOUD.key = '';
+  ION_CLOUD.t0 = performance.now();
+  ION_SHELL.key = '';
+  ION_SHELL.t0 = performance.now();
+  clearIonIdleTimer();
+  if (ionFraming) {
+    ionFraming.textContent = '';
+    ionFraming.classList.remove('is-shown');
+  }
+  ION.instructionShown = false;
+  ION.sawInteract = false;
+  ION.pullAttempts = 0;
+
+  if (ionStage) {
+    // Keep has-chrome from frame 1 so the canvas never jumps from the
+    // solo max-width layout into the 3-column chrome grid mid-fade.
+    ionStage.classList.remove('eq-in', 'meter-in');
+    ionStage.classList.add('is-live', 'has-chrome');
+  }
+  await ionLayoutReady();
+
+  if (prefersReduced) {
+    ION.fadeAtom = ION.fadeOval = 1;
+    if (ionStage) ionStage.classList.add('eq-in', 'meter-in');
+    placeElectronOnOrbit();
+    drawIon();
+    syncIonMeterChrome();
+    ION.layoutLock = false;
+    armIonIdleInstruction();
+    return;
+  }
+
+  // 1) atom alone (chrome slots reserved, eq/meter still opacity 0)
+  await fadeTo(v => { ION.fadeAtom = v; }, 1200);
+  await wait(420);
+  // 2) potential cloud (no outline)
+  await fadeTo(v => { ION.fadeOval = v; }, 950);
+  await wait(380);
+  // 3) equation + energy bar — layout already final, no resize
+  if (ionStage) ionStage.classList.add('eq-in');
+  await wait(320);
+  if (ionStage) ionStage.classList.add('meter-in');
+
+  // ensure we didn't pick up a stray drag during the reveal
+  ION.mode = 'idle';
+  ION.pointer = null;
+  ION.energy = 0;
+  placeElectronOnOrbit();
+  drawIon();
+  updateIeMeterDom();
+  ION.layoutLock = false;
+  armIonIdleInstruction();
+}
+
+function resetIonElectron() {
+  if (ION.actionTimer) {
+    clearTimeout(ION.actionTimer);
+    ION.actionTimer = null;
+  }
+  ION.mode = 'idle';
+  ION.energy = 0;
+  ION.pointer = null;
+  ION.evx = 0;
+  ION.evy = 0;
+  ION.angle = -Math.PI * 0.35;
+  ION.shellAngle = ION.angle;
+  ION.innerAngle = Math.PI * 0.15;
+  placeElectronOnOrbit();
+  if (ionReset) ionReset.hidden = true;
+  // keep Next visible after H / He ionization so they can advance when ready
+  const a = atomDef();
+  const keepNext =
+    a.nextLabel &&
+    ((ION.atomId === 'H' && ION.doneH) || (ION.atomId === 'He' && ION.doneHe));
+  if (ionNext && !keepNext) {
+    ionNext.hidden = true;
+  }
+  if (ionHint) ionHint.textContent = '';
+  updateIeMeterDom();
+  drawIon();
+  ionCanvas.classList.remove('is-dragging');
+}
+
+function loadIonAtom(id) {
+  const a = ION_ATOMS[id];
+  if (!a) return;
+  ION.atomId = id;
+  if (ionFraming) {
+    ionFraming.textContent = '';
+    ionFraming.classList.remove('is-shown');
+  }
+  if (ionCanvas) ionCanvas.setAttribute('aria-label', a.aria);
+  if (ionReset) ionReset.hidden = true;
+  if (ionNext) ionNext.hidden = true;
+  if (ionHint) ionHint.textContent = '';
+  ION.mode = 'idle';
+  ION.energy = 0;
+  ION.pointer = null;
+  ION.angle = -Math.PI * 0.35;
+  ION.shellAngle = ION.angle;
+  ION.innerAngle = Math.PI * 0.15;
+  ION.namedIE = false;
+  ION.pullAttempts = 0;
+  ION_CLOUD.key = '';
+  ION_SHELL.key = '';
+  syncIonMeterChrome();
+  placeElectronOnOrbit();
+  drawIon();
+}
+
+async function startIonStage(atomId) {
+  if (!ionCanvas || !ictx) return;
+  ION.active = true;
+  loadIonAtom(atomId || 'H');
+  beginIonLoop();
+  await playIonIntro();
+}
+
+if (ionCanvas) {
+  ionCanvas.addEventListener('mousedown', onIonPointerDown);
+  window.addEventListener('mousemove', onIonPointerMove);
+  window.addEventListener('mouseup', onIonPointerUp);
+  ionCanvas.addEventListener('touchstart', onIonPointerDown, { passive: false });
+  window.addEventListener('touchmove', onIonPointerMove, { passive: false });
+  window.addEventListener('touchend', onIonPointerUp);
+  ionCanvas.addEventListener('keydown', onIonKey);
+  ionCanvas.addEventListener('keyup', onIonKeyUp);
+}
+if (ionReset) {
+  ionReset.addEventListener('click', () => {
+    resetIonElectron();
+  });
+}
+if (ionNext) {
+  ionNext.addEventListener('click', async () => {
+    const nextMap = { H: 'He', He: 'Li' };
+    const nextId = nextMap[ION.atomId];
+    if (!nextId) return;
+    if (ION.atomId === 'H' && !ION.doneH) return;
+    if (ION.atomId === 'He' && !ION.doneHe) return;
+    ionNext.hidden = true;
+    if (ionReset) ionReset.hidden = true;
+    if (ionHint) ionHint.textContent = '';
+    clearIonIdleTimer();
+    // brief fade then next atom — keep has-chrome so the canvas box stays put
+    if (!prefersReduced && ionStage) {
+      ionStage.classList.remove('is-live', 'eq-in', 'meter-in');
+      if (ionFraming) ionFraming.classList.remove('is-shown');
+      await wait(400);
+    }
+    loadIonAtom(nextId);
+    ION.fadeAtom = 0;
+    ION.fadeOval = 0;
+    await playIonIntro();
+  });
+}
+if (ionFinish) {
+  ionFinish.addEventListener('click', () => {
+    ionFinish.hidden = true;
+    setGate('moduleComplete', true);
+  });
+}
+
+const _ionResizeObs = window.ResizeObserver
+  ? new ResizeObserver(() => {
+      if (!ION.active || ION.layoutLock) return;
+      ionResize();
+    })
+  : null;
+if (_ionResizeObs && ionStage) _ionResizeObs.observe(ionStage);
+window.addEventListener('resize', () => {
+  if (!ION.active || ION.layoutLock) return;
+  ionResize();
+});
+
+const DEBRIEF = {
+  intentions: [
+    { text: "We will use data to understand the relationships between charge and distance of two particles.",
+      target: 'playground', revisit: 'Coulomb playground' },
+    { text: "We will use data to understand the relationship between “ionization energy” and “coulombic potential”.",
+      target: 'part2', revisit: 'Ionization bench' },
+    { text: "We will solve problems to further solidify our understanding of the key equation.",
+      target: 'part2', revisit: 'Ionization bench' }
+  ],
+  competencies: [
+    { code: "PAI",
+      name: "Processing and analyzing data and information",
+      text: "I can analyze how changes in nuclear and electron charge (q₁ and q₂) and the distance between them (d) affect the ionization energy by applying Coulomb’s Law, and use this relationship to estimate relative ionization energies across atoms."
+    }
+  ]
+};
+
+function fillIntentionList(ul, items, opts) {
+  if (!ul || ul.childElementCount) return;
+  opts = opts || {};
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.appendChild(document.createTextNode(item.text));
+    if (item.note) {
+      li.className = 'elsewhere';
+      const tag = document.createElement('span');
+      tag.className = 'debrief-tag';
+      tag.textContent = ` — ${item.note}`;
+      li.appendChild(tag);
+    }
+    if (opts.showRevisit && item.target && item.revisit) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'debrief-revisit';
+      btn.dataset.target = item.target;
+      btn.textContent = 'Explore again → ' + item.revisit;
+      li.appendChild(btn);
+    }
+    ul.appendChild(li);
+  });
+}
+
+function fillCompetencyList(ul, items) {
+  if (!ul || ul.childElementCount) return;
+  items.forEach(item => {
+    const li = document.createElement('li');
+    const name = document.createElement('span');
+    name.className = 'cc-name';
+    name.textContent = item.name;
+    li.appendChild(name);
+    li.appendChild(document.createTextNode(item.text));
+    if (item.note) {
+      const tag = document.createElement('span');
+      tag.className = 'debrief-tag';
+      tag.textContent = ` — ${item.note}`;
+      li.appendChild(tag);
+    }
+    ul.appendChild(li);
+  });
+}
+
+function renderBriefing() {
+  fillIntentionList(document.getElementById('briefingIntentions'), DEBRIEF.intentions);
+  fillCompetencyList(document.getElementById('briefingCompetencies'), DEBRIEF.competencies);
+}
+
+function startModule(opts = {}) {
+  const skipIntro = !!opts.skipIntro;
+  const briefing = document.getElementById('briefing');
+  const stage = document.getElementById('moduleStage');
+  const playground = document.getElementById('playground');
+  if (briefing) briefing.hidden = true;
+  if (stage) stage.hidden = false;
+  if (playground) {
+    playground.classList.toggle('intro-active', !skipIntro);
+    playground.classList.toggle('intro-done', skipIntro);
+  }
+  if (skipIntro) {
+    INTRO.active = false;
+    INTRO.done = true;
+    INTRO.q1 = INTRO.q2 = INTRO.track = INTRO.eqChrome = 1;
+    requestAnimationFrame(() => {
+      resize();
+      CLOUD.key = '';
+      drawPlate();
+      kickCloudAnim();
+    });
+    return;
+  }
+  INTRO.active = true;
+  INTRO.done = false;
+  INTRO.q1 = INTRO.q2 = INTRO.track = INTRO.eqChrome = 0;
+  requestAnimationFrame(() => {
+    resize();
+    playIntroReveal();
+  });
+}
+
+function renderDebrief() {
+  fillIntentionList(document.getElementById('debriefIntentions'), DEBRIEF.intentions, { showRevisit: true });
+  fillCompetencyList(document.getElementById('debriefCompetencies'), DEBRIEF.competencies);
+}
+
+function enterDebriefStage() {
+  const stage = document.getElementById('moduleStage');
+  const debrief = document.getElementById('debrief');
+  if (!stage || !debrief) return;
+  Array.from(stage.children).forEach(child => {
+    if (child === debrief) return;
+    if (!child.hasAttribute('data-pre-debrief-hidden')) {
+      child.setAttribute('data-pre-debrief-hidden', child.hidden ? '1' : '0');
+    }
+    child.hidden = true;
+  });
+  debrief.hidden = false;
+}
+
+function leaveDebriefStage() {
+  const stage = document.getElementById('moduleStage');
+  const debrief = document.getElementById('debrief');
+  if (!stage) return;
+  Array.from(stage.children).forEach(child => {
+    if (child === debrief) return;
+    if (child.hasAttribute('data-pre-debrief-hidden')) {
+      child.hidden = child.getAttribute('data-pre-debrief-hidden') === '1';
+      child.removeAttribute('data-pre-debrief-hidden');
+    }
+  });
+  if (debrief) debrief.hidden = true;
+}
+
+let debriefRevisitWired = false;
+function wireDebriefRevisit() {
+  if (debriefRevisitWired) return;
+  debriefRevisitWired = true;
   document.addEventListener('click', (e) => {
-    if(!helpPanel.contains(e.target) && e.target !== stuckBtn) {
-      helpPanel.classList.remove('open');
+    const btn = e.target.closest('.debrief-revisit');
+    if (!btn || !btn.dataset.target) return;
+    e.preventDefault();
+    leaveDebriefStage();
+    const playground = document.getElementById('playground');
+    if (btn.dataset.target === 'playground') {
+      if (part2) {
+        part2.hidden = true;
+        part2.classList.remove('is-live');
+      }
+      if (playground) {
+        playground.hidden = false;
+        playground.classList.remove('is-leaving');
+        playground.classList.add('intro-done');
+        playground.classList.remove('intro-active');
+      }
+      INTRO.active = false;
+      INTRO.done = true;
+      requestAnimationFrame(() => {
+        resize();
+        CLOUD.key = '';
+        drawPlate();
+        kickCloudAnim();
+      });
+      if (ionFinish) {
+        ionFinish.hidden = true;
+      }
+      const sandboxNext = document.getElementById('sandboxNext');
+      if (sandboxNext) {
+        sandboxNext.hidden = false;
+        sandboxNext.textContent = 'What this was for →';
+        sandboxNext.dataset.returnDebrief = '1';
+      }
+      playground.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+      return;
+    }
+    if (btn.dataset.target === 'part2') {
+      if (playground) playground.hidden = true;
+      if (part2) {
+        part2.hidden = false;
+        part2.classList.add('is-live');
+      }
+      if (ionFinish) {
+        ionFinish.hidden = false;
+        ionFinish.textContent = 'What this was for →';
+      }
+      requestAnimationFrame(() => ionResize());
+      part2.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
     }
   });
 }
 
-// === REFERENCE DATA ===
-const DATA = {
-  constants: {
-    k: 8.988e9,
-    e: 1.602e-19,
-    c: 3.00e8,
-    h: 6.626e-34
-  }
-};
+function revealDebrief() {
+  const section = document.getElementById('debrief');
+  if (!section) return;
+  renderDebrief();
+  wireDebriefRevisit();
+  enterDebriefStage();
+  section.scrollIntoView({
+    behavior: prefersReduced ? 'auto' : 'smooth',
+    block: 'start'
+  });
+}
 
-// === DISCOVERY GATE INIT ===
+function hideDebrief() {
+  leaveDebriefStage();
+}
+
+const practiceReveal = document.getElementById('practiceReveal');
+const practiceAnswers = document.getElementById('practiceAnswers');
+if (practiceReveal && practiceAnswers) {
+  practiceReveal.addEventListener('click', () => {
+    const open = practiceAnswers.hasAttribute('hidden');
+    if (open) {
+      practiceAnswers.removeAttribute('hidden');
+      practiceReveal.setAttribute('aria-expanded', 'true');
+      practiceReveal.textContent = 'Hide answers';
+    } else {
+      practiceAnswers.setAttribute('hidden', '');
+      practiceReveal.setAttribute('aria-expanded', 'false');
+      practiceReveal.textContent = 'Click to reveal answers';
+    }
+  });
+}
+
 setGate('hasPulledApart', false);
+setGate('moduleComplete', false);
 
-// === STANDBY ANIMATION: Pulsing force-field rings ===
-const ringCount = 8;
+renderBriefing();
+const briefingNext = document.getElementById('briefingNext');
+if (briefingNext) briefingNext.addEventListener('click', startModule);
 
-function drawStandby(t) {
-  ctx.clearRect(0, 0, W, H);
-  drawGrid();
+const devSkipPart2 = document.getElementById('devSkipPart2');
+if (devSkipPart2) {
+  devSkipPart2.addEventListener('click', () => {
+    CHALLENGE.phase = 'done';
+    startModule({ skipIntro: true });
+    goToPart2();
+  });
+}
 
-  const cx = W / 2;
-  const cy = H / 2;
-  const baseSpacing = Math.min(W, H) / (ringCount + 2);
-  const pulse = Math.sin(t * 0.001) * 6;
-
-  for(let i = ringCount; i >= 1; i--) {
-    const r = i * baseSpacing + pulse * (i / ringCount);
-    const alpha = 0.12 - (i / ringCount) * 0.08;
-    ctx.save();
-    ctx.shadowColor = '#ffb24d';
-    ctx.shadowBlur = 10;
-    ctx.strokeStyle = '#ffb24d';
-    ctx.globalAlpha = Math.max(0.02, alpha);
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(cx, cy, Math.max(1, r), 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
+const _qs = new URLSearchParams(location.search);
+if (_qs.has('debrief') || _qs.has('start') || _qs.has('part2') || _qs.has('compare')) {
+  startModule({ skipIntro: true });
+  if (_qs.has('debrief')) revealDebrief();
+  if (_qs.has('compare')) {
+    CHALLENGE.phase = 'done';
+    (async () => {
+      const playground = document.getElementById('playground');
+      if (playground) playground.hidden = true;
+      if (part2) {
+        part2.hidden = false;
+        part2.classList.add('is-live');
+      }
+      ION.active = true;
+      ION.doneH = true;
+      ION.doneHe = true;
+      ION.doneLi = true;
+      ION.fadeAtom = 0;
+      ION.fadeOval = 0;
+      beginIonLoop();
+      await playCompareFinale();
+    })();
+  } else if (_qs.has('part2')) {
+    // skip sandbox challenges — jump straight to the ionization stage
+    CHALLENGE.phase = 'done';
+    goToPart2();
   }
-
-  glowCircle(cx, cy, 4, '#ffb24d');
-}
-
-/* === SIMULATION LOGIC — TO BE DESIGNED === */
-
-function loop(t) {
-  drawStandby(t);
-  if(!prefersReduced) requestAnimationFrame(loop);
-}
-
-if(prefersReduced) {
-  drawStandby(0);
 } else {
-  requestAnimationFrame(loop);
+  resize();
 }
 </script>
 </body>

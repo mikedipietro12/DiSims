@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>10 — Summary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/suite.css">
+<style>
+.mono-label,
+.act-meta,.path-num,.path-go,.scaffold-note,.discovery-line,.model-tag{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+}
+.act-meta{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--dim);margin:-0.35rem 0 0.85rem;
+}
+.discovery-line{
+  display:none;margin:0.35rem 0 0.9rem;padding:0.55rem 0;
+  border-top:1px solid var(--grid);border-bottom:1px solid var(--grid);
+  font-size:var(--label-sm);font-weight:600;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--signal);line-height:1.45;
+}
+.discovery-line.visible{display:block;}
+.scaffold-note{
+  font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--faint);margin:0.35rem 0 0.85rem;
+}
+.act-panel[hidden]{display:none !important;}
+.plate-body{padding:0.35rem 0 0;}
+.unit-path{
+  list-style:none;margin:0;padding:0;
+  border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);
+}
+.unit-path li + li{border-top:1px solid var(--grid);}
+.unit-path a{
+  display:grid;grid-template-columns:auto 1fr auto;gap:0.75rem 1rem;align-items:baseline;
+  text-decoration:none;color:inherit;padding:0.85rem 0.15rem 0.9rem;
+}
+.unit-path a:hover{background:rgba(126,140,69,0.14);}
+.unit-path a:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.path-num{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--dim);
+}
+.path-title{
+  font-family:var(--font-display);font-size:1.05rem;font-weight:400;
+  letter-spacing:-0.02em;line-height:1.15;color:var(--ink);
+}
+.path-teaser{display:block;font-size:0.95rem;line-height:1.45;color:var(--ink-soft);margin-top:0.2rem;}
+.path-go{
+  font-size:var(--label-xs);font-weight:600;color:var(--faint);
+  opacity:0;transition:opacity 0.15s;
+}
+.unit-path a:hover .path-go,
+.unit-path a:focus-visible .path-go{opacity:1;color:var(--olive-deep);}
+.model-stack{display:grid;gap:0.75rem;}
+.model-card{
+  border-left:4px solid var(--olive);padding:0.55rem 0 0.55rem 1rem;
+}
+.model-card.signal{border-left-color:var(--signal);}
+.model-card.ember{border-left-color:var(--ember);}
+.model-tag{
+  display:block;font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.25rem;
+}
+.model-card.signal .model-tag{color:var(--signal);}
+.model-card.ember .model-tag{color:var(--ember);}
+.model-card h3{
+  font-family:var(--font-display);font-size:1.2rem;font-weight:400;
+  letter-spacing:-0.02em;margin-bottom:0.3rem;
+}
+.model-card p{margin:0;font-size:1rem;line-height:1.5;color:var(--ink-soft);}
+.reflect-prompts{margin:0.85rem 0 0;}
+.reflect-prompts .student-q{margin:0.55rem 0;}
+@media(max-width:560px){
+  .unit-path a{grid-template-columns:auto 1fr;gap:0.35rem 0.75rem;}
+  .path-go{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="module-wrap">
+  <div class="top-nav">
+    <a href="index.html" class="back-link">← Unit 1b</a>
+    <div class="mod-meta">Module 10 · Summary</div>
+  </div>
+
+  <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
+    <div class="briefing-kicker"><span>Before you begin</span></div>
+    <h1 id="briefingTitle">Summary</h1>
+    <p class="briefing-lead">Look back across the instruments. This close is for naming what the measurements forced you to change about the atom.</p>
+    <div class="briefing-columns">
+      <div class="briefing-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="briefing-li" id="briefingIntentions"></ul>
+      </div>
+      <div class="briefing-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="briefing-cc" id="briefingCompetencies"></ul>
+      </div>
+    </div>
+    <div class="briefing-actions">
+      <button type="button" class="btn submit" id="briefingNext">Next → Look back</button>
+    </div>
+  </section>
+
+  <div id="moduleStage" hidden>
+    <div class="mod-tag">Module 10</div>
+    <div class="act-meta" id="actMeta">Act 1 of 2 · The instruments</div>
+    <h1>Summary</h1>
+    <p class="framing" id="framing" aria-live="polite">Ten instruments. Revisit any of them — the path is open.</p>
+    <p class="discovery-line" id="discoveryLine" aria-live="polite"></p>
+    <p class="scaffold-note">Scaffold — reflective prompts live on paper; this page is the map and the model spine.</p>
+
+    <div class="act-panel" id="act1" data-act="1">
+      <div class="viewport" data-fig="FIG. 10  ·  THE PATH">
+        <div class="plate-body">
+          <ol class="unit-path" id="unitPath"></ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act2" data-act="2" hidden>
+      <div class="viewport" data-fig="FIG. 10  ·  WHAT SURVIVED">
+        <div class="plate-body">
+          <div class="model-stack">
+            <div class="model-card">
+              <span class="model-tag">From IE jumps</span>
+              <h3>Shell model</h3>
+              <p>Electrons live in shells. Core charge — not full Z — sets how hard the valence electron is held. Module 03 built it; Module 06 broke its two-peak promise.</p>
+            </div>
+            <div class="model-card signal">
+              <span class="model-tag">From PES peaks</span>
+              <h3>Subshells</h3>
+              <p>Ne’s third peak split n=2. Configurations are measured from peak positions and heights — then 4s before 3d falls out of K and Sc.</p>
+            </div>
+            <div class="model-card ember">
+              <span class="model-tag">From magnetic moments</span>
+              <h3>Spin</h3>
+              <p>Unpaired arrows explain paramagnetism. Measured moments force Hund’s arrangement; three-in-a-box never matches — Pauli as impossibility.</p>
+            </div>
+          </div>
+          <div class="reflect-prompts">
+            <p class="student-q">Which parts of the model you arrived with survived the instruments?</p>
+            <p class="student-q">Where did a measurement force you to change the picture?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="module-footer" aria-label="Section navigation">
+      <div class="module-footer-back">
+        <button type="button" class="btn" id="backBtn" hidden>← Back</button>
+      </div>
+      <div class="module-footer-help">
+        <button type="button" id="stuckBtn" hidden>Stuck?</button>
+      </div>
+      <div class="module-footer-fwd">
+        <button type="button" class="btn submit" id="continueBtn">Continue →</button>
+      </div>
+    </nav>
+    <div class="help-panel" id="helpPanel">
+      <p id="helpText">Open any earlier module from the path. This page does not gate anything.</p>
+    </div>
+
+    <section class="debrief" id="debrief" hidden aria-labelledby="debriefTitle">
+      <h2 id="debriefTitle">What this was for</h2>
+      <p class="debrief-lead">The unit’s closing look — intentions for the synthesis, and the evaluating competency that asks what still holds.</p>
+      <div class="debrief-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="debrief-li" id="debriefIntentions"></ul>
+      </div>
+      <div class="debrief-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="debrief-cc" id="debriefCompetencies"></ul>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="assets/suite-chrome.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  const MODULES = [
+    { id:'01', href:'01-nucleus-isotopes.html', title:'Nucleus & Isotopes', teaser:'Z fixes identity; mass is a weighted average.' },
+    { id:'02', href:'02-coulomb-ionization.html', title:'Coulomb & Ionization', teaser:'V = kq₁q₂/d — how tightly an electron is held.' },
+    { id:'03', href:'03-shell-core-charge.html', title:'Shell Model & Core Charge', teaser:'IE jumps reveal shells; core charge sets the pull.' },
+    { id:'04', href:'04-atomic-size.html', title:'Atomic Size', teaser:'Radius from core charge and valence shell.' },
+    { id:'05', href:'05-light-energy.html', title:'Light & Energy', teaser:'c = λf; photon energy E = hf.' },
+    { id:'06', href:'06-photoelectron-spectroscopy.html', title:'Photoelectron Spectroscopy', teaser:'Ne’s third peak — subshells.' },
+    { id:'07', href:'07-electron-configurations.html', title:'Electron Configurations', teaser:'PES peaks → written configurations.' },
+    { id:'08', href:'08-electron-diagrams-spin.html', title:'Electron Configuration Diagrams, Quantum Numbers, and Spin', teaser:'Orbital boxes · Aufbau · Hund · Pauli.' },
+    { id:'09', href:'09-electron-affinity-electronegativity.html', title:'Electron Affinity & Electronegativity', teaser:'EN from AVEE; EA blanks as structure.' }
+  ];
+
+  /* Unit close — synthesis / evaluating language spanning Modules 07–08. */
+  const DEBRIEF = {
+    intentions: [
+      { text: 'We will link concepts from previous chem activities to synthesize our understandings.',
+        target: 'act:1', revisit: 'The instruments' },
+      { text: 'We will discuss Hund’s rule, the Pauli principle, and the Aufbau principle and how “spin” relates to electron configurations.',
+        note: 'revisited', target: 'act:2', revisit: 'What survived' }
+    ],
+    competencies: [
+      { code:'E', name:'Evaluating',
+        text:'I can critically evaluate the strengths and limitations of previous models (like the Bohr diagram and planetary model) and how they can or cannot apply PES, Aufbau, Hund’s rule, and Pauli exclusion when applied to real atomic systems.' },
+      { code:'C', name:'Communicating',
+        text:'I can use scientific terminology to explain the structure of an atom in terms of shells, subshells, and orbitals as part of electron configuration.' }
+    ]
+  };
+
+  const FRAMING = {
+    1: 'Ten instruments. Revisit any of them — the path is open.',
+    2: 'Shell → subshell → spin. What did the data force you to keep, and what had to go?'
+  };
+  const HELP = {
+    1: 'Open any earlier module from the path. This page does not gate anything.',
+    2: 'The reflective questions stay on paper. Use the model spine to frame what you write.'
+  };
+  const ACT_META = {
+    1: 'Act 1 of 2 · The instruments',
+    2: 'Act 2 of 2 · What survived'
+  };
+
+  const STATE = { act:1, moduleComplete:false };
+
+  const els = {
+    framing: document.getElementById('framing'),
+    actMeta: document.getElementById('actMeta'),
+    discoveryLine: document.getElementById('discoveryLine'),
+    unitPath: document.getElementById('unitPath'),
+    backBtn: document.getElementById('backBtn'),
+    continueBtn: document.getElementById('continueBtn'),
+    helpText: document.getElementById('helpText'),
+    stuckBtn: document.getElementById('stuckBtn')
+  };
+
+  function renderPath() {
+    els.unitPath.innerHTML = '';
+    let visited = {};
+    try { visited = JSON.parse(localStorage.getItem('unit1b_visited')) || {}; } catch (e) {}
+    MODULES.forEach(m => {
+      const li = document.createElement('li');
+      if (visited[m.id]) li.classList.add('visited');
+      const a = document.createElement('a');
+      a.href = m.href;
+      const num = document.createElement('span');
+      num.className = 'path-num';
+      num.textContent = 'Mod ' + m.id;
+      const mid = document.createElement('span');
+      const title = document.createElement('span');
+      title.className = 'path-title';
+      title.textContent = m.title;
+      const teaser = document.createElement('span');
+      teaser.className = 'path-teaser';
+      teaser.textContent = m.teaser;
+      mid.appendChild(title);
+      mid.appendChild(teaser);
+      const go = document.createElement('span');
+      go.className = 'path-go';
+      go.setAttribute('aria-hidden', 'true');
+      go.textContent = 'Open →';
+      a.appendChild(num);
+      a.appendChild(mid);
+      a.appendChild(go);
+      li.appendChild(a);
+      els.unitPath.appendChild(li);
+    });
+  }
+
+  function setAct(n) {
+    STATE.act = n;
+    document.querySelectorAll('.act-panel').forEach(p => {
+      p.hidden = Number(p.dataset.act) !== n;
+    });
+    els.framing.textContent = FRAMING[n];
+    els.actMeta.textContent = ACT_META[n];
+    els.helpText.textContent = HELP[n];
+    document.getElementById('helpPanel').classList.remove('open');
+    els.backBtn.hidden = n === 1;
+    els.stuckBtn.hidden = n === 1;
+    if (STATE.moduleComplete && n === 2) {
+      els.continueBtn.textContent = 'What this was for →';
+    } else {
+      els.continueBtn.textContent = n === 2 ? 'Finish →' : 'Continue →';
+    }
+    if (n === 2) {
+      els.discoveryLine.textContent = 'The anomaly taught more than the tidy cases — Ne, K/Sc, and C’s moment.';
+      els.discoveryLine.classList.add('visible');
+    } else {
+      els.discoveryLine.classList.remove('visible');
+    }
+  }
+
+  function showDebriefStage() {
+    STATE.moduleComplete = true;
+    SuiteChrome.revealDebrief(DEBRIEF, {
+      exclusive: true,
+      onRevisit: function (target) {
+        SuiteChrome.leaveDebriefStage();
+        const n = Number(String(target).replace(/^act:/, '')) || 1;
+        setAct(Math.min(2, Math.max(1, n)));
+        window.scrollTo({ top: 0, behavior: SuiteChrome.prefersReduced ? 'auto' : 'smooth' });
+      }
+    });
+  }
+
+  function startModule() {
+    document.getElementById('briefing').hidden = true;
+    document.getElementById('moduleStage').hidden = false;
+    renderPath();
+    setAct(1);
+  }
+
+  SuiteChrome.renderBriefing(DEBRIEF);
+  SuiteChrome.wireStuckHelp();
+  document.getElementById('briefingNext').addEventListener('click', startModule);
+  els.backBtn.addEventListener('click', () => setAct(1));
+  els.continueBtn.addEventListener('click', () => {
+    if (STATE.act < 2) setAct(2);
+    else showDebriefStage();
+  });
+
+  const qs = new URLSearchParams(location.search);
+  if (qs.has('debrief') || qs.has('start')) {
+    startModule();
+    if (qs.has('debrief')) {
+      setAct(2);
+      showDebriefStage();
+    } else if (qs.get('act')) {
+      setAct(Math.min(2, Math.max(1, Number(qs.get('act')) || 1)));
+    }
+  }
+})();
+</script>
+</body>
+</html>

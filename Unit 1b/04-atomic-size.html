@@ -6,291 +6,2598 @@
 <title>04 — Atomic Size</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --void:#0a0912;
-  --void-2:#0c0b1c;
-  --panel:#151330;
-  --panel-edge:#2a2660;
-  --grid:#211d47;
-  --phosphor:#3fe0cf;
-  --phosphor-dim:#1c6b66;
-  --ember:#ffb24d;
-  --signal:#b579ff;
-  --ink:#e9e7fb;
-  --dim:#797597;
+  --paper:#e6e1cf;
+  --paper-2:#d8d2bc;
+  --paper-3:#c9c2a8;
+  --void:#050505;
+  --void-2:#0c0c0c;
+  --panel:#efe9d4;
+  --panel-edge:#1a1810;
+  --grid:#cfc8ae;
+  --phosphor:#5c6b28;
+  --ember:#a85a32;
+  --signal:#1a6aa3;
+  --ink:#16140e;
+  --ink-soft:#33301f;
+  --dim:#55513f;
+  --faint:#6f6b59;
+  --proton:#a85a32;
+  --neutron:#7e8c45;
+  --electron:#c4a35a;
+  --success:#4f5a28;
+  --error:#a85a32;
+  --neon:#c4a35a;
+  --olive:#7e8c45;
+  --olive-deep:#4f5a28;
+  --mustard:#c4a35a;
+  --plate:#050505;
+  --plate-ink:#e8e6d9;
+
+  --font-display:'Archivo Black',Helvetica,sans-serif;
+  --font-body:Barlow,Helvetica,Univers,'Helvetica Neue',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  --label-xs:0.72rem;
+  --label-sm:0.78rem;
+  --label-md:0.85rem;
+  --track-wide:0.13em;
+  --track-tight:0.08em;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--void);color:var(--ink);font-family:'IBM Plex Mono',monospace;min-height:100vh;}
+html{font-size:16px;-webkit-text-size-adjust:100%;}
+body{
+  background-color:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:1.0625rem;
+  min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+.mono-label,
+.back-link,.mod-meta,.task-kicker,.debrief-kicker,.briefing-kicker,#stuckBtn,.btn,.mod-tag,.viewport::before,
+.atom-kicker,.atom-sym,.meta-row,.meta-kicker,.disk-label,.disk-r,.summary-kicker,.story-term,.hud-strip{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+}
 body::before{
   content:'';
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   z-index:9999;
   pointer-events:none;
-  opacity:0.045;
-  mix-blend-mode:screen;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:0.14;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:256px 256px;
 }
-.module-wrap{max-width:900px;margin:0 auto;padding:1.5rem 1rem 3rem;}
-.back-link{
-  display:inline-block;
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.8rem;
-  color:var(--dim);
-  text-decoration:none;
-  margin-bottom:1.2rem;
-  transition:color 0.2s;
+.module-wrap{max-width:920px;margin:0 auto;padding:1.35rem 1.35rem 3.5rem;position:relative;z-index:1;}
+.top-nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap;border-bottom:1px solid var(--ink);padding-bottom:0.7rem;}
+.back-link{font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color 0.2s;}
+.back-link:hover{color:var(--olive-deep);}
+.mod-meta{font-size:var(--label-xs);font-weight:600;color:var(--ink);letter-spacing:var(--track-wide);text-transform:uppercase;}
+
+.task-kicker,.mod-tag{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--olive-deep);
+  margin-bottom:0.7rem;
 }
-.back-link:hover{color:var(--phosphor);}
-.mod-tag{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.55rem;
-  color:var(--dim);
-  text-transform:uppercase;
-  letter-spacing:0.15em;
-  margin-bottom:0.5rem;
+.task-kicker::before,.mod-tag::before{
+  content:'';
+  width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);
+  flex:none;
+  transform:translateY(-0.12em);
 }
-h1{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.9rem;
-  color:var(--phosphor);
-  text-shadow:0 0 12px rgba(63,224,207,0.4),0 0 30px rgba(63,224,207,0.15);
-  margin-bottom:0.75rem;
-  line-height:1.6;
+h1,.task-title{
+  font-family:var(--font-display);
+  font-size:clamp(1.9rem,4.7vw,2.75rem);
+  font-weight:400;
+  letter-spacing:-0.025em;
+  line-height:0.98;
+  color:var(--ink);
+  margin-bottom:0.7rem;
 }
 .framing{
-  font-family:'IBM Plex Mono',monospace;
-  color:var(--dim);
-  font-style:italic;
-  font-size:0.85rem;
-  line-height:1.6;
-  margin-bottom:0.5rem;
+  font-size:1.15rem;
+  font-weight:400;
+  line-height:1.5;
+  color:var(--ink-soft);
+  max-width:none;
+  text-wrap:pretty;
+  margin-bottom:0.85rem;
 }
+.framing strong{color:var(--ember);font-weight:600;}
+.story{
+  font-size:1.08rem;
+  line-height:1.55;
+  color:var(--ink-soft);
+  text-wrap:pretty;
+  margin:0 0 0.85rem;
+}
+.story .story-term{color:var(--ember);font-weight:600;letter-spacing:0.04em;text-transform:none;}
+.student-q{
+  color:var(--signal);
+  font-weight:700;
+  font-size:1.08rem;
+  line-height:1.5;
+  text-wrap:pretty;
+  margin:0.65rem 0 0.35rem;
+}
+.hyp-list{
+  list-style:none;
+  margin:1rem 0 1.15rem;
+  padding:0;
+  counter-reset:hyp;
+}
+.hyp-list li{
+  position:relative;
+  counter-increment:hyp;
+  padding-left:2rem;
+  margin:0.85rem 0;
+  color:var(--signal);
+  font-weight:700;
+  font-size:1.08rem;
+  line-height:1.5;
+  text-wrap:pretty;
+}
+.hyp-list li::before{
+  content:counter(hyp) ")";
+  position:absolute;
+  left:0;
+  font-family:var(--font-mono);
+  font-size:var(--label-md);
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--signal);
+}
+.hyp-note{
+  font-size:1.05rem;
+  line-height:1.55;
+  color:var(--ink-soft);
+  text-wrap:pretty;
+  margin:0.85rem 0 0;
+}
+
+/* Hover/focus tip for defined terms (e.g. IONS) */
+.term-tip{
+  position:relative;
+  color:var(--ember);
+  font-weight:700;
+  letter-spacing:0.06em;
+  cursor:help;
+  border-bottom:1.5px dotted var(--ember);
+  text-transform:none;
+}
+.term-tip:focus-visible{
+  outline:2px solid var(--olive-deep);
+  outline-offset:3px;
+}
+.term-tip::after{
+  content:attr(data-tip);
+  position:absolute;
+  left:50%;
+  bottom:calc(100% + 0.55rem);
+  transform:translateX(-50%) translateY(0.25rem);
+  width:max-content;
+  max-width:16rem;
+  padding:0.45rem 0.65rem;
+  background:var(--plate);
+  color:var(--plate-ink);
+  border:1px solid var(--plate-ink);
+  font-family:var(--font-body);
+  font-size:0.92rem;
+  font-weight:500;
+  letter-spacing:0.01em;
+  line-height:1.35;
+  text-transform:none;
+  white-space:normal;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.18s ease, transform 0.18s ease;
+  z-index:5;
+}
+.term-tip:hover::after,
+.term-tip:focus-visible::after{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+.atom-svg .e-grabbable{
+  cursor:grab;
+  pointer-events:auto;
+}
+.atom-svg .e-grab-hit{
+  cursor:grab;
+  pointer-events:auto;
+}
+.atom-svg .e-grabbable:focus{
+  outline:2px solid var(--olive-deep);
+  outline-offset:3px;
+}
+.atom-svg .e-grabbable.is-lifted,
+.atom-svg .e-grab-hit.is-lifted{
+  opacity:0;
+  pointer-events:none;
+}
+.atom-card.is-drop-hot .atom-sym{
+  color:var(--signal);
+}
+.atom-card.is-drop-hot .atom-svg .shell-valence{
+  stroke:var(--signal);
+  stroke-width:2;
+  opacity:0.95;
+}
+.e-drag-ghost{
+  position:fixed;
+  left:0;
+  top:0;
+  width:22px;
+  height:22px;
+  margin:-11px 0 0 -11px;
+  pointer-events:none;
+  z-index:50;
+}
+.e-drag-ghost svg{display:block;width:100%;height:100%;}
+body.is-e-dragging{
+  cursor:grabbing;
+  user-select:none;
+}
+body.is-e-dragging .atom-svg .e-grabbable{cursor:grabbing;}
+
+.ions-pair-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:flex-end;
+  gap:1rem 2rem;
+  margin-bottom:1.5rem;
+}
+.ions-pair-row:last-child{margin-bottom:0;}
+.ions-pair-label{
+  flex:0 0 100%;
+  text-align:center;
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:-0.35rem;
+}
+
+.btn{background:transparent;border:1px solid var(--ink);color:var(--ink);font-size:var(--label-md);letter-spacing:0.09em;text-transform:uppercase;font-weight:600;padding:0.65rem 1.3rem;border-radius:0;cursor:pointer;transition:background 0.15s,color 0.15s;margin-right:0.5rem;margin-top:0.4rem;}
+.btn:hover{background:var(--ink);color:var(--paper);}
+.btn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.btn.submit{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+.btn.submit:hover{background:var(--olive-deep);border-color:var(--olive-deep);}
+.btn:disabled{opacity:0.35;cursor:not-allowed;pointer-events:none;}
+
+#stuckBtn{background:none;border:1px solid var(--ink);color:var(--ink);font-size:var(--label-sm);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:0.55rem 1.2rem;border-radius:0;cursor:pointer;transition:background 0.15s,color 0.15s;margin:0;}
+#stuckBtn:hover{background:var(--ink);color:var(--paper);}
+#stuckBtn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.module-footer{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;
+  column-gap:0.75rem;
+  row-gap:0.5rem;
+  width:100%;
+  margin-top:1.25rem;
+  min-height:2.6rem;
+}
+.module-footer[hidden]{display:none !important;}
+.module-footer-back,
+.module-footer-help,
+.module-footer-fwd{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:0.5rem;
+  min-width:0;
+}
+.module-footer-back{justify-self:start;justify-content:flex-start;}
+.module-footer-help{justify-self:center;justify-content:center;}
+.module-footer-fwd{justify-self:end;justify-content:flex-end;}
+.module-footer .btn,
+.module-footer #stuckBtn{margin:0;}
+.module-footer #stuckBtn[hidden],
+.module-footer .btn[hidden]{display:none !important;}
+@media (max-width:520px){
+  .module-footer{
+    grid-template-columns:1fr 1fr;
+    grid-template-areas:
+      "back fwd"
+      "help help";
+  }
+  .module-footer-back{grid-area:back;}
+  .module-footer-help{grid-area:help;}
+  .module-footer-fwd{grid-area:fwd;}
+}
+.help-panel{opacity:0;max-height:0;overflow:hidden;transition:opacity 0.3s,max-height 0.3s;border:1px solid transparent;background:var(--plate);border-radius:0;padding:0 1.2rem;margin-top:0.75rem;color:var(--plate-ink);font-size:1.05rem;line-height:1.6;max-width:none;text-wrap:pretty;}
+.help-panel.open{opacity:1;max-height:320px;padding:1rem 1.2rem;border-color:var(--neon);}
+
+/* briefing */
+.briefing{margin:0 0 0.5rem;padding:0.2rem 0 0;width:100%;}
+.briefing[hidden]{display:none;}
+.module-wrap:has(#briefing:not([hidden])){max-width:1120px;padding-left:clamp(1.35rem,4vw,2.75rem);padding-right:clamp(1.35rem,4vw,2.75rem);}
+.briefing-kicker{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.7rem;
+}
+.briefing-kicker::before{
+  content:'';width:1.6rem;height:0.28rem;background:var(--olive-deep);flex:none;
+  transform:translateY(-0.12em);
+}
+.briefing h1{
+  font-family:var(--font-display);font-size:clamp(1.85rem,4.5vw,2.55rem);
+  font-weight:400;letter-spacing:-0.025em;line-height:1.02;color:var(--ink);
+  margin-bottom:0.55rem;
+}
+.briefing-lead{font-size:1.15rem;line-height:1.55;color:var(--ink-soft);max-width:none;margin:0 0 1.5rem;text-wrap:pretty;}
+.briefing-columns{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.75rem 2.5rem;
+  align-items:start;
+}
+.briefing-actions{
+  display:flex;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  margin-top:1.75rem;
+  padding-top:1.25rem;
+  border-top:1px solid var(--ink);
+}
+.briefing .btn.submit{margin-top:0;}
+#moduleStage[hidden]{display:none;}
+
+/* debrief */
+.debrief{margin:0.25rem 0 1.25rem;padding:1.2rem 0 0;border-top:1px solid var(--ink);}
+.debrief[hidden]{display:none;}
+.briefing h2,
+.debrief h2{font-family:var(--font-display);font-size:1.5rem;font-weight:400;letter-spacing:-0.02em;line-height:1.1;color:var(--ink);margin-bottom:0.35rem;}
+.debrief-lead{font-size:1.05rem;line-height:1.5;color:var(--dim);max-width:none;margin:0 0 1.15rem;text-wrap:pretty;}
+.briefing-block,
+.debrief-block{border-left:4px solid var(--olive);padding:0.1rem 0 0.1rem 1.05rem;margin-bottom:1.15rem;}
+.briefing-block{margin-bottom:0;}
+.briefing-block:last-of-type,
+.debrief-block:last-child{margin-bottom:0;}
+.briefing-block.cc,
+.debrief-block.cc{border-left-color:var(--signal);}
+.debrief-kicker{font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.5rem;}
+.briefing-block.cc .debrief-kicker,
+.debrief-block.cc .debrief-kicker{color:var(--signal);}
+.briefing ul,
+.debrief ul{list-style:none;margin:0;padding:0;}
+.briefing li,
+.debrief li{position:relative;padding-left:1.6rem;margin:0.45rem 0;font-size:1rem;line-height:1.5;color:var(--ink-soft);max-width:none;text-wrap:pretty;}
+.briefing li{font-size:1.05rem;line-height:1.55;margin:0.55rem 0;}
+.briefing-li li::before{content:'\25B8';position:absolute;left:0;color:var(--olive-deep);}
+.debrief-li li::before{content:'\2713';position:absolute;left:0;color:var(--olive-deep);font-weight:700;}
+.briefing-li li.elsewhere::before,
+.debrief-li li.elsewhere::before,
+.briefing-cc li.elsewhere::before,
+.debrief-cc li.elsewhere::before{content:'\270E';color:var(--ember);}
+.debrief-tag{font-family:var(--font-mono);font-size:var(--label-xs);letter-spacing:0.1em;text-transform:uppercase;color:var(--ember);white-space:nowrap;}
+.debrief-revisit{
+  display:block;margin:0.35rem 0 0;padding:0;
+  border:none;background:none;cursor:pointer;text-align:left;
+  font-family:var(--font-mono);font-size:var(--label-sm);font-weight:600;
+  letter-spacing:var(--track-tight);text-transform:uppercase;
+  color:var(--signal);line-height:1.4;
+}
+.debrief-revisit:hover{color:var(--olive-deep);text-decoration:underline;}
+.debrief-revisit:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.briefing-cc li::before,
+.debrief-cc li::before{content:'\25B8';position:absolute;left:0;color:var(--signal);}
+.briefing-cc .cc-name,
+.debrief-cc .cc-name{display:block;font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--signal);margin-bottom:0.15rem;}
+
+.debrief-block.todo{border-left-color:var(--ember);}
+.debrief-block.todo .debrief-kicker{color:var(--ember);}
+.debrief-todo{list-style:none;margin:0;padding:0;}
+.debrief-todo li{position:static;padding-left:0;margin:0.65rem 0;}
+.debrief-todo label{
+  display:flex;align-items:flex-start;gap:0.7rem;
+  cursor:pointer;font-size:1rem;line-height:1.5;color:var(--ink-soft);
+  text-wrap:pretty;
+}
+.debrief-todo input[type="checkbox"]{
+  appearance:none;-webkit-appearance:none;
+  flex:0 0 auto;width:1.05rem;height:1.05rem;margin:0.2rem 0 0;
+  border:1.5px solid var(--ink);border-radius:0;background:var(--paper);
+  cursor:pointer;
+}
+.debrief-todo input[type="checkbox"]:checked{
+  background:var(--olive-deep);border-color:var(--olive-deep);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.5 L4.5 9 L10 3' fill='none' stroke='%23e6e1cf' stroke-width='1.8'/%3E%3C/svg%3E");
+  background-size:0.75rem 0.75rem;background-position:center;background-repeat:no-repeat;
+}
+.debrief-todo input[type="checkbox"]:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+
+.act[hidden]{display:none;}
 .viewport{
   position:relative;
-  background:var(--void-2);
-  border:2px solid var(--panel-edge);
-  border-radius:4px;
-  box-shadow:
-    0 0 0 4px var(--void),
-    0 0 0 6px var(--panel-edge),
-    0 0 30px rgba(63,224,207,0.06);
+  background:transparent;
+  border:3px solid var(--ink);
+  border-radius:0;
   padding:0;
-  margin:1.5rem 0;
+  margin:0.35rem 0 1rem;
   overflow:hidden;
 }
-#simCanvas{width:100%;display:block;}
-.controls{/* placeholder for simulation controls */}
-.hud{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.7rem;
+.viewport::before{
+  content:attr(data-fig);
+  display:block;
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--ink);
+  padding:0.55rem 1rem 0.42rem;
+  border-bottom:2px solid var(--ink);
+}
+.plate-body{padding:1.1rem 1rem 1.25rem;}
+
+.atom-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:flex-end;
+  gap:1rem 1.35rem;
+}
+.atom-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.45rem;
+  min-width:0;
+  transition:opacity 0.4s ease, transform 0.55s ease;
+}
+.atom-card.is-dim{opacity:0.4;}
+.atom-kicker{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
   color:var(--dim);
-  padding:0.5rem 0.75rem;
-  border-top:1px solid var(--panel-edge);
-  background:var(--panel);
+  text-align:center;
 }
-[data-gate]{opacity:0;transition:opacity 0.6s;pointer-events:none;}
-[data-gate].discovered{opacity:1;pointer-events:auto;}
-#stuckBtn{
-  background:none;
-  border:1px solid var(--signal);
-  color:var(--signal);
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.8rem;
-  padding:0.5rem 1.2rem;
-  border-radius:4px;
-  cursor:pointer;
-  transition:background 0.2s,color 0.2s;
-  margin-top:1rem;
+.atom-sym{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.06em;
+  color:var(--ink);
+  text-transform:none;
 }
-#stuckBtn:hover{background:rgba(181,121,255,0.1);}
-#stuckBtn:focus-visible{outline:2px solid var(--signal);outline-offset:2px;}
-.help-panel{
+.atom-svg{
+  width:min(100%,240px);
+  height:auto;
+  display:block;
+}
+.atom-svg .shell{
+  fill:none;
+  stroke:var(--ink);
+  stroke-width:1.25;
+  opacity:0.55;
+  transition:r 0.9s ease, opacity 0.5s ease;
+}
+.atom-svg .shell-orbit{
+  transform-box:view-box;
+  animation:shell-orbit 26s linear infinite;
+}
+.atom-svg .shell-orbit-inner{
+  animation-duration:15s;
+  animation-direction:reverse;
+}
+@keyframes shell-orbit{
+  to{transform:rotate(360deg);}
+}
+.atom-svg .neg-core-disk{pointer-events:none;}
+.atom-svg .neg-stipple circle{
+  fill:var(--electron);
+  stroke:none;
+  pointer-events:none;
+}
+.atom-svg .e-marker,
+.atom-svg .e-valence{
+  fill:var(--electron);
+  stroke:#6a5530;
+  stroke-width:1;
+  transition:cx 0.9s ease, cy 0.9s ease;
+}
+.atom-svg .nuc-label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  fill:var(--paper);
+  text-anchor:middle;
+  dominant-baseline:central;
+}
+.atom-svg .nuc-label.is-shielded{opacity:0.4;}
+.atom-svg .radius-line{
+  stroke:var(--ember);
+  stroke-width:1.5;
+  fill:none;
+}
+.atom-svg .radius-tick{
+  stroke:var(--ember);
+  stroke-width:1.5;
+}
+.atom-svg .radius-label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  fill:var(--ember);
+  text-anchor:middle;
+}
+.atom-svg .radius-knockout{
+  fill:var(--paper);
+}
+.atom-svg .measure-group{
   opacity:0;
-  max-height:0;
-  overflow:hidden;
-  transition:opacity 0.3s,max-height 0.3s;
-  border:1px solid var(--signal);
-  background:var(--panel);
-  border-radius:4px;
-  padding:0 1.2rem;
-  margin-top:0.75rem;
-  color:var(--dim);
-  font-size:0.85rem;
-  line-height:1.6;
+  transition:opacity 0.55s ease;
 }
-.help-panel.open{
-  opacity:1;
-  max-height:200px;
-  padding:1rem 1.2rem;
+.atom-svg .measure-group.is-on{opacity:1;}
+
+/* Soft oval linking nucleus ↔ outer electron (attraction) — fill only, no stroke */
+.atom-svg .attraction-oval{
+  stroke:none;
+  pointer-events:none;
+}
+.atom-svg .attraction-fleck{
+  fill:var(--ember);
+  stroke:none;
+  pointer-events:none;
+}
+
+.meta-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));
+  gap:0.55rem 1rem;
+  margin-top:0.85rem;
+  padding-top:0.75rem;
+  border-top:1px solid var(--paper-3);
+}
+.meta-row{display:flex;flex-direction:column;align-items:center;gap:0.15rem;text-align:center;}
+.meta-kicker{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--faint);
+}
+.meta-val{
+  font-family:var(--font-mono);
+  font-size:1.05rem;
+  font-weight:600;
+  color:var(--ink);
+  font-variant-numeric:tabular-nums;
+  text-align:center;
+}
+.meta-val .unit{font-weight:500;color:var(--dim);font-size:0.85rem;margin-left:0.2rem;}
+
+.hud-strip{
+  font-size:var(--label-sm);
+  font-weight:500;
+  letter-spacing:var(--track-tight);
+  text-transform:uppercase;
+  color:var(--ink);
+  padding:0.55rem 1rem;
+  border-top:2px solid var(--ink);
+}
+.hud-strip.is-student-q{
+  text-transform:none;
+  letter-spacing:0.01em;
+  font-size:1.02rem;
+  font-weight:700;
+  line-height:1.45;
+  color:var(--signal);
+  text-wrap:pretty;
+}
+
+.disk-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:flex-end;
+  gap:1.25rem 1.75rem;
+  min-height:12rem;
+  padding:0.5rem 0;
+}
+.disk-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.4rem;
+}
+.disk-host{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:9.5rem;
+  height:9.5rem;
+}
+.disk-svg{width:100%;height:100%;display:block;}
+.disk-label{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--ink);
+  text-transform:none;
+}
+.disk-r{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--phosphor);
+}
+.pair-block{margin-bottom:1.35rem;}
+.pair-block:last-child{margin-bottom:0;}
+.pair-title{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:0.55rem;
+  text-align:center;
+}
+
+.summary-block{margin-bottom:1.35rem;}
+.summary-block:last-child{margin-bottom:0;}
+.summary-kicker{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin-bottom:0.65rem;
+  text-align:center;
+}
+.summary-note{
+  font-size:1.02rem;
+  line-height:1.5;
+  color:var(--ink-soft);
+  text-wrap:pretty;
+  margin-top:0.85rem;
+  text-align:center;
+}
+
+/* Periodic relative-size chart (summary) */
+.trend-chart{
+  display:grid;
+  grid-template-columns:2.6rem 1fr;
+  grid-template-rows:auto 1fr;
+  gap:0.45rem 0.55rem;
+  background:var(--paper-2);
+  border:1px solid var(--ink);
+  padding:0.65rem 0.75rem 0.85rem;
+}
+.trend-arrow-across{
+  grid-column:2;
+  grid-row:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:1.85rem;
+  background:var(--olive-deep);
+  color:var(--paper);
+  font-family:var(--font-body);
+  font-size:0.92rem;
+  font-weight:600;
+  letter-spacing:0.02em;
+  text-transform:none;
+  clip-path:polygon(0 0, calc(100% - 1.1rem) 0, 100% 50%, calc(100% - 1.1rem) 100%, 0 100%);
+  padding:0.35rem 1.6rem 0.35rem 0.85rem;
+}
+.trend-arrow-down{
+  grid-column:1;
+  grid-row:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--olive-deep);
+  color:var(--paper);
+  font-family:var(--font-body);
+  font-size:0.92rem;
+  font-weight:600;
+  letter-spacing:0.02em;
+  text-transform:none;
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);
+  clip-path:polygon(0 0, 100% 0, 100% calc(100% - 1.1rem), 50% 100%, 0 calc(100% - 1.1rem));
+  padding:0.85rem 0.2rem 1.5rem;
+  text-align:center;
+}
+.trend-grid{
+  grid-column:2;
+  grid-row:2;
+  display:grid;
+  grid-template-columns:repeat(8, minmax(0, 1fr));
+  gap:0;
+  background:var(--paper);
+  border:1px solid var(--ink);
+}
+.trend-cell{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  gap:0.15rem;
+  min-height:4.6rem;
+  padding:0.35rem 0.15rem 0.4rem;
+  border-right:1px solid var(--paper-3);
+  border-bottom:1px solid var(--paper-3);
+  background:var(--paper);
+}
+.trend-cell:nth-child(8n){border-right:none;}
+.trend-cell.is-empty{
+  background:transparent;
+  border-color:transparent;
+}
+.trend-disk-host{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:2.85rem;
+}
+.trend-disk-host .disk-svg{
+  width:auto;
+  height:100%;
+  max-width:100%;
+}
+.trend-sym{
+  font-family:var(--font-body);
+  font-size:0.78rem;
+  font-weight:600;
+  letter-spacing:0.02em;
+  color:var(--ink);
+  text-transform:none;
+  line-height:1;
+}
+
+@media(max-width:760px){
+  .trend-chart{
+    grid-template-columns:1.85rem 1fr;
+    padding:0.45rem;
+    gap:0.3rem 0.35rem;
+  }
+  .trend-arrow-across,
+  .trend-arrow-down{
+    font-size:0.72rem;
+  }
+  .trend-arrow-across{
+    min-height:1.5rem;
+    padding:0.25rem 1.2rem 0.25rem 0.5rem;
+    clip-path:polygon(0 0, calc(100% - 0.85rem) 0, 100% 50%, calc(100% - 0.85rem) 100%, 0 100%);
+  }
+  .trend-cell{
+    min-height:3.4rem;
+    padding:0.2rem 0.05rem 0.25rem;
+  }
+  .trend-disk-host{height:2.1rem;}
+  .trend-sym{font-size:0.68rem;}
+}
+
+@media(max-width:760px){
+  .briefing-columns{grid-template-columns:1fr;gap:1.35rem;}
+  .atom-svg{width:min(100%,180px);}
+  .disk-host{width:7.5rem;height:7.5rem;}
+}
+@media(prefers-reduced-motion:reduce){
+  .atom-svg .shell-orbit,
+  .atom-svg .shell-orbit-inner{animation:none;}
+  .atom-svg .shell,
+  .atom-svg .e-marker,
+  .atom-svg .e-valence,
+  .atom-svg .measure-group,
+  .atom-card{transition:none;}
+  .term-tip::after{transition:none;}
+}
+@media print{
+  .debrief{break-inside:avoid;border-top-color:#000;}
+  .briefing h1,.briefing h2,.briefing li,.debrief h2,.debrief li,.debrief-kicker,.briefing-cc .cc-name,.debrief-cc .cc-name,.debrief-tag{color:#000;}
+  #stuckBtn,.module-footer{display:none;}
 }
 </style>
 </head>
 <body>
 <div class="module-wrap">
-  <a href="index.html" class="back-link">← Unit 1b</a>
+  <div class="top-nav">
+    <a href="index.html" class="back-link">← Unit 1b</a>
+    <div class="mod-meta">Module 04 · Atomic Size</div>
+  </div>
+
+  <!-- Briefing -->
+  <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
+    <div class="briefing-kicker"><span>Before you begin</span></div>
+    <h1 id="briefingTitle">Atomic Size</h1>
+    <p class="briefing-lead">Read what this module is aiming for. Then open the instrument and work through it.</p>
+    <div class="briefing-columns">
+      <div class="briefing-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="briefing-li" id="briefingIntentions"></ul>
+      </div>
+      <div class="briefing-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="briefing-cc" id="briefingCompetencies"></ul>
+      </div>
+    </div>
+    <div class="briefing-actions">
+      <button type="button" class="btn submit" id="briefingNext">Next → Start simulation</button>
+    </div>
+  </section>
+
+  <div id="moduleStage" hidden>
   <header>
-    <div class="mod-tag">Module 04</div>
-    <h1>Atomic Size</h1>
-    <p class="framing">Line up the atoms. Some shrink across a row. Some grow going down. Why?</p>
+    <div class="mod-tag" id="actTag">Module 04 · Act 1</div>
+    <h1 class="task-title" id="actTitle">Atomic radius</h1>
+    <p class="framing" id="actFrame" hidden></p>
   </header>
 
-  <div class="viewport">
-    <canvas id="simCanvas"></canvas>
-    <div class="hud">— standby —</div>
+  <!-- Act 0: define radius on C -->
+  <section class="act" id="actDefine" aria-labelledby="actTitle">
+    <p class="story" id="defineStory">
+      The <span class="story-term">atomic radius</span> is the distance from the nucleus out to the furthest electron.
+      For carbon, that means the valence shell — the electrons outside the core.
+    </p>
+    <div class="viewport" data-fig="FIG. 04A  ·  CARBON RADIUS">
+      <div class="plate-body">
+        <div class="atom-row" id="defineHost"></div>
+        <div class="meta-grid" id="defineMeta"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- After measure: write hypotheses before exploring trends -->
+  <section class="act" id="actHypothesize" hidden aria-labelledby="actTitle">
+    <p class="story">
+      Before we move on, we are going to practice creating a hypothesis.
+    </p>
+    <p class="story">Create a hypothesis for these two questions:</p>
+    <ol class="hyp-list">
+      <li>How will the radius of the atoms change moving left to right in a row on the periodic table?</li>
+      <li>How will the radius of the atoms change moving down the periodic table?</li>
+    </ol>
+    <p class="hyp-note">Make sure you are thorough in your reasoning.</p>
+    <p class="hyp-note">Write them down and check as you go. Be prepared to share at the end of class.</p>
+  </section>
+
+  <!-- Act: across period -->
+  <section class="act" id="actAcross" hidden aria-labelledby="actTitle">
+    <p class="student-q">The radius decreases moving left to right on the periodic table; does this match your hypothesis? Why might this be the case?</p>
+    <div class="viewport" data-fig="FIG. 04B  ·  ACROSS A PERIOD">
+      <div class="plate-body">
+        <div class="atom-row" id="acrossHost"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Act 2: down a group -->
+  <section class="act" id="actDown" hidden aria-labelledby="actTitle">
+    <p class="student-q">
+      Look what happens as we move down the group, how would you describe this change?
+    </p>
+    <div class="viewport" data-fig="FIG. 04C  ·  DOWN A GROUP">
+      <div class="plate-body">
+        <div class="atom-row" id="downHost"></div>
+      </div>
+      <div class="hud-strip" id="downHud">Start with oxygen, and move down the periodic table to see how radius changes</div>
+    </div>
+  </section>
+
+  <!-- Act 5: ions — hypothesis → transfer → examples -->
+  <section class="act" id="actIons" hidden aria-labelledby="actTitle">
+    <div id="ionsHypView">
+      <p class="student-q">
+        Now that we know what happens when we move across and down the periodic table,
+        could you hypothesize what happens when we make
+        <span class="term-tip" tabindex="0" data-tip="Adding or removing electrons">IONS</span>
+        from atoms?
+      </p>
+      <p class="hyp-note">Write it down and check as you go. Be prepared to share.</p>
+    </div>
+
+    <div id="ionsTransferView" hidden>
+      <p class="story">
+        Grab sodium’s outer electron and drag it onto chlorine — see how it matches your hypothesis.
+      </p>
+      <div class="viewport" data-fig="FIG. 04D  ·  ELECTRON TRANSFER">
+        <div class="plate-body">
+          <div class="atom-row" id="ionsTransferHost"></div>
+        </div>
+        <div class="hud-strip" id="ionsTransferHud">Grab the outer electron on Na</div>
+      </div>
+    </div>
+
+    <div id="ionsExamplesView" hidden>
+      <p class="story">A few more — neutral atom beside its ion.</p>
+      <div class="viewport" data-fig="FIG. 04E  ·  ATOMS &amp; IONS">
+        <div class="plate-body" id="ionsExamplesHost"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Act 6: summary -->
+  <section class="act" id="actSummary" hidden aria-labelledby="actTitle">
+    <p class="story">
+      Across a period atoms shrink. Down a group they grow.
+    </p>
+    <div class="viewport" data-fig="FIG. 04F  ·  RELATIVE SIZE">
+      <div class="plate-body" id="summaryHost"></div>
+      <div class="hud-strip">Across → shrink · down → grow</div>
+    </div>
+  </section>
+
+  <nav class="module-footer" aria-label="Section navigation">
+    <div class="module-footer-back">
+      <button type="button" class="btn" id="stageBack" hidden>← Back</button>
+    </div>
+    <div class="module-footer-help">
+      <button type="button" id="stuckBtn">Stuck?</button>
+    </div>
+    <div class="module-footer-fwd">
+      <button type="button" class="btn submit" id="stageNext">Next →</button>
+    </div>
+  </nav>
+  <div class="help-panel" id="helpPanel" role="region" aria-live="polite">
+    <p id="helpText">Look at how far the outermost electron sits from the nucleus.</p>
   </div>
 
-  <div class="controls"><!-- simulation controls will go here --></div>
-
-  <button id="stuckBtn">Stuck?</button>
-  <div class="help-panel" id="helpPanel">
-    <p>Same number of electrons across this row — so what's different that makes them shrink?</p>
-  </div>
+  <section class="debrief" id="debrief" hidden aria-labelledby="debriefTitle">
+    <h2 id="debriefTitle">What this was for</h2>
+    <p class="debrief-lead">The intentions behind this module, and the competencies you just practised. Read each competency statement and decide honestly how well it fits you right now.</p>
+    <div class="debrief-block">
+      <div class="debrief-kicker">Learning intentions</div>
+      <ul class="debrief-li" id="debriefIntentions"></ul>
+    </div>
+    <div class="debrief-block cc">
+      <div class="debrief-kicker">Curricular competencies</div>
+      <ul class="debrief-cc" id="debriefCompetencies"></ul>
+    </div>
+    <div class="debrief-block todo">
+      <div class="debrief-kicker">To do</div>
+      <ul class="debrief-todo">
+        <li>
+          <label>
+            <input type="checkbox" name="todo-notes">
+            <span>In your OneNote, make some notes that summarize each of the last four modules. Pretend you are studying for a test and you need to make quick notes to reference later. Use both the learning intentions and CCs as your guide.</span>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox" name="todo-ap">
+            <span>Go to AP Classroom and complete the quizzes 01 and 02–04.</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+  </section>
+  </div><!-- /#moduleStage -->
 </div>
 
 <script>
-// === CANVAS ENGINE ===
-const canvas = document.getElementById('simCanvas');
-const ctx = canvas.getContext('2d');
-let W, H, dpr;
-
-function resize() {
-  dpr = window.devicePixelRatio || 1;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  W = rect.width;
-  H = Math.min(W * 0.6, 500);
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.height = H + 'px';
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-window.addEventListener('resize', resize);
-resize();
-
-// === REDUCED MOTION ===
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SVG_NS = 'http://www.w3.org/2000/svg';
 
-// === GLOW HELPERS ===
-function glowLine(x1, y1, x2, y2, color, width = 2) {
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 12;
-  ctx.strokeStyle = color;
-  ctx.globalAlpha = 0.3;
-  ctx.lineWidth = width + 4;
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.lineWidth = width;
-  ctx.stroke();
-  ctx.restore();
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, prefersReduced ? 0 : ms));
 }
 
-function glowCircle(x, y, r, color) {
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 15;
-  ctx.fillStyle = color;
-  ctx.globalAlpha = 0.2;
-  ctx.beginPath(); ctx.arc(x,y,r+4,0,Math.PI*2); ctx.fill();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-  ctx.restore();
+function stippleHash(i, seed) {
+  const x = Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453;
+  return x - Math.floor(x);
 }
 
-function drawGrid(spacing = 40, color = 'rgba(33,29,71,0.6)') {
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1;
-  for(let x = 0; x < W; x += spacing){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for(let y = 0; y < H; y += spacing){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-  ctx.restore();
+function addNegStipple(parent, ox, oy, radius, count, seed, edgeFade) {
+  if (count <= 0) return;
+  const g = document.createElementNS(SVG_NS, 'g');
+  g.setAttribute('class', 'neg-stipple');
+  g.setAttribute('aria-hidden', 'true');
+  const fadeStart = edgeFade ? 1 - edgeFade : 1;
+  for (let i = 0; i < count; i++) {
+    const u = stippleHash(i, seed);
+    const v = stippleHash(i + 31, seed + 1);
+    const ang = u * Math.PI * 2;
+    const t = Math.sqrt(v);
+    const rad = radius * t;
+    const opacity = t <= fadeStart
+      ? 0.32 + stippleHash(i, seed + 5) * 0.26
+      : Math.max(0.04, (1 - (t - fadeStart) / edgeFade) * 0.3);
+    const dot = document.createElementNS(SVG_NS, 'circle');
+    dot.setAttribute('cx', String(ox + rad * Math.cos(ang)));
+    dot.setAttribute('cy', String(oy + rad * Math.sin(ang)));
+    dot.setAttribute('r', String(0.7 + stippleHash(i, seed + 4) * 1.1));
+    dot.setAttribute('opacity', String(opacity));
+    g.appendChild(dot);
+  }
+  parent.appendChild(g);
 }
 
-// === DISCOVERY GATE SYSTEM ===
-const gates = {};
-function setGate(name, val) {
-  gates[name] = val;
-  document.querySelectorAll('[data-gate]').forEach(el => {
-    const required = el.dataset.gate.split(',');
-    const unlocked = required.every(g => gates[g.trim()]);
-    el.classList.toggle('discovered', unlocked);
+function addNegCoreDisk(defs, parent, cx, cy, radius, uid, strength) {
+  const gid = `neg-core-${uid}`;
+  const grad = document.createElementNS(SVG_NS, 'radialGradient');
+  grad.setAttribute('id', gid);
+  grad.setAttribute('cx', '50%');
+  grad.setAttribute('cy', '50%');
+  grad.setAttribute('r', '50%');
+  /* Soft mustard veil — outer e⁻ can't "see" the nucleus through the core. */
+  [
+    [0,   `rgba(184,145,48,${0.82 * strength})`],
+    [0.28,`rgba(196,163,90,${0.64 * strength})`],
+    [0.55,`rgba(168,130,42,${0.42 * strength})`],
+    [0.78,`rgba(196,163,90,${0.18 * strength})`],
+    [1,   'rgba(196,163,90,0)']
+  ].forEach(([o, c]) => {
+    const s = document.createElementNS(SVG_NS, 'stop');
+    s.setAttribute('offset', `${o * 100}%`);
+    s.setAttribute('stop-color', c);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+  const disk = document.createElementNS(SVG_NS, 'circle');
+  disk.setAttribute('class', 'neg-core-disk');
+  disk.setAttribute('cx', cx);
+  disk.setAttribute('cy', cy);
+  disk.setAttribute('r', radius);
+  disk.setAttribute('fill', `url(#${gid})`);
+  parent.appendChild(disk);
+}
+
+/**
+ * Soft textured attraction wash (no stroke) along +x from nucleus to outer shell.
+ * Lives inside a spinning outer-shell group so it stays with the lead electron.
+ */
+function addAttractionOval(defs, parent, cx, cy, rOuter, uid, opacity) {
+  const mx = cx + rOuter / 2;
+  const my = cy;
+  const rx = rOuter / 2 + 16;
+  const ry = Math.max(24, rOuter * 0.28);
+  const op = Math.max(0.45, Math.min(1.3, opacity));
+
+  const gid = `attr-${uid}`;
+  const clipId = `attr-clip-${uid}`;
+
+  const grad = document.createElementNS(SVG_NS, 'radialGradient');
+  grad.setAttribute('id', gid);
+  grad.setAttribute('cx', '35%');
+  grad.setAttribute('cy', '45%');
+  grad.setAttribute('r', '70%');
+  [
+    [0,   `rgba(168,90,50,${0.58 * op})`],
+    [0.45,`rgba(168,90,50,${0.34 * op})`],
+    [0.78,`rgba(168,90,50,${0.14 * op})`],
+    [1,   'rgba(168,90,50,0)']
+  ].forEach(([o, c]) => {
+    const s = document.createElementNS(SVG_NS, 'stop');
+    s.setAttribute('offset', `${o * 100}%`);
+    s.setAttribute('stop-color', c);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+
+  const clip = document.createElementNS(SVG_NS, 'clipPath');
+  clip.setAttribute('id', clipId);
+  const clipEl = document.createElementNS(SVG_NS, 'ellipse');
+  clipEl.setAttribute('cx', String(mx));
+  clipEl.setAttribute('cy', String(my));
+  clipEl.setAttribute('rx', String(rx));
+  clipEl.setAttribute('ry', String(ry));
+  clip.appendChild(clipEl);
+  defs.appendChild(clip);
+
+  const g = document.createElementNS(SVG_NS, 'g');
+  g.setAttribute('class', 'attraction-field');
+  g.setAttribute('opacity', String(Math.min(1, op)));
+
+  const oval = document.createElementNS(SVG_NS, 'ellipse');
+  oval.setAttribute('class', 'attraction-oval');
+  oval.setAttribute('cx', String(mx));
+  oval.setAttribute('cy', String(my));
+  oval.setAttribute('rx', String(rx));
+  oval.setAttribute('ry', String(ry));
+  oval.setAttribute('fill', `url(#${gid})`);
+  g.appendChild(oval);
+
+  const flecks = document.createElementNS(SVG_NS, 'g');
+  flecks.setAttribute('clip-path', `url(#${clipId})`);
+  const seed = uid.split('').reduce((a, ch) => a + ch.charCodeAt(0), 0);
+  const count = 55;
+  for (let i = 0; i < count; i++) {
+    const u = stippleHash(i, seed);
+    const v = stippleHash(i + 17, seed + 3);
+    const ang = u * Math.PI * 2;
+    const t = Math.sqrt(v);
+    const px = mx + Math.cos(ang) * rx * t;
+    const py = my + Math.sin(ang) * ry * t;
+    const dot = document.createElementNS(SVG_NS, 'circle');
+    dot.setAttribute('class', 'attraction-fleck');
+    dot.setAttribute('cx', String(px));
+    dot.setAttribute('cy', String(py));
+    dot.setAttribute('r', String(0.55 + stippleHash(i, seed + 9) * 1.15));
+    dot.setAttribute('opacity', String((0.18 + stippleHash(i, seed + 2) * 0.32) * Math.min(1, op)));
+    flecks.appendChild(dot);
+  }
+  g.appendChild(flecks);
+  parent.appendChild(g);
+}
+
+/** Soft-shaded nucleus + static shells; electrons as markers. Optional radius measure. */
+function buildAtomSVG(opts) {
+  const {
+    z = 6,
+    inner = 2,
+    valence = 4,
+    showInnerRing = true,
+    size = 220,
+    uid = 'a',
+    scale = 1,
+    canvas = size,
+    animateShell = false,
+    showCoreChargeOnNuc = true,
+    showRadiusMeasure = false,
+    radiusPm = null,
+    measureOn = false,
+    showAttraction = false,
+    attractionOpacity = 1
+  } = opts;
+
+  const cx = canvas / 2;
+  const cy = canvas / 2;
+  const rNuc = 22;
+  const doSpin = animateShell && !prefersReduced;
+
+  let shellCounts;
+  if (Array.isArray(opts.shells) && opts.shells.length) {
+    shellCounts = opts.shells.slice();
+  } else {
+    shellCounts = [];
+    if (showInnerRing || inner > 0) shellCounts.push(inner);
+    shellCounts.push(valence);
+  }
+  const nShells = shellCounts.length;
+  const valenceCount = shellCounts[nShells - 1] || 0;
+  const coreCounts = shellCounts.slice(0, -1);
+  const innerTotal = coreCounts.reduce((a, b) => a + b, 0);
+  const coreCharge = z - innerTotal;
+
+  const rOuter = Math.min(canvas * 0.46, (opts.outerBase || 88) * scale);
+  /* Inner shells must scale with rOuter. A fixed inner radius collides with a
+     shrunken cation (Na⁺ in FIG. 04E): the 8-e⁻ ring sits on top of the 2-e⁻ ring. */
+  const rInnerCap = Math.min(52, canvas * 0.19);
+  const radii = [];
+  if (nShells === 1) {
+    radii.push(rOuter);
+  } else if (nShells === 2) {
+    const rInner = Math.min(rInnerCap, rOuter * 0.55);
+    radii.push(rInner, rOuter);
+  } else {
+    for (let i = 0; i < nShells; i++) {
+      const t = i / (nShells - 1);
+      const rMin = Math.min(rInnerCap * 0.72, rOuter * 0.36);
+      radii.push(rMin + (rOuter - rMin) * t);
+    }
+  }
+  const rVal = radii[nShells - 1];
+  const rCore = Math.min(
+    rVal - 4,
+    (radii[Math.max(0, nShells - 2)] || rInnerCap) + 12
+  );
+
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'atom-svg' + (doSpin ? ' is-spinning' : ''));
+  svg.setAttribute('viewBox', `0 0 ${canvas} ${canvas}`);
+  svg.setAttribute('width', String(size));
+  svg.setAttribute('height', String(size));
+  svg.setAttribute('role', 'img');
+  svg.setAttribute('aria-label', opts.label || `Atom Z=${z}`);
+
+  const defs = document.createElementNS(SVG_NS, 'defs');
+  const grad = document.createElementNS(SVG_NS, 'radialGradient');
+  grad.setAttribute('id', `nuc-${uid}`);
+  grad.setAttribute('cx', '32%');
+  grad.setAttribute('cy', '28%');
+  grad.setAttribute('r', '68%');
+  [
+    ['0%', '#e8b48a'],
+    ['45%', '#a85a32'],
+    ['100%', '#5a2c16']
+  ].forEach(([o, c]) => {
+    const s = document.createElementNS(SVG_NS, 'stop');
+    s.setAttribute('offset', o);
+    s.setAttribute('stop-color', c);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  function makeOrbitGroup(extraClass) {
+    const g = document.createElementNS(SVG_NS, 'g');
+    if (doSpin) {
+      g.setAttribute('class', `shell-orbit ${extraClass}`.trim());
+      g.setAttribute('style', `transform-origin:${cx}px ${cy}px;transform-box:view-box`);
+    }
+    return g;
+  }
+
+  function placeShell(parent, n, r, cls, startAng) {
+    if (n <= 0) return;
+    const drawN = Math.min(n, 18);
+    const eR = drawN > 8 ? 5 : 7;
+    for (let i = 0; i < drawN; i++) {
+      const ang = startAng + (i * 2 * Math.PI) / Math.max(drawN, 1);
+      const e = document.createElementNS(SVG_NS, 'circle');
+      e.setAttribute('class', cls);
+      e.setAttribute('cx', String(cx + r * Math.cos(ang)));
+      e.setAttribute('cy', String(cy + r * Math.sin(ang)));
+      e.setAttribute('r', eR);
+      parent.appendChild(e);
+    }
+  }
+
+  const corePack = document.createElementNS(SVG_NS, 'g');
+  corePack.setAttribute('class', 'core-pack');
+
+  coreCounts.forEach((count, i) => {
+    const r = radii[i];
+    const ring = document.createElementNS(SVG_NS, 'circle');
+    ring.setAttribute('class', 'shell');
+    ring.setAttribute('cx', cx);
+    ring.setAttribute('cy', cy);
+    ring.setAttribute('r', r);
+    corePack.appendChild(ring);
+  });
+
+  if (innerTotal > 0) {
+    const strength = Math.min(1, 0.62 + innerTotal / 16);
+    addNegCoreDisk(defs, corePack, cx, cy, rCore, uid, strength);
+    /* Grain on top of the wash — soft shade still carries the shielding read. */
+    const dots = Math.round(42 + Math.min(innerTotal, 18) * 5);
+    addNegStipple(corePack, cx, cy, rCore, dots, 11 + innerTotal + z, 0.4);
+  }
+
+  coreCounts.forEach((count, i) => {
+    if (count <= 0) return;
+    const innerGroup = makeOrbitGroup('shell-orbit-inner');
+    placeShell(innerGroup, count, radii[i], 'e-marker', -Math.PI / 2 + i * 0.35);
+    corePack.appendChild(innerGroup);
+  });
+
+  if (coreCounts.length > 0 || innerTotal > 0) {
+    svg.appendChild(corePack);
+  }
+
+  const outer = document.createElementNS(SVG_NS, 'circle');
+  outer.setAttribute('class', 'shell shell-valence');
+  outer.setAttribute('cx', cx);
+  outer.setAttribute('cy', cy);
+  outer.setAttribute('r', rVal);
+  svg.appendChild(outer);
+
+  const outerGroup = makeOrbitGroup('shell-orbit-outer');
+  if (showAttraction && valenceCount > 0) {
+    addAttractionOval(defs, outerGroup, cx, cy, rVal, uid, attractionOpacity);
+  }
+  placeShell(outerGroup, valenceCount, rVal, 'e-valence', 0);
+  svg.appendChild(outerGroup);
+
+  const nuc = document.createElementNS(SVG_NS, 'circle');
+  nuc.setAttribute('cx', cx);
+  nuc.setAttribute('cy', cy);
+  nuc.setAttribute('r', rNuc);
+  nuc.setAttribute('fill', `url(#nuc-${uid})`);
+  svg.appendChild(nuc);
+
+  const nucLabel = document.createElementNS(SVG_NS, 'text');
+  nucLabel.setAttribute('class', 'nuc-label' + (innerTotal > 0 && !showCoreChargeOnNuc ? ' is-shielded' : ''));
+  nucLabel.setAttribute('x', cx);
+  nucLabel.setAttribute('y', cy);
+  nucLabel.textContent = showCoreChargeOnNuc ? `+${coreCharge}` : `+${z}`;
+  svg.appendChild(nucLabel);
+
+  if (showRadiusMeasure) {
+    const mg = document.createElementNS(SVG_NS, 'g');
+    mg.setAttribute('class', 'measure-group' + (measureOn ? ' is-on' : ''));
+    mg.setAttribute('aria-hidden', measureOn ? 'false' : 'true');
+
+    const lineY = cy + 4;
+    const x1 = cx + rNuc;
+    const x2 = cx + rVal;
+    const line = document.createElementNS(SVG_NS, 'line');
+    line.setAttribute('class', 'radius-line');
+    line.setAttribute('x1', String(x1));
+    line.setAttribute('y1', String(lineY));
+    line.setAttribute('x2', String(x2));
+    line.setAttribute('y2', String(lineY));
+    mg.appendChild(line);
+
+    [[x1, lineY], [x2, lineY]].forEach(([x, y]) => {
+      const tick = document.createElementNS(SVG_NS, 'line');
+      tick.setAttribute('class', 'radius-tick');
+      tick.setAttribute('x1', String(x));
+      tick.setAttribute('y1', String(y - 6));
+      tick.setAttribute('x2', String(x));
+      tick.setAttribute('y2', String(y + 6));
+      mg.appendChild(tick);
+    });
+
+    const midX = (x1 + x2) / 2;
+    const labelY = lineY + 22;
+    const knock = document.createElementNS(SVG_NS, 'rect');
+    knock.setAttribute('class', 'radius-knockout');
+    knock.setAttribute('x', String(midX - 28));
+    knock.setAttribute('y', String(labelY - 10));
+    knock.setAttribute('width', '56');
+    knock.setAttribute('height', '16');
+    mg.appendChild(knock);
+
+    const lab = document.createElementNS(SVG_NS, 'text');
+    lab.setAttribute('class', 'radius-label');
+    lab.setAttribute('x', String(midX));
+    lab.setAttribute('y', String(labelY));
+    lab.textContent = radiusPm != null ? `${radiusPm} pm` : 'radius';
+    mg.appendChild(lab);
+    svg.appendChild(mg);
+  }
+
+  svg.dataset.rVal = String(rVal);
+  svg.dataset.coreCharge = String(coreCharge);
+  return svg;
+}
+
+function buildRadiusDisk(opts) {
+  const {
+    radiusPm,
+    maxPm = 140,
+    size = 150,
+    uid = 'd',
+    label = '',
+    fill = 'phosphor'
+  } = opts;
+  const canvas = 160;
+  const cx = canvas / 2;
+  const cy = canvas / 2;
+  const rMax = 68;
+  const r = Math.max(10, (radiusPm / maxPm) * rMax);
+
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'disk-svg');
+  svg.setAttribute('viewBox', `0 0 ${canvas} ${canvas}`);
+  svg.setAttribute('width', String(size));
+  svg.setAttribute('height', String(size));
+  svg.setAttribute('role', 'img');
+  svg.setAttribute('aria-label', `${label} radius ${radiusPm} pm`);
+
+  const defs = document.createElementNS(SVG_NS, 'defs');
+  const gid = `disk-${uid}`;
+  const grad = document.createElementNS(SVG_NS, 'radialGradient');
+  grad.setAttribute('id', gid);
+  grad.setAttribute('cx', '42%');
+  grad.setAttribute('cy', '38%');
+  grad.setAttribute('r', '68%');
+  const palette = fill === 'ember'
+    ? [['0%', 'rgba(232,180,138,0.95)'], ['45%', 'rgba(168,90,50,0.85)'], ['100%', 'rgba(90,44,22,0.15)']]
+    : [['0%', 'rgba(126,140,69,0.95)'], ['50%', 'rgba(92,107,40,0.75)'], ['100%', 'rgba(79,90,40,0.12)']];
+  palette.forEach(([o, c]) => {
+    const s = document.createElementNS(SVG_NS, 'stop');
+    s.setAttribute('offset', o);
+    s.setAttribute('stop-color', c);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  const circle = document.createElementNS(SVG_NS, 'circle');
+  circle.setAttribute('cx', cx);
+  circle.setAttribute('cy', cy);
+  circle.setAttribute('r', r);
+  circle.setAttribute('fill', `url(#${gid})`);
+  circle.setAttribute('stroke', 'rgba(22,20,14,0.35)');
+  circle.setAttribute('stroke-width', '1');
+  svg.appendChild(circle);
+
+  const nuc = document.createElementNS(SVG_NS, 'circle');
+  nuc.setAttribute('cx', cx);
+  nuc.setAttribute('cy', cy);
+  nuc.setAttribute('r', 4);
+  nuc.setAttribute('fill', 'var(--ink)');
+  svg.appendChild(nuc);
+
+  return svg;
+}
+
+function fillMeta(host, rows) {
+  host.replaceChildren();
+  rows.forEach(row => {
+    const div = document.createElement('div');
+    div.className = 'meta-row';
+    const k = document.createElement('div');
+    k.className = 'meta-kicker';
+    k.textContent = row.k;
+    const v = document.createElement('div');
+    v.className = 'meta-val';
+    v.innerHTML = row.v;
+    div.appendChild(k);
+    div.appendChild(v);
+    host.appendChild(div);
   });
 }
 
-// === HELP SYSTEM ===
+function makeAtomCard(atom, opts = {}) {
+  const card = document.createElement('div');
+  card.className = 'atom-card' + (opts.dim ? ' is-dim' : '');
+  if (opts.kicker) {
+    const kick = document.createElement('div');
+    kick.className = 'atom-kicker';
+    kick.textContent = opts.kicker;
+    card.appendChild(kick);
+  }
+  const sym = document.createElement('div');
+  sym.className = 'atom-sym';
+  sym.textContent = atom.sym;
+  card.appendChild(sym);
+
+  const host = document.createElement('div');
+  host.className = 'atom-host';
+  const scaleMax = opts.scaleMax != null ? opts.scaleMax : 1.15;
+  const scale = opts.scaleFromPm
+    ? Math.max(0.55, Math.min(scaleMax, atom.radius / opts.scaleFromPm))
+    : (opts.scale || 1);
+  const svg = buildAtomSVG({
+    z: atom.z,
+    shells: atom.shells,
+    uid: opts.uid || atom.sym,
+    size: opts.size || 200,
+    canvas: opts.canvas || 220,
+    outerBase: opts.outerBase || 88,
+    scale,
+    animateShell: opts.animateShell !== false,
+    showCoreChargeOnNuc: opts.showCoreChargeOnNuc !== false,
+    showRadiusMeasure: !!opts.showRadiusMeasure,
+    radiusPm: atom.radius,
+    measureOn: !!opts.measureOn,
+    showAttraction: !!opts.showAttraction,
+    attractionOpacity: opts.attractionOpacity != null ? opts.attractionOpacity : 1,
+    label: `${atom.sym}, radius ${atom.radius} pm`
+  });
+  host.appendChild(svg);
+  card.appendChild(host);
+
+  if (opts.showRadiusText !== false) {
+    const r = document.createElement('div');
+    r.className = 'disk-r';
+    r.textContent = `${atom.radius} pm`;
+    card.appendChild(r);
+  }
+  return card;
+}
+
+function makeDiskCard(species, maxPm, uid) {
+  const card = document.createElement('div');
+  card.className = 'disk-card';
+  const host = document.createElement('div');
+  host.className = 'disk-host';
+  host.appendChild(buildRadiusDisk({
+    radiusPm: species.radius,
+    maxPm,
+    uid,
+    label: species.sym,
+    fill: species.ion ? 'ember' : 'phosphor'
+  }));
+  card.appendChild(host);
+  const lab = document.createElement('div');
+  lab.className = 'disk-label';
+  lab.textContent = species.sym;
+  card.appendChild(lab);
+  const r = document.createElement('div');
+  r.className = 'disk-r';
+  r.textContent = `${species.radius} pm`;
+  card.appendChild(r);
+  return card;
+}
+
+// === DATA (§8.4) ===
+const ATOMS = {
+  B:  { sym: 'B',  z: 5,  shells: [2, 3],       n: 2, radius: 89,  core: 3 },
+  C:  { sym: 'C',  z: 6,  shells: [2, 4],       n: 2, radius: 77,  core: 4 },
+  O:  { sym: 'O',  z: 8,  shells: [2, 6],       n: 2, radius: 66,  core: 6 },
+  F:  { sym: 'F',  z: 9,  shells: [2, 7],       n: 2, radius: 64,  core: 7 },
+  S:  { sym: 'S',  z: 16, shells: [2, 8, 6],    n: 3, radius: 104, core: 6 },
+  As: { sym: 'As', z: 33, shells: [2, 8, 18, 5], n: 4, radius: 121, core: 5 },
+  Se: { sym: 'Se', z: 34, shells: [2, 8, 18, 6], n: 4, radius: 117, core: 6 },
+  /* Na / Cl used for the transfer demo (shell structure from the unit model).
+     Ionic radii for Na⁺ / Cl⁻ from §8.4; neutral radii are relative visual scales. */
+  Na:  { sym: 'Na',  z: 11, shells: [2, 8, 1], n: 3, radius: 160, core: 1 },
+  NaIon:{ sym: 'Na⁺', z: 11, shells: [2, 8],   n: 2, radius: 102, core: 9 },
+  Cl:  { sym: 'Cl',  z: 17, shells: [2, 8, 7], n: 3, radius: 99,  core: 7 },
+  ClIon:{ sym: 'Cl⁻', z: 17, shells: [2, 8, 8], n: 3, radius: 181, core: 7 }
+};
+
+/* Neutral / ion pairs — anions from §8.4 Table 3; Na⁺ ionic radius from §8.4. */
+const ION_EXAMPLE_PAIRS = [
+  {
+    title: 'Sodium',
+    kind: 'cation',
+    left:  { sym: 'Na',  z: 11, shells: [2, 8, 1], radius: 160, core: 1 },
+    right: { sym: 'Na⁺', z: 11, shells: [2, 8],   radius: 102, core: 9 }
+  },
+  {
+    title: 'Fluorine',
+    kind: 'anion',
+    left:  { sym: 'F',  z: 9, shells: [2, 7], radius: 64,  core: 7 },
+    right: { sym: 'F⁻', z: 9, shells: [2, 8], radius: 133, core: 7 }
+  },
+  {
+    title: 'Oxygen',
+    kind: 'anion',
+    left:  { sym: 'O',   z: 8, shells: [2, 6], radius: 66,  core: 6 },
+    right: { sym: 'O²⁻', z: 8, shells: [2, 8], radius: 140, core: 6 }
+  }
+];
+
+// === STATE ===
+const ACTS = ['define', 'hypothesize', 'across', 'down', 'ions', 'summary'];
+const STATE = {
+  actIndex: 0,
+  defineMeasured: false,
+  downStep: 0, // 0 O alone · 1 O+S · 2 O+S+Se
+  ionStep: 0,  // 0 hypothesis · 1 transfer · 2 examples
+  ionTransferred: false,
+  transitioning: false
+};
+
+const HELP = {
+  define: 'The radius runs from the nucleus out to the valence shell — not to an empty ring beyond it.',
+  hypothesize: 'Use what you just measured on carbon. What would change left to right? What would change going down?',
+  across: 'Same outer shell — so what’s pulling harder as you move from B to O?',
+  down: 'What changed that Coulomb’s d cares about?',
+  ionsHyp: 'Think about what happens to the cloud when an atom loses an electron — and when another atom gains one.',
+  ionsTransfer: 'Grab the mustard marker on sodium — drag it across onto chlorine.',
+  ionsExamples: 'Losing an electron shrinks the atom. Gaining electrons swells it. What happens to core charge in each case?',
+  summary: 'Read left-to-right, then top-to-bottom. Which way shrinks? Which way grows?'
+};
+
+const ACT_COPY = {
+  define: {
+    tag: 'Module 04 · Act 1',
+    title: 'Atomic radius',
+    frame: ''
+  },
+  hypothesize: {
+    tag: 'Module 04 · Act 2',
+    title: 'Create a hypothesis',
+    frame: ''
+  },
+  across: {
+    tag: 'Module 04 · Act 3',
+    title: 'Across a period',
+    frame: 'Shielding stays the same. Core charge climbs. Watch the valence shell tighten.'
+  },
+  down: {
+    tag: 'Module 04 · Act 4',
+    title: 'Down a group',
+    frame: ''
+  },
+  ions: {
+    tag: 'Module 04 · Act 5',
+    title: 'Atoms and ions',
+    frame: ''
+  },
+  summary: {
+    tag: 'Module 04 · Act 6',
+    title: 'Relative size',
+    frame: 'Across a period atoms shrink. Down a group they grow.'
+  }
+};
+
+// === RENDERERS ===
+function renderDefine() {
+  const host = document.getElementById('defineHost');
+  host.replaceChildren();
+  const card = makeAtomCard(ATOMS.C, {
+    uid: 'def-C',
+    size: 240,
+    canvas: 260,
+    outerBase: 96,
+    scale: 1,
+    showRadiusMeasure: true,
+    measureOn: STATE.defineMeasured,
+    showRadiusText: false,
+    kicker: 'Carbon'
+  });
+  host.appendChild(card);
+  fillMeta(document.getElementById('defineMeta'), [
+    { k: 'Nuclear charge', v: 'Z = 6' },
+    { k: 'Inner-shell e⁻', v: '2' },
+    { k: 'Core charge', v: '+4' },
+    { k: 'Valence shell', v: 'n = 2' },
+    { k: 'Atomic radius', v: STATE.defineMeasured ? '77<span class="unit">pm</span>' : '— <span class="unit">measure it</span>' }
+  ]);
+  document.getElementById('stageNext').textContent = STATE.defineMeasured
+    ? 'Next → Create a hypothesis'
+    : 'Measure the radius →';
+  updateStageChrome();
+}
+
+function renderHypothesize() {
+  document.getElementById('stageNext').textContent = 'Next → Across a period';
+  updateStageChrome();
+}
+
+function renderAcross() {
+  const host = document.getElementById('acrossHost');
+  host.replaceChildren();
+  const row = [ATOMS.B, ATOMS.C, ATOMS.O];
+  const ref = ATOMS.B.radius;
+  row.forEach((atom, i) => {
+    /* B lightest → O darkest: rising core charge, same shielding. */
+    const pull = 0.48 + ((atom.core - 3) / 3) * 0.78;
+    host.appendChild(makeAtomCard(atom, {
+      uid: `across-${atom.sym}`,
+      size: 190,
+      canvas: 220,
+      outerBase: 92,
+      scaleFromPm: ref,
+      kicker: `Core +${atom.core}`,
+      animateShell: true,
+      showAttraction: true,
+      attractionOpacity: pull
+    }));
+  });
+  document.getElementById('stageNext').textContent = 'Next → Down a group';
+}
+
+/** Drift motion: expand shells so valence electrons move outward. */
+async function playDownDrift(fromAtom, toAtom) {
+  const host = document.getElementById('downHost');
+  const opts = downCardOpts(toAtom, `drift-${toAtom.sym}`);
+  const canvas = opts.canvas;
+  const size = opts.size;
+  const scaleMax = opts.scaleMax;
+  const scaleFromPm = opts.scaleFromPm;
+  const outerBase = opts.outerBase;
+  const compactScale = Math.max(0.55, Math.min(scaleMax, fromAtom.radius / scaleFromPm));
+  const fullScale = Math.max(0.55, Math.min(scaleMax, toAtom.radius / scaleFromPm));
+
+  const card = document.createElement('div');
+  card.className = 'atom-card';
+  const sym = document.createElement('div');
+  sym.className = 'atom-sym';
+  sym.textContent = toAtom.sym;
+  card.appendChild(sym);
+  const atomHost = document.createElement('div');
+  atomHost.className = 'atom-host';
+  card.appendChild(atomHost);
+  const rLab = document.createElement('div');
+  rLab.className = 'disk-r';
+  rLab.textContent = `${fromAtom.radius} → ${toAtom.radius} pm`;
+  card.appendChild(rLab);
+  host.appendChild(card);
+
+  if (prefersReduced) {
+    atomHost.appendChild(buildAtomSVG({
+      z: toAtom.z,
+      shells: toAtom.shells,
+      uid: `drift-${toAtom.sym}`,
+      size,
+      canvas,
+      outerBase,
+      scale: fullScale,
+      animateShell: false,
+      showCoreChargeOnNuc: true,
+      label: `${toAtom.sym}`
+    }));
+    rLab.textContent = `${toAtom.radius} pm`;
+    return;
+  }
+
+  const duration = 900;
+  const t0 = performance.now();
+  await new Promise(resolve => {
+    function frame(now) {
+      const t = Math.min(1, (now - t0) / duration);
+      // ease-out cubic
+      const e = 1 - Math.pow(1 - t, 3);
+      const scale = compactScale + (fullScale - compactScale) * e;
+      atomHost.replaceChildren(buildAtomSVG({
+        z: toAtom.z,
+        shells: toAtom.shells,
+        uid: `drift-${toAtom.sym}-${Math.round(t * 20)}`,
+        size,
+        canvas,
+        outerBase,
+        scale,
+        animateShell: false,
+        showCoreChargeOnNuc: true,
+        label: `${toAtom.sym}`
+      }));
+      if (t < 1) requestAnimationFrame(frame);
+      else resolve();
+    }
+    requestAnimationFrame(frame);
+  });
+  rLab.textContent = `${toAtom.radius} pm`;
+}
+
+async function renderDown(animate) {
+  const host = document.getElementById('downHost');
+  const step = STATE.downStep;
+  const sequence = [ATOMS.O, ATOMS.S, ATOMS.Se];
+  const visible = sequence.slice(0, step + 1);
+
+  if (animate && step > 0) {
+    host.replaceChildren();
+    sequence.slice(0, step).forEach(atom => {
+      host.appendChild(makeAtomCard(atom, downCardOpts(atom, `down-${atom.sym}-prev`)));
+    });
+    await playDownDrift(sequence[step - 1], sequence[step]);
+    await wait(200);
+  }
+
+  host.replaceChildren();
+  visible.forEach(atom => {
+    host.appendChild(makeAtomCard(atom, downCardOpts(atom, `down-${atom.sym}-${step}`)));
+  });
+
+  document.getElementById('downHud').textContent = step === 0
+    ? 'Start with oxygen, and move down the periodic table to see how radius changes'
+    : step === 1
+      ? 'O → S · new shell · electrons farther out'
+      : 'O → S → Se · down the column, radius grows';
+
+  if (step < 2) {
+    document.getElementById('stageNext').textContent = step === 0 ? 'Add a shell → S' : 'Continue → Se';
+  } else {
+    document.getElementById('stageNext').textContent = 'Next → Atoms & ions';
+  }
+  updateStageChrome();
+}
+
+function downCardOpts(atom, uid) {
+  /* Scale off O (66 pm). S and Se used to share the 1.15 cap — Se must read larger. */
+  return {
+    uid,
+    size: 230,
+    canvas: 280,
+    outerBase: 70,
+    scaleFromPm: 66,
+    scaleMax: 1.9,
+    animateShell: true
+  };
+}
+
+/** Relative visual scale for Na / Cl transfer (ionic radii from §8.4). */
+function ionTransferScale(radiusPm) {
+  return Math.max(0.55, Math.min(1.2, radiusPm / 130));
+}
+
+function transferCardOpts(atom, uid, opts = {}) {
+  const pull = opts.attractionOpacity != null ? opts.attractionOpacity : 1;
+  return {
+    uid,
+    size: 200,
+    canvas: 240,
+    outerBase: 88,
+    scale: ionTransferScale(atom.radius),
+    animateShell: opts.animateShell !== false,
+    showAttraction: !!opts.showAttraction,
+    attractionOpacity: pull,
+    showRadiusText: false,
+    kicker: opts.kicker || ''
+  };
+}
+
+function paintTransferPair(host, transferred, animateShell) {
+  host.replaceChildren();
+  const na = transferred ? ATOMS.NaIon : ATOMS.Na;
+  const cl = transferred ? ATOMS.ClIon : ATOMS.Cl;
+  /* Pre-transfer: keep shells still so Na’s valence e⁻ stays grabable.
+     Na: weak pull when neutral (core +1); gone as Na⁺.
+     Cl: strong pull when neutral (core +7); softer when Cl⁻ expands. */
+  host.appendChild(makeAtomCard(na, transferCardOpts(na, `xfer-Na-${transferred ? 'ion' : 'atm'}`, {
+    showAttraction: !transferred,
+    attractionOpacity: 0.42,
+    animateShell: transferred ? animateShell : false,
+    kicker: transferred ? 'Core +9' : 'Core +1'
+  })));
+  host.appendChild(makeAtomCard(cl, transferCardOpts(cl, `xfer-Cl-${transferred ? 'ion' : 'atm'}`, {
+    showAttraction: true,
+    attractionOpacity: transferred ? 0.55 : 1.15,
+    animateShell: transferred ? animateShell : false,
+    kicker: 'Core +7'
+  })));
+}
+
+const XFER = {
+  dragging: false,
+  ghost: null,
+  sourceEl: null,
+  clCard: null,
+  onMove: null,
+  onUp: null
+};
+
+function setTransferHud(text, asStudentQ) {
+  const hud = document.getElementById('ionsTransferHud');
+  if (!hud) return;
+  hud.textContent = text;
+  hud.classList.toggle('is-student-q', !!asStudentQ);
+  hud.classList.toggle('student-q', !!asStudentQ);
+}
+
+function clearTransferDrag() {
+  if (XFER.onMove) {
+    window.removeEventListener('pointermove', XFER.onMove);
+    XFER.onMove = null;
+  }
+  if (XFER.onUp) {
+    window.removeEventListener('pointerup', XFER.onUp);
+    window.removeEventListener('pointercancel', XFER.onUp);
+    XFER.onUp = null;
+  }
+  if (XFER.ghost) {
+    XFER.ghost.remove();
+    XFER.ghost = null;
+  }
+  if (XFER.sourceEl) {
+    XFER.sourceEl.classList.remove('is-lifted');
+    XFER.sourceEl = null;
+  }
+  if (XFER.clCard) {
+    XFER.clCard.classList.remove('is-drop-hot');
+    XFER.clCard = null;
+  }
+  document.body.classList.remove('is-e-dragging');
+  XFER.dragging = false;
+}
+
+function makeDragGhost() {
+  const wrap = document.createElement('div');
+  wrap.className = 'e-drag-ghost';
+  wrap.setAttribute('aria-hidden', 'true');
+  wrap.innerHTML =
+    '<svg viewBox="0 0 22 22" width="22" height="22">' +
+    '<circle cx="11" cy="11" r="8.5" fill="var(--electron)" stroke="#6a5530" stroke-width="1"/>' +
+    '</svg>';
+  return wrap;
+}
+
+function moveDragGhost(clientX, clientY) {
+  if (!XFER.ghost) return;
+  XFER.ghost.style.transform = `translate(${clientX}px, ${clientY}px)`;
+}
+
+function pointOverCard(clientX, clientY, card) {
+  if (!card) return false;
+  const r = card.getBoundingClientRect();
+  const pad = 12;
+  return (
+    clientX >= r.left - pad &&
+    clientX <= r.right + pad &&
+    clientY >= r.top - pad &&
+    clientY <= r.bottom + pad
+  );
+}
+
+async function playElectronTransfer() {
+  const host = document.getElementById('ionsTransferHost');
+  if (prefersReduced) {
+    paintTransferPair(host, true, false);
+    return;
+  }
+
+  const duration = 1100;
+  const t0 = performance.now();
+  const na0 = ATOMS.Na;
+  const na1 = ATOMS.NaIon;
+  const cl0 = ATOMS.Cl;
+  const cl1 = ATOMS.ClIon;
+
+  await new Promise(resolve => {
+    function frame(now) {
+      const t = Math.min(1, (now - t0) / duration);
+      const e = 1 - Math.pow(1 - t, 3);
+      host.replaceChildren();
+
+      const naShells = t < 0.45 ? [2, 8, 1] : [2, 8];
+      const naRadius = na0.radius + (na1.radius - na0.radius) * e;
+      const naPull = 0.42 * (1 - e);
+      host.appendChild(makeAtomCard(
+        { sym: t < 0.45 ? 'Na' : 'Na⁺', z: 11, shells: naShells, radius: naRadius },
+        {
+          uid: `xfer-Na-anim-${Math.round(t * 24)}`,
+          size: 200,
+          canvas: 240,
+          outerBase: 88,
+          scale: ionTransferScale(naRadius),
+          animateShell: false,
+          showAttraction: t < 0.45 && naPull > 0.08,
+          attractionOpacity: naPull,
+          showRadiusText: false,
+          kicker: `Core +${t < 0.45 ? 1 : 9}`
+        }
+      ));
+
+      const clShells = t < 0.45 ? [2, 8, 7] : [2, 8, 8];
+      const clRadius = cl0.radius + (cl1.radius - cl0.radius) * e;
+      const clPull = 1.15 + (0.55 - 1.15) * e;
+      host.appendChild(makeAtomCard(
+        { sym: t < 0.45 ? 'Cl' : 'Cl⁻', z: 17, shells: clShells, radius: clRadius },
+        {
+          uid: `xfer-Cl-anim-${Math.round(t * 24)}`,
+          size: 200,
+          canvas: 240,
+          outerBase: 88,
+          scale: ionTransferScale(clRadius),
+          animateShell: false,
+          showAttraction: true,
+          attractionOpacity: clPull,
+          showRadiusText: false,
+          kicker: 'Core +7'
+        }
+      ));
+
+      if (t < 1) requestAnimationFrame(frame);
+      else resolve();
+    }
+    requestAnimationFrame(frame);
+  });
+
+  paintTransferPair(host, true, true);
+}
+
+async function finishElectronTransfer() {
+  if (STATE.ionTransferred || STATE.transitioning) return;
+  STATE.transitioning = true;
+  clearTransferDrag();
+  setTransferHud(
+    'Count how many valence electrons each have now. How does that compare to the core charge?',
+    true
+  );
+  await playElectronTransfer();
+  STATE.ionTransferred = true;
+  STATE.transitioning = false;
+  renderIons();
+}
+
+function enableElectronTransfer() {
+  clearTransferDrag();
+  if (STATE.ionTransferred) return;
+
+  const host = document.getElementById('ionsTransferHost');
+  const cards = host.querySelectorAll('.atom-card');
+  if (cards.length < 2) return;
+  const naCard = cards[0];
+  const clCard = cards[1];
+  const valence = naCard.querySelector('.e-valence');
+  if (!valence) return;
+
+  valence.classList.add('e-grabbable');
+  valence.setAttribute('tabindex', '0');
+  valence.setAttribute('role', 'button');
+  valence.setAttribute(
+    'aria-label',
+    'Sodium valence electron. Drag onto chlorine, or press Enter to transfer.'
+  );
+
+  /* Generous hit target — Module 02 uses a wide grab radius. */
+  const hit = document.createElementNS(SVG_NS, 'circle');
+  hit.setAttribute('class', 'e-grab-hit');
+  hit.setAttribute('cx', valence.getAttribute('cx'));
+  hit.setAttribute('cy', valence.getAttribute('cy'));
+  hit.setAttribute('r', '22');
+  hit.setAttribute('fill', 'transparent');
+  hit.setAttribute('tabindex', '-1');
+  hit.setAttribute('aria-hidden', 'true');
+  valence.parentNode.insertBefore(hit, valence);
+
+  function beginDrag(clientX, clientY) {
+    if (STATE.ionTransferred || STATE.transitioning || XFER.dragging) return;
+    XFER.dragging = true;
+    XFER.sourceEl = valence;
+    XFER.clCard = clCard;
+    valence.classList.add('is-lifted');
+    hit.classList.add('is-lifted');
+    document.body.classList.add('is-e-dragging');
+    XFER.ghost = makeDragGhost();
+    document.body.appendChild(XFER.ghost);
+    moveDragGhost(clientX, clientY);
+    setTransferHud('Drop it onto Cl');
+
+    XFER.onMove = (e) => {
+      if (!XFER.dragging) return;
+      moveDragGhost(e.clientX, e.clientY);
+      const over = pointOverCard(e.clientX, e.clientY, clCard);
+      clCard.classList.toggle('is-drop-hot', over);
+      setTransferHud(over ? 'Release to transfer' : 'Drop it onto Cl');
+    };
+    XFER.onUp = (e) => {
+      if (!XFER.dragging) return;
+      const over = pointOverCard(e.clientX, e.clientY, clCard);
+      if (over) finishElectronTransfer();
+      else {
+        clearTransferDrag();
+        hit.classList.remove('is-lifted');
+        setTransferHud('Grab the outer electron on Na');
+      }
+    };
+    window.addEventListener('pointermove', XFER.onMove);
+    window.addEventListener('pointerup', XFER.onUp);
+    window.addEventListener('pointercancel', XFER.onUp);
+  }
+
+  function onPointerDown(e) {
+    if (e.button != null && e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    beginDrag(e.clientX, e.clientY);
+  }
+
+  valence.addEventListener('pointerdown', onPointerDown);
+  hit.addEventListener('pointerdown', onPointerDown);
+
+  valence.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    finishElectronTransfer();
+  });
+}
+
+function renderIonsExamples() {
+  const host = document.getElementById('ionsExamplesHost');
+  host.replaceChildren();
+  ION_EXAMPLE_PAIRS.forEach((pair, pi) => {
+    const row = document.createElement('div');
+    row.className = 'ions-pair-row';
+    const lab = document.createElement('div');
+    lab.className = 'ions-pair-label';
+    lab.textContent = pair.kind === 'cation'
+      ? `${pair.title} · core +${pair.left.core} → +${pair.right.core}`
+      : `${pair.title} · core +${pair.left.core}`;
+    row.appendChild(lab);
+    /* Scale off the neutral: anions grow past it; cations shrink under it. */
+    const ref = pair.left.radius;
+    const isCation = pair.kind === 'cation';
+    row.appendChild(makeAtomCard(pair.left, {
+      uid: `ex-L-${pi}`,
+      size: 220,
+      canvas: 280,
+      outerBase: 78,
+      scaleFromPm: ref,
+      scaleMax: 2.2,
+      showAttraction: true,
+      attractionOpacity: isCation ? 0.42 : 1.05
+    }));
+    row.appendChild(makeAtomCard(pair.right, {
+      uid: `ex-R-${pi}`,
+      size: 220,
+      canvas: 280,
+      outerBase: 78,
+      scaleFromPm: ref,
+      scaleMax: 2.2,
+      showAttraction: !isCation,
+      attractionOpacity: 0.5
+    }));
+    host.appendChild(row);
+  });
+}
+
+function renderIons() {
+  const step = STATE.ionStep;
+  const hyp = document.getElementById('ionsHypView');
+  const xfer = document.getElementById('ionsTransferView');
+  const ex = document.getElementById('ionsExamplesView');
+  hyp.hidden = step !== 0;
+  xfer.hidden = step !== 1;
+  ex.hidden = step !== 2;
+
+  const titleEl = document.getElementById('actTitle');
+  const helpEl = document.getElementById('helpText');
+  const nextBtn = document.getElementById('stageNext');
+
+  if (step === 0) {
+    clearTransferDrag();
+    titleEl.textContent = 'Create a hypothesis';
+    helpEl.textContent = HELP.ionsHyp;
+    nextBtn.textContent = 'Next → Sodium & chlorine';
+    nextBtn.disabled = false;
+  } else if (step === 1) {
+    titleEl.textContent = 'Making ions';
+    helpEl.textContent = HELP.ionsTransfer;
+    paintTransferPair(
+      document.getElementById('ionsTransferHost'),
+      STATE.ionTransferred,
+      true
+    );
+    setTransferHud(
+      STATE.ionTransferred
+        ? 'Count how many valence electrons each have now. How does that compare to the core charge?'
+        : 'Grab the outer electron on Na',
+      STATE.ionTransferred
+    );
+    if (!STATE.ionTransferred) enableElectronTransfer();
+    else clearTransferDrag();
+    nextBtn.textContent = 'Next → More examples';
+    nextBtn.disabled = !STATE.ionTransferred;
+  } else {
+    clearTransferDrag();
+    titleEl.textContent = 'Atoms and ions';
+    helpEl.textContent = HELP.ionsExamples;
+    renderIonsExamples();
+    nextBtn.textContent = 'Next → Relative size';
+    nextBtn.disabled = false;
+  }
+  updateStageChrome();
+}
+
+function renderSummary() {
+  const host = document.getElementById('summaryHost');
+  host.replaceChildren();
+
+  /* Relative sizes for the trend poster. §8.4 values used where listed
+     (B 89, C 77, O 66, F 64, S 104); others are schematic so the grid can
+     show the across/down pattern like a textbook chart. No pm labels. */
+  const TREND_CHART = [
+    [
+      { sym: 'H', r: 53 }, null, null, null, null, null, null,
+      { sym: 'He', r: 31 }
+    ],
+    [
+      { sym: 'Li', r: 152 }, { sym: 'Be', r: 112 },
+      { sym: 'B', r: 89 }, { sym: 'C', r: 77 },
+      { sym: 'N', r: 71 }, { sym: 'O', r: 66 },
+      { sym: 'F', r: 64 }, { sym: 'Ne', r: 58 }
+    ],
+    [
+      { sym: 'Na', r: 166 }, { sym: 'Mg', r: 141 },
+      { sym: 'Al', r: 121 }, { sym: 'Si', r: 111 },
+      { sym: 'P', r: 107 }, { sym: 'S', r: 104 },
+      { sym: 'Cl', r: 99 }, { sym: 'Ar', r: 98 }
+    ]
+  ];
+  const maxPm = 166;
+
+  const chart = document.createElement('div');
+  chart.className = 'trend-chart';
+  chart.setAttribute('role', 'img');
+  chart.setAttribute(
+    'aria-label',
+    'Periodic table fragment. Atomic radius decreases left to right across a period, and increases top to bottom down a group.'
+  );
+
+  const across = document.createElement('div');
+  across.className = 'trend-arrow-across';
+  across.textContent = 'atomic radius decreases';
+  chart.appendChild(across);
+
+  const down = document.createElement('div');
+  down.className = 'trend-arrow-down';
+  down.textContent = 'atomic radius increases';
+  chart.appendChild(down);
+
+  const grid = document.createElement('div');
+  grid.className = 'trend-grid';
+  TREND_CHART.forEach((period, pi) => {
+    period.forEach((el, ei) => {
+      const cell = document.createElement('div');
+      cell.className = 'trend-cell' + (el ? '' : ' is-empty');
+      if (el) {
+        const diskHost = document.createElement('div');
+        diskHost.className = 'trend-disk-host';
+        diskHost.appendChild(buildRadiusDisk({
+          radiusPm: el.r,
+          maxPm,
+          size: 72,
+          uid: `trend-${pi}-${ei}`,
+          label: el.sym,
+          fill: 'phosphor'
+        }));
+        cell.appendChild(diskHost);
+        const sym = document.createElement('div');
+        sym.className = 'trend-sym';
+        sym.textContent = el.sym;
+        cell.appendChild(sym);
+      }
+      grid.appendChild(cell);
+    });
+  });
+  chart.appendChild(grid);
+  host.appendChild(chart);
+
+  document.getElementById('stageNext').textContent = 'Finish → What this was for';
+  document.getElementById('stageNext').disabled = false;
+}
+
+function showAct(name) {
+  document.getElementById('actDefine').hidden = name !== 'define';
+  document.getElementById('actHypothesize').hidden = name !== 'hypothesize';
+  document.getElementById('actAcross').hidden = name !== 'across';
+  document.getElementById('actDown').hidden = name !== 'down';
+  document.getElementById('actIons').hidden = name !== 'ions';
+  document.getElementById('actSummary').hidden = name !== 'summary';
+
+  const copy = ACT_COPY[name];
+  document.getElementById('actTag').textContent = copy.tag;
+  document.getElementById('actTitle').textContent = copy.title;
+  const frameEl = document.getElementById('actFrame');
+  if (copy.frame) {
+    frameEl.hidden = false;
+    frameEl.textContent = copy.frame;
+  } else {
+    frameEl.hidden = true;
+    frameEl.textContent = '';
+  }
+  const helpKey = name === 'ions'
+    ? (STATE.ionStep === 0 ? 'ionsHyp' : STATE.ionStep === 1 ? 'ionsTransfer' : 'ionsExamples')
+    : name;
+  document.getElementById('helpText').textContent = HELP[helpKey];
+  document.getElementById('helpPanel').classList.remove('open');
+
+  updateStageChrome();
+
+  if (name === 'define') renderDefine();
+  else if (name === 'hypothesize') renderHypothesize();
+  else if (name === 'across') renderAcross();
+  else if (name === 'down') renderDown(false);
+  else if (name === 'ions') renderIons();
+  else if (name === 'summary') renderSummary();
+}
+
+function updateStageChrome() {
+  const act = ACTS[STATE.actIndex];
+  const canBack =
+    STATE.actIndex > 0 ||
+    (act === 'define' && STATE.defineMeasured) ||
+    (act === 'down' && STATE.downStep > 0) ||
+    (act === 'ions' && STATE.ionStep > 0);
+  document.getElementById('stageBack').hidden = !canBack;
+  document.getElementById('stuckBtn').hidden = !!gates.moduleComplete;
+}
+
+async function goNext() {
+  if (STATE.transitioning) return;
+  const act = ACTS[STATE.actIndex];
+
+  if (act === 'define' && !STATE.defineMeasured) {
+    STATE.defineMeasured = true;
+    const svg = document.querySelector('#defineHost .measure-group');
+    if (svg) {
+      svg.classList.add('is-on');
+      svg.setAttribute('aria-hidden', 'false');
+    }
+    renderDefine();
+    return;
+  }
+
+  if (act === 'down' && STATE.downStep < 2) {
+    STATE.transitioning = true;
+    STATE.downStep += 1;
+    await renderDown(true);
+    STATE.transitioning = false;
+    return;
+  }
+
+  if (act === 'ions' && STATE.ionStep < 2) {
+    if (STATE.ionStep === 1 && !STATE.ionTransferred) return;
+    STATE.ionStep += 1;
+    renderIons();
+    return;
+  }
+
+  if (STATE.actIndex >= ACTS.length - 1) {
+    if (gates.moduleComplete) {
+      revealDebrief();
+      return;
+    }
+    setGate('moduleComplete', true);
+    document.getElementById('stageNext').disabled = true;
+    document.getElementById('stuckBtn').hidden = true;
+    return;
+  }
+
+  STATE.actIndex += 1;
+  if (ACTS[STATE.actIndex] === 'ions') {
+    STATE.ionStep = 0;
+    STATE.ionTransferred = false;
+  }
+  showAct(ACTS[STATE.actIndex]);
+}
+
+function goBack() {
+  if (STATE.transitioning) return;
+  const act = ACTS[STATE.actIndex];
+
+  if (act === 'down' && STATE.downStep > 0) {
+    STATE.downStep -= 1;
+    renderDown(false);
+    return;
+  }
+
+  if (act === 'ions' && STATE.ionStep > 0) {
+    STATE.ionStep -= 1;
+    if (STATE.ionStep === 0) STATE.ionTransferred = false;
+    renderIons();
+    return;
+  }
+
+  if (act === 'define' && STATE.defineMeasured) {
+    STATE.defineMeasured = false;
+    renderDefine();
+    return;
+  }
+
+  if (STATE.actIndex <= 0) return;
+  STATE.actIndex -= 1;
+  if (ACTS[STATE.actIndex] === 'down') STATE.downStep = 2;
+  if (ACTS[STATE.actIndex] === 'ions') {
+    STATE.ionStep = 2;
+    STATE.ionTransferred = true;
+  }
+  if (ACTS[STATE.actIndex] === 'define') STATE.defineMeasured = true;
+  document.getElementById('stageNext').disabled = false;
+  hideDebrief();
+  showAct(ACTS[STATE.actIndex]);
+}
+
+// === GATES / HELP ===
+const gates = {};
+function setGate(name, val) {
+  gates[name] = val;
+  if (name === 'moduleComplete' && val) revealDebrief();
+}
+
 const stuckBtn = document.getElementById('stuckBtn');
 const helpPanel = document.getElementById('helpPanel');
-if(stuckBtn && helpPanel) {
+if (stuckBtn && helpPanel) {
   stuckBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     helpPanel.classList.toggle('open');
   });
   document.addEventListener('click', (e) => {
-    if(!helpPanel.contains(e.target) && e.target !== stuckBtn) {
+    if (!helpPanel.contains(e.target) && e.target !== stuckBtn) {
       helpPanel.classList.remove('open');
     }
   });
 }
 
-// === REFERENCE DATA ===
-const DATA = {
-  radii: { B:89, C:77, O:66, S:104, As:121, Se:117 },
-  isoelectronic: [
-    {ion:'S²⁻', electrons:18, radius:184, coreCharge:6},
-    {ion:'Cl⁻', electrons:18, radius:181, coreCharge:7},
-    {ion:'K⁺',  electrons:18, radius:133, coreCharge:9},
-    {ion:'Ca²⁺',electrons:18, radius:104, coreCharge:10}
+document.getElementById('stageNext').addEventListener('click', goNext);
+document.getElementById('stageBack').addEventListener('click', goBack);
+
+// === DEBRIEF ===
+const DEBRIEF = {
+  intentions: [
+    { text: 'We will learn about the concept of atomic radius.',
+      target: 'actDefine', revisit: 'Measure radius' },
+    { text: 'We will connect core charge to atomic radius.',
+      target: 'actAcross', revisit: 'Across a period' },
+    { text: 'We will learn how adding or removing electrons affects the atomic radius.',
+      target: 'actIons', revisit: 'Ions' },
+    { text: 'We will discuss the patterns and trends which exist on the periodic table.',
+      target: 'actDown', revisit: 'Down a group' },
+    { text: 'We will learn about terms such as affinity, ionization, and electronegativity.', note: 'later' },
+    { text: 'We will relate the trends to previous learnings such as radius and ionization energy.',
+      target: 'actAcross', revisit: 'Across a period' },
+    { text: 'We will see how the trends change as electrons are gained or lost by atoms.',
+      target: 'actIons', revisit: 'Ions' }
+  ],
+  competencies: [
+    {
+      code: 'Q&P',
+      name: 'Questioning and predicting',
+      text: 'I can compare two atoms and hypothesize which one has a larger atomic radius based on their position in the periodic table and their core charge.'
+    },
+    {
+      code: 'PAI',
+      name: 'Processing and analyzing data and information',
+      text: 'I can analyze how gaining or losing electrons affects the radius of an ion by comparing their core charge and electron configuration.'
+    },
+    {
+      code: 'Q&P',
+      name: 'Questioning and predicting',
+      text: 'I can make predictions about chemical properties or reactivity based on multiple trends, including atomic radius and ionization energy, and support those predictions using prior learning.',
+      note: 'later'
+    },
+    {
+      code: 'PAI',
+      name: 'Processing and analyzing data and information',
+      text: 'I can identify and explain periodic trends (e.g. atomic radius, electronegativity, ionization energy) by analyzing their patterns across periods and down groups on the periodic table and justify those patterns based on their atomic configuration and associated properties.'
+    },
+    {
+      code: 'C',
+      name: 'Communicating',
+      text: 'I can accurately define and use key terms such as electron affinity, ionization energy, and electronegativity when explaining periodic trends or comparing elements.',
+      note: 'later'
+    }
   ]
 };
 
-// === DISCOVERY GATE INIT ===
-setGate('hasComparedSizes', false);
-
-// === STANDBY ANIMATION: Pulsing atom circles ===
-const atoms = [
-  { label:'B',  r:89 },
-  { label:'C',  r:77 },
-  { label:'O',  r:66 },
-  { label:'S',  r:104 },
-  { label:'As', r:121 },
-  { label:'Se', r:117 }
-];
-const maxR = 130;
-
-function drawStandby(t) {
-  ctx.clearRect(0, 0, W, H);
-  drawGrid();
-
-  const cy = H / 2;
-  const count = atoms.length;
-  const spacing = W / (count + 1);
-
-  atoms.forEach((a, i) => {
-    const x = spacing * (i + 1);
-    const scale = a.r / maxR;
-    const baseR = scale * Math.min(40, W / (count * 2.5));
-    const pulse = 1 + Math.sin(t * 0.002 + i * 1.1) * 0.06;
-    const r = baseR * pulse;
-
-    glowCircle(x, cy, r, '#3fe0cf');
+function fillIntentionList(ul, items, opts) {
+  if (!ul || ul.childElementCount) return;
+  opts = opts || {};
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.appendChild(document.createTextNode(item.text));
+    if (item.note) {
+      li.className = 'elsewhere';
+      const tag = document.createElement('span');
+      tag.className = 'debrief-tag';
+      tag.textContent = ` — ${item.note}`;
+      li.appendChild(tag);
+    }
+    if (opts.showRevisit && item.target && item.revisit) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'debrief-revisit';
+      btn.dataset.target = item.target;
+      btn.textContent = 'Explore again → ' + item.revisit;
+      li.appendChild(btn);
+    }
+    ul.appendChild(li);
   });
 }
 
-/* === SIMULATION LOGIC — TO BE DESIGNED === */
-
-function loop(t) {
-  drawStandby(t);
-  if(!prefersReduced) requestAnimationFrame(loop);
+function fillCompetencyList(ul, items) {
+  if (!ul || ul.childElementCount) return;
+  items.forEach(item => {
+    const li = document.createElement('li');
+    if (item.note) li.className = 'elsewhere';
+    const name = document.createElement('span');
+    name.className = 'cc-name';
+    name.textContent = item.name;
+    li.appendChild(name);
+    li.appendChild(document.createTextNode(item.text));
+    if (item.note) {
+      const tag = document.createElement('span');
+      tag.className = 'debrief-tag';
+      tag.textContent = ` — ${item.note}`;
+      li.appendChild(tag);
+    }
+    ul.appendChild(li);
+  });
 }
 
-if(prefersReduced) {
-  drawStandby(0);
-} else {
-  requestAnimationFrame(loop);
+function renderBriefing() {
+  fillIntentionList(document.getElementById('briefingIntentions'), DEBRIEF.intentions);
+  fillCompetencyList(document.getElementById('briefingCompetencies'), DEBRIEF.competencies);
+}
+
+function startModule() {
+  const briefing = document.getElementById('briefing');
+  const stage = document.getElementById('moduleStage');
+  if (briefing) briefing.hidden = true;
+  if (stage) stage.hidden = false;
+  showAct(ACTS[STATE.actIndex]);
+}
+
+function renderDebrief() {
+  fillIntentionList(document.getElementById('debriefIntentions'), DEBRIEF.intentions, { showRevisit: true });
+  fillCompetencyList(document.getElementById('debriefCompetencies'), DEBRIEF.competencies);
+}
+
+function enterDebriefStage() {
+  const stage = document.getElementById('moduleStage');
+  const debrief = document.getElementById('debrief');
+  if (!stage || !debrief) return;
+  Array.from(stage.children).forEach(child => {
+    if (child === debrief) return;
+    if (!child.hasAttribute('data-pre-debrief-hidden')) {
+      child.setAttribute('data-pre-debrief-hidden', child.hidden ? '1' : '0');
+    }
+    child.hidden = true;
+  });
+  debrief.hidden = false;
+}
+
+function leaveDebriefStage() {
+  const stage = document.getElementById('moduleStage');
+  const debrief = document.getElementById('debrief');
+  if (!stage) return;
+  Array.from(stage.children).forEach(child => {
+    if (child === debrief) return;
+    if (child.hasAttribute('data-pre-debrief-hidden')) {
+      child.hidden = child.getAttribute('data-pre-debrief-hidden') === '1';
+      child.removeAttribute('data-pre-debrief-hidden');
+    }
+  });
+  if (debrief) debrief.hidden = true;
+}
+
+let debriefRevisitWired = false;
+function wireDebriefRevisit() {
+  if (debriefRevisitWired) return;
+  debriefRevisitWired = true;
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.debrief-revisit');
+    if (!btn || !btn.dataset.target) return;
+    e.preventDefault();
+    const map = {
+      actDefine: 'define',
+      actHypothesize: 'hypothesize',
+      actAcross: 'across',
+      actDown: 'down',
+      actIons: 'ions',
+      actSummary: 'summary'
+    };
+    const name = map[btn.dataset.target] || btn.dataset.target;
+    const idx = ACTS.indexOf(name);
+    if (idx < 0) return;
+    leaveDebriefStage();
+    STATE.actIndex = idx;
+    if (name === 'define') STATE.defineMeasured = true;
+    if (name === 'down') STATE.downStep = 2;
+    if (name === 'ions') {
+      STATE.ionStep = 2;
+      STATE.ionTransferred = true;
+    }
+    showAct(name);
+    document.getElementById('stageNext').disabled = false;
+    document.getElementById('stageNext').textContent =
+      gates.moduleComplete && name === 'summary' ? 'What this was for →' : (name === 'summary' ? 'Finish → What this was for' : 'Continue →');
+    window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
+  });
+}
+
+function revealDebrief() {
+  const section = document.getElementById('debrief');
+  if (!section) return;
+  renderDebrief();
+  wireDebriefRevisit();
+  enterDebriefStage();
+  section.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+}
+
+function hideDebrief() {
+  leaveDebriefStage();
+  setGate('moduleComplete', false);
+  document.getElementById('stageNext').disabled = false;
+}
+
+setGate('moduleComplete', false);
+renderBriefing();
+document.getElementById('briefingNext').addEventListener('click', startModule);
+
+// Teacher preview deep-links
+const _qs = new URLSearchParams(location.search);
+if (_qs.has('debrief') || _qs.has('start') || _qs.has('ions') || _qs.has('summary') || _qs.has('across') || _qs.has('down') || _qs.has('hypothesize')) {
+  startModule();
+  if (_qs.has('hypothesize')) { STATE.actIndex = 1; STATE.defineMeasured = true; showAct('hypothesize'); }
+  else if (_qs.has('across')) { STATE.actIndex = 2; STATE.defineMeasured = true; showAct('across'); }
+  else if (_qs.has('down')) { STATE.actIndex = 3; STATE.defineMeasured = true; STATE.downStep = 2; showAct('down'); }
+  else if (_qs.has('ions')) {
+    STATE.actIndex = 4;
+    STATE.defineMeasured = true;
+    STATE.downStep = 2;
+    STATE.ionStep = 0;
+    STATE.ionTransferred = false;
+    showAct('ions');
+  }
+  else if (_qs.has('summary')) {
+    STATE.actIndex = 5;
+    STATE.defineMeasured = true;
+    STATE.downStep = 2;
+    STATE.ionStep = 2;
+    STATE.ionTransferred = true;
+    showAct('summary');
+  }
+  if (_qs.has('debrief')) {
+    STATE.actIndex = 5;
+    STATE.defineMeasured = true;
+    STATE.downStep = 2;
+    STATE.ionStep = 2;
+    STATE.ionTransferred = true;
+    showAct('summary');
+    setGate('moduleComplete', true);
+  }
 }
 </script>
 </body>

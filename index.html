@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DiPietro Science Sims</title>
   <meta name="description" content="DiPietro Science Sims: interactive browser-based science demos." />
-  <link rel="stylesheet" href="./assets/home.css" />
+  <link rel="stylesheet" href="./assets/home.css?v=3" />
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
-      <span class="brand"><span class="live-dot"></span>DIPIETRO.SCI</span>
+      <a class="brand" href="./index.html"><span class="live-dot"></span>DIPIETRO.SCI</a>
       <span class="stat">COLLECTION <b>SCIENCE SIMS</b></span>
       <span class="stat">RUNTIME <b>BROWSER</b></span>
       <span class="spacer"></span>
@@ -19,126 +19,55 @@
 
     <div class="hero">
       <h1>DiPietro Science Sims</h1>
-      <p>
-        A curated set of interactive science simulations for learning, exploration, and classroom demos.
-      </p>
+      <p>Choose a course, then open a simulation.</p>
     </div>
 
-    <div class="grid" role="list">
-      <a class="card" role="listitem" href="./collision_theory.html">
+    <div class="grid">
+      <a class="card card-course" href="./ap-chemistry-12/">
         <div class="panel-head">
-          <span class="title">COLLISION THEORY</span>
-          <span class="meta">CANVAS</span>
+          <span class="title">COURSE</span>
+          <span class="meta">4 SIMS</span>
         </div>
         <div class="panel-body">
-          <div class="sim-name">Collision Theory</div>
-          <div class="sim-desc">A quick, interactive demo of collision theory.</div>
-          <div class="meta"><span>ENTRY</span> <code>collision_theory.html</code></div>
+          <div class="sim-name">AP Chemistry 12</div>
+          <div class="sim-desc">Collision theory, Maxwell–Boltzmann, equilibrium, and titration.</div>
           <div class="actions">
             <span class="btn">Open</span>
-            <span class="tag amber">canvas</span>
+            <span class="tag cyan">grade 12</span>
           </div>
         </div>
       </a>
 
-      <a class="card" role="listitem" href="./beers_law.html">
+      <a class="card card-course" href="./chemistry-11h/">
         <div class="panel-head">
-          <span class="title">BEER’S LAW</span>
-          <span class="meta">LAB</span>
+          <span class="title">COURSE</span>
+          <span class="meta">1 SUITE</span>
         </div>
         <div class="panel-body">
-          <div class="sim-name">Beer’s Law</div>
-          <div class="sim-desc">An interactive visualization inspired by Beer’s Law.</div>
-          <div class="meta"><span>ENTRY</span> <code>beers_law.html</code></div>
+          <div class="sim-name">Chemistry 11H</div>
+          <div class="sim-desc">Atomic structure suite — build the atom from measured evidence.</div>
           <div class="actions">
             <span class="btn">Open</span>
-            <span class="tag lime">lab</span>
+            <span class="tag magenta">grade 11</span>
           </div>
         </div>
       </a>
 
-      <a class="card" role="listitem" href="./equilibrium_simulations.html">
+      <a class="card card-course" href="./other/">
         <div class="panel-head">
-          <span class="title">EQUILIBRIUM</span>
-          <span class="meta">SET</span>
+          <span class="title">COURSE</span>
+          <span class="meta">1 SIM</span>
         </div>
         <div class="panel-body">
-          <div class="sim-name">Equilibrium Simulations</div>
-          <div class="sim-desc">A collection of equilibrium-themed simulations.</div>
-          <div class="meta"><span>ENTRY</span> <code>equilibrium_simulations.html</code></div>
+          <div class="sim-name">Other</div>
+          <div class="sim-desc">Earth science and extras that don’t sit in a chemistry course.</div>
           <div class="actions">
             <span class="btn">Open</span>
-            <span class="tag cyan">set</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="card" role="listitem" href="./Maxwell-Boltzman.html">
-        <div class="panel-head">
-          <span class="title">MAXWELL–BOLTZMANN</span>
-          <span class="meta">STATS</span>
-        </div>
-        <div class="panel-body">
-          <div class="sim-name">Maxwell–Boltzmann</div>
-          <div class="sim-desc">A visual exploration of Maxwell–Boltzmann distributions.</div>
-          <div class="meta"><span>ENTRY</span> <code>Maxwell-Boltzman.html</code></div>
-          <div class="actions">
-            <span class="btn">Open</span>
-            <span class="tag magenta">stats</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="card" role="listitem" href="./Titration%20Simulator%20(1).html">
-        <div class="panel-head">
-          <span class="title">TITRATION</span>
-          <span class="meta">REACT</span>
-        </div>
-        <div class="panel-body">
-          <div class="sim-name">Titration Simulator</div>
-          <div class="sim-desc">A polished, interactive titration experience.</div>
-          <div class="meta"><span>ENTRY</span> <code>Titration Simulator (1).html</code></div>
-          <div class="actions">
-            <span class="btn">Open</span>
-            <span class="tag cyan">react</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="card" role="listitem" href="./Unit%201b/index.html">
-        <div class="panel-head">
-          <span class="title">ATOMIC STRUCTURE</span>
-          <span class="meta">UNIT 1b</span>
-        </div>
-        <div class="panel-body">
-          <div class="sim-name">Atomic Structure Suite</div>
-          <div class="sim-desc">8 guided simulations — build the atom from measured evidence.</div>
-          <div class="meta"><span>ENTRY</span> <code>Unit 1b/index.html</code></div>
-          <div class="actions">
-            <span class="btn">Open</span>
-            <span class="tag magenta">unit</span>
-          </div>
-        </div>
-      </a>
-
-      <a class="card" role="listitem" href="./bc-tides.html">
-        <div class="panel-head">
-          <span class="title">BC TIDES</span>
-          <span class="meta">EARTH</span>
-        </div>
-        <div class="panel-body">
-          <div class="sim-name">BC Tide</div>
-          <div class="sim-desc">Live tide heights for White Rock and Jericho Beach.</div>
-          <div class="meta"><span>ENTRY</span> <code>bc-tides.html</code></div>
-          <div class="actions">
-            <span class="btn">Open</span>
-            <span class="tag amber">earth</span>
+            <span class="tag amber">misc</span>
           </div>
         </div>
       </a>
     </div>
-
   </div>
 </body>
 </html>
-

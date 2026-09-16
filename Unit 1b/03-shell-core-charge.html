@@ -6,298 +6,3823 @@
 <title>03 — Shell Model &amp; Core Charge</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --void:#0a0912;
-  --void-2:#0c0b1c;
-  --panel:#151330;
-  --panel-edge:#2a2660;
-  --grid:#211d47;
-  --phosphor:#3fe0cf;
-  --phosphor-dim:#1c6b66;
-  --ember:#ffb24d;
-  --signal:#b579ff;
-  --ink:#e9e7fb;
-  --dim:#797597;
+  --paper:#e6e1cf;
+  --paper-2:#d8d2bc;
+  --paper-3:#c9c2a8;
+  --void:#050505;
+  --void-2:#0c0c0c;
+  --panel:#efe9d4;
+  --panel-edge:#1a1810;
+  --grid:#cfc8ae;
+  --phosphor:#5c6b28;
+  --ember:#a85a32;
+  --signal:#1a6aa3;
+  --ink:#16140e;
+  --ink-soft:#33301f;
+  --dim:#55513f;
+  --faint:#6f6b59;
+  --proton:#a85a32;
+  --neutron:#7e8c45;
+  --electron:#c4a35a;
+  --success:#4f5a28;
+  --error:#a85a32;
+  --neon:#c4a35a;
+  --olive:#7e8c45;
+  --olive-deep:#4f5a28;
+  --mustard:#c4a35a;
+  --plate:#050505;
+  --plate-ink:#e8e6d9;
+
+  --font-display:'Archivo Black',Helvetica,sans-serif;
+  --font-body:Barlow,Helvetica,Univers,'Helvetica Neue',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  --label-xs:0.72rem;
+  --label-sm:0.78rem;
+  --label-md:0.85rem;
+  --track-wide:0.13em;
+  --track-tight:0.08em;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--void);color:var(--ink);font-family:'IBM Plex Mono',monospace;min-height:100vh;}
+html{font-size:16px;-webkit-text-size-adjust:100%;}
+body{
+  background-color:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:1.0625rem;
+  min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+.mono-label,
+.back-link,.mod-meta,.task-kicker,.debrief-kicker,.briefing-kicker,#stuckBtn,.btn,.mod-tag,.viewport::before,
+.atom-kicker,.eq,.eq-note,.core-formula,.stepper-label,.shield-tag,.atom-sym,
+.atom-card .ie-kicker,.atom-card .ie-val,.atom-card .ie-unit,
+.period-intro,.period-eq,.nuc-tip,.period-hint{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+}
 body::before{
   content:'';
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   z-index:9999;
   pointer-events:none;
-  opacity:0.045;
-  mix-blend-mode:screen;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:0.14;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:256px 256px;
 }
-.module-wrap{max-width:900px;margin:0 auto;padding:1.5rem 1rem 3rem;}
-.back-link{
-  display:inline-block;
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.8rem;
-  color:var(--dim);
-  text-decoration:none;
-  margin-bottom:1.2rem;
-  transition:color 0.2s;
+.module-wrap{max-width:920px;margin:0 auto;padding:1.35rem 1.35rem 3.5rem;position:relative;z-index:1;}
+.top-nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap;border-bottom:1px solid var(--ink);padding-bottom:0.7rem;}
+.back-link{font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color 0.2s;}
+.back-link:hover{color:var(--olive-deep);}
+.mod-meta{font-size:var(--label-xs);font-weight:600;color:var(--ink);letter-spacing:var(--track-wide);text-transform:uppercase;}
+
+.task-kicker,.mod-tag{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--olive-deep);
+  margin-bottom:0.7rem;
 }
-.back-link:hover{color:var(--phosphor);}
-.mod-tag{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.55rem;
-  color:var(--dim);
-  text-transform:uppercase;
-  letter-spacing:0.15em;
-  margin-bottom:0.5rem;
+.task-kicker::before,.mod-tag::before{
+  content:'';
+  width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);
+  flex:none;
+  transform:translateY(-0.12em);
 }
-h1{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.9rem;
-  color:var(--phosphor);
-  text-shadow:0 0 12px rgba(63,224,207,0.4),0 0 30px rgba(63,224,207,0.15);
-  margin-bottom:0.75rem;
-  line-height:1.6;
+h1,.task-title{
+  font-family:var(--font-display);
+  font-size:clamp(1.9rem,4.7vw,2.75rem);
+  font-weight:400;
+  letter-spacing:-0.025em;
+  line-height:0.98;
+  color:var(--ink);
+  margin-bottom:0.7rem;
 }
 .framing{
-  font-family:'IBM Plex Mono',monospace;
-  color:var(--dim);
-  font-style:italic;
-  font-size:0.85rem;
-  line-height:1.6;
-  margin-bottom:0.5rem;
+  font-size:1.15rem;
+  font-weight:400;
+  line-height:1.5;
+  color:var(--ink-soft);
+  max-width:none;
+  text-wrap:pretty;
+  margin-bottom:0.85rem;
 }
+.framing strong{color:var(--ember);font-weight:600;}
+
+.btn{background:transparent;border:1px solid var(--ink);color:var(--ink);font-size:var(--label-md);letter-spacing:0.09em;text-transform:uppercase;font-weight:600;padding:0.65rem 1.3rem;border-radius:0;cursor:pointer;transition:background 0.15s,color 0.15s;margin-right:0.5rem;margin-top:0.4rem;}
+.btn:hover{background:var(--ink);color:var(--paper);}
+.btn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.btn.submit{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+.btn.submit:hover{background:var(--olive-deep);border-color:var(--olive-deep);}
+.btn:disabled{opacity:0.35;cursor:not-allowed;pointer-events:none;}
+
+.stage-nav,
+.module-footer,
+.act-actions,
+.page-nav,
+.compare-actions,
+.group-actions{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;
+  column-gap:0.75rem;
+  row-gap:0.5rem;
+  width:100%;
+  margin-top:1.25rem;
+  min-height:2.6rem;
+}
+.module-footer-back,
+.module-footer-help,
+.module-footer-fwd{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:0.5rem;
+  min-width:0;
+}
+.module-footer-back{justify-self:start;justify-content:flex-start;}
+.module-footer-help{justify-self:center;justify-content:center;}
+.module-footer-fwd{justify-self:end;justify-content:flex-end;}
+.stage-nav .btn,
+.module-footer .btn,
+.act-actions .btn,
+.page-nav .btn,
+.compare-actions .btn,
+.group-actions .btn,
+.module-footer #stuckBtn,
+#stuckBtn{margin:0;}
+#stuckBtn{background:none;border:1px solid var(--ink);color:var(--ink);font-size:var(--label-sm);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:0.55rem 1.2rem;border-radius:0;cursor:pointer;transition:background 0.15s,color 0.15s;}
+#stuckBtn:hover{background:var(--ink);color:var(--paper);}
+#stuckBtn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+#stuckBtn[hidden],.js-stage-back[hidden],.module-footer .btn[hidden]{display:none !important;}
+@media (max-width:520px){
+  .stage-nav,
+  .module-footer,
+  .act-actions,
+  .page-nav,
+  .compare-actions,
+  .group-actions{
+    grid-template-columns:1fr 1fr;
+    grid-template-areas:
+      "back fwd"
+      "help help";
+  }
+  .module-footer-back{grid-area:back;}
+  .module-footer-help{grid-area:help;}
+  .module-footer-fwd{grid-area:fwd;}
+}
+.help-panel{opacity:0;max-height:0;overflow:hidden;transition:opacity 0.3s,max-height 0.3s;border:1px solid transparent;background:var(--plate);border-radius:0;padding:0 1.2rem;margin-top:0.75rem;color:var(--plate-ink);font-size:1.05rem;line-height:1.6;max-width:62ch;text-wrap:pretty;}
+.help-panel.open{opacity:1;max-height:320px;padding:1rem 1.2rem;border-color:var(--neon);}
+/* Student questions — answer on paper / in notes (§7) */
+.student-q,
+.reveal-prompt,
+.compare-prompt{
+  color:var(--signal);
+  font-weight:700;
+}
+.group-prompt.student-q{
+  color:var(--signal);
+  font-weight:700;
+}
+
+/* briefing */
+.briefing{margin:0 0 0.5rem;padding:0.2rem 0 0;width:100%;}
+.briefing[hidden]{display:none;}
+.module-wrap:has(#briefing:not([hidden])){max-width:1120px;padding-left:clamp(1.35rem,4vw,2.75rem);padding-right:clamp(1.35rem,4vw,2.75rem);}
+.module-wrap:has(#actPeriod:not([hidden])),
+.module-wrap:has(#actCompare:not([hidden])){max-width:1100px;}
+.briefing-kicker{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.7rem;
+}
+.briefing-kicker::before{
+  content:'';width:1.6rem;height:0.28rem;background:var(--olive-deep);flex:none;
+  transform:translateY(-0.12em);
+}
+.briefing h1{
+  font-family:var(--font-display);font-size:clamp(1.85rem,4.5vw,2.55rem);
+  font-weight:400;letter-spacing:-0.025em;line-height:1.02;color:var(--ink);
+  margin-bottom:0.55rem;
+}
+.briefing-lead{font-size:1.15rem;line-height:1.55;color:var(--ink-soft);max-width:none;margin:0 0 1.5rem;text-wrap:pretty;}
+.briefing-columns{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.75rem 2.5rem;
+  align-items:start;
+}
+.briefing-actions{
+  display:flex;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  margin-top:1.75rem;
+  padding-top:1.25rem;
+  border-top:1px solid var(--ink);
+}
+.briefing .btn.submit{margin-top:0;}
+#moduleStage[hidden]{display:none;}
+
+/* debrief */
+.debrief{margin:0.25rem 0 1.25rem;padding:1.2rem 0 0;border-top:1px solid var(--ink);}
+.debrief[hidden]{display:none;}
+.briefing h2,
+.debrief h2{font-family:var(--font-display);font-size:1.5rem;font-weight:400;letter-spacing:-0.02em;line-height:1.1;color:var(--ink);margin-bottom:0.35rem;}
+.debrief-lead{font-size:1.05rem;line-height:1.5;color:var(--dim);max-width:none;margin:0 0 1.15rem;text-wrap:pretty;}
+.briefing-block,
+.debrief-block{border-left:4px solid var(--olive);padding:0.1rem 0 0.1rem 1.05rem;margin-bottom:1.15rem;}
+.briefing-block{margin-bottom:0;}
+.briefing-block:last-of-type,
+.debrief-block:last-child{margin-bottom:0;}
+.briefing-block.cc,
+.debrief-block.cc{border-left-color:var(--signal);}
+.debrief-kicker{font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.5rem;}
+.briefing-block.cc .debrief-kicker,
+.debrief-block.cc .debrief-kicker{color:var(--signal);}
+.briefing ul,
+.debrief ul{list-style:none;margin:0;padding:0;}
+.briefing li,
+.debrief li{position:relative;padding-left:1.6rem;margin:0.45rem 0;font-size:1rem;line-height:1.5;color:var(--ink-soft);max-width:none;text-wrap:pretty;}
+.briefing li{font-size:1.05rem;line-height:1.55;margin:0.55rem 0;}
+.briefing-li li::before{content:'\25B8';position:absolute;left:0;color:var(--olive-deep);}
+.debrief-li li::before{content:'\2713';position:absolute;left:0;color:var(--olive-deep);font-weight:700;}
+.briefing-li li.elsewhere::before,
+.debrief-li li.elsewhere::before{content:'\270E';color:var(--ember);}
+.debrief-tag{font-family:var(--font-mono);font-size:var(--label-xs);letter-spacing:0.1em;text-transform:uppercase;color:var(--ember);white-space:nowrap;}
+.debrief-revisit{
+  display:block;margin:0.35rem 0 0;padding:0;
+  border:none;background:none;cursor:pointer;text-align:left;
+  font-family:var(--font-mono);font-size:var(--label-sm);font-weight:600;
+  letter-spacing:var(--track-tight);text-transform:uppercase;
+  color:var(--signal);line-height:1.4;
+}
+.debrief-revisit:hover{color:var(--olive-deep);text-decoration:underline;}
+.debrief-revisit:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.briefing-cc li::before,
+.debrief-cc li::before{content:'\25B8';position:absolute;left:0;color:var(--signal);}
+.briefing-cc .cc-name,
+.debrief-cc .cc-name{display:block;font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--signal);margin-bottom:0.15rem;}
+
+/* === Act 1 plate === */
+.act[hidden]{display:none;}
 .viewport{
   position:relative;
-  background:var(--void-2);
-  border:2px solid var(--panel-edge);
-  border-radius:4px;
-  box-shadow:
-    0 0 0 4px var(--void),
-    0 0 0 6px var(--panel-edge),
-    0 0 30px rgba(63,224,207,0.06);
+  background:transparent;
+  border:3px solid var(--ink);
+  border-radius:0;
   padding:0;
-  margin:1.5rem 0;
+  margin:0.35rem 0 1rem;
   overflow:hidden;
 }
-#simCanvas{width:100%;display:block;}
-.controls{/* placeholder for simulation controls */}
-.hud{
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.7rem;
+.viewport::before{
+  content:attr(data-fig);
+  display:block;
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--ink);
+  padding:0.55rem 1rem 0.42rem;
+  border-bottom:2px solid var(--ink);
+}
+.plate-body{padding:1.1rem 1rem 1.25rem;}
+
+.li-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.25rem 1.5rem;
+  align-items:start;
+}
+.atom-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.65rem;
+  transition:opacity 0.45s ease,filter 0.45s ease;
+}
+.atom-card.is-dim{
+  opacity:0.38;
+  filter:grayscale(0.25);
+}
+.atom-kicker{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
   color:var(--dim);
-  padding:0.5rem 0.75rem;
-  border-top:1px solid var(--panel-edge);
-  background:var(--panel);
+  text-align:center;
 }
-[data-gate]{opacity:0;transition:opacity 0.6s;pointer-events:none;}
-[data-gate].discovered{opacity:1;pointer-events:auto;}
-#stuckBtn{
-  background:none;
-  border:1px solid var(--signal);
-  color:var(--signal);
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.8rem;
-  padding:0.5rem 1.2rem;
-  border-radius:4px;
+.atom-sym{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.08em;
+  color:var(--ink);
+}
+.atom-svg{
+  width:min(100%,220px);
+  height:auto;
+  display:block;
+}
+.atom-svg .shell{
+  fill:none;
+  stroke:var(--ink);
+  stroke-width:1.25;
+  opacity:0.55;
+}
+.atom-svg .shell-inner-empty{
+  stroke-dasharray:3 4;
+  opacity:0.35;
+}
+/* Soft oval linking nucleus ↔ outer electron (attraction) — fill only, no stroke */
+.atom-svg .attraction-oval{
+  stroke:none;
+  pointer-events:none;
+}
+.atom-svg .attraction-fleck{
+  fill:var(--ember);
+  stroke:none;
+  pointer-events:none;
+}
+.atom-svg .shell-orbit{
+  transform-box:view-box;
+  animation:shell-orbit 26s linear infinite;
+}
+.atom-svg .shell-orbit-inner{
+  animation-duration:15s;
+  animation-direction:reverse;
+}
+@keyframes shell-orbit{
+  to{transform:rotate(360deg);}
+}
+/* Yellow = negative charge. Soft core disk + stipple hide the positive. */
+.atom-svg .neg-core-disk{
+  pointer-events:none;
+}
+.atom-svg .neg-stipple circle{
+  fill:var(--electron);
+  stroke:none;
+  pointer-events:none;
+}
+.atom-svg .e-marker{
+  fill:var(--electron);
+  stroke:#6a5530;
+  stroke-width:1;
+}
+.atom-svg .e-valence{
+  fill:var(--electron);
+  stroke:#6a5530;
+  stroke-width:1;
+}
+.atom-svg .nuc-label,
+.atom-svg .e-count-label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  fill:var(--paper);
+  text-anchor:middle;
+  dominant-baseline:central;
+}
+.atom-svg .nuc-label.is-shielded{
+  opacity:0.4;
+}
+.atom-svg .shell-label{
+  font-family:var(--font-mono);
+  font-size:9px;
+  font-weight:500;
+  letter-spacing:0.08em;
+  fill:var(--faint);
+  text-anchor:middle;
+  text-transform:uppercase;
+}
+
+.atom-svg .nuc-hit{
+  cursor:help;
+  fill:transparent;
+  pointer-events:all;
+}
+.atom-svg .nuc-hit:focus{outline:none;}
+.atom-svg .nuc-hit:focus-visible{
+  stroke:var(--signal);
+  stroke-width:2;
+}
+
+.eq{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.55rem;
+  font-size:clamp(0.95rem,2.2vw,1.2rem);
+  font-weight:500;
+  color:var(--ink);
+  min-height:4.2rem;
+}
+.eq .eq-frac{display:inline-flex;flex-direction:column;align-items:center;}
+.eq .eq-num{
+  display:flex;
+  align-items:baseline;
+  gap:0.28rem;
+  padding:0 0.35rem 0.22rem;
+  border-bottom:2px solid var(--ink);
+}
+.eq .eq-den{padding-top:0.22rem;}
+.eq .eq-v{color:var(--ember);font-weight:600;}
+.eq .eq-q1{color:var(--proton);font-weight:600;transition:font-size 0.25s ease;}
+.eq .eq-q2{color:var(--electron);font-weight:600;}
+.eq .eq-d{color:var(--olive-deep);font-weight:600;}
+.eq .eq-k{color:var(--faint);}
+.eq-note{
+  font-size:var(--label-xs);
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--faint);
+  text-align:center;
+}
+.atom-card .ie-readout{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.1rem;
+  margin-top:0.15rem;
+  padding-top:0.5rem;
+  border-top:1px solid var(--paper-3);
+  width:100%;
+  max-width:11rem;
+}
+.atom-card .ie-readout[hidden]{display:none;}
+.atom-card .ie-kicker{
+  font-size:0.62rem;
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--faint);
+}
+.atom-card .ie-val{
+  font-size:clamp(0.95rem,1.8vw,1.15rem);
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0.04em;
+  color:var(--ember);
+  line-height:1.15;
+}
+.atom-card .ie-unit{
+  font-size:0.58rem;
+  font-weight:500;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+
+.li-controls{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:0.75rem 1.25rem;
+  margin:0.85rem 0 0.35rem;
+  padding-top:0.85rem;
+  border-top:1px solid var(--paper-3);
+}
+.stepper{
+  display:flex;
+  align-items:center;
+  gap:0.45rem;
+}
+.stepper-label{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.stepper button{
+  background:transparent;
+  border:1px solid var(--ink);
+  color:var(--ink);
+  font-family:var(--font-mono);
+  font-size:1.1rem;
+  font-weight:600;
+  width:2.2rem;
+  height:2.2rem;
+  border-radius:0;
   cursor:pointer;
-  transition:background 0.2s,color 0.2s;
-  margin-top:1rem;
+  line-height:1;
 }
-#stuckBtn:hover{background:rgba(181,121,255,0.1);}
-#stuckBtn:focus-visible{outline:2px solid var(--signal);outline-offset:2px;}
-.help-panel{
+.stepper button:hover{background:var(--ink);color:var(--paper);}
+.stepper button:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.stepper button:disabled{opacity:0.3;cursor:not-allowed;}
+.stepper .count{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-size:1.15rem;
+  font-weight:600;
+  min-width:1.5rem;
+  text-align:center;
+  color:var(--ink);
+}
+
+.reveal-block{
+  margin-top:1rem;
+  padding-top:0.9rem;
+  border-top:1px solid var(--ink);
   opacity:0;
   max-height:0;
   overflow:hidden;
-  transition:opacity 0.3s,max-height 0.3s;
-  border:1px solid var(--signal);
-  background:var(--panel);
-  border-radius:4px;
-  padding:0 1.2rem;
-  margin-top:0.75rem;
-  color:var(--dim);
-  font-size:0.85rem;
-  line-height:1.6;
+  transition:opacity 0.55s ease,max-height 0.55s ease;
 }
-.help-panel.open{
+.reveal-block.open{
   opacity:1;
-  max-height:200px;
-  padding:1rem 1.2rem;
+  max-height:56rem;
+}
+.reveal-step{
+  margin:0 0 0.95rem;
+}
+.reveal-step:last-child{margin-bottom:0;}
+.reveal-prompt{
+  font-family:var(--font-body);
+  font-size:clamp(1.05rem,2.3vw,1.25rem);
+  font-weight:700;
+  line-height:1.45;
+  color:var(--signal);
+  margin:0;
+  width:100%;
+  max-width:none;
+  text-wrap:pretty;
+}
+.reveal-story{
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  line-height:1.55;
+  color:var(--ink-soft);
+  margin:0 0 0.75rem;
+  text-wrap:pretty;
+  width:100%;
+  max-width:none;
+}
+.reveal-story:last-child{margin-bottom:0;}
+.reveal-story .term{
+  color:var(--ink);
+  font-weight:600;
+}
+.reveal-story .shield-word{
+  font-family:var(--font-mono);
+  font-size:0.92em;
+  font-weight:700;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--signal);
+}
+.ie-table-wrap{
+  margin:0.55rem 0 0;
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.ie-strip{
+  width:100%;
+  min-width:28rem;
+  border-collapse:collapse;
+  font-variant-numeric:tabular-nums;
+}
+.ie-strip caption{
+  caption-side:top;
+  text-align:left;
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:0.5rem;
+}
+.ie-strip th,
+.ie-strip td{
+  font-family:var(--font-mono);
+  text-align:center;
+  padding:0.4rem 0.3rem;
+  border-bottom:1px solid var(--paper-3);
+}
+.ie-strip .ie-p1 th,
+.ie-strip .ie-els th{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.04em;
+  text-transform:none;
+  color:var(--ink);
+}
+.ie-strip .ie-p1 th{
+  border-bottom:none;
+  padding-bottom:0.2rem;
+}
+.ie-strip .ie-p1-vals td{
+  font-size:clamp(0.72rem,1.4vw,0.88rem);
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--ember);
+  border-bottom:1px solid var(--ink);
+  padding-top:0.2rem;
+  padding-bottom:0.55rem;
+}
+.ie-strip .ie-p1 td.is-empty,
+.ie-strip .ie-p1 th.is-empty,
+.ie-strip .ie-p1-vals td.is-empty{
+  border-bottom:none;
+  background:transparent;
+}
+.ie-strip .ie-els th{
+  border-bottom:1px solid var(--ink);
+  padding-top:0.55rem;
+}
+.ie-strip .ie-vals td{
+  font-size:clamp(0.78rem,1.5vw,0.95rem);
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--ember);
+  border-bottom:none;
+  padding-top:0.55rem;
+}
+.ie-strip th.is-focus,
+.ie-strip td.is-focus{
+  background:rgba(168,90,50,0.08);
+}
+.reveal-advance{
+  margin-top:0.35rem;
+  display:flex;
+  justify-content:flex-end;
+}
+.reveal-advance .btn{margin:0;}
+.shield-tag{
+  display:inline-block;
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--signal);
+  margin-bottom:0.45rem;
+}
+.core-formula{
+  font-size:clamp(1rem,2.4vw,1.25rem);
+  font-weight:500;
+  color:var(--ink);
+  line-height:1.55;
+}
+.core-formula .cc{color:var(--signal);font-weight:600;}
+.core-formula .z{color:var(--proton);font-weight:600;}
+.core-hint{
+  margin-top:0.45rem;
+  font-size:1.02rem;
+  color:var(--ink-soft);
+  max-width:none;
+  text-wrap:pretty;
+}
+
+.act-actions{
+  margin-top:1rem;
+}
+
+/* Act 1 → period transition: surroundings fade; Li atom stays (handoff via flyer) */
+#actLi.is-exiting{
+  pointer-events:none;
+}
+#actLi.is-exiting #cardNaive,
+#actLi.is-exiting .li-controls,
+#actLi.is-exiting .reveal-block,
+#actLi.is-exiting .act-actions,
+#actLi.is-exiting #cardReal .atom-kicker,
+#actLi.is-exiting #cardReal .atom-sym,
+#actLi.is-exiting #cardReal .eq,
+#actLi.is-exiting #cardReal .eq-note,
+#actLi.is-exiting #cardReal .ie-readout,
+#actLi.is-exiting #liViewport::before{
+  opacity:0;
+  transition:opacity 0.95s ease;
+}
+#actLi.is-exiting #liViewport{
+  border-color:transparent;
+  transition:border-color 0.95s ease;
+}
+#actLi.is-exiting #svgReal{
+  /* stays visible until flyer clones it */
+  opacity:1;
+}
+#actLi.is-exiting #svgReal.is-handed-off{
+  opacity:0;
+}
+#moduleStage > header.is-clearing .mod-tag,
+#moduleStage > header.is-clearing h1,
+#moduleStage > header.is-clearing .framing{
+  opacity:0;
+  transition:opacity 0.9s ease;
+}
+.li-flyer{
+  position:fixed;
+  z-index:60;
+  margin:0;
+  padding:0;
+  pointer-events:none;
+  will-change:left,top,width,height;
+  transition:left 1.45s cubic-bezier(0.22,1,0.36,1),
+              top 1.45s cubic-bezier(0.22,1,0.36,1),
+              width 1.45s cubic-bezier(0.22,1,0.36,1),
+              height 1.45s cubic-bezier(0.22,1,0.36,1);
+}
+.period-card.is-handoff .atom-sym,
+.period-card.is-handoff .core-badge{
+  opacity:0;
+}
+.period-card.is-handoff .atom-svg{
+  opacity:0;
+}
+.period-card.is-handoff.is-revealed .atom-sym,
+.period-card.is-handoff.is-revealed .core-badge{
+  opacity:1;
+  transition:opacity 1s ease;
+}
+.period-card.is-handoff.is-revealed .atom-svg{
+  opacity:1;
+}
+
+/* Period-2 explorer — open on the paper, no plate box */
+.period-stage{
+  position:relative;
+  min-height:22rem;
+}
+.period-chrome{
+  opacity:0;
+  transition:opacity 1.25s ease;
+}
+.period-chrome.is-in{opacity:1;}
+.period-intro{
+  font-family:var(--font-body);
+  font-size:clamp(1.15rem,2.6vw,1.45rem);
+  font-weight:500;
+  line-height:1.45;
+  color:var(--ink);
+  text-align:left;
+  max-width:none;
+  margin:0 0 1rem;
+  text-wrap:pretty;
+}
+.period-intro em{
+  font-style:normal;
+  font-weight:700;
+  letter-spacing:0.06em;
+  color:var(--signal);
+  text-transform:uppercase;
+}
+.period-eq{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:0.35rem 0.55rem;
+  font-size:clamp(1rem,2.3vw,1.3rem);
+  font-weight:500;
+  color:var(--ink);
+  margin:0 0 0.85rem;
+  padding:0 0 0.9rem;
+  border-bottom:1px solid var(--paper-3);
+  text-align:center;
+}
+.period-eq .cc{color:var(--signal);font-weight:600;}
+.period-eq .z{color:var(--proton);font-weight:600;}
+.period-hint{
+  font-family:var(--font-body);
+  font-size:0.98rem;
+  color:var(--dim);
+  text-align:left;
+  margin:0 0 1.35rem;
+}
+
+.period-rail{
+  position:relative;
+  overflow:visible;
+  min-height:18rem;
+  margin:0 -0.25rem;
+}
+.period-viewport{
+  position:relative;
+  overflow:hidden;
+  min-height:17rem;
+}
+.period-grid{
+  display:flex;
+  flex-wrap:nowrap;
+  justify-content:center;
+  align-items:flex-end;
+  gap:1rem 1.75rem;
+  min-height:17rem;
+  padding:0.5rem 0 0.75rem;
+  width:100%;
+}
+.period-grid.is-layer{
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  transition:transform 0.55s cubic-bezier(0.22,1,0.36,1), opacity 0.45s ease;
+  will-change:transform,opacity;
+}
+.period-grid.is-exit-left{
+  transform:translateX(-108%);
+  opacity:0;
+  pointer-events:none;
+}
+.period-grid.is-exit-right{
+  transform:translateX(108%);
+  opacity:0;
+  pointer-events:none;
+}
+.period-grid.is-enter-from-right{
+  transform:translateX(108%);
+  opacity:0;
+}
+.period-grid.is-enter-from-left{
+  transform:translateX(-108%);
+  opacity:0;
+}
+.period-grid.is-enter-settled{
+  transform:translateX(0);
+  opacity:1;
+}
+.period-card{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  gap:0.4rem;
+  flex:0 1 auto;
+  width:min(100%,17.5rem);
+  text-align:center;
+  opacity:0;
+  transition:opacity 1.15s ease;
+}
+.period-card.is-in{opacity:1;}
+.period-card .atom-sym,
+.period-card .core-badge{
+  width:100%;
+  text-align:center;
+}
+.period-card .period-atom-host{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  line-height:0;
+}
+.period-card .atom-svg{
+  display:block;
+  width:min(100%,14rem);
+  max-width:100%;
+  height:auto;
+  margin:0 auto;
+}
+.period-card .core-badge{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--signal);
+}
+
+.nuc-tip{
+  position:absolute;
+  z-index:8;
+  min-width:11rem;
+  padding:0.65rem 0.8rem;
+  background:var(--plate);
+  color:var(--plate-ink);
+  border:1px solid var(--neon);
+  font-size:var(--label-sm);
+  line-height:1.45;
+  letter-spacing:0.04em;
+  text-transform:none;
+  pointer-events:none;
+  opacity:0;
+  transform:translate(-50%,-0.4rem);
+  transition:opacity 0.18s ease,transform 0.18s ease;
+  white-space:nowrap;
+}
+.nuc-tip[hidden]{display:none;}
+.nuc-tip.is-on{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+.nuc-tip .tip-eq{color:var(--plate-ink);margin-top:0.2rem;}
+.nuc-tip .tip-cc{color:var(--mustard);font-weight:600;}
+.nuc-tip .tip-z{color:#e8b48a;font-weight:600;}
+
+.page-nav{
+  margin-top:1.35rem;
+  padding-top:0.95rem;
+  border-top:1px solid var(--paper-3);
+  opacity:0;
+  transition:opacity 1.25s ease;
+}
+.page-nav.is-in{opacity:1;}
+
+/* Full-row IE × core-charge compare — after paging the period */
+.compare-stage{
+  position:relative;
+  min-height:18rem;
+}
+.compare-chrome{
+  opacity:0;
+  transition:opacity 1.25s ease;
+}
+.compare-chrome.is-in{opacity:1;}
+.compare-prompt{
+  font-family:var(--font-body);
+  font-size:clamp(1.15rem,2.6vw,1.45rem);
+  font-weight:700;
+  line-height:1.45;
+  color:var(--signal);
+  text-align:center;
+  width:100%;
+  max-width:none;
+  margin:1.15rem 0 0;
+  text-wrap:pretty;
+}
+.compare-ie{
+  margin:0 0 1.35rem;
+}
+.compare-rail{
+  overflow-x:auto;
+  margin:0 -0.25rem;
+  padding:0.25rem 0 0.5rem;
+  -webkit-overflow-scrolling:touch;
+}
+.compare-grid{
+  display:flex;
+  flex-wrap:nowrap;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:0.55rem 0.65rem;
+  min-width:min(100%,52rem);
+  padding:0.35rem 0.15rem 0.5rem;
+}
+.compare-card{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.28rem;
+  flex:1 1 0;
+  min-width:4.5rem;
+  max-width:7.5rem;
+  text-align:center;
+  opacity:0;
+  transition:opacity 1.1s ease;
+}
+.compare-card.is-in{opacity:1;}
+.compare-card .compare-atom-host{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  line-height:0;
+}
+.compare-card .atom-svg{
+  display:block;
+  width:100%;
+  max-width:6.5rem;
+  height:auto;
+  margin:0 auto;
+}
+.compare-card .atom-sym{
+  font-size:var(--label-xs);
+  letter-spacing:0.06em;
+  text-transform:none;
+  width:100%;
+  text-align:center;
+}
+.compare-card .core-badge{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--signal);
+  width:100%;
+  text-align:center;
+}
+.compare-card .ie-readout{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.1rem;
+  margin-top:0.2rem;
+  padding-top:0.45rem;
+  border-top:1px solid var(--paper-3);
+  width:100%;
+}
+.compare-card .ie-kicker{
+  font-family:var(--font-mono);
+  font-size:0.62rem;
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--faint);
+}
+.compare-card .ie-val{
+  font-family:var(--font-mono);
+  font-size:clamp(0.85rem,1.6vw,1.05rem);
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0.04em;
+  color:var(--ember);
+  line-height:1.15;
+}
+.compare-card .ie-unit{
+  font-family:var(--font-mono);
+  font-size:0.58rem;
+  font-weight:500;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.compare-actions{
+  margin-top:1.5rem;
+  padding-top:1rem;
+  border-top:1px solid var(--paper-3);
+  opacity:0;
+  transition:opacity 1.25s ease;
+}
+.compare-actions.is-in{opacity:1;}
+.compare-prompt.is-swap{
+  opacity:0;
+  transition:opacity 0.55s ease;
+}
+
+/* Act 1d — down a column (alkali, then halogen) */
+.group-stage{
+  position:relative;
+  min-height:18rem;
+}
+.group-chrome{
+  opacity:0;
+  transition:opacity 1.1s ease;
+}
+.group-chrome.is-in{opacity:1;}
+.group-kicker{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin:0 0 0.55rem;
+}
+.group-kicker::before{
+  content:'';
+  display:inline-block;
+  width:1.6rem;
+  height:0.28rem;
+  margin-right:0.55rem;
+  vertical-align:middle;
+  background:var(--olive-deep);
+}
+.group-prompt{
+  font-family:var(--font-body);
+  font-size:clamp(1.1rem,2.5vw,1.4rem);
+  font-weight:500;
+  line-height:1.45;
+  color:var(--ink);
+  width:100%;
+  max-width:none;
+  margin:0 0 1.25rem;
+  text-wrap:pretty;
+}
+.group-prompt.is-swap{opacity:0;transition:opacity 0.5s ease;}
+.group-board{
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.group-board:empty{
+  display:none;
+}
+.group-row{
+  display:flex;
+  flex-direction:column;
+  flex-wrap:nowrap;
+  justify-content:flex-start;
+  align-items:center;
+  gap:1.15rem;
+  margin:0 auto 0.5rem;
+  width:fit-content;
+  max-width:100%;
+}
+.group-row.is-pair{
+  flex-direction:row;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:flex-end;
+  gap:1.75rem 2.5rem;
+}
+.group-card{
+  display:grid;
+  grid-template-columns:auto auto;
+  grid-template-rows:auto auto;
+  grid-template-areas:
+    "sym sym"
+    "atom meta";
+  align-items:center;
+  justify-items:start;
+  justify-content:center;
+  width:fit-content;
+  max-width:100%;
+  column-gap:1.35rem;
+  row-gap:0.35rem;
+  opacity:0;
+  transform:translateY(0.4rem);
+  transition:opacity 0.9s ease, transform 0.9s ease;
+}
+.group-card.is-pair{
+  grid-template-columns:1fr;
+  grid-template-areas:
+    "sym"
+    "atom"
+    "meta";
+  justify-items:center;
+  text-align:center;
+  column-gap:0;
+}
+.group-card.is-in{
+  opacity:1;
+  transform:none;
+}
+.group-card .atom-sym{
+  grid-area:sym;
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:none;
+  justify-self:start;
+}
+.group-card.is-pair .atom-sym{
+  justify-self:center;
+  text-align:center;
+}
+.group-card .group-atom-host{
+  grid-area:atom;
+  justify-self:start;
+}
+.group-card.is-pair .group-atom-host{
+  justify-self:center;
+}
+.group-card .atom-svg{
+  width:min(100%,9.5rem);
+  max-width:9.5rem;
+  display:block;
+}
+.group-card.is-pair .atom-svg{
+  width:min(100%,11.5rem);
+  max-width:11.5rem;
+}
+.group-card .group-meta{
+  grid-area:meta;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:0.2rem;
+  min-width:0;
+}
+.group-card.is-pair .group-meta{
+  align-items:center;
+  text-align:center;
+}
+.group-card.is-pair .ie-readout{
+  align-items:center;
+  width:100%;
+}
+.group-card .core-badge{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--signal);
+}
+.group-card .shell-tag{
+  font-family:var(--font-mono);
+  font-size:0.65rem;
+  font-weight:500;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.group-card .ie-readout{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:0.08rem;
+  margin-top:0.35rem;
+  padding-top:0.4rem;
+  border-top:1px solid var(--paper-3);
+  width:auto;
+  min-width:0;
+}
+.group-card .ie-kicker{
+  font-family:var(--font-mono);
+  font-size:0.62rem;
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--faint);
+}
+.group-card .ie-val{
+  font-family:var(--font-mono);
+  font-size:clamp(0.95rem,1.8vw,1.15rem);
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+  color:var(--ember);
+}
+.group-card .ie-unit{
+  font-family:var(--font-mono);
+  font-size:0.58rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.group-pair-note{
+  font-family:var(--font-body);
+  font-size:clamp(1.05rem,2.2vw,1.25rem);
+  font-weight:700;
+  line-height:1.45;
+  color:var(--signal);
+  text-align:center;
+  max-width:36rem;
+  width:auto;
+  margin:0.75rem auto 0;
+  text-wrap:pretty;
+  opacity:0;
+  transition:opacity 0.8s ease;
+}
+.group-pair-note.is-in{opacity:1;}
+.atom-svg .core-pack{
+  transition:opacity 1.5s ease;
+}
+.atom-svg.is-core-faded .core-pack{opacity:0;}
+.atom-svg .nuc-label.is-core-view{fill:var(--signal);}
+.group-actions{
+  margin-top:1.5rem;
+  padding-top:1rem;
+  border-top:1px solid var(--paper-3);
+  opacity:0;
+  transition:opacity 1.1s ease;
+}
+.group-actions.is-in{opacity:1;}
+
+/* Finale — both families side by side (mirrors period-row compare) */
+.group-finale{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:flex-start;
+  gap:1.75rem 3rem;
+  width:100%;
+  margin:0.25rem 0 0.5rem;
+}
+.group-finale-col{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.85rem;
+  min-width:0;
+}
+.group-finale-label{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin:0;
+  text-align:center;
+}
+.group-finale-stack{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.65rem;
+}
+.group-finale .compare-card{
+  flex:none;
+  min-width:5.25rem;
+  max-width:6.75rem;
+  width:100%;
+}
+.group-finale .compare-card .atom-svg{
+  max-width:5.75rem;
+}
+
+@media(max-width:760px){
+  .briefing-columns{grid-template-columns:1fr;gap:1.35rem;}
+  .li-grid{grid-template-columns:1fr;gap:1.75rem;}
+  .period-grid{flex-wrap:wrap;gap:1.4rem 1rem;justify-content:center;}
+  .period-grid.is-layer{flex-wrap:nowrap;}
+  .nuc-tip{white-space:normal;min-width:9.5rem;}
+  .compare-grid{
+    flex-wrap:wrap;
+    justify-content:center;
+    min-width:0;
+    gap:1.1rem 0.85rem;
+  }
+  .compare-card{
+    flex:0 1 auto;
+    min-width:5.5rem;
+    max-width:6.75rem;
+  }
+  .group-row{gap:1rem;width:fit-content;max-width:100%;}
+  .group-card{
+    column-gap:1rem;
+    width:fit-content;
+  }
+  .group-card .atom-svg,
+  .group-card.is-pair .atom-svg{
+    width:min(100%,8.5rem);
+    max-width:8.5rem;
+  }
+  .group-finale{gap:1.5rem 1.75rem;}
+  .group-finale .compare-card{
+    min-width:4.75rem;
+    max-width:6rem;
+  }
+}
+@media print{
+  .debrief{break-inside:avoid;border-top-color:#000;}
+  .briefing h1,.briefing h2,.briefing li,.debrief h2,.debrief li,.debrief-kicker,.briefing-cc .cc-name,.debrief-cc .cc-name,.debrief-tag{color:#000;}
+  #stuckBtn,.stage-nav,.module-footer,.act-actions,.page-nav,.li-controls,.compare-actions,.group-actions{display:none;}
+}
+@media(prefers-reduced-motion:reduce){
+  .atom-card,.reveal-block,.eq .eq-q1,
+  .period-chrome,.period-card,.period-grid.is-layer,.page-nav,.nuc-tip,.li-flyer,
+  .compare-chrome,.compare-card,.compare-actions,.compare-prompt,
+  .group-chrome,.group-card,.group-actions,.group-prompt,.group-pair-note,
+  .atom-svg .core-pack,
+  #actLi.is-exiting #cardNaive,
+  #actLi.is-exiting .li-controls,
+  #actLi.is-exiting .reveal-block,
+  #actLi.is-exiting .act-actions,
+  #moduleStage > header.is-clearing .mod-tag,
+  #moduleStage > header.is-clearing h1,
+  #moduleStage > header.is-clearing .framing{transition:none;}
+  .atom-svg .shell-orbit,
+  .atom-svg .shell-orbit-inner{animation:none;}
 }
 </style>
 </head>
 <body>
 <div class="module-wrap">
-  <a href="index.html" class="back-link">← Unit 1b</a>
+  <div class="top-nav">
+    <a href="index.html" class="back-link">← Unit 1b</a>
+    <div class="mod-meta">Module 03 · Shell Model &amp; Core Charge</div>
+  </div>
+
+  <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
+    <div class="briefing-kicker"><span>Before you begin</span></div>
+    <h1 id="briefingTitle">Shell Model &amp; Core Charge</h1>
+    <p class="briefing-lead">Read what this module is aiming for. Then open the instrument and work through it.</p>
+    <div class="briefing-columns">
+      <div class="briefing-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="briefing-li" id="briefingIntentions"></ul>
+      </div>
+      <div class="briefing-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="briefing-cc" id="briefingCompetencies"></ul>
+      </div>
+    </div>
+    <div class="briefing-actions">
+      <button type="button" class="btn submit" id="briefingNext">Next → Start simulation</button>
+    </div>
+  </section>
+
+  <div id="moduleStage" hidden>
   <header>
     <div class="mod-tag">Module 03</div>
     <h1>Shell Model &amp; Core Charge</h1>
-    <p class="framing">Twenty elements. Their ionization energies hide a pattern — find the jumps.</p>
+    <p class="framing" id="framing" aria-live="polite">
+      As we saw at the end of the last simulation, there were two proposed configurations of lithium. Here, we will see how we know which one is correct by adding electrons and seeing how that changes the V value, which is the potential energy required to remove an electron, which we will now consider as IE.<br><br>
+      Add electrons to see how “q” changes as inner shell electrons are considered.
+    </p>
   </header>
 
-  <div class="viewport">
-    <canvas id="simCanvas"></canvas>
-    <div class="hud">— standby —</div>
-  </div>
+  <!-- Act 1a: two hypothetical Li -->
+  <section class="act" id="actLi" aria-label="Two stories about lithium">
+    <div class="viewport" data-fig="FIG. 03A  ·  LITHIUM — TWO STORIES" id="liViewport">
+      <div class="plate-body">
+        <div class="li-grid">
+          <!-- Left: naive +3 -->
+          <article class="atom-card" id="cardNaive" aria-label="Lithium if the valence electron felt the full nuclear charge">
+            <div class="atom-kicker">Configuration A</div>
+            <div class="atom-sym">Li · Z = 3</div>
+            <div id="svgNaive"></div>
+            <div class="eq" aria-hidden="false">
+              <span class="eq-v">V</span>
+              <span>=</span>
+              <span class="eq-frac">
+                <span class="eq-num">
+                  <span class="eq-k">k</span>
+                  <span class="eq-q1">+3</span>
+                  <span class="eq-q2">−1</span>
+                </span>
+                <span class="eq-den"><span class="eq-d">d</span></span>
+              </span>
+            </div>
+            <div class="eq-note">q₁ fixed at +3</div>
+            <div class="ie-readout" id="ieNaive" hidden>
+              <span class="ie-kicker">IE₁</span>
+              <span class="ie-val">3.50</span>
+              <span class="ie-unit">MJ/mol</span>
+            </div>
+          </article>
 
-  <div class="controls"><!-- simulation controls will go here --></div>
+          <!-- Right: interactive -->
+          <article class="atom-card" id="cardReal" aria-label="Lithium — place the inner electrons">
+            <div class="atom-kicker" id="realKicker">Configuration B — add the inner shell</div>
+            <div class="atom-sym">Li · Z = 3</div>
+            <div id="svgReal"></div>
+            <div class="eq" aria-live="polite">
+              <span class="eq-v">V</span>
+              <span>=</span>
+              <span class="eq-frac">
+                <span class="eq-num">
+                  <span class="eq-k">k</span>
+                  <span class="eq-q1" id="realQ1">+3</span>
+                  <span class="eq-q2">−1</span>
+                </span>
+                <span class="eq-den"><span class="eq-d">d</span></span>
+              </span>
+            </div>
+            <div class="eq-note" id="realEqNote">Add the inner-shell electrons</div>
+            <div class="ie-readout" id="ieReal" hidden>
+              <span class="ie-kicker">IE₁</span>
+              <span class="ie-val">0.52</span>
+              <span class="ie-unit">MJ/mol</span>
+            </div>
+          </article>
+        </div>
 
-  <button id="stuckBtn">Stuck?</button>
+        <div class="li-controls">
+          <div class="stepper" role="group" aria-label="Inner-shell electrons on the right-hand lithium">
+            <span class="stepper-label">Inner-shell e⁻</span>
+            <button type="button" id="innerMinus" aria-label="Remove an inner-shell electron">−</button>
+            <span class="count" id="innerCount" aria-live="polite">0</span>
+            <button type="button" id="innerPlus" aria-label="Add an inner-shell electron">+</button>
+          </div>
+        </div>
+
+        <div class="reveal-block" id="coreReveal" aria-live="polite">
+          <div class="reveal-step" id="revealDiff" hidden>
+            <p class="reveal-prompt">How did adding electrons to a different shell affect the equation? Can you hypothesize why?</p>
+          </div>
+          <div class="reveal-step" id="revealIE" hidden>
+            <div class="ie-table-wrap" id="revealIEHost"></div>
+          </div>
+          <div class="reveal-step" id="revealData" hidden>
+            <p class="reveal-prompt">How does the data support our understanding of the organization of the electrons in this atom?</p>
+          </div>
+          <div class="reveal-step" id="revealShield" hidden>
+            <p class="reveal-story">
+              The electrons in the outermost shell of an atom are called <span class="term">valence electrons</span>.
+              Electrons in shells closer to the nucleus are <span class="term">inner-shell electrons</span>.
+              Lithium has one valence electron and two inner-shell electrons.
+              Hydrogen has one valence electron and no inner-shell electrons.
+            </p>
+            <p class="reveal-story">
+              The nucleus plus the inner shells of electrons make up the <span class="term">core</span> of the atom,
+              and the net overall charge on the core is the <span class="term">core charge</span>.
+              Configuration&nbsp;B shows lithium written that way: a core of charge <span class="term">+1</span>
+              with one valence electron outside it.
+            </p>
+          </div>
+          <div class="reveal-step" id="revealDef" hidden>
+            <div class="shield-tag">Core charge</div>
+            <div class="core-formula">
+              <span class="cc">Core charge</span>
+              = Nucleus charge (<span class="z">Z</span>) − Inner shell electrons
+              &nbsp;→&nbsp;
+              <span class="z">3</span> − 2 = <span class="cc">+1</span>
+            </div>
+            <p class="core-hint">The valence electron feels the core charge, not the full nuclear charge. That is why lithium’s ionization energy is only 0.52&nbsp;MJ/mol.</p>
+          </div>
+          <div class="reveal-advance" id="revealAdvance" hidden>
+            <button type="button" class="btn" id="revealNext">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="module-footer act-actions" aria-label="Section navigation">
+      <div class="module-footer-back">
+        <button type="button" class="btn js-stage-back">← Back</button>
+      </div>
+      <div class="module-footer-help">
+        <button type="button" id="stuckBtn">Stuck?</button>
+      </div>
+      <div class="module-footer-fwd">
+        <button type="button" class="btn submit" id="liNext" disabled>Next → Along the row</button>
+      </div>
+    </nav>
+  </section>
+
+  <!-- Act 1b: core charge across period 2 -->
+  <section class="act" id="actPeriod" hidden aria-label="Core charge across period 2">
+    <div class="period-stage">
+      <div class="period-chrome" id="periodChrome">
+        <p class="period-intro" id="periodIntro">
+          Now let’s see how core charge changes as we move <em>across</em> the periodic table.
+        </p>
+        <div class="period-eq" id="periodEq" aria-hidden="true">
+          <span class="cc">core charge</span>
+          <span>=</span>
+          <span class="z">Z</span>
+          <span>−</span>
+          <span>(inner-shell electrons)</span>
+        </div>
+        <p class="period-hint" id="periodHint">Hover a nucleus to see its calculation.</p>
+      </div>
+      <div class="period-rail">
+        <div class="period-viewport" id="periodViewport">
+          <div class="period-grid" id="periodGrid"></div>
+        </div>
+        <div class="nuc-tip" id="nucTip" role="tooltip" hidden>
+          <div id="nucTipSym"></div>
+          <div class="tip-eq" id="nucTipEq"></div>
+        </div>
+      </div>
+      <nav class="module-footer page-nav" id="pageNav" aria-label="Period pages">
+        <div class="module-footer-back">
+          <button type="button" class="btn" id="pagePrev">← Back</button>
+        </div>
+        <div class="module-footer-help"></div>
+        <div class="module-footer-fwd">
+          <button type="button" class="btn submit" id="pageNext">Next →</button>
+        </div>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Act 1c: full row — core charge beside measured IE₁ -->
+  <section class="act" id="actCompare" hidden aria-label="Core charge and ionization energy across period 2">
+    <div class="compare-stage">
+      <div class="compare-chrome" id="compareChrome">
+        <div class="compare-ie ie-table-wrap" id="compareIEHost"></div>
+      </div>
+      <div class="compare-rail">
+        <div class="compare-grid" id="compareGrid" role="list"></div>
+      </div>
+      <p class="compare-prompt student-q" id="comparePrompt">
+        Take a look at the entire row — what do you notice?
+      </p>
+      <nav class="module-footer compare-actions" id="compareActions" aria-label="Section navigation">
+        <div class="module-footer-back">
+          <button type="button" class="btn js-stage-back">← Back</button>
+        </div>
+        <div class="module-footer-help"></div>
+        <div class="module-footer-fwd">
+          <button type="button" class="btn submit" id="compareDone">Continue →</button>
+        </div>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Act 1d: down a column — alkali then halogen -->
+  <section class="act" id="actGroup" hidden aria-label="Core charge and ionization energy down a column">
+    <div class="group-stage">
+      <div class="group-chrome" id="groupChrome">
+        <div class="group-kicker" id="groupKicker">Down a column</div>
+        <p class="group-prompt" id="groupPrompt" aria-live="polite"></p>
+      </div>
+      <div class="group-board" id="groupBoard"></div>
+      <nav class="module-footer group-actions" id="groupActions" aria-label="Section navigation">
+        <div class="module-footer-back">
+          <button type="button" class="btn js-stage-back">← Back</button>
+        </div>
+        <div class="module-footer-help"></div>
+        <div class="module-footer-fwd">
+          <button type="button" class="btn" id="groupFadeBtn" hidden>Look past the core →</button>
+          <button type="button" class="btn submit" id="groupNext">Continue →</button>
+        </div>
+      </nav>
+    </div>
+  </section>
+
   <div class="help-panel" id="helpPanel">
-    <p>IE climbs, then suddenly falls at Li. What could make an electron easier to remove?</p>
-    <p style="margin-top:0.5rem;">Count the protons the valence electron actually feels through the inner electrons.</p>
+    <p id="helpText">Add the two electrons that sit closer to the nucleus on the right-hand lithium. Watch the attraction oval as you add them.</p>
   </div>
+
+  <section class="debrief" id="debrief" hidden aria-labelledby="debriefTitle">
+    <h2 id="debriefTitle">What this was for</h2>
+    <p class="debrief-lead">The intentions behind this module, and the competencies you just practised. Read each competency statement and decide honestly how well it fits you right now.</p>
+    <div class="debrief-block">
+      <div class="debrief-kicker">Learning intentions</div>
+      <ul class="debrief-li" id="debriefIntentions"></ul>
+    </div>
+    <div class="debrief-block cc">
+      <div class="debrief-kicker">Curricular competencies</div>
+      <ul class="debrief-cc" id="debriefCompetencies"></ul>
+    </div>
+  </section>
+  </div><!-- /#moduleStage -->
 </div>
 
 <script>
-// === CANVAS ENGINE ===
-const canvas = document.getElementById('simCanvas');
-const ctx = canvas.getContext('2d');
-let W, H, dpr;
-
-function resize() {
-  dpr = window.devicePixelRatio || 1;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  W = rect.width;
-  H = Math.min(W * 0.6, 500);
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.height = H + 'px';
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-window.addEventListener('resize', resize);
-resize();
-
-// === REDUCED MOTION ===
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// === GLOW HELPERS ===
-function glowLine(x1, y1, x2, y2, color, width = 2) {
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 12;
-  ctx.strokeStyle = color;
-  ctx.globalAlpha = 0.3;
-  ctx.lineWidth = width + 4;
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.lineWidth = width;
-  ctx.stroke();
-  ctx.restore();
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+/** Stable 0–1 hash so stipple dots don't jitter on re-render. */
+function stippleHash(i, seed) {
+  const x = Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453;
+  return x - Math.floor(x);
 }
 
-function glowCircle(x, y, r, color) {
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 15;
-  ctx.fillStyle = color;
-  ctx.globalAlpha = 0.2;
-  ctx.beginPath(); ctx.arc(x,y,r+4,0,Math.PI*2); ctx.fill();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-  ctx.restore();
+/**
+ * Yellow stipple = negative charge.
+ * Drawn as discrete mustard dots (printed stipple, not a soft wash).
+ * @param {number} [edgeFade=0] — if >0, dots near the rim fade out (0–1 radius fraction kept full)
+ */
+function addNegStipple(parent, ox, oy, radius, count, seed, edgeFade) {
+  if (count <= 0) return;
+  const g = document.createElementNS(SVG_NS, 'g');
+  g.setAttribute('class', 'neg-stipple');
+  g.setAttribute('aria-hidden', 'true');
+  const fadeStart = edgeFade ? 1 - edgeFade : 1;
+  for (let i = 0; i < count; i++) {
+    const u = stippleHash(i, seed);
+    const v = stippleHash(i + 31, seed + 1);
+    const ang = u * Math.PI * 2;
+    const t = Math.sqrt(v); // 0 at centre → 1 at rim
+    const rad = radius * t;
+    const opacity = t <= fadeStart
+      ? 0.32 + stippleHash(i, seed + 5) * 0.26
+      : Math.max(0.04, (1 - (t - fadeStart) / edgeFade) * 0.3);
+    const dot = document.createElementNS(SVG_NS, 'circle');
+    dot.setAttribute('cx', String(ox + rad * Math.cos(ang)));
+    dot.setAttribute('cy', String(oy + rad * Math.sin(ang)));
+    dot.setAttribute('r', String(0.7 + stippleHash(i, seed + 4) * 1.1));
+    dot.setAttribute('opacity', String(opacity));
+    g.appendChild(dot);
+  }
+  parent.appendChild(g);
 }
 
-function drawGrid(spacing = 40, color = 'rgba(33,29,71,0.6)') {
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1;
-  for(let x = 0; x < W; x += spacing){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for(let y = 0; y < H; y += spacing){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-  ctx.restore();
+/** Soft-edged yellow disk covering the core (nucleus + inner shell). */
+function addNegCoreDisk(defs, parent, cx, cy, radius, uid, strength) {
+  const gid = `neg-core-${uid}`;
+  const grad = document.createElementNS(SVG_NS, 'radialGradient');
+  grad.setAttribute('id', gid);
+  grad.setAttribute('cx', '50%');
+  grad.setAttribute('cy', '50%');
+  grad.setAttribute('r', '50%');
+  /* Soft mustard veil — outer e⁻ can't "see" the nucleus through the core. */
+  const stops = [
+    [0,   `rgba(184,145,48,${0.82 * strength})`],
+    [0.28,`rgba(196,163,90,${0.64 * strength})`],
+    [0.55,`rgba(168,130,42,${0.42 * strength})`],
+    [0.78,`rgba(196,163,90,${0.18 * strength})`],
+    [1,   'rgba(196,163,90,0)']
+  ];
+  stops.forEach(([o, c]) => {
+    const s = document.createElementNS(SVG_NS, 'stop');
+    s.setAttribute('offset', `${o * 100}%`);
+    s.setAttribute('stop-color', c);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+
+  const disk = document.createElementNS(SVG_NS, 'circle');
+  disk.setAttribute('class', 'neg-core-disk');
+  disk.setAttribute('cx', cx);
+  disk.setAttribute('cy', cy);
+  disk.setAttribute('r', radius);
+  disk.setAttribute('fill', `url(#${gid})`);
+  parent.appendChild(disk);
 }
 
-// === DISCOVERY GATE SYSTEM ===
-const gates = {};
-function setGate(name, val) {
-  gates[name] = val;
-  document.querySelectorAll('[data-gate]').forEach(el => {
-    const required = el.dataset.gate.split(',');
-    const unlocked = required.every(g => gates[g.trim()]);
-    el.classList.toggle('discovered', unlocked);
+/** Soft-shaded nucleus + static shells; electrons as markers.
+ *  Li compare models may animate shell groups (opt-in via animateShell).
+ *  Pass `shells: number[]` (inner → valence) for multi-shell atoms (Na, Cl). */
+function buildAtomSVG(opts) {
+  const {
+    z = 3,
+    inner = 0,
+    valence = 1,
+    showInnerRing = true,
+    emptyInner = false,
+    size = 220,
+    uid = 'a',
+    interactiveNuc = false,
+    scale = 1,
+    canvas = size,
+    showAttraction = false,
+    attractionOpacity = 1,
+    animateShell = false,
+    coreFaded = false,
+    showCoreChargeOnNuc = false
+  } = opts;
+
+  const cx = canvas / 2;
+  const cy = canvas / 2;
+  const rNuc = 22; // fixed — never scales with core charge
+  const doSpin = animateShell && !prefersReduced;
+
+  // Resolve shell electron counts: optional shells[] overrides inner/valence
+  let shellCounts;
+  if (Array.isArray(opts.shells) && opts.shells.length) {
+    shellCounts = opts.shells.slice();
+  } else {
+    shellCounts = [];
+    if (showInnerRing || inner > 0 || emptyInner) {
+      shellCounts.push(inner);
+    }
+    shellCounts.push(valence);
+  }
+  const nShells = shellCounts.length;
+  const valenceCount = shellCounts[nShells - 1] || 0;
+  const coreCounts = shellCounts.slice(0, -1);
+  const innerTotal = coreCounts.reduce((a, b) => a + b, 0);
+  const coreCharge = z - innerTotal;
+
+  const rOuter = Math.min(canvas * 0.46, (opts.outerBase || 88) * scale);
+  const rInnerBase = Math.min(52, canvas * 0.19);
+  const radii = [];
+  if (nShells === 1) {
+    radii.push(rOuter);
+  } else if (nShells === 2) {
+    radii.push(rInnerBase, rOuter);
+  } else {
+    // 3+ shells: nest from near-nucleus out to valence
+    for (let i = 0; i < nShells; i++) {
+      const t = i / (nShells - 1);
+      const rMin = rInnerBase * 0.72;
+      radii.push(rMin + (rOuter - rMin) * t);
+    }
+  }
+  const rCore = (radii[Math.max(0, nShells - 2)] || rInnerBase) + 12;
+
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'atom-svg' + (doSpin ? ' is-spinning' : '') + (coreFaded ? ' is-core-faded' : ''));
+  svg.setAttribute('viewBox', `0 0 ${canvas} ${canvas}`);
+  svg.setAttribute('width', String(size));
+  svg.setAttribute('height', String(size));
+  svg.setAttribute('role', 'img');
+  svg.setAttribute('aria-label', opts.label || `Atom Z=${z}`);
+
+  const defs = document.createElementNS(SVG_NS, 'defs');
+  const grad = document.createElementNS(SVG_NS, 'radialGradient');
+  grad.setAttribute('id', `nuc-${uid}`);
+  grad.setAttribute('cx', '32%');
+  grad.setAttribute('cy', '28%');
+  grad.setAttribute('r', '68%');
+  [
+    ['0%', '#e8b48a'],
+    ['45%', '#a85a32'],
+    ['100%', '#5a2c16']
+  ].forEach(([o, c]) => {
+    const s = document.createElementNS(SVG_NS, 'stop');
+    s.setAttribute('offset', o);
+    s.setAttribute('stop-color', c);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  function makeOrbitGroup(extraClass) {
+    const g = document.createElementNS(SVG_NS, 'g');
+    if (doSpin) {
+      g.setAttribute('class', `shell-orbit ${extraClass}`.trim());
+      g.setAttribute('style', `transform-origin:${cx}px ${cy}px;transform-box:view-box`);
+    }
+    return g;
+  }
+
+  function placeShell(parent, n, r, cls, startAng) {
+    if (n <= 0) return;
+    for (let i = 0; i < n; i++) {
+      const ang = startAng + (i * 2 * Math.PI) / Math.max(n, 1);
+      const e = document.createElementNS(SVG_NS, 'circle');
+      e.setAttribute('class', cls);
+      e.setAttribute('cx', String(cx + r * Math.cos(ang)));
+      e.setAttribute('cy', String(cy + r * Math.sin(ang)));
+      e.setAttribute('r', 7);
+      parent.appendChild(e);
+    }
+  }
+
+  // Core pack — rings, cloud, and inner electrons (fades as a unit)
+  const corePack = document.createElementNS(SVG_NS, 'g');
+  corePack.setAttribute('class', 'core-pack');
+  if (coreFaded) corePack.setAttribute('opacity', '0');
+
+  coreCounts.forEach((count, i) => {
+    const r = radii[i];
+    const ring = document.createElementNS(SVG_NS, 'circle');
+    ring.setAttribute('class', 'shell' + (emptyInner && i === 0 && count === 0 ? ' shell-inner-empty' : ''));
+    ring.setAttribute('cx', cx);
+    ring.setAttribute('cy', cy);
+    ring.setAttribute('r', r);
+    corePack.appendChild(ring);
+  });
+
+  // Empty inner ring (Li story A→B) when no core electrons yet
+  if (coreCounts.length === 0 && showInnerRing && emptyInner) {
+    const ring = document.createElementNS(SVG_NS, 'circle');
+    ring.setAttribute('class', 'shell shell-inner-empty');
+    ring.setAttribute('cx', cx);
+    ring.setAttribute('cy', cy);
+    ring.setAttribute('r', rInnerBase);
+    svg.appendChild(ring);
+  }
+
+  if (innerTotal > 0) {
+    const strength = Math.min(1, 0.62 + innerTotal / 16);
+    addNegCoreDisk(defs, corePack, cx, cy, rCore, uid, strength);
+    /* Grain on top of the wash — soft shade still carries the shielding read. */
+    const dots = Math.round(42 + Math.min(innerTotal, 18) * 5);
+    addNegStipple(corePack, cx, cy, rCore, dots, 11 + innerTotal + z, 0.4);
+  }
+
+  coreCounts.forEach((count, i) => {
+    if (count <= 0 || count > 8) return; // deep shells: ring + core wash only
+    const innerGroup = makeOrbitGroup('shell-orbit-inner');
+    placeShell(innerGroup, count, radii[i], 'e-marker', -Math.PI / 2 + i * 0.35);
+    corePack.appendChild(innerGroup);
+  });
+
+  if (coreCounts.length > 0 || innerTotal > 0) {
+    svg.appendChild(corePack);
+  }
+
+  // Valence shell
+  const rVal = radii[nShells - 1];
+  const outer = document.createElementNS(SVG_NS, 'circle');
+  outer.setAttribute('class', 'shell');
+  outer.setAttribute('cx', cx);
+  outer.setAttribute('cy', cy);
+  outer.setAttribute('r', rVal);
+  svg.appendChild(outer);
+
+  const outerGroup = makeOrbitGroup('shell-orbit-outer');
+  const outerStart = 0;
+  if (showAttraction && valenceCount > 0) {
+    addAttractionOval(defs, outerGroup, cx, cy, rVal, uid, attractionOpacity);
+  }
+  placeShell(outerGroup, valenceCount, rVal, 'e-valence', outerStart);
+  svg.appendChild(outerGroup);
+
+  const nuc = document.createElementNS(SVG_NS, 'circle');
+  nuc.setAttribute('cx', cx);
+  nuc.setAttribute('cy', cy);
+  nuc.setAttribute('r', rNuc);
+  nuc.setAttribute('fill', `url(#nuc-${uid})`);
+  svg.appendChild(nuc);
+
+  const nucLabel = document.createElementNS(SVG_NS, 'text');
+  const showCore = showCoreChargeOnNuc || coreFaded;
+  nucLabel.setAttribute('class', 'nuc-label' + (innerTotal > 0 && !showCore ? ' is-shielded' : '') + (showCore ? ' is-core-view' : ''));
+  nucLabel.setAttribute('x', cx);
+  nucLabel.setAttribute('y', cy);
+  nucLabel.textContent = showCore ? `+${coreCharge}` : `+${z}`;
+  svg.appendChild(nucLabel);
+
+  if (interactiveNuc) {
+    const hit = document.createElementNS(SVG_NS, 'circle');
+    hit.setAttribute('class', 'nuc-hit');
+    hit.setAttribute('cx', cx);
+    hit.setAttribute('cy', cy);
+    hit.setAttribute('r', rNuc + 10);
+    hit.setAttribute('tabindex', '0');
+    hit.setAttribute('role', 'button');
+    hit.setAttribute('aria-label', opts.tipLabel || `Core charge for Z=${z}`);
+    hit.dataset.sym = opts.sym || '';
+    hit.dataset.z = String(z);
+    hit.dataset.inner = String(innerTotal);
+    hit.dataset.core = String(coreCharge);
+    svg.appendChild(hit);
+  }
+
+  return svg;
+}
+
+/**
+ * Soft textured attraction wash (no stroke) along +x from nucleus to outer shell.
+ * Lives inside a spinning outer-shell group so it stays with the lead electron.
+ */
+function addAttractionOval(defs, parent, cx, cy, rOuter, uid, opacity) {
+  const mx = cx + rOuter / 2;
+  const my = cy;
+  const rx = rOuter / 2 + 16;
+  const ry = Math.max(24, rOuter * 0.28);
+  const op = Math.max(0.55, Math.min(1.25, opacity));
+
+  const gid = `attr-${uid}`;
+  const clipId = `attr-clip-${uid}`;
+
+  const grad = document.createElementNS(SVG_NS, 'radialGradient');
+  grad.setAttribute('id', gid);
+  grad.setAttribute('cx', '35%');
+  grad.setAttribute('cy', '45%');
+  grad.setAttribute('r', '70%');
+  [
+    [0,   `rgba(168,90,50,${0.58 * op})`],
+    [0.45,`rgba(168,90,50,${0.34 * op})`],
+    [0.78,`rgba(168,90,50,${0.14 * op})`],
+    [1,   'rgba(168,90,50,0)']
+  ].forEach(([o, c]) => {
+    const s = document.createElementNS(SVG_NS, 'stop');
+    s.setAttribute('offset', `${o * 100}%`);
+    s.setAttribute('stop-color', c);
+    grad.appendChild(s);
+  });
+  defs.appendChild(grad);
+
+  const clip = document.createElementNS(SVG_NS, 'clipPath');
+  clip.setAttribute('id', clipId);
+  const clipEl = document.createElementNS(SVG_NS, 'ellipse');
+  clipEl.setAttribute('cx', String(mx));
+  clipEl.setAttribute('cy', String(my));
+  clipEl.setAttribute('rx', String(rx));
+  clipEl.setAttribute('ry', String(ry));
+  clip.appendChild(clipEl);
+  defs.appendChild(clip);
+
+  const g = document.createElementNS(SVG_NS, 'g');
+  g.setAttribute('class', 'attraction-field');
+  g.setAttribute('opacity', String(Math.min(1, op)));
+
+  const oval = document.createElementNS(SVG_NS, 'ellipse');
+  oval.setAttribute('class', 'attraction-oval');
+  oval.setAttribute('cx', String(mx));
+  oval.setAttribute('cy', String(my));
+  oval.setAttribute('rx', String(rx));
+  oval.setAttribute('ry', String(ry));
+  oval.setAttribute('fill', `url(#${gid})`);
+  g.appendChild(oval);
+
+  // Quiet printed texture inside the wash (no outline)
+  const flecks = document.createElementNS(SVG_NS, 'g');
+  flecks.setAttribute('clip-path', `url(#${clipId})`);
+  const seed = uid.split('').reduce((a, ch) => a + ch.charCodeAt(0), 0);
+  const count = 55;
+  for (let i = 0; i < count; i++) {
+    const u = stippleHash(i, seed);
+    const v = stippleHash(i + 17, seed + 3);
+    const ang = u * Math.PI * 2;
+    const t = Math.sqrt(v);
+    const px = mx + Math.cos(ang) * rx * t;
+    const py = my + Math.sin(ang) * ry * t;
+    const dot = document.createElementNS(SVG_NS, 'circle');
+    dot.setAttribute('class', 'attraction-fleck');
+    dot.setAttribute('cx', String(px));
+    dot.setAttribute('cy', String(py));
+    dot.setAttribute('r', String(0.55 + stippleHash(i, seed + 9) * 1.15));
+    dot.setAttribute('opacity', String((0.18 + stippleHash(i, seed + 2) * 0.32) * Math.min(1, op)));
+    flecks.appendChild(dot);
+  }
+  g.appendChild(flecks);
+  parent.appendChild(g);
+}
+
+function replaceAtom(host, opts) {
+  host.replaceChildren(buildAtomSVG(opts));
+}
+
+// === STATE ===
+const STATE = {
+  act: 'li', // li · period · compare · group
+  inner: 0,
+  reachedPlus1: false,
+  // 0 none · 1 diff Q · 2 model IEs · 3 IE table · 4 data Q · 5 full explanation
+  revealStage: 0,
+  periodPage: 0,
+  transitioning: false,
+  compareStep: 0, // 0 notice row · 1 relationship notes
+  groupStep: 0
+};
+
+/** Period 2, three at a time — Li leads the first page. */
+const PERIOD_PAGES = [
+  [
+    { sym: 'Li', z: 3, valence: 1 },
+    { sym: 'Be', z: 4, valence: 2 },
+    { sym: 'B',  z: 5, valence: 3 }
+  ],
+  [
+    { sym: 'C', z: 6, valence: 4 },
+    { sym: 'N', z: 7, valence: 5 },
+    { sym: 'O', z: 8, valence: 6 }
+  ],
+  [
+    { sym: 'F',  z: 9,  valence: 7 },
+    { sym: 'Ne', z: 10, valence: 8 }
+  ]
+];
+
+/** Full period-2 row with IE₁ (MJ/mol, §8.3) — shared by reveal table + compare act. */
+const PERIOD2_ROW = [
+  { sym: 'Li', z: 3, valence: 1, ie: 0.52 },
+  { sym: 'Be', z: 4, valence: 2, ie: 0.90 },
+  { sym: 'B',  z: 5, valence: 3, ie: 0.80 },
+  { sym: 'C',  z: 6, valence: 4, ie: 1.09 },
+  { sym: 'N',  z: 7, valence: 5, ie: 1.40 },
+  { sym: 'O',  z: 8, valence: 6, ie: 1.31 },
+  { sym: 'F',  z: 9, valence: 7, ie: 1.68 },
+  { sym: 'Ne', z: 10, valence: 8, ie: 2.08 }
+];
+
+/** Period 1 IE₁ (MJ/mol, §8.3) — sit above Li and Ne on the strip. */
+const PERIOD1_IE = {
+  H: { sym: 'H', ie: 1.31 },
+  He: { sym: 'He', ie: 2.37 }
+};
+
+/** Alkali metals down a column — IE₁ from §8.3. shells = inner → valence. */
+const ALKALI_COL = [
+  { sym: 'H',  z: 1,  shells: [1],       ie: 1.31, n: 1 },
+  { sym: 'Li', z: 3,  shells: [2, 1],     ie: 0.52, n: 2 },
+  { sym: 'Na', z: 11, shells: [2, 8, 1],  ie: 0.50, n: 3 }
+];
+
+/** Halogens — F / Cl (Moog CA5 pair used in the guided fade). */
+const HALOGEN_COL = [
+  { sym: 'F',  z: 9,  shells: [2, 7],     ie: 1.68, n: 2 },
+  { sym: 'Cl', z: 17, shells: [2, 8, 7],  ie: 1.25, n: 3 }
+];
+
+/**
+ * Finale overview — first four alkali metals + first four halogens.
+ * IE₁: Li/Na/K/F/Cl from §8.3; Rb 0.40 from Moog CA5 Table 1;
+ * Br 1.14 / I 1.01 extend past the first-20 table (same MJ/mol rounding).
+ */
+const FINALE_ALKALI = [
+  { sym: 'Li', z: 3,  shells: [2, 1],           ie: 0.52, n: 2 },
+  { sym: 'Na', z: 11, shells: [2, 8, 1],        ie: 0.50, n: 3 },
+  { sym: 'K',  z: 19, shells: [2, 8, 8, 1],     ie: 0.42, n: 4 },
+  { sym: 'Rb', z: 37, shells: [2, 8, 18, 8, 1], ie: 0.40, n: 5 }
+];
+const FINALE_HALOGEN = [
+  { sym: 'F',  z: 9,  shells: [2, 7],              ie: 1.68, n: 2 },
+  { sym: 'Cl', z: 17, shells: [2, 8, 7],           ie: 1.25, n: 3 },
+  { sym: 'Br', z: 35, shells: [2, 8, 18, 7],       ie: 1.14, n: 4 },
+  { sym: 'I',  z: 53, shells: [2, 8, 18, 18, 7],  ie: 1.01, n: 5 }
+];
+
+const GROUP_CANVAS = 220;
+const GROUP_SIZE = 168;
+const GROUP_PAIR_SIZE = 196;
+const GROUP_OUTER = 96;
+const FINALE_CANVAS = 160;
+const FINALE_SIZE = 112;
+const FINALE_OUTER = 72;
+
+/**
+ * Horizontal IE₁ strip: H/He above Li/Ne, then period-2 symbols with values under.
+ * Same markup is mounted in the Li reveal and the compare act.
+ */
+function buildIEStripTable(opts = {}) {
+  const atoms = opts.atoms || PERIOD2_ROW;
+  const focusSym = opts.focusSym || '';
+  const caption = opts.caption || 'First ionization energy (MJ/mol)';
+  const cols = atoms.length;
+
+  const table = document.createElement('table');
+  table.className = 'ie-strip';
+  table.setAttribute('aria-label', caption);
+
+  const cap = document.createElement('caption');
+  cap.textContent = caption;
+  table.appendChild(cap);
+
+  const thead = document.createElement('thead');
+
+  // Period 1: H above Li (first col), He above Ne (last col)
+  const p1El = document.createElement('tr');
+  p1El.className = 'ie-p1';
+  atoms.forEach((atom, i) => {
+    const th = document.createElement('th');
+    th.scope = 'col';
+    if (i === 0) {
+      th.textContent = PERIOD1_IE.H.sym;
+      if (focusSym === 'H') th.classList.add('is-focus');
+    } else if (i === cols - 1) {
+      th.textContent = PERIOD1_IE.He.sym;
+      if (focusSym === 'He') th.classList.add('is-focus');
+    } else {
+      th.className = 'is-empty';
+      th.textContent = '';
+    }
+    p1El.appendChild(th);
+  });
+  thead.appendChild(p1El);
+
+  const p1Val = document.createElement('tr');
+  p1Val.className = 'ie-p1-vals';
+  atoms.forEach((atom, i) => {
+    const td = document.createElement('td');
+    if (i === 0) {
+      td.textContent = PERIOD1_IE.H.ie.toFixed(2);
+      if (focusSym === 'H') td.classList.add('is-focus');
+    } else if (i === cols - 1) {
+      td.textContent = PERIOD1_IE.He.ie.toFixed(2);
+      if (focusSym === 'He') td.classList.add('is-focus');
+    } else {
+      td.className = 'is-empty';
+      td.textContent = '';
+    }
+    p1Val.appendChild(td);
+  });
+  thead.appendChild(p1Val);
+
+  const elRow = document.createElement('tr');
+  elRow.className = 'ie-els';
+  atoms.forEach(atom => {
+    const th = document.createElement('th');
+    th.scope = 'col';
+    th.textContent = atom.sym;
+    if (focusSym && atom.sym === focusSym) th.classList.add('is-focus');
+    elRow.appendChild(th);
+  });
+  thead.appendChild(elRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  const valRow = document.createElement('tr');
+  valRow.className = 'ie-vals';
+  atoms.forEach(atom => {
+    const td = document.createElement('td');
+    td.textContent = atom.ie.toFixed(2);
+    if (focusSym && atom.sym === focusSym) td.classList.add('is-focus');
+    valRow.appendChild(td);
+  });
+  tbody.appendChild(valRow);
+  table.appendChild(tbody);
+
+  return table;
+}
+
+function mountIEStrip(host, opts) {
+  if (!host) return;
+  host.replaceChildren(buildIEStripTable(opts));
+}
+
+const COMPARE_CANVAS = 160;
+const COMPARE_OUTER_BASE = 72;
+const COMPARE_SIZE = 112;
+
+function q1FromInner(inner) {
+  return 3 - inner;
+}
+
+/** Outer-shell radius only. Li starts large; Ne stays readable (not tiny). */
+function scaleForCore(core) {
+  const t = (core - 1) / 7; // 0…1
+  return 1 - t * 0.36; // 1.00 → 0.64
+}
+
+const PERIOD_CANVAS = 280;
+const PERIOD_OUTER_BASE = 128; // Li valence distance — dramatic start
+
+function renderLiAtoms() {
+  const q1 = q1FromInner(STATE.inner);
+  // Attraction wash: A a bit stronger; B fades gently as inner electrons shield
+  const fade = 1 - (STATE.inner / 2) * 0.32; // 1 → 0.84 → 0.68
+
+  // A: added electrons stay on the *same* (outer) shell — no inner shell
+  replaceAtom(document.getElementById('svgNaive'), {
+    uid: 'naive',
+    z: 3,
+    inner: 0,
+    valence: 1 + STATE.inner,
+    showInnerRing: true,
+    emptyInner: true,
+    showAttraction: true,
+    attractionOpacity: 1.15,
+    animateShell: true,
+    label: 'Lithium — all electrons on the outer shell, full +3 nucleus'
+  });
+  // B: same electrons go into the inner shell
+  replaceAtom(document.getElementById('svgReal'), {
+    uid: 'real',
+    z: 3,
+    inner: STATE.inner,
+    valence: 1,
+    showInnerRing: true,
+    emptyInner: STATE.inner === 0,
+    showAttraction: true,
+    attractionOpacity: fade,
+    animateShell: true,
+    label: `Lithium with ${STATE.inner} inner-shell electron${STATE.inner === 1 ? '' : 's'}`
+  });
+
+  const q1El = document.getElementById('realQ1');
+  q1El.textContent = (q1 >= 0 ? '+' : '') + q1;
+  q1El.style.fontSize = (1 + (3 - q1) * 0.08) + 'em';
+
+  document.getElementById('innerCount').textContent = String(STATE.inner);
+  document.getElementById('innerMinus').disabled = STATE.inner <= 0;
+  document.getElementById('innerPlus').disabled = STATE.inner >= 2;
+
+  const note = document.getElementById('realEqNote');
+  if (STATE.inner === 0) {
+    note.textContent = 'Add the inner-shell electrons';
+  } else if (STATE.inner < 2) {
+    note.textContent = `q₁ = 3 − ${STATE.inner} = +${q1}`;
+  } else {
+    note.textContent = 'q₁ = 3 − 2 = +1';
+  }
+
+  // Keep both models fully visible for side-by-side comparison
+  document.getElementById('cardNaive').classList.remove('is-dim');
+
+  if (STATE.inner === 2) {
+    STATE.reachedPlus1 = true;
+    if (STATE.revealStage < 1) STATE.revealStage = 1;
+    document.getElementById('helpText').textContent =
+      'Compare the two models — then step through what the difference means.';
+  } else if (!STATE.reachedPlus1) {
+    STATE.revealStage = 0;
+    document.getElementById('liNext').disabled = true;
+  }
+
+  syncReveal();
+}
+
+function syncReveal() {
+  const block = document.getElementById('coreReveal');
+  const diff = document.getElementById('revealDiff');
+  const ie = document.getElementById('revealIE');
+  const data = document.getElementById('revealData');
+  const shield = document.getElementById('revealShield');
+  const def = document.getElementById('revealDef');
+  const advance = document.getElementById('revealAdvance');
+  const liNext = document.getElementById('liNext');
+  const kicker = document.getElementById('realKicker');
+  const ieNaive = document.getElementById('ieNaive');
+  const ieReal = document.getElementById('ieReal');
+  const stage = STATE.revealStage;
+
+  if (stage >= 1) block.classList.add('open');
+  else block.classList.remove('open');
+
+  // Under the two diagrams (stage 2+), then table → data Q → full explanation
+  if (ieNaive) ieNaive.hidden = stage < 2;
+  if (ieReal) ieReal.hidden = stage < 2;
+  diff.hidden = stage < 1;
+  ie.hidden = stage < 3;
+  data.hidden = stage < 4;
+  shield.hidden = stage < 5;
+  def.hidden = stage < 5;
+
+  if (stage >= 3) {
+    mountIEStrip(document.getElementById('revealIEHost'), { focusSym: 'Li' });
+  }
+
+  advance.hidden = !(stage >= 1 && stage < 5);
+
+  if (stage >= 5) {
+    kicker.textContent = 'The outer electron feels +1';
+    liNext.disabled = false;
+    setGate('hasBuiltCoreCharge', true);
+    document.getElementById('helpText').textContent =
+      'Core charge = Z − inner-shell electrons. Along a period, Z rises while the number of inner electrons stays the same.';
+  } else if (stage >= 1) {
+    kicker.textContent = 'Configuration B — inner shell filled';
+    liNext.disabled = true;
+  } else {
+    kicker.textContent = 'Configuration B — add the inner shell';
+  }
+  syncStageNav();
+}
+
+function advanceReveal() {
+  if (STATE.revealStage < 1 || STATE.revealStage >= 5) return;
+  STATE.revealStage += 1;
+  syncReveal();
+}
+
+function setInner(n) {
+  STATE.inner = Math.max(0, Math.min(2, n | 0));
+  renderLiAtoms();
+}
+
+function hideNucTip() {
+  const tip = document.getElementById('nucTip');
+  tip.classList.remove('is-on');
+  tip.hidden = true;
+}
+
+function showNucTip(hit) {
+  const tip = document.getElementById('nucTip');
+  const z = Number(hit.dataset.z);
+  const inner = Number(hit.dataset.inner);
+  const core = Number(hit.dataset.core);
+  const sym = hit.dataset.sym || '';
+  document.getElementById('nucTipSym').textContent = `${sym} · Z = ${z}`;
+  document.getElementById('nucTipEq').innerHTML =
+    `<span class="tip-cc">core charge</span> = <span class="tip-z">${z}</span> − ${inner} = <span class="tip-cc">+${core}</span>`;
+
+  const rail = document.querySelector('.period-rail');
+  const hitRect = hit.getBoundingClientRect();
+  const railRect = rail.getBoundingClientRect();
+  const x = hitRect.left + hitRect.width / 2 - railRect.left;
+  const y = hitRect.top - railRect.top;
+
+  tip.hidden = false;
+  tip.style.left = `${x}px`;
+  tip.style.top = '0px';
+  tip.classList.add('is-on');
+  requestAnimationFrame(() => {
+    tip.style.top = `${Math.max(4, y - tip.offsetHeight - 8)}px`;
   });
 }
 
-// === HELP SYSTEM ===
+function bindNucHover(card) {
+  const hit = card.querySelector('.nuc-hit');
+  if (!hit) return;
+  const open = () => showNucTip(hit);
+  const close = () => hideNucTip();
+  hit.addEventListener('mouseenter', open);
+  hit.addEventListener('mouseleave', close);
+  hit.addEventListener('focus', open);
+  hit.addEventListener('blur', close);
+}
+
+function makePeriodCard(atom, opts = {}) {
+  const core = atom.z - 2;
+  const card = document.createElement('article');
+  card.className = 'period-card' + (opts.anchor ? ' is-anchor' : '');
+  card.setAttribute('aria-label', `${atom.sym}, core charge +${core}`);
+
+  const sym = document.createElement('div');
+  sym.className = 'atom-sym';
+  sym.textContent = `${atom.sym} · Z = ${atom.z}`;
+  card.appendChild(sym);
+
+  const host = document.createElement('div');
+  host.className = 'period-atom-host';
+  card.appendChild(host);
+  replaceAtom(host, {
+    uid: opts.uid || `p-${atom.sym}`,
+    z: atom.z,
+    inner: 2,
+    valence: Math.min(atom.valence, 8),
+    showInnerRing: true,
+    emptyInner: false,
+    size: PERIOD_CANVAS,
+    canvas: PERIOD_CANVAS,
+    outerBase: PERIOD_OUTER_BASE,
+    scale: scaleForCore(core),
+    interactiveNuc: true,
+    sym: atom.sym,
+    tipLabel: `${atom.sym} core charge calculation`,
+    label: `${atom.sym} shell diagram, core charge +${core}`
+  });
+
+  const badge = document.createElement('div');
+  badge.className = 'core-badge';
+  badge.textContent = `core +${core}`;
+  card.appendChild(badge);
+
+  bindNucHover(card);
+  return card;
+}
+
+function updatePeriodNav() {
+  document.getElementById('pagePrev').disabled = STATE.transitioning;
+
+  const nextBtn = document.getElementById('pageNext');
+  nextBtn.disabled = STATE.transitioning || gates.moduleComplete;
+  if (STATE.periodPage >= PERIOD_PAGES.length - 1) {
+    nextBtn.textContent = 'See the full row →';
+  } else {
+    nextBtn.textContent = 'Next →';
+  }
+}
+
+function fillPeriodGrid(grid, pageIndex, { animateCards = true } = {}) {
+  const page = PERIOD_PAGES[pageIndex];
+  grid.replaceChildren();
+  page.forEach((atom, i) => {
+    const card = makePeriodCard(atom, { uid: `p${pageIndex}-${i}` });
+    grid.appendChild(card);
+    if (prefersReduced || !animateCards) {
+      card.classList.add('is-in');
+    } else {
+      void card.offsetWidth;
+      setTimeout(() => card.classList.add('is-in'), 160 + i * 240);
+    }
+  });
+}
+
+function renderPeriodPage(opts = {}) {
+  const { animate = true, direction = 1 } = opts;
+  const viewport = document.getElementById('periodViewport');
+  let grid = document.getElementById('periodGrid');
+  hideNucTip();
+
+  const hasCards = grid && grid.querySelector('.period-card');
+  const canSlide = animate && !prefersReduced && hasCards && direction !== 0;
+
+  if (!canSlide) {
+    if (!grid) {
+      grid = document.createElement('div');
+      grid.className = 'period-grid';
+      grid.id = 'periodGrid';
+      viewport.replaceChildren(grid);
+    }
+    fillPeriodGrid(grid, STATE.periodPage, { animateCards: animate });
+    updatePeriodNav();
+    return;
+  }
+
+  STATE.transitioning = true;
+  updatePeriodNav();
+
+  const outgoing = grid;
+  const lockedH = Math.max(outgoing.offsetHeight, viewport.offsetHeight);
+  viewport.style.minHeight = `${lockedH}px`;
+
+  outgoing.removeAttribute('id');
+  outgoing.classList.add('is-layer');
+  outgoing.setAttribute('aria-hidden', 'true');
+
+  const incoming = document.createElement('div');
+  incoming.className = 'period-grid is-layer ' +
+    (direction > 0 ? 'is-enter-from-right' : 'is-enter-from-left');
+  incoming.id = 'periodGrid';
+
+  const page = PERIOD_PAGES[STATE.periodPage];
+  page.forEach((atom, i) => {
+    const card = makePeriodCard(atom, { uid: `p${STATE.periodPage}-${i}` });
+    card.classList.add('is-in');
+    incoming.appendChild(card);
+  });
+
+  viewport.appendChild(incoming);
+  void incoming.offsetWidth;
+
+  requestAnimationFrame(() => {
+    outgoing.classList.add(direction > 0 ? 'is-exit-left' : 'is-exit-right');
+    incoming.classList.add('is-enter-settled');
+  });
+
+  const SLIDE_MS = 560;
+  window.setTimeout(() => {
+    outgoing.remove();
+    incoming.classList.remove(
+      'is-layer',
+      'is-enter-from-right',
+      'is-enter-from-left',
+      'is-enter-settled'
+    );
+    incoming.removeAttribute('aria-hidden');
+    viewport.style.minHeight = '';
+    STATE.transitioning = false;
+    updatePeriodNav();
+  }, SLIDE_MS);
+}
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, prefersReduced ? 0 : ms));
+}
+
+/** Clone keeps gradient IDs; remint so fills stay valid after the source is hidden. */
+function remintSvgPaintIds(svg, suffix) {
+  const idMap = new Map();
+  svg.querySelectorAll('[id]').forEach(el => {
+    const oldId = el.getAttribute('id');
+    if (!oldId) return;
+    const neu = `${oldId}-${suffix}`;
+    idMap.set(oldId, neu);
+    el.setAttribute('id', neu);
+  });
+  if (!idMap.size) return;
+  // Longer IDs first so a short id never rewrites a longer one’s url(#…)
+  const pairs = [...idMap.entries()].sort((a, b) => b[0].length - a[0].length);
+  svg.querySelectorAll('*').forEach(el => {
+    for (const attr of ['fill', 'stroke', 'filter', 'clip-path', 'mask', 'href', 'xlink:href']) {
+      const v = el.getAttribute(attr);
+      if (!v) continue;
+      let next = v;
+      for (const [oldId, neu] of pairs) {
+        next = next.split(`url(#${oldId})`).join(`url(#${neu})`);
+        if (next === `#${oldId}`) next = `#${neu}`;
+      }
+      if (next !== v) el.setAttribute(attr, next);
+    }
+  });
+}
+
+function waitTransition(el, propName) {
+  if (prefersReduced) return Promise.resolve();
+  return new Promise(resolve => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      el.removeEventListener('transitionend', done);
+      resolve();
+    };
+    const done = (e) => {
+      if (propName && e.propertyName !== propName) return;
+      finish();
+    };
+    el.addEventListener('transitionend', done);
+    setTimeout(finish, 2200); // safety — longer than the slowest flyer slide
+  });
+}
+
+async function showPeriodAct() {
+  if (STATE.transitioning) return;
+  STATE.transitioning = true;
+  document.getElementById('liNext').disabled = true;
+
+  const header = document.querySelector('#moduleStage > header');
+  const actLi = document.getElementById('actLi');
+  const framing = document.getElementById('framing');
+  const actPeriod = document.getElementById('actPeriod');
+  const chrome = document.getElementById('periodChrome');
+  const pageNav = document.getElementById('pageNav');
+  const periodEq = document.getElementById('periodEq');
+  const svgHost = document.getElementById('svgReal');
+  const srcSvg = svgHost.querySelector('svg');
+
+  chrome.classList.remove('is-in');
+  pageNav.classList.remove('is-in');
+  periodEq.setAttribute('aria-hidden', 'true');
+
+  document.getElementById('helpText').textContent =
+    'Same number of inner electrons across this row — so what’s changing in the core-charge equation?';
+
+  // 1 — surroundings fade; lithium atom stays
+  header.classList.add('is-clearing');
+  actLi.classList.add('is-exiting');
+  await wait(1000);
+
+  // 2 — lift Li into a fixed flyer so it can travel
+  const start = srcSvg.getBoundingClientRect();
+  const flyer = srcSvg.cloneNode(true);
+  flyer.removeAttribute('id');
+  remintSvgPaintIds(flyer, `fly-${Date.now()}`);
+  flyer.classList.add('li-flyer');
+  flyer.style.left = `${start.left}px`;
+  flyer.style.top = `${start.top}px`;
+  flyer.style.width = `${start.width}px`;
+  flyer.style.height = `${start.height}px`;
+  document.body.appendChild(flyer);
+  // Reminted defs first — then hide source so nucleus fill never points at display:none
+  svgHost.classList.add('is-handed-off');
+
+  // 3 — park the destination Li card (atom hidden under flyer)
+  STATE.periodPage = 0;
+  actPeriod.hidden = false;
+  const grid = document.getElementById('periodGrid');
+  grid.replaceChildren();
+  const liCard = makePeriodCard(PERIOD_PAGES[0][0], { uid: 'p-li-anchor', anchor: true });
+  liCard.classList.add('is-in', 'is-handoff');
+  grid.appendChild(liCard);
+
+  // Keep flyer stable while layout shifts under it
+  actLi.hidden = true;
+  framing.hidden = true;
+  framing.textContent = '';
+  // leave header.is-clearing on until Li lands — avoids a layout jump mid-flight
+
+  await wait(80);
+  const destSvg = liCard.querySelector('.atom-svg');
+  const end = destSvg.getBoundingClientRect();
+  // Zoom a bit larger than the period card’s base size
+  const zoom = 1.12;
+  const endW = end.width * zoom;
+  const endH = end.height * zoom;
+  const endLeft = end.left + (end.width - endW) / 2;
+  const endTop = end.top + (end.height - endH) / 2;
+
+  if (prefersReduced) {
+    flyer.style.left = `${endLeft}px`;
+    flyer.style.top = `${endTop}px`;
+    flyer.style.width = `${endW}px`;
+    flyer.style.height = `${endH}px`;
+  } else {
+    void flyer.offsetWidth;
+    flyer.style.left = `${endLeft}px`;
+    flyer.style.top = `${endTop}px`;
+    flyer.style.width = `${endW}px`;
+    flyer.style.height = `${endH}px`;
+    await waitTransition(flyer, 'left');
+  }
+
+  // 4 — settle: reveal destination atom, drop flyer, soft zoom-out to final size
+  liCard.classList.add('is-revealed');
+  flyer.style.opacity = '0';
+  flyer.style.transition = prefersReduced ? 'none' : 'opacity 0.45s ease';
+  await wait(480);
+  flyer.remove();
+
+  if (!prefersReduced) {
+    destSvg.style.transformOrigin = 'center center';
+    destSvg.style.transform = `scale(${zoom})`;
+    destSvg.style.transition = 'transform 0.9s cubic-bezier(0.22,1,0.36,1)';
+    void destSvg.offsetWidth;
+    destSvg.style.transform = 'scale(1)';
+    await wait(920);
+    destSvg.style.transition = '';
+    destSvg.style.transform = '';
+  }
+
+  // 5 — next phase slowly fades in (title returns with the chrome)
+  header.classList.remove('is-clearing');
+  await wait(350);
+  chrome.classList.add('is-in');
+  periodEq.setAttribute('aria-hidden', 'false');
+  // Hold on Li alone before Be / B slide in
+  await wait(1400);
+  pageNav.classList.add('is-in');
+
+  PERIOD_PAGES[0].slice(1).forEach((atom, i) => {
+    const card = makePeriodCard(atom, { uid: `p0-${i + 1}` });
+    grid.appendChild(card);
+    if (prefersReduced) {
+      card.classList.add('is-in');
+    } else {
+      void card.offsetWidth;
+      setTimeout(() => card.classList.add('is-in'), 450 + i * 380);
+    }
+  });
+
+  document.getElementById('pageNext').textContent = 'Next →';
+
+  STATE.act = 'period';
+  STATE.transitioning = false;
+  updatePeriodNav();
+  syncStageNav();
+}
+
+function makeCompareCard(atom, opts = {}) {
+  const core = atom.z - 2;
+  const card = document.createElement('article');
+  card.className = 'compare-card';
+  card.setAttribute('role', 'listitem');
+  card.setAttribute('aria-label',
+    `${atom.sym}, core charge +${core}, first ionization energy ${atom.ie.toFixed(2)} megajoules per mole`);
+
+  const sym = document.createElement('div');
+  sym.className = 'atom-sym';
+  sym.textContent = atom.sym;
+  card.appendChild(sym);
+
+  const host = document.createElement('div');
+  host.className = 'compare-atom-host';
+  card.appendChild(host);
+  replaceAtom(host, {
+    uid: opts.uid || `cmp-${atom.sym}`,
+    z: atom.z,
+    inner: 2,
+    valence: Math.min(atom.valence, 8),
+    showInnerRing: true,
+    emptyInner: false,
+    size: COMPARE_SIZE,
+    canvas: COMPARE_CANVAS,
+    outerBase: COMPARE_OUTER_BASE,
+    scale: scaleForCore(core),
+    interactiveNuc: false,
+    sym: atom.sym,
+    label: `${atom.sym} shell diagram, core charge +${core}`
+  });
+
+  const badge = document.createElement('div');
+  badge.className = 'core-badge';
+  badge.textContent = `core +${core}`;
+  card.appendChild(badge);
+
+  return card;
+}
+
+async function showCompareAct() {
+  if (STATE.transitioning) return;
+  STATE.transitioning = true;
+  STATE.compareStep = 0;
+
+  const actPeriod = document.getElementById('actPeriod');
+  const actCompare = document.getElementById('actCompare');
+  const chrome = document.getElementById('compareChrome');
+  const actions = document.getElementById('compareActions');
+  const grid = document.getElementById('compareGrid');
+  const prompt = document.getElementById('comparePrompt');
+
+  document.getElementById('helpText').textContent =
+    'Scan left to right. Watch core charge under each atom against the IE₁ row above.';
+
+  chrome.classList.remove('is-in');
+  actions.classList.remove('is-in');
+  prompt.classList.remove('is-swap');
+  prompt.textContent = 'Take a look at the entire row — what do you notice?';
+  prompt.classList.add('student-q');
+  grid.replaceChildren();
+  mountIEStrip(document.getElementById('compareIEHost'));
+
+  actPeriod.hidden = true;
+  actCompare.hidden = false;
+  STATE.act = 'compare';
+  syncStageNav();
+  actCompare.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+
+  PERIOD2_ROW.forEach((atom, i) => {
+    const card = makeCompareCard(atom, { uid: `cmp-${i}` });
+    grid.appendChild(card);
+    if (prefersReduced) {
+      card.classList.add('is-in');
+    } else {
+      void card.offsetWidth;
+      setTimeout(() => card.classList.add('is-in'), 120 + i * 110);
+    }
+  });
+
+  await wait(200);
+  chrome.classList.add('is-in');
+  await wait(prefersReduced ? 0 : 900);
+  actions.classList.add('is-in');
+
+  STATE.transitioning = false;
+  syncStageNav();
+}
+
+async function advanceCompare() {
+  if (STATE.transitioning) return;
+  if (STATE.compareStep === 0) {
+    STATE.transitioning = true;
+    const prompt = document.getElementById('comparePrompt');
+    prompt.classList.add('is-swap');
+    await wait(prefersReduced ? 0 : 480);
+    prompt.textContent =
+      'Write an explanation in your notes in your own words, the WHY is the most important part';
+    prompt.classList.add('student-q');
+    prompt.classList.remove('is-swap');
+    document.getElementById('helpText').textContent =
+      'As core charge climbs across the row, what happens to IE₁? Put that in your own words.';
+    STATE.compareStep = 1;
+    STATE.transitioning = false;
+    syncStageNav();
+    const doneBtn = document.getElementById('compareDone');
+    if (doneBtn && gates.moduleComplete) {
+      doneBtn.textContent = 'What this was for →';
+    }
+    return;
+  }
+  if (gates.moduleComplete) {
+    revealDebrief();
+    return;
+  }
+  await showGroupAct();
+}
+
+function coreChargeOf(atom) {
+  const shells = atom.shells || [];
+  const inner = shells.slice(0, -1).reduce((a, b) => a + b, 0);
+  return atom.z - inner;
+}
+
+function makeGroupCard(atom, opts = {}) {
+  const core = coreChargeOf(atom);
+  const card = document.createElement('article');
+  card.className = 'group-card' + (opts.pair ? ' is-pair' : '');
+  card.setAttribute('aria-label',
+    `${atom.sym}, core charge +${core}, valence shell n=${atom.n}, first ionization energy ${atom.ie.toFixed(2)} megajoules per mole`);
+
+  const sym = document.createElement('div');
+  sym.className = 'atom-sym';
+  sym.textContent = atom.sym;
+  card.appendChild(sym);
+
+  const host = document.createElement('div');
+  host.className = 'group-atom-host';
+  card.appendChild(host);
+
+  const size = opts.pair ? GROUP_PAIR_SIZE : GROUP_SIZE;
+  const scale = opts.scale != null ? opts.scale : (1 + (atom.n - 1) * 0.08);
+  replaceAtom(host, {
+    uid: opts.uid || `g-${atom.sym}`,
+    z: atom.z,
+    shells: atom.shells,
+    showInnerRing: atom.shells.length > 1,
+    emptyInner: false,
+    size,
+    canvas: GROUP_CANVAS,
+    outerBase: GROUP_OUTER,
+    scale,
+    interactiveNuc: false,
+    sym: atom.sym,
+    coreFaded: !!opts.coreFaded,
+    showCoreChargeOnNuc: !!opts.showCoreChargeOnNuc,
+    label: `${atom.sym} shell diagram, core charge +${core}`
+  });
+
+  const meta = document.createElement('div');
+  meta.className = 'group-meta';
+
+  const badge = document.createElement('div');
+  badge.className = 'core-badge';
+  badge.textContent = `core +${core}`;
+  meta.appendChild(badge);
+
+  const shellTag = document.createElement('div');
+  shellTag.className = 'shell-tag';
+  shellTag.textContent = `valence n = ${atom.n}`;
+  meta.appendChild(shellTag);
+
+  const ie = document.createElement('div');
+  ie.className = 'ie-readout';
+  ie.innerHTML =
+    `<span class="ie-kicker">IE₁</span>` +
+    `<span class="ie-val">${atom.ie.toFixed(2)}</span>` +
+    `<span class="ie-unit">MJ/mol</span>`;
+  meta.appendChild(ie);
+
+  card.appendChild(meta);
+  return card;
+}
+
+async function revealGroupCards(cards) {
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    if (prefersReduced) {
+      card.classList.add('is-in');
+    } else {
+      void card.offsetWidth;
+      await wait(90);
+      card.classList.add('is-in');
+      await wait(220);
+    }
+  }
+}
+
+async function setGroupPrompt(text) {
+  const prompt = document.getElementById('groupPrompt');
+  prompt.classList.add('is-swap');
+  await wait(prefersReduced ? 0 : 400);
+  prompt.textContent = text;
+  prompt.classList.toggle('student-q', /\?/.test(text));
+  prompt.classList.remove('is-swap');
+  syncStageNav();
+}
+
+function setGroupChrome(kicker, promptText) {
+  document.getElementById('groupKicker').textContent = kicker;
+  const prompt = document.getElementById('groupPrompt');
+  prompt.textContent = promptText;
+  prompt.classList.toggle('student-q', /\?/.test(promptText));
+  prompt.classList.remove('is-swap');
+  syncStageNav();
+}
+
+function setGroupButtons({ next = true, fade = false, nextLabel = 'Continue →' } = {}) {
+  const nextBtn = document.getElementById('groupNext');
+  const fadeBtn = document.getElementById('groupFadeBtn');
+  nextBtn.hidden = !next;
+  nextBtn.textContent = nextLabel;
+  nextBtn.disabled = false;
+  fadeBtn.hidden = !fade;
+  fadeBtn.disabled = false;
+}
+
+async function showGroupAct() {
+  if (STATE.transitioning) return;
+  STATE.transitioning = true;
+  STATE.groupStep = 0;
+
+  const actCompare = document.getElementById('actCompare');
+  const actGroup = document.getElementById('actGroup');
+  const chrome = document.getElementById('groupChrome');
+  const actions = document.getElementById('groupActions');
+  const board = document.getElementById('groupBoard');
+
+  document.getElementById('helpText').textContent =
+    'Same family, different rows. Watch what stays put and what gets farther from the nucleus.';
+
+  chrome.classList.remove('is-in');
+  actions.classList.remove('is-in');
+  board.replaceChildren();
+  setGroupChrome(
+    'Down a column',
+    'We just saw that across a row, the core charge changes, and so did the IE. Now let’s look down a column, starting with hydrogen, lithium, and sodium.'
+  );
+  setGroupButtons({ next: true, fade: false });
+
+  actCompare.hidden = true;
+  actGroup.hidden = false;
+  STATE.act = 'group';
+  syncStageNav();
+  actGroup.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+
+  await wait(180);
+  chrome.classList.add('is-in');
+  await wait(prefersReduced ? 0 : 700);
+  actions.classList.add('is-in');
+  STATE.transitioning = false;
+  syncStageNav();
+}
+
+async function renderAlkaliColumn() {
+  const board = document.getElementById('groupBoard');
+  board.replaceChildren();
+  const row = document.createElement('div');
+  row.className = 'group-row';
+  row.setAttribute('role', 'list');
+  const cards = ALKALI_COL.map((atom, i) => {
+    const card = makeGroupCard(atom, { uid: `alk-${i}` });
+    card.setAttribute('role', 'listitem');
+    row.appendChild(card);
+    return card;
+  });
+  board.appendChild(row);
+  await revealGroupCards(cards);
+}
+
+async function renderAlkaliFadePair(faded) {
+  const board = document.getElementById('groupBoard');
+  board.replaceChildren();
+  const row = document.createElement('div');
+  row.className = 'group-row is-pair';
+  const h = makeGroupCard(ALKALI_COL[0], {
+    uid: 'pair-h',
+    pair: true,
+    scale: 0.92,
+    showCoreChargeOnNuc: faded
+  });
+  const na = makeGroupCard(ALKALI_COL[2], {
+    uid: 'pair-na',
+    pair: true,
+    scale: 1.22,
+    coreFaded: faded,
+    showCoreChargeOnNuc: faded
+  });
+  row.appendChild(h);
+  row.appendChild(na);
+  board.appendChild(row);
+
+  if (faded) {
+    const note = document.createElement('p');
+    note.className = 'group-pair-note student-q';
+    note.id = 'groupPairNote';
+    note.textContent =
+      'They both have a +1 core charge, but what leads to the different IE?';
+    board.appendChild(note);
+    await revealGroupCards([h, na]);
+    await wait(prefersReduced ? 0 : 200);
+    note.classList.add('is-in');
+    return;
+  }
+
+  await revealGroupCards([h, na]);
+}
+
+async function renderHalogenColumn() {
+  const board = document.getElementById('groupBoard');
+  board.replaceChildren();
+  const row = document.createElement('div');
+  row.className = 'group-row';
+  row.setAttribute('role', 'list');
+  const cards = HALOGEN_COL.map((atom, i) => {
+    const card = makeGroupCard(atom, { uid: `hal-${i}` });
+    card.setAttribute('role', 'listitem');
+    row.appendChild(card);
+    return card;
+  });
+  board.appendChild(row);
+
+  const note = document.createElement('p');
+  note.className = 'group-pair-note student-q';
+  note.id = 'groupPairNote';
+  note.textContent = 'Look at F and Cl — what is the same, and what is different?';
+  board.appendChild(note);
+
+  await revealGroupCards(cards);
+  await wait(prefersReduced ? 0 : 200);
+  note.classList.add('is-in');
+}
+
+async function renderHalogenFadePair(faded) {
+  const board = document.getElementById('groupBoard');
+  board.replaceChildren();
+  const row = document.createElement('div');
+  row.className = 'group-row is-pair';
+  const f = makeGroupCard(HALOGEN_COL[0], {
+    uid: 'pair-f',
+    pair: true,
+    scale: 0.95,
+    showCoreChargeOnNuc: faded
+  });
+  const cl = makeGroupCard(HALOGEN_COL[1], {
+    uid: 'pair-cl',
+    pair: true,
+    scale: 1.2,
+    coreFaded: faded,
+    showCoreChargeOnNuc: faded
+  });
+  row.appendChild(f);
+  row.appendChild(cl);
+  board.appendChild(row);
+
+  await revealGroupCards([f, cl]);
+}
+
+/** Compact compare-style card for the dual-column finale (atom + core + IE₁). */
+function makeFinaleCard(atom, opts = {}) {
+  const core = coreChargeOf(atom);
+  const card = document.createElement('article');
+  card.className = 'compare-card';
+  card.setAttribute('role', 'listitem');
+  card.setAttribute('aria-label',
+    `${atom.sym}, core charge +${core}, first ionization energy ${atom.ie.toFixed(2)} megajoules per mole`);
+
+  const sym = document.createElement('div');
+  sym.className = 'atom-sym';
+  sym.textContent = atom.sym;
+  card.appendChild(sym);
+
+  const host = document.createElement('div');
+  host.className = 'compare-atom-host';
+  card.appendChild(host);
+
+  const scale = opts.scale != null ? opts.scale : (0.92 + (atom.n - 2) * 0.06);
+  replaceAtom(host, {
+    uid: opts.uid || `fin-${atom.sym}`,
+    z: atom.z,
+    shells: atom.shells,
+    showInnerRing: atom.shells.length > 1,
+    emptyInner: false,
+    size: FINALE_SIZE,
+    canvas: FINALE_CANVAS,
+    outerBase: FINALE_OUTER,
+    scale,
+    interactiveNuc: false,
+    sym: atom.sym,
+    label: `${atom.sym} shell diagram, core charge +${core}`
+  });
+
+  const badge = document.createElement('div');
+  badge.className = 'core-badge';
+  badge.textContent = `core +${core}`;
+  card.appendChild(badge);
+
+  const ie = document.createElement('div');
+  ie.className = 'ie-readout';
+  ie.innerHTML =
+    `<span class="ie-kicker">IE₁</span>` +
+    `<span class="ie-val">${atom.ie.toFixed(2)}</span>` +
+    `<span class="ie-unit">MJ/mol</span>`;
+  card.appendChild(ie);
+
+  return card;
+}
+
+function buildFinaleColumn(label, atoms, uidPrefix) {
+  const col = document.createElement('div');
+  col.className = 'group-finale-col';
+
+  const title = document.createElement('p');
+  title.className = 'group-finale-label';
+  title.textContent = label;
+  col.appendChild(title);
+
+  const stack = document.createElement('div');
+  stack.className = 'group-finale-stack';
+  stack.setAttribute('role', 'list');
+  const cards = atoms.map((atom, i) => {
+    const card = makeFinaleCard(atom, {
+      uid: `${uidPrefix}-${i}`,
+      scale: 0.88 + (atom.n - 2) * 0.07
+    });
+    stack.appendChild(card);
+    return card;
+  });
+  col.appendChild(stack);
+  return { col, cards };
+}
+
+async function renderGroupFinale() {
+  const board = document.getElementById('groupBoard');
+  board.replaceChildren();
+  const wrap = document.createElement('div');
+  wrap.className = 'group-finale';
+
+  const alkali = buildFinaleColumn('Alkali metals', FINALE_ALKALI, 'fin-alk');
+  const halogen = buildFinaleColumn('Halogens', FINALE_HALOGEN, 'fin-hal');
+  wrap.appendChild(alkali.col);
+  wrap.appendChild(halogen.col);
+  board.appendChild(wrap);
+
+  const cards = alkali.cards.concat(halogen.cards);
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    if (prefersReduced) {
+      card.classList.add('is-in');
+    } else {
+      void card.offsetWidth;
+      await wait(70);
+      card.classList.add('is-in');
+      await wait(90);
+    }
+  }
+}
+
+async function fadeGroupCore(sym) {
+  const host = [...document.querySelectorAll('.group-card')].find(c =>
+    c.querySelector('.atom-sym')?.textContent === sym
+  );
+  if (!host) return;
+  const svg = host.querySelector('.atom-svg');
+  const label = svg?.querySelector('.nuc-label');
+  if (!svg) return;
+
+  if (prefersReduced) {
+    svg.classList.add('is-core-faded');
+    if (label) {
+      const atom = sym === 'Na' ? ALKALI_COL[2] : HALOGEN_COL[1];
+      label.textContent = `+${coreChargeOf(atom)}`;
+      label.classList.add('is-core-view');
+      label.classList.remove('is-shielded');
+    }
+    return;
+  }
+
+  svg.classList.add('is-core-faded');
+  await wait(900);
+  if (label) {
+    const atom = sym === 'Na' ? ALKALI_COL[2] : HALOGEN_COL[1];
+    label.textContent = `+${coreChargeOf(atom)}`;
+    label.classList.add('is-core-view');
+    label.classList.remove('is-shielded');
+  }
+  await wait(600);
+}
+
+/**
+ * Guided column steps (Moog CA5 spirit — pauses, not answers):
+ * 0 intro → 1 alkali row + notice → 2 H/Na pair → 3 fade Na → 4 IE prompt
+ * → 5 halogen row → 6 F/Cl pair → 7 fade Cl → 8 IE prompt
+ * → 9 both-families overview → debrief
+ */
+async function advanceGroup() {
+  if (STATE.transitioning) return;
+  STATE.transitioning = true;
+  const step = STATE.groupStep;
+  const nextBtn = document.getElementById('groupNext');
+  const fadeBtn = document.getElementById('groupFadeBtn');
+  nextBtn.disabled = true;
+  fadeBtn.disabled = true;
+
+  try {
+    if (step === 0) {
+      setGroupChrome('Alkali metals', 'Look at H, Li, and Na. What stays the same down this column? What changes?');
+      document.getElementById('helpText').textContent =
+        'Check core charge, number of valence electrons, and how far out the outer shell sits.';
+      await renderAlkaliColumn();
+      setGroupButtons({ next: true, fade: false });
+      STATE.groupStep = 1;
+    } else if (step === 1) {
+      await setGroupPrompt(
+        "Let's bring H and Na side by side to see what we can find."
+      );
+      await renderAlkaliFadePair(false);
+      setGroupButtons({ next: false, fade: true });
+      document.getElementById('helpText').textContent =
+        'When the core softens away, what’s left to compare with hydrogen?';
+      STATE.groupStep = 2;
+    } else if (step === 2) {
+      STATE.transitioning = false;
+      return;
+    } else if (step === 3) {
+      await setGroupPrompt(
+        'Once we just consider what charge the valence electrons “see”, it paints a different picture.'
+      );
+      await renderAlkaliFadePair(true);
+      setGroupButtons({ next: true, fade: false, nextLabel: 'Next → Halogens' });
+      document.getElementById('helpText').textContent =
+        'Recall V = kq₁q₂/d. Core charge matches — so what changed in the equation?';
+      STATE.groupStep = 4;
+    } else if (step === 4) {
+      setGroupChrome(
+        'Halogens',
+        'Same idea, other side of the table.'
+      );
+      document.getElementById('helpText').textContent =
+        'Core charge, valence count, and distance from the nucleus — which of those move down the column?';
+      await renderHalogenColumn();
+      setGroupButtons({ next: true, fade: false });
+      STATE.groupStep = 5;
+    } else if (step === 5) {
+      await setGroupPrompt(
+        'Bring F and Cl side by side. Chlorine still shows its full core — look past it the same way.'
+      );
+      await renderHalogenFadePair(false);
+      setGroupButtons({ next: false, fade: true });
+      document.getElementById('helpText').textContent =
+        'Look past chlorine’s core the same way you did with sodium.';
+      STATE.groupStep = 6;
+    } else if (step === 6) {
+      STATE.transitioning = false;
+      return;
+    } else if (step === 7) {
+      await setGroupPrompt(
+        'Both feel core charge +7 with seven valence electrons. Why is Cl’s IE₁ lower than F’s? Write it in your notes.'
+      );
+      setGroupButtons({ next: true, fade: false, nextLabel: 'Continue →' });
+      document.getElementById('helpText').textContent =
+        'Down a column: core charge holds steady; the valence shell moves out. How should IE respond?';
+      STATE.groupStep = 8;
+    } else if (step === 8) {
+      setGroupChrome(
+        'Both families',
+        'Take a look at both columns — what do you notice?'
+      );
+      document.getElementById('helpText').textContent =
+        'Same core charge down each family; IE₁ falls as the valence shell moves farther out.';
+      await renderGroupFinale();
+      setGroupButtons({ next: true, fade: false, nextLabel: 'Finish →' });
+      STATE.groupStep = 9;
+    } else {
+      finishAct1();
+      return;
+    }
+  } finally {
+    STATE.transitioning = false;
+    nextBtn.disabled = false;
+    fadeBtn.disabled = false;
+    syncStageNav();
+  }
+}
+
+async function onGroupFade() {
+  if (STATE.transitioning) return;
+  if (STATE.groupStep !== 2 && STATE.groupStep !== 6) return;
+  STATE.transitioning = true;
+  document.getElementById('groupFadeBtn').disabled = true;
+  document.getElementById('groupNext').disabled = true;
+
+  try {
+    if (STATE.groupStep === 2) {
+      await fadeGroupCore('Na');
+      STATE.groupStep = 3;
+    } else if (STATE.groupStep === 6) {
+      await fadeGroupCore('Cl');
+      STATE.groupStep = 7;
+    }
+  } finally {
+    STATE.transitioning = false;
+    document.getElementById('groupFadeBtn').disabled = false;
+    document.getElementById('groupNext').disabled = false;
+    syncStageNav();
+  }
+  await advanceGroup();
+}
+
+function finishAct1() {
+  setGate('moduleComplete', true);
+  const nextBtn = document.getElementById('pageNext');
+  if (nextBtn) nextBtn.disabled = true;
+  const doneBtn = document.getElementById('compareDone');
+  if (doneBtn) doneBtn.disabled = true;
+  const groupNext = document.getElementById('groupNext');
+  if (groupNext) groupNext.disabled = true;
+  const groupFade = document.getElementById('groupFadeBtn');
+  if (groupFade) groupFade.disabled = true;
+  syncStageNav();
+  revealDebrief();
+}
+
+/** Show ← Back leftmost in the current act’s Continue / Next row. */
+function syncStageNav() {
+  const stuck = document.getElementById('stuckBtn');
+  const help = document.getElementById('helpPanel');
+  const backs = document.querySelectorAll('.js-stage-back');
+  if (!stuck) return;
+
+  const showStuck = STATE.act === 'li' && !gates.moduleComplete;
+  stuck.hidden = !showStuck;
+  if (!showStuck && help) help.classList.remove('open');
+
+  // Always offer Back once the sim is running — prior section or prior beat.
+  let backHost = null;
+  if (STATE.act === 'li') {
+    backHost = document.querySelector('#actLi .act-actions');
+  } else if (STATE.act === 'compare') {
+    backHost = document.getElementById('compareActions');
+  } else if (STATE.act === 'group') {
+    backHost = document.getElementById('groupActions');
+  }
+  // Period uses #pagePrev as its Back control (always visible in that act).
+
+  backs.forEach(btn => {
+    const show = !!(backHost && backHost.contains(btn));
+    btn.hidden = !show;
+    btn.disabled = !show || STATE.transitioning;
+  });
+}
+
+function returnToBriefing() {
+  const briefing = document.getElementById('briefing');
+  const stage = document.getElementById('moduleStage');
+  if (stage) stage.hidden = true;
+  if (briefing) {
+    briefing.hidden = false;
+    briefing.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+  }
+  STATE.act = 'li';
+  syncStageNav();
+}
+
+async function returnToLiFromPeriod() {
+  const actLi = document.getElementById('actLi');
+  const actPeriod = document.getElementById('actPeriod');
+  const framing = document.getElementById('framing');
+  const header = document.querySelector('#moduleStage > header');
+  const svgHost = document.getElementById('svgReal');
+
+  hideNucTip();
+  actPeriod.hidden = true;
+  actLi.hidden = false;
+  actLi.classList.remove('is-exiting');
+  if (svgHost) svgHost.classList.remove('is-handed-off');
+  if (header) header.classList.remove('is-clearing');
+  framing.hidden = false;
+  framing.innerHTML =
+    'As we saw at the end of the last simulation, there were two proposed configurations of lithium. Here, we will see how we know which one is correct by adding electrons and seeing how that changes the V value, which is the potential energy required to remove an electron, which we will now consider as IE.<br><br>' +
+    'Add electrons to see how “q” changes as inner shell electrons are considered.';
+
+  STATE.act = 'li';
+  STATE.periodPage = 0;
+  document.getElementById('helpText').textContent =
+    STATE.revealStage >= 5
+      ? 'Core charge = Z − inner-shell electrons. Along a period, Z rises while the number of inner electrons stays the same.'
+      : 'Add the two electrons that sit closer to the nucleus on the right-hand lithium. Watch the attraction oval as you add them.';
+  renderLiAtoms();
+  syncStageNav();
+  actLi.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+}
+
+async function returnToPeriodFromCompare() {
+  const actPeriod = document.getElementById('actPeriod');
+  const actCompare = document.getElementById('actCompare');
+  actCompare.hidden = true;
+  actPeriod.hidden = false;
+  STATE.act = 'period';
+  STATE.compareStep = 0;
+  document.getElementById('helpText').textContent =
+    'Same number of inner electrons across this row — so what’s changing in the core-charge equation?';
+  updatePeriodNav();
+  syncStageNav();
+  actPeriod.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+}
+
+async function returnToCompareFromGroup() {
+  const actCompare = document.getElementById('actCompare');
+  const actGroup = document.getElementById('actGroup');
+  actGroup.hidden = true;
+  actCompare.hidden = false;
+  STATE.act = 'compare';
+  STATE.groupStep = 0;
+  document.getElementById('groupBoard').replaceChildren();
+  document.getElementById('helpText').textContent =
+    'Scan left to right. Watch core charge under each atom against the IE₁ row above.';
+  syncStageNav();
+  actCompare.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+}
+
+async function goGroupBack() {
+  const step = STATE.groupStep;
+  if (step <= 0) {
+    await returnToCompareFromGroup();
+    return;
+  }
+  if (step === 1) {
+    setGroupChrome(
+      'Down a column',
+      'We just saw that across a row, the core charge changes, and so did the IE. Now let’s look down a column, starting with hydrogen, lithium, and sodium.'
+    );
+    document.getElementById('groupBoard').replaceChildren();
+    setGroupButtons({ next: true, fade: false });
+    STATE.groupStep = 0;
+    syncStageNav();
+    return;
+  }
+  if (step === 2) {
+    setGroupChrome('Alkali metals', 'Look at H, Li, and Na. What stays the same down this column? What changes?');
+    document.getElementById('helpText').textContent =
+      'Check core charge, number of valence electrons, and how far out the outer shell sits.';
+    await renderAlkaliColumn();
+    setGroupButtons({ next: true, fade: false });
+    STATE.groupStep = 1;
+    syncStageNav();
+    return;
+  }
+  if (step === 3 || step === 4) {
+    await setGroupPrompt(
+      "Let's bring H and Na side by side to see what we can find."
+    );
+    await renderAlkaliFadePair(false);
+    setGroupButtons({ next: false, fade: true });
+    document.getElementById('helpText').textContent =
+      'When the core softens away, what’s left to compare with hydrogen?';
+    STATE.groupStep = 2;
+    syncStageNav();
+    return;
+  }
+  if (step === 5) {
+    await setGroupPrompt(
+      'Once we just consider what charge the valence electrons “see”, it paints a different picture.'
+    );
+    await renderAlkaliFadePair(true);
+    setGroupButtons({ next: true, fade: false, nextLabel: 'Next → Halogens' });
+    document.getElementById('helpText').textContent =
+      'Recall V = kq₁q₂/d. Core charge matches — so what changed in the equation?';
+    STATE.groupStep = 4;
+    syncStageNav();
+    return;
+  }
+  if (step === 6) {
+    setGroupChrome(
+      'Halogens',
+      'Same idea, other side of the table.'
+    );
+    document.getElementById('helpText').textContent =
+      'Core charge, valence count, and distance from the nucleus — which of those move down the column?';
+    await renderHalogenColumn();
+    setGroupButtons({ next: true, fade: false });
+    STATE.groupStep = 5;
+    syncStageNav();
+    return;
+  }
+  if (step === 7 || step === 8) {
+    await setGroupPrompt(
+      'Bring F and Cl side by side. Chlorine still shows its full core — look past it the same way.'
+    );
+    await renderHalogenFadePair(false);
+    setGroupButtons({ next: false, fade: true });
+    document.getElementById('helpText').textContent =
+      'Look past chlorine’s core the same way you did with sodium.';
+    STATE.groupStep = 6;
+    syncStageNav();
+    return;
+  }
+  if (step === 9) {
+    await setGroupPrompt(
+      'Both feel core charge +7 with seven valence electrons. Why is Cl’s IE₁ lower than F’s? Write it in your notes.'
+    );
+    await renderHalogenFadePair(true);
+    setGroupButtons({ next: true, fade: false, nextLabel: 'Continue →' });
+    document.getElementById('helpText').textContent =
+      'Down a column: core charge holds steady; the valence shell moves out. How should IE respond?';
+    STATE.groupStep = 8;
+    syncStageNav();
+  }
+}
+
+async function goStageBack() {
+  if (STATE.transitioning) return;
+  STATE.transitioning = true;
+  try {
+    if (STATE.act === 'li') {
+      if (STATE.revealStage > 1) {
+        STATE.revealStage -= 1;
+        syncReveal();
+        return;
+      }
+      returnToBriefing();
+      return;
+    }
+    if (STATE.act === 'compare') {
+      if (STATE.compareStep > 0) {
+        const prompt = document.getElementById('comparePrompt');
+        prompt.classList.add('is-swap');
+        await wait(prefersReduced ? 0 : 320);
+        prompt.textContent = 'Take a look at the entire row — what do you notice?';
+        prompt.classList.add('student-q');
+        prompt.classList.remove('is-swap');
+        document.getElementById('helpText').textContent =
+          'Scan left to right. Watch core charge under each atom against the IE₁ row above.';
+        STATE.compareStep = 0;
+        syncStageNav();
+        return;
+      }
+      await returnToPeriodFromCompare();
+      return;
+    }
+    if (STATE.act === 'group') {
+      await goGroupBack();
+    }
+  } finally {
+    STATE.transitioning = false;
+    syncStageNav();
+  }
+}
+
+// === GATES / HELP / DEBRIEF ===
+const gates = {};
+function setGate(name, val) {
+  gates[name] = val;
+  if (name === 'moduleComplete' && val) revealDebrief();
+}
+
 const stuckBtn = document.getElementById('stuckBtn');
 const helpPanel = document.getElementById('helpPanel');
-if(stuckBtn && helpPanel) {
+if (stuckBtn && helpPanel) {
   stuckBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     helpPanel.classList.toggle('open');
   });
   document.addEventListener('click', (e) => {
-    if(!helpPanel.contains(e.target) && e.target !== stuckBtn) {
+    if (!helpPanel.contains(e.target) && e.target !== stuckBtn) {
       helpPanel.classList.remove('open');
     }
   });
 }
+document.querySelectorAll('.js-stage-back').forEach(btn => {
+  btn.addEventListener('click', () => { goStageBack(); });
+});
 
-// === REFERENCE DATA ===
-const DATA = {
-  ie1: {
-    H:1.31, He:2.37, Li:0.52, Be:0.90, B:0.80, C:1.09, N:1.40, O:1.31,
-    F:1.68, Ne:2.08, Na:0.50, Mg:0.74, Al:0.58, Si:0.79, P:1.01, S:1.00,
-    Cl:1.25, Ar:1.52, K:0.42, Ca:0.59
-  }
+const DEBRIEF = {
+  intentions: [
+    { text: "We will review our previous understandings and conceptions of what “atoms” are.",
+      target: 'actLi', revisit: 'Lithium diagrams' },
+    { text: "We will review the model of the atom we came in with, and some of the limitations which come with using it.", note: "on paper" },
+    { text: "We will discover what the “first ionization” energy is.",
+      target: 'actLi', revisit: 'Lithium diagrams' },
+    { text: "We will use data and hypothesis to compare atoms with different characteristics and IEs.",
+      target: 'actCompare', revisit: 'Period-2 compare' },
+    { text: "We will learn about valence vs. inner shell electrons.",
+      target: 'actLi', revisit: 'Lithium diagrams' },
+    { text: "We will discover the concept of “core charge” using data and diagrams.",
+      target: 'actLi', revisit: 'Lithium diagrams' },
+    { text: "We will connect the concepts of core charge and ionization energy.",
+      target: 'actCompare', revisit: 'Period-2 compare' },
+    { text: "We will use data to strengthen our understanding of core charge and ionization energy.",
+      target: 'actGroup', revisit: 'Group columns' }
+  ],
+  competencies: [
+    { code: "Q&P",
+      name: "Questioning and predicting",
+      text: "I can make informed predictions about the relative first ionization energies of two hypothetical atoms by reasoning through how atomic structure — such as nuclear charge and electron distance — influences the energy required to remove an electron."
+    },
+    { code: "Q&P",
+      name: "Questioning and predicting",
+      text: "I can predict how the number of valence electrons influences the ionization energy of an atom, using ideas about electrostatic forces and atomic structure."
+    },
+    { code: "PC",
+      name: "Planning and conducting",
+      text: "I can calculate the core charge of any atom in the first three periods of the periodic table using periodic trends and atomic structure."
+    },
+    { code: "PAI",
+      name: "Processing and analyzing data and information",
+      text: "I can analyze how valence electrons and core charge relate to each other by identifying patterns across periods and groups in the periodic table."
+    },
+    { code: "E",
+      name: "Evaluating",
+      text: "I can evaluate how core charge affects ionization energy by connecting changes in nuclear attraction to energy required for electron removal, considering atomic size and effective nuclear charge."
+    },
+    { code: "E",
+      name: "Evaluating",
+      text: "I can evaluate the validity and limitations of our current understanding of atoms."
+    }
+  ]
 };
 
-// === DISCOVERY GATE INIT ===
-setGate('hasFoundShellDrop', false);
-setGate('hasBuiltCoreCharge', false);
-
-// === STANDBY ANIMATION: Bobbing IE data points ===
-const elements = Object.keys(DATA.ie1);
-const maxIE = 2.5;
-const dots = elements.map((el, i) => ({
-  label: el,
-  ie: DATA.ie1[el],
-  phase: Math.random() * Math.PI * 2
-}));
-
-function drawStandby(t) {
-  ctx.clearRect(0, 0, W, H);
-  drawGrid();
-
-  const padL = 50, padR = 20, padT = 30, padB = 40;
-  const plotW = W - padL - padR;
-  const plotH = H - padT - padB;
-
-  // faint horizontal reference lines
-  ctx.save();
-  ctx.strokeStyle = 'rgba(33,29,71,0.4)';
-  ctx.lineWidth = 1;
-  for(let v = 0.5; v <= 2.5; v += 0.5) {
-    const y = padT + plotH - (v / maxIE) * plotH;
-    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + plotW, y); ctx.stroke();
-  }
-  ctx.restore();
-
-  dots.forEach((d, i) => {
-    const x = padL + (i / (dots.length - 1)) * plotW;
-    const baseY = padT + plotH - (d.ie / maxIE) * plotH;
-    const bob = Math.sin(t * 0.0015 + d.phase) * 4;
-    const y = baseY + bob;
-
-    glowCircle(x, y, 3, '#3fe0cf');
+function fillIntentionList(ul, items, opts) {
+  if (!ul || ul.childElementCount) return;
+  opts = opts || {};
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.appendChild(document.createTextNode(item.text));
+    if (item.note) {
+      li.className = 'elsewhere';
+      const tag = document.createElement('span');
+      tag.className = 'debrief-tag';
+      tag.textContent = ` — ${item.note}`;
+      li.appendChild(tag);
+    }
+    if (opts.showRevisit && item.target && item.revisit) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'debrief-revisit';
+      btn.dataset.target = item.target;
+      btn.textContent = 'Explore again → ' + item.revisit;
+      li.appendChild(btn);
+    }
+    ul.appendChild(li);
   });
 }
 
-/* === SIMULATION LOGIC — TO BE DESIGNED === */
-
-function loop(t) {
-  drawStandby(t);
-  if(!prefersReduced) requestAnimationFrame(loop);
+function fillCompetencyList(ul, items) {
+  if (!ul || ul.childElementCount) return;
+  items.forEach(item => {
+    const li = document.createElement('li');
+    const name = document.createElement('span');
+    name.className = 'cc-name';
+    name.textContent = item.name;
+    li.appendChild(name);
+    li.appendChild(document.createTextNode(item.text));
+    if (item.note) {
+      const tag = document.createElement('span');
+      tag.className = 'debrief-tag';
+      tag.textContent = ` — ${item.note}`;
+      li.appendChild(tag);
+    }
+    ul.appendChild(li);
+  });
 }
 
-if(prefersReduced) {
-  drawStandby(0);
-} else {
-  requestAnimationFrame(loop);
+function renderBriefing() {
+  fillIntentionList(document.getElementById('briefingIntentions'), DEBRIEF.intentions);
+  fillCompetencyList(document.getElementById('briefingCompetencies'), DEBRIEF.competencies);
+}
+
+function startModule() {
+  const briefing = document.getElementById('briefing');
+  const stage = document.getElementById('moduleStage');
+  if (briefing) briefing.hidden = true;
+  if (stage) stage.hidden = false;
+  STATE.act = 'li';
+  renderLiAtoms();
+  syncStageNav();
+}
+
+function renderDebrief() {
+  fillIntentionList(document.getElementById('debriefIntentions'), DEBRIEF.intentions, { showRevisit: true });
+  fillCompetencyList(document.getElementById('debriefCompetencies'), DEBRIEF.competencies);
+}
+
+function enterDebriefStage() {
+  const stage = document.getElementById('moduleStage');
+  const debrief = document.getElementById('debrief');
+  if (!stage || !debrief) return;
+  Array.from(stage.children).forEach(child => {
+    if (child === debrief) return;
+    if (!child.hasAttribute('data-pre-debrief-hidden')) {
+      child.setAttribute('data-pre-debrief-hidden', child.hidden ? '1' : '0');
+    }
+    child.hidden = true;
+  });
+  debrief.hidden = false;
+}
+
+function leaveDebriefStage() {
+  const stage = document.getElementById('moduleStage');
+  const debrief = document.getElementById('debrief');
+  if (!stage) return;
+  Array.from(stage.children).forEach(child => {
+    if (child === debrief) return;
+    if (child.hasAttribute('data-pre-debrief-hidden')) {
+      child.hidden = child.getAttribute('data-pre-debrief-hidden') === '1';
+      child.removeAttribute('data-pre-debrief-hidden');
+    }
+  });
+  if (debrief) debrief.hidden = true;
+}
+
+let debriefRevisitWired = false;
+function wireDebriefRevisit() {
+  if (debriefRevisitWired) return;
+  debriefRevisitWired = true;
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.debrief-revisit');
+    if (!btn || !btn.dataset.target) return;
+    e.preventDefault();
+    revisitSection(btn.dataset.target);
+  });
+}
+
+function revealDebrief() {
+  const section = document.getElementById('debrief');
+  if (!section) return;
+  renderDebrief();
+  wireDebriefRevisit();
+  enterDebriefStage();
+  section.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+}
+
+async function revisitSection(target) {
+  leaveDebriefStage();
+  ['actLi', 'actPeriod', 'actCompare', 'actGroup'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.hidden = true;
+  });
+  const header = document.querySelector('#moduleStage > header');
+  const framing = document.getElementById('framing');
+  const help = document.getElementById('helpPanel');
+  if (header) {
+    header.hidden = false;
+    header.classList.remove('is-clearing');
+  }
+  if (help) help.hidden = false;
+
+  if (target === 'actLi') {
+    const actLi = document.getElementById('actLi');
+    actLi.hidden = false;
+    actLi.classList.remove('is-exiting');
+    if (framing) framing.hidden = false;
+    STATE.act = 'li';
+    STATE.transitioning = false;
+    const nextBtn = document.getElementById('liNext');
+    if (nextBtn) nextBtn.disabled = false;
+    renderLiAtoms();
+    syncStageNav();
+    actLi.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+    return;
+  }
+
+  if (framing) framing.hidden = true;
+  if (target === 'actCompare') {
+    await showCompareAct();
+    const doneBtn = document.getElementById('compareDone');
+    if (doneBtn) {
+      doneBtn.disabled = false;
+      doneBtn.textContent = gates.moduleComplete ? 'What this was for →' : 'Continue →';
+    }
+    return;
+  }
+
+  if (target === 'actGroup') {
+    document.getElementById('actCompare').hidden = true;
+    await showGroupAct();
+    STATE.groupStep = 0;
+    await renderAlkaliColumn();
+    const groupNext = document.getElementById('groupNext');
+    const groupFade = document.getElementById('groupFadeBtn');
+    if (groupNext) groupNext.disabled = false;
+    if (groupFade) groupFade.disabled = false;
+    return;
+  }
+}
+
+setGate('hasBuiltCoreCharge', false);
+setGate('moduleComplete', false);
+
+document.getElementById('innerPlus').addEventListener('click', () => setInner(STATE.inner + 1));
+document.getElementById('innerMinus').addEventListener('click', () => setInner(STATE.inner - 1));
+document.getElementById('revealNext').addEventListener('click', advanceReveal);
+document.getElementById('liNext').addEventListener('click', showPeriodAct);
+document.getElementById('pagePrev').addEventListener('click', async () => {
+  if (STATE.transitioning) return;
+  if (STATE.periodPage <= 0) {
+    await returnToLiFromPeriod();
+    return;
+  }
+  STATE.periodPage -= 1;
+  renderPeriodPage({ direction: -1 });
+});
+document.getElementById('pageNext').addEventListener('click', () => {
+  if (STATE.transitioning) return;
+  if (STATE.periodPage < PERIOD_PAGES.length - 1) {
+    STATE.periodPage += 1;
+    renderPeriodPage({ direction: 1 });
+  } else {
+    showCompareAct();
+  }
+});
+document.getElementById('compareDone').addEventListener('click', advanceCompare);
+document.getElementById('groupNext').addEventListener('click', advanceGroup);
+document.getElementById('groupFadeBtn').addEventListener('click', onGroupFade);
+
+renderBriefing();
+const briefingNext = document.getElementById('briefingNext');
+if (briefingNext) briefingNext.addEventListener('click', startModule);
+
+const _qs = new URLSearchParams(location.search);
+if (_qs.has('debrief') || _qs.has('start') || _qs.has('compare') || _qs.has('group')) {
+  startModule();
+  if (_qs.has('debrief') || _qs.has('compare') || _qs.has('group')) {
+    (async () => {
+      STATE.inner = 2;
+      STATE.reachedPlus1 = true;
+      STATE.revealStage = 5;
+      renderLiAtoms();
+      await showPeriodAct();
+      STATE.periodPage = PERIOD_PAGES.length - 1;
+      renderPeriodPage({ animate: false });
+      await showCompareAct();
+      if (_qs.has('group') || _qs.has('debrief')) {
+        STATE.compareStep = 1;
+        await showGroupAct();
+      }
+      if (_qs.has('debrief')) finishAct1();
+    })();
+  }
 }
 </script>
 </body>

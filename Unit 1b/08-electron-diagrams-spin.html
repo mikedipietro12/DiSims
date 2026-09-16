@@ -1,0 +1,2177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>08 — Electron Configuration Diagrams, Quantum Numbers, and Spin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/suite.css">
+<style>
+.mono-label,
+.act-meta,.hud-item .k,.el-btn,.box-label,.subshell-label,.tray-kicker,.cfg-readout,
+.rule-chip,.scaffold-note,.discovery-line,.plate-aside-kicker,.atom-caption,
+.pes-axis-label,.pes-tick,.pes-num,.pes-sublabel,.gap-callout,.split-brace-label,
+.tour-cap,.qn-card-kicker,.qn-row,.qn-model-kicker,
+.ie-ex-cap,.ie-ex-model-kicker,.ie-ex-sym,.ie-ex-val,.ie-ex-axis{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+}
+.act-meta{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--dim);margin:-0.35rem 0 0.85rem;
+}
+.discovery-line{
+  display:none;margin:0.35rem 0 0.9rem;padding:0.55rem 0;
+  border-top:1px solid var(--grid);border-bottom:1px solid var(--grid);
+  font-size:var(--label-sm);font-weight:600;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--signal);line-height:1.45;
+}
+.discovery-line.visible{display:block;}
+.act-panel[hidden]{display:none !important;}
+.plate-body{padding:1rem 1.1rem 1.2rem;}
+.opener-grid{
+  display:grid;grid-template-columns:minmax(140px,0.85fr) minmax(0,1.4fr);
+  gap:1.1rem 1.5rem;align-items:center;margin-top:0.85rem;
+}
+@media(max-width:720px){
+  .opener-grid{grid-template-columns:1fr;}
+}
+.atom-pane{display:flex;flex-direction:column;align-items:center;gap:0.45rem;}
+.atom-host{display:flex;justify-content:center;position:relative;}
+.atom-svg{width:min(100%,220px);height:auto;display:block;}
+.atom-svg .shell{fill:none;stroke:var(--ink);stroke-width:1.25;opacity:0.55;}
+.atom-svg .shell-outer.is-gap{
+  stroke:var(--signal);stroke-width:2;opacity:1;
+  stroke-dasharray:4 3;
+}
+.atom-svg .neg-core-disk{pointer-events:none;}
+.atom-svg .e-marker,.atom-svg .e-valence{
+  fill:var(--electron);stroke:var(--ink);stroke-width:1;
+}
+.atom-svg .nuc-label{
+  font-family:var(--font-mono);font-size:13px;font-weight:600;
+  fill:var(--paper);text-anchor:middle;dominant-baseline:central;
+  letter-spacing:0.02em;pointer-events:none;
+}
+.atom-svg .gap-label{
+  font-size:10px;font-weight:600;letter-spacing:0.08em;
+  text-transform:uppercase;fill:var(--signal);opacity:0;
+  transition:opacity 0.4s ease;
+}
+.beat-show-pes .atom-svg .gap-label{opacity:1;}
+.atom-caption{
+  font-size:var(--label-sm);font-weight:600;letter-spacing:0;
+  text-transform:none;color:var(--ink);text-align:center;
+}
+.atom-caption .sub{
+  display:block;margin-top:0.15rem;
+  font-size:var(--label-xs);letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--dim);
+}
+.gap-callout{
+  display:none;margin-top:0.35rem;padding:0.45rem 0 0;
+  border-top:1px solid var(--grid);
+  font-size:var(--label-xs);font-weight:600;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--signal);line-height:1.4;text-align:center;
+}
+.beat-show-pes .gap-callout{display:block;}
+.pes-pane{
+  opacity:0;transform:translateY(8px);
+  transition:opacity 0.45s ease, transform 0.45s ease;
+  pointer-events:none;min-width:0;
+}
+.beat-show-pes .pes-pane{
+  opacity:1;transform:none;pointer-events:auto;
+}
+.pes-svg{width:100%;height:auto;display:block;overflow:visible;}
+.pes-axis-label{
+  font-size:11px;font-weight:600;letter-spacing:0.1em;
+  text-transform:uppercase;fill:var(--dim);
+}
+.pes-tick{
+  font-size:10px;font-weight:500;letter-spacing:0.04em;fill:var(--faint);
+}
+.pes-num{
+  font-size:11px;font-weight:600;letter-spacing:0.02em;fill:var(--ink);
+}
+.pes-sublabel{
+  font-size:12px;font-weight:600;letter-spacing:0.08em;
+  text-transform:uppercase;fill:var(--signal);
+}
+.peak-fill{fill:rgba(92,107,40,0.16);}
+.peak-stroke{fill:none;stroke:var(--phosphor);stroke-width:1.75;}
+.axis-line{stroke:var(--ink);stroke-width:1.25;fill:none;}
+.axis-break{stroke:var(--ink);stroke-width:1.25;fill:none;}
+.split-brace{stroke:var(--signal);stroke-width:1.5;fill:none;}
+.split-brace-label{
+  font-size:10px;font-weight:600;letter-spacing:0.08em;
+  text-transform:uppercase;fill:var(--signal);
+}
+.story-panel{margin-bottom:0.15rem;}
+.beat-kicker{
+  font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;
+  letter-spacing:0.14em;text-transform:uppercase;color:var(--olive-deep);
+  margin:0 0 0.35rem;
+}
+.story-panel p{margin:0;font-size:1rem;line-height:1.55;color:var(--ink-soft);}
+@media(prefers-reduced-motion:reduce){
+  .pes-pane{transition:none;}
+}
+.el-picker{
+  display:flex;flex-wrap:wrap;gap:0.35rem;margin:0.35rem 0 0.85rem;
+}
+.el-btn{
+  background:transparent;border:1px solid var(--ink);color:var(--ink);
+  font-size:var(--label-sm);font-weight:600;letter-spacing:0;
+  text-transform:none;padding:0.4rem 0.65rem;cursor:pointer;min-width:2.4rem;
+}
+.el-btn:hover{background:rgba(126,140,69,0.14);}
+.el-btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);}
+.el-btn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.el-btn.el-gap{margin-left:0.85rem;}
+.builder-layout{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:1rem;
+}
+.orbital-board{
+  /* Energy ladder: 1s at the bottom (core), valence up top. */
+  display:flex;flex-direction:column-reverse;align-items:flex-start;
+  gap:0.85rem;min-height:11rem;padding:0.35rem 0 0.15rem;
+}
+.subshell{
+  display:flex;flex-direction:row;align-items:center;gap:0.65rem;
+}
+.subshell-label{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;
+  text-transform:lowercase;color:var(--dim);
+  min-width:1.6rem;text-align:right;
+}
+.subshell-boxes{
+  display:flex;gap:0.35rem;justify-content:center;
+  /* Width set in JS to the widest active subshell (p=3, d=5). */
+}
+.orb-box{
+  width:3.15rem;height:3.2rem;border:1.5px solid var(--ink);
+  background:var(--panel);display:flex;flex-direction:row;
+  align-items:center;justify-content:center;gap:0.42rem;
+  cursor:pointer;position:relative;padding:0.2rem 0.35rem;
+}
+.orb-box:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.orb-box.is-target{box-shadow:inset 0 0 0 2px var(--signal);}
+.orb-box.is-refuse{
+  animation:refuse-flash 0.35s ease;
+}
+@keyframes refuse-flash{
+  0%,100%{background:var(--panel);}
+  40%{background:rgba(168,90,50,0.22);}
+}
+.spin-arrow{
+  width:0.9rem;height:2.3rem;display:block;flex-shrink:0;
+  color:var(--electron);
+  overflow:visible;
+}
+.spin-arrow.up{color:var(--mustard);}
+.spin-arrow.down{color:var(--olive-deep);}
+.spin-arrow .shaft{
+  fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:square;
+}
+.spin-arrow .barb{fill:currentColor;stroke:none;}
+.box-label{
+  position:absolute;bottom:-1.15rem;left:50%;transform:translateX(-50%);
+  font-size:0.65rem;font-weight:500;letter-spacing:0.06em;
+  text-transform:lowercase;color:var(--faint);white-space:nowrap;
+}
+.tray-row{
+  display:flex;flex-wrap:wrap;align-items:center;gap:0.55rem 0.85rem;
+  padding-top:0.85rem;border-top:1px solid var(--grid);margin-top:0.35rem;
+}
+.tray-kicker{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--olive-deep);
+}
+.tray-pool{
+  display:flex;flex-wrap:wrap;gap:0.3rem;min-height:2rem;align-items:center;
+}
+.tray-e{
+  width:1.55rem;height:1.55rem;border-radius:0;border:1px solid var(--ink);
+  background:radial-gradient(circle at 32% 28%,#e8d49a 0%,#c4a35a 48%,#8a6e2e 100%);
+  cursor:grab;touch-action:none;
+}
+.tray-e:active{cursor:grabbing;}
+.tray-e:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.tray-e.is-dragging{opacity:0.35;}
+.cfg-readout{
+  font-size:1.05rem;font-weight:600;letter-spacing:var(--track-tight);
+  color:var(--ink);margin:0.15rem 0 0;
+}
+.cfg-readout .dim{color:var(--faint);font-weight:500;}
+.rules-row{
+  display:none;flex-wrap:wrap;gap:0.4rem;margin-top:0.75rem;
+}
+.rules-row.visible{display:flex;}
+.rule-chip{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.1em;
+  text-transform:uppercase;color:var(--signal);
+  border:1px solid var(--signal);padding:0.28rem 0.55rem;
+}
+.hud{
+  display:flex;flex-wrap:wrap;gap:0.85rem 1.35rem;
+  font-size:var(--label-sm);font-weight:500;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--ink);
+  padding:0.65rem 1rem;border:1px solid var(--ink);border-top:none;margin-bottom:0.35rem;
+}
+.hud-item .k{display:block;font-size:var(--label-xs);color:var(--dim);margin-bottom:0.12rem;}
+.hud-item .v{font-weight:600;text-transform:none;letter-spacing:0;}
+.ghost-drag{
+  position:fixed;pointer-events:none;z-index:40;
+  width:1.55rem;height:1.55rem;border:1px solid var(--ink);
+  background:radial-gradient(circle at 32% 28%,#e8d49a 0%,#c4a35a 48%,#8a6e2e 100%);
+  opacity:0.92;transform:translate(-50%,-50%);
+}
+@media(prefers-reduced-motion:reduce){
+  .orb-box.is-refuse{animation:none;}
+}
+
+/* —— Act 2: orbital-diagram tour —— */
+.tour-stage{
+  margin-top:0.85rem;display:flex;flex-direction:column;align-items:flex-start;gap:0.75rem;
+  min-height:7.5rem;
+}
+.tour-board{
+  display:flex;flex-direction:row;align-items:center;gap:0.75rem;
+}
+.tour-label{
+  font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;
+  letter-spacing:0.12em;text-transform:lowercase;color:var(--dim);
+  min-width:1.8rem;text-align:right;
+}
+.tour-boxes{
+  display:flex;flex-wrap:wrap;gap:0.35rem;
+}
+.tour-boxes .orb-box{cursor:default;}
+.tour-boxes .orb-box:focus{outline:none;}
+.tour-cap{
+  margin:0;font-size:var(--label-xs);font-weight:600;letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--olive-deep);
+}
+.spin-arrow.is-entering{
+  opacity:0;transform:translateY(7px) scale(0.82);
+  animation:spin-pop 0.42s ease forwards;
+}
+@keyframes spin-pop{
+  to{opacity:1;transform:none;}
+}
+@media(prefers-reduced-motion:reduce){
+  .spin-arrow.is-entering{animation:none;opacity:1;transform:none;}
+}
+
+/* —— Act 5: quantum numbers / unique seats —— */
+.qn-layout{
+  display:grid;grid-template-columns:minmax(0,1.2fr) minmax(12rem,0.9fr);
+  gap:1.1rem 1.5rem;align-items:start;margin-top:0.85rem;
+}
+@media(max-width:720px){
+  .qn-layout{grid-template-columns:1fr;}
+}
+.qn-layout.is-practice{
+  grid-template-columns:1fr;
+}
+.qn-layout.is-compare{
+  grid-template-columns:minmax(0,1fr) minmax(18rem,1.15fr);
+}
+.qn-layout.is-compare-3{
+  grid-template-columns:minmax(0,0.85fr) minmax(22rem,1.35fr);
+}
+.qn-board-wrap{min-width:0;}
+.qn-board .orb-box{cursor:default;}
+.qn-board .orb-box:focus{outline:none;}
+.qn-board .orb-box.is-qn-focus{
+  box-shadow:inset 0 0 0 2px var(--ink);
+  background:rgba(22,20,14,0.04);
+}
+.qn-board .orb-box.is-qn-dim{
+  opacity:0.42;
+}
+.qn-board .spin-arrow.is-qn-focus.is-tone-up{color:var(--mustard);}
+.qn-board .spin-arrow.is-qn-focus.is-tone-down{color:var(--signal);}
+.qn-board .spin-arrow.is-qn-focus.is-tone-s{color:var(--phosphor);}
+.qn-cards{
+  display:grid;gap:0.65rem;min-width:0;
+}
+.qn-cards[hidden]{display:none !important;}
+.qn-cards.is-compare{
+  grid-template-columns:1fr 1fr;gap:0.55rem;
+}
+.qn-cards.is-compare-3{
+  grid-template-columns:1fr 1fr 1fr;gap:0.45rem;
+}
+@media(max-width:720px){
+  .qn-cards.is-compare-3{grid-template-columns:1fr;}
+  .qn-cards.is-compare{grid-template-columns:1fr;}
+}
+.qn-card{
+  border:1.5px solid var(--ink);padding:0.7rem 0.75rem;
+  background:var(--panel);
+}
+.qn-card.is-up{
+  border-color:var(--mustard);
+  background:rgba(196,163,90,0.12);
+}
+.qn-card.is-down{
+  border-color:var(--signal);
+  background:rgba(26,106,163,0.08);
+}
+.qn-card.is-s{
+  border-color:var(--phosphor);
+  background:rgba(92,107,40,0.12);
+}
+.qn-card-kicker{
+  font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;
+  letter-spacing:0.14em;text-transform:uppercase;margin:0 0 0.55rem;
+}
+.qn-card.is-up .qn-card-kicker{color:var(--mustard);}
+.qn-card.is-down .qn-card-kicker{color:var(--signal);}
+.qn-card.is-s .qn-card-kicker{color:var(--phosphor);}
+.qn-rows{display:grid;gap:0.35rem;}
+.qn-row{
+  display:grid;grid-template-columns:2.4rem 1fr;gap:0.55rem;align-items:baseline;
+  font-family:var(--font-mono);font-size:var(--label-sm);font-weight:600;
+  letter-spacing:var(--track-tight);
+}
+.qn-row .sym{text-transform:none;letter-spacing:0;}
+.qn-card.is-up .qn-row .sym{color:var(--mustard);}
+.qn-card.is-down .qn-row .sym{color:var(--signal);}
+.qn-card.is-s .qn-row .sym{color:var(--phosphor);}
+.qn-card:not(.is-up):not(.is-down):not(.is-s) .qn-row .sym{color:var(--signal);}
+.qn-row .val{color:var(--ink);text-transform:none;letter-spacing:0;}
+.qn-row .hint{display:block;font-size:var(--label-xs);font-weight:500;
+  letter-spacing:var(--track-wide);text-transform:uppercase;color:var(--dim);margin-top:0.1rem;}
+.qn-practice{margin-top:0.85rem;}
+.qn-practice[hidden]{display:none !important;}
+.qn-practice .student-q{margin:0 0 0.75rem;}
+.qn-check-row{display:flex;flex-wrap:wrap;gap:0.45rem;margin-bottom:0.75rem;}
+.qn-model{
+  border-top:1px solid var(--grid);padding-top:0.75rem;
+}
+.qn-model[hidden]{display:none !important;}
+.qn-model-kicker{
+  font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;
+  letter-spacing:0.14em;text-transform:uppercase;color:var(--olive-deep);
+  margin:0 0 0.55rem;
+}
+
+/* —— Act 4: period-2 IE exceptions —— */
+.ie-ex-cap{
+  margin:0.85rem 0 0.45rem;font-size:var(--label-xs);font-weight:600;
+  letter-spacing:0.14em;text-transform:uppercase;color:var(--dim);
+}
+.ie-ex-chart{
+  width:100%;height:auto;display:block;overflow:visible;margin:0.25rem 0 0.35rem;
+}
+.ie-ex-chart .bar{fill:rgba(92,107,40,0.55);}
+.ie-ex-chart .bar.is-dip{fill:var(--ember);}
+.ie-ex-chart .bar-line{stroke:var(--ink);stroke-width:1;fill:none;}
+.ie-ex-chart .axis-line{stroke:var(--ink);stroke-width:1.25;fill:none;}
+.ie-ex-chart .grid-line{stroke:var(--grid);stroke-width:1;fill:none;}
+.ie-ex-sym{
+  font-size:12px;font-weight:600;letter-spacing:0;text-transform:none;fill:var(--ink);
+}
+.ie-ex-sym.is-dip{fill:var(--ember);}
+.ie-ex-val{
+  font-size:10px;font-weight:600;letter-spacing:0.02em;fill:var(--ember);
+}
+.ie-ex-axis{
+  font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;fill:var(--dim);
+}
+.ie-ex-brace{stroke:var(--signal);stroke-width:1.5;fill:none;}
+.ie-ex-brace-label{
+  font-family:var(--font-mono);font-size:10px;font-weight:600;
+  letter-spacing:0.08em;text-transform:uppercase;fill:var(--signal);
+}
+.ie-ex-prompt{
+  margin:0.85rem 0 0.75rem;font-size:1rem;line-height:1.55;color:var(--ink-soft);
+}
+.ie-ex-check-row{display:flex;flex-wrap:wrap;gap:0.45rem;margin-bottom:0.75rem;}
+.ie-ex-model{
+  border-top:1px solid var(--grid);padding-top:0.85rem;
+}
+.ie-ex-model[hidden]{display:none !important;}
+.ie-ex-model-kicker{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--olive-deep);margin:0 0 0.65rem;
+}
+.ie-ex-grids{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0.85rem 1rem;margin-bottom:0.95rem;
+}
+@media(max-width:720px){
+  .ie-ex-grids{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+.ie-ex-card{min-width:0;}
+.ie-ex-card-label{
+  font-family:var(--font-mono);font-size:var(--label-sm);font-weight:600;
+  letter-spacing:0;text-transform:none;color:var(--ink);margin:0 0 0.35rem;
+}
+.ie-ex-card-label .ie{color:var(--ember);font-weight:600;margin-left:0.35rem;
+  font-size:var(--label-xs);letter-spacing:0.04em;}
+.ie-ex-board.orbital-board{
+  gap:0.45rem;min-height:0;padding:0;
+}
+.ie-ex-board .orb-box{
+  width:2.15rem;height:2.2rem;gap:0.28rem;padding:0.12rem 0.2rem;
+}
+.ie-ex-board .spin-arrow{width:0.65rem;height:1.55rem;}
+.ie-ex-board .subshell{gap:0.4rem;}
+.ie-ex-board .subshell-label{min-width:1.35rem;font-size:0.65rem;}
+.ie-ex-answers{display:grid;gap:0.75rem;}
+.ie-ex-answer p{margin:0.25rem 0 0;font-size:1rem;line-height:1.55;color:var(--ink-soft);}
+.ie-ex-answer .pair-kicker{
+  font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;
+  letter-spacing:0.12em;text-transform:uppercase;color:var(--signal);margin:0;
+}
+</style>
+</head>
+<body>
+<div class="module-wrap">
+  <div class="top-nav">
+    <a href="index.html" class="back-link">← Unit 1b</a>
+    <div class="mod-meta">Module 08 · Electron Configuration Diagrams, Quantum Numbers, and Spin</div>
+  </div>
+
+  <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
+    <div class="briefing-kicker"><span>Before you begin</span></div>
+    <h1 id="briefingTitle">Electron Configuration Diagrams, Quantum Numbers, and Spin</h1>
+    <p class="briefing-lead">Read what this module is aiming for. Then open the instrument and work through it.</p>
+    <div class="briefing-columns">
+      <div class="briefing-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="briefing-li" id="briefingIntentions"></ul>
+      </div>
+      <div class="briefing-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="briefing-cc" id="briefingCompetencies"></ul>
+      </div>
+    </div>
+    <div class="briefing-actions">
+      <button type="button" class="btn submit" id="briefingNext">Next → Start simulation</button>
+    </div>
+  </section>
+
+  <div id="moduleStage" hidden>
+    <div class="mod-tag">Module 08</div>
+    <div class="act-meta" id="actMeta">Act 1 of 5 · Shell limit</div>
+    <h1>Electron Configuration Diagrams, Quantum Numbers, and Spin</h1>
+    <p class="framing" id="framing" aria-live="polite">Neon’s shell model sits here the way you’ve drawn it all unit.</p>
+    <p class="discovery-line" id="discoveryLine" aria-live="polite"></p>
+
+    <div class="act-panel" id="act1" data-act="1">
+      <div class="viewport" id="shellLimitPlate" data-fig="FIG. 08  ·  SHELL LIMIT" data-beat="1">
+        <div class="plate-body">
+          <div class="story-panel" aria-live="polite">
+            <div class="beat-kicker" id="storyKicker">Shell model</div>
+            <p id="storyText">Two shells for neon — an inner pair and eight on the outer ring. That picture matched the old two-peak prediction.</p>
+          </div>
+
+          <div class="opener-grid">
+            <div class="atom-pane">
+              <div class="atom-host" id="neAtomHost"></div>
+              <div class="atom-caption">Ne <span class="sub" id="atomCaptionSub">Shell model</span></div>
+              <p class="gap-callout" id="gapCallout">Outer ring = one shell. Nowhere to mark the split.</p>
+            </div>
+
+            <div class="pes-pane" id="pesPane" aria-hidden="true">
+              <svg class="pes-svg" viewBox="0 0 640 300" role="img" aria-label="Photoelectron spectrum of neon with three peaks">
+                <defs>
+                  <linearGradient id="peakWash08" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#5c6b28" stop-opacity="0.28"/>
+                    <stop offset="100%" stop-color="#5c6b28" stop-opacity="0.04"/>
+                  </linearGradient>
+                </defs>
+                <line class="axis-line" x1="56" y1="36" x2="56" y2="220"/>
+                <line class="axis-line" x1="56" y1="220" x2="600" y2="220"/>
+                <g class="axis-break" aria-hidden="true">
+                  <line x1="210" y1="214" x2="222" y2="226"/>
+                  <line x1="222" y1="214" x2="234" y2="226"/>
+                </g>
+                <text class="pes-axis-label" transform="translate(22 180) rotate(-90)">Peak height</text>
+                <text class="pes-axis-label" x="328" y="268" text-anchor="middle">← Binding energy (MJ/mol)</text>
+                <text class="pes-tick" x="110" y="242" text-anchor="middle">84.0</text>
+                <text class="pes-tick" x="400" y="242" text-anchor="middle">4.68</text>
+                <text class="pes-tick" x="500" y="242" text-anchor="middle">2.08</text>
+
+                <g class="peak-group" transform="translate(110 220)">
+                  <path class="peak-fill" d="M-14,0 C-8,-4 -2.5,-44 -0.4,-54 C0,-56 0,-56 0.4,-54 C2.5,-44 8,-4 14,0 Z" fill="url(#peakWash08)"/>
+                  <path class="peak-stroke" d="M-14,0 C-8,-4 -2.5,-44 -0.4,-54 C0,-56 0,-56 0.4,-54 C2.5,-44 8,-4 14,0"/>
+                  <text class="pes-num" x="0" y="-62" text-anchor="middle">2</text>
+                  <text class="pes-sublabel" x="0" y="-80" text-anchor="middle">1s</text>
+                </g>
+                <g class="peak-group" transform="translate(400 220)">
+                  <path class="peak-fill" d="M-14,0 C-8,-4 -2.5,-44 -0.4,-54 C0,-56 0,-56 0.4,-54 C2.5,-44 8,-4 14,0 Z" fill="url(#peakWash08)"/>
+                  <path class="peak-stroke" d="M-14,0 C-8,-4 -2.5,-44 -0.4,-54 C0,-56 0,-56 0.4,-54 C2.5,-44 8,-4 14,0"/>
+                  <text class="pes-num" x="0" y="-62" text-anchor="middle">2</text>
+                  <text class="pes-sublabel" x="0" y="-80" text-anchor="middle">2s</text>
+                </g>
+                <g class="peak-group" transform="translate(500 220)">
+                  <path class="peak-fill" d="M-26,0 C-13,-14 -3.5,-145 -0.5,-165 C0,-168 0,-168 0.5,-165 C3.5,-145 13,-14 26,0 Z" fill="url(#peakWash08)"/>
+                  <path class="peak-stroke" d="M-26,0 C-13,-14 -3.5,-145 -0.5,-165 C0,-168 0,-168 0.5,-165 C3.5,-145 13,-14 26,0"/>
+                  <text class="pes-num" x="0" y="-176" text-anchor="middle">6</text>
+                  <text class="pes-sublabel" x="0" y="-196" text-anchor="middle">2p</text>
+                </g>
+
+                <!-- Brace under n=2 peaks: same shell, two energies -->
+                <path class="split-brace" d="M378 250 L378 258 L522 258 L522 250"/>
+                <text class="split-brace-label" x="450" y="278" text-anchor="middle">n=2 split · two subshells</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act2" data-act="2" hidden>
+      <div class="viewport" id="orbitalTourPlate" data-fig="FIG. 08  ·  ORBITAL DIAGRAM">
+        <div class="plate-body">
+          <div class="story-panel" aria-live="polite">
+            <div class="beat-kicker" id="tourKicker">s orbital</div>
+            <p id="tourText">An s subshell is a single box. Two electrons can share that orbital.</p>
+          </div>
+          <div class="tour-stage">
+            <p class="tour-cap" id="tourCap" aria-live="polite">1s · empty</p>
+            <div class="tour-board" id="tourBoard" role="img" aria-label="Orbital diagram tour"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act3" data-act="3" hidden>
+      <div class="viewport" data-fig="FIG. 08  ·  ORBITAL BUILDER">
+        <div class="plate-body">
+          <div class="builder-layout">
+            <div class="el-picker" id="elPicker" role="group" aria-label="Element picker"></div>
+            <div class="orbital-board" id="orbitalBoard" role="group" aria-label="Orbital boxes"></div>
+            <p class="cfg-readout" id="cfgReadout" aria-live="polite"><span class="dim">Configuration —</span></p>
+            <div class="rules-row" id="rulesRow" aria-live="polite">
+              <span class="rule-chip">Aufbau</span>
+              <span class="rule-chip">Hund</span>
+              <span class="rule-chip">Pauli</span>
+              <span class="rule-chip">Spin</span>
+            </div>
+            <div class="tray-row">
+              <span class="tray-kicker">Electrons left</span>
+              <div class="tray-pool" id="trayPool"></div>
+              <button type="button" class="btn" id="resetBtn">Clear</button>
+              <button type="button" class="btn" id="undoBtn">Remove last</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act4" data-act="4" hidden>
+      <div class="viewport" id="ieExPlate" data-fig="FIG. 08  ·  IE EXCEPTIONS">
+        <div class="plate-body">
+          <div class="story-panel" aria-live="polite">
+            <div class="beat-kicker" id="ieExKicker">Looking back</div>
+            <p id="ieExText">Now that you can place valence electrons with orbital diagrams, those diagrams can explain some ionization-energy trends that core charge alone could not.</p>
+          </div>
+
+          <p class="student-q">Why is there a disruption in the trend of ionization energy between Be and B, and between N and O?</p>
+
+          <div class="ie-ex-cap">First ionization energy · period 2 (MJ/mol)</div>
+          <div id="ieExChartHost" aria-label="Period 2 first ionization energies"></div>
+
+          <p class="ie-ex-prompt">In your notes, draw the orbital diagrams for Be, B, N, and O. Hypothesize what leads to each drop.</p>
+
+          <div class="ie-ex-check-row">
+            <button type="button" class="btn submit" id="ieExRevealBtn">Show model answer</button>
+          </div>
+
+          <div class="ie-ex-model" id="ieExModel" hidden>
+            <div class="ie-ex-model-kicker">Model answer · compare with yours</div>
+            <div class="ie-ex-grids" id="ieExGrids"></div>
+            <div class="ie-ex-answers">
+              <div class="ie-ex-answer">
+                <p class="pair-kicker">Be → B</p>
+                <p>Beryllium’s valence electrons fill 2s. Boron’s next electron goes into 2p — a different subshell, held less tightly on average — so first ionization energy dips even though core charge rises.</p>
+              </div>
+              <div class="ie-ex-answer">
+                <p class="pair-kicker">N → O</p>
+                <p>Nitrogen’s 2p is half-full: three unpaired electrons. Oxygen’s fourth 2p electron must pair in a box. Electron repulsion makes that paired electron easier to remove, so IE₁ drops.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act5" data-act="5" hidden>
+      <div class="viewport" id="qnPlate" data-fig="FIG. 08  ·  UNIQUE SEATS">
+        <div class="plate-body">
+          <div class="story-panel" aria-live="polite">
+            <div class="beat-kicker" id="qnKicker">Unique seats</div>
+            <p id="qnText">Every electron in an atom has its own address. Four quantum numbers name that seat.</p>
+          </div>
+
+          <div class="qn-layout" id="qnLayout">
+            <div class="qn-board-wrap">
+              <div class="orbital-board qn-board" id="qnBoard" role="img" aria-label="Oxygen orbital diagram"></div>
+              <p class="cfg-readout" id="qnCfg" aria-live="polite">O · 1s² 2s² 2p⁴</p>
+            </div>
+            <div class="qn-cards" id="qnCards" hidden aria-live="polite"></div>
+          </div>
+
+          <div class="qn-practice" id="qnPractice" hidden>
+            <p class="student-q" id="qnPracticeQ"></p>
+            <div class="qn-check-row">
+              <button type="button" class="btn submit" id="qnRevealBtn">Show model diagram</button>
+            </div>
+            <div class="qn-model" id="qnModel" hidden>
+              <div class="qn-model-kicker">Model answer · compare with yours</div>
+              <div class="orbital-board qn-board" id="qnModelBoard" role="img" aria-label="Model orbital diagram"></div>
+              <p class="cfg-readout" id="qnModelCfg"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud" aria-live="polite">
+      <div class="hud-item"><span class="k">Element</span><span class="v" id="hudEl">Ne</span></div>
+      <div class="hud-item"><span class="k">Placed</span><span class="v" id="hudPlaced">—</span></div>
+      <div class="hud-item"><span class="k">Z</span><span class="v" id="hudZ">10</span></div>
+    </div>
+
+    <nav class="module-footer" aria-label="Section navigation">
+      <div class="module-footer-back">
+        <button type="button" class="btn" id="backBtn" hidden>← Back</button>
+      </div>
+      <div class="module-footer-help">
+        <button type="button" id="stuckBtn">Stuck?</button>
+      </div>
+      <div class="module-footer-fwd">
+        <button type="button" class="btn submit" id="continueBtn">Continue →</button>
+      </div>
+    </nav>
+    <div class="help-panel" id="helpPanel">
+      <p id="helpText">Continue when you’ve looked at the rings. The next click brings the instrument back.</p>
+    </div>
+
+    <section class="debrief" id="debrief" hidden aria-labelledby="debriefTitle">
+      <h2 id="debriefTitle">What this was for</h2>
+      <p class="debrief-lead">The intentions behind this module, and the competencies you just practised. Read each competency statement and decide honestly how well it fits you right now.</p>
+      <div class="debrief-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="debrief-li" id="debriefIntentions"></ul>
+      </div>
+      <div class="debrief-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="debrief-cc" id="debriefCompetencies"></ul>
+      </div>
+      <div class="debrief-block todo">
+        <div class="debrief-kicker">To do</div>
+        <ul class="debrief-todo">
+          <li>
+            <label>
+              <input type="checkbox" name="todo-notes">
+              <span>In your OneNote, sketch orbital diagrams for C and N and label which rule each step used.</span>
+            </label>
+          </li>
+          <li>
+            <label>
+              <input type="checkbox" name="todo-ap">
+              <span>Go to AP Classroom and complete quiz 08.</span>
+            </label>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="assets/suite-chrome.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+
+  const ELEMENTS = [
+    { sym:'H',  Z:1 },
+    { sym:'He', Z:2 },
+    { sym:'Li', Z:3 },
+    { sym:'Be', Z:4 },
+    { sym:'B',  Z:5 },
+    { sym:'C',  Z:6 },
+    { sym:'N',  Z:7 },
+    { sym:'O',  Z:8 },
+    { sym:'F',  Z:9 },
+    { sym:'Ne', Z:10 },
+    { sym:'Sc', Z:21 },
+    { sym:'Fe', Z:26 },
+    { sym:'Cu', Z:29, exception:'cu' }
+  ];
+
+  /* Aufbau order through the first transition series: one box per orbital. */
+  const SUBSHELLS = [
+    { id:'1s', label:'1s', boxes:1 },
+    { id:'2s', label:'2s', boxes:1 },
+    { id:'2p', label:'2p', boxes:3 },
+    { id:'3s', label:'3s', boxes:1 },
+    { id:'3p', label:'3p', boxes:3 },
+    { id:'4s', label:'4s', boxes:1 },
+    { id:'3d', label:'3d', boxes:5 }
+  ];
+
+  const DEBRIEF = {
+    intentions: [
+      { text: 'We will discuss Hund’s rule, the Pauli principle, and the Aufbau principle and how “spin” relates to electron configurations.',
+        target: 'act:3', revisit: 'Orbital builder' },
+      { text: 'We will use orbital diagrams to explain drops in ionization energy between Be and B and between N and O.',
+        target: 'act:4', revisit: 'IE exceptions' }
+    ],
+    competencies: [
+      { code:'PAI', name:'Processing and analyzing data and information',
+        text:'I can construct and interpret full, short-hand, and orbital diagrams for electron configurations of atoms.',
+        target: 'act:5', revisit: 'Config practice' },
+      { code:'E', name:'Evaluating',
+        text:'I can critically evaluate the strengths and limitations of previous models (like the Bohr diagram and planetary model) and how they can or cannot apply PES, Aufbau, Hund’s rule, and Pauli exclusion when applied to real atomic systems.',
+        target: 'act:1', revisit: 'Shell limit' }
+    ]
+  };
+
+  const FRAMING = {
+    1: 'Neon’s shell model sits here the way you’ve drawn it all unit.',
+    2: 'Here is the new diagram — one box per orbital.',
+    3: 'Blank orbital boxes. Drag electrons in and watch where they are allowed to stick.',
+    4: 'Period-2 ionization energies again — with orbital diagrams in hand.',
+    5: 'Oxygen’s diagram is full. Eight electrons — eight seats.'
+  };
+  const ACT1_BEATS = {
+    1: {
+      framing: 'Neon’s shell model sits here the way you’ve drawn it all unit.',
+      kicker: 'Shell model',
+      story: 'Two shells for neon — an inner pair and eight on the outer ring. That picture matched the old two-peak prediction.',
+      help: 'Continue when you’ve looked at the rings. The next click brings the instrument back.',
+      caption: 'Shell model',
+      hud: 'shell model'
+    },
+    2: {
+      framing: 'Neon’s measured spectrum. Level 2 is split — the outer ring has nowhere to put that.',
+      kicker: 'PES · the split',
+      story: 'Once we experimentally measure the energy levels using PES, we see that the second energy level is actually split into two. Therefore, our old diagrams don\'t work anymore. We need something better.',
+      help: 'The brace under 2s and 2p is the lesson. Where would that split live on the ring diagram?',
+      caption: 'Missing the split',
+      hud: 'PES vs rings'
+    }
+  };
+  const ACT2_BEATS = {
+    1: {
+      framing: 'Here is the new diagram — one box per orbital.',
+      kicker: 's orbital',
+      story: 'An s subshell is a single box. Two electrons can share that orbital.',
+      help: 'One box, two electrons. Opposite arrows mean opposite spin.',
+      label: '1s',
+      boxes: 1,
+      continueLabel: 'Continue → p orbitals'
+    },
+    2: {
+      framing: 'p subshells need three boxes side by side.',
+      kicker: 'p orbitals',
+      story: 'A p subshell is three boxes — six electrons in all. They half-fill before any box pairs.',
+      help: 'Count three ups before any downs. That’s the half-fill pattern.',
+      label: '2p',
+      boxes: 3,
+      continueLabel: 'Continue → d orbitals'
+    },
+    3: {
+      framing: 'd subshells stretch to five boxes.',
+      kicker: 'd orbitals',
+      story: 'A d subshell is five boxes — room for ten electrons. Same half-fill, then pair.',
+      help: 'Same pattern as p, just more boxes.',
+      label: '3d',
+      boxes: 5,
+      continueLabel: 'Continue → f orbitals'
+    },
+    4: {
+      framing: 'f is the widest row — seven boxes.',
+      kicker: 'f orbitals',
+      story: 'An f subshell is seven boxes — fourteen electrons when full. Half-fill, then pair.',
+      help: 'You’ve seen s, p, d, and f. Next you place the electrons yourself.',
+      label: '4f',
+      boxes: 7,
+      continueLabel: 'Continue → Orbital builder'
+    }
+  };
+  const HELP = {
+    1: ACT1_BEATS[1].help,
+    2: ACT2_BEATS[1].help,
+    3: 'Try carbon: do the three 2p boxes share before any pairs?',
+    4: 'Compare Be’s filled 2s with B’s first 2p electron — then N’s half-filled 2p with O’s first pair.',
+    5: 'The paired electrons in 2p share a box — only their spins differ.'
+  };
+  const ACT_META = {
+    1: 'Act 1 of 5 · Shell limit',
+    2: 'Act 2 of 5 · Orbital diagram',
+    3: 'Act 3 of 5 · Orbital builder',
+    4: 'Act 4 of 5 · IE exceptions',
+    5: 'Act 5 of 5 · Unique seats'
+  };
+
+  /* Period-2 IE₁ (MJ/mol) — §8.3. Dips at Be→B and N→O. */
+  const IE_EX_ROW = [
+    { sym: 'Li', ie: 0.52 },
+    { sym: 'Be', ie: 0.90, dip: true },
+    { sym: 'B',  ie: 0.80, dip: true },
+    { sym: 'C',  ie: 1.09 },
+    { sym: 'N',  ie: 1.40, dip: true },
+    { sym: 'O',  ie: 1.31, dip: true },
+    { sym: 'F',  ie: 1.68 },
+    { sym: 'Ne', ie: 2.08 }
+  ];
+  const IE_EX_DIAGRAMS = [
+    { sym: 'Be', ie: 0.90, counts: [2, 2, 0, 0, 0] },
+    { sym: 'B',  ie: 0.80, counts: [2, 2, 1, 0, 0] },
+    { sym: 'N',  ie: 1.40, counts: [2, 2, 1, 1, 1] },
+    { sym: 'O',  ie: 1.31, counts: [2, 2, 2, 1, 1] }
+  ];
+
+  /* H–Ne board shape used by Act 4–5 diagrams. */
+  const QN_SHELLS = [
+    { id:'1s', label:'1s', boxes:1 },
+    { id:'2s', label:'2s', boxes:1 },
+    { id:'2p', label:'2p', boxes:3 }
+  ];
+  const QN_O_COUNTS = [2, 2, 2, 1, 1]; /* 1s² 2s² 2p⁴ — pair in first 2p box */
+  const QN_CARD_2P_UP = {
+    tone: 'up',
+    title: '2p · spin up',
+    rows: [
+      { sym:'n', val:'2', hint:'shell' },
+      { sym:'ℓ', val:'1', hint:'p subshell' },
+      { sym:'mℓ', val:'−1', hint:'leftmost p box' },
+      { sym:'ms', val:'+½', hint:'spin up' }
+    ]
+  };
+  const QN_CARD_2P_DOWN = {
+    tone: 'down',
+    title: '2p · spin down',
+    rows: [
+      { sym:'n', val:'2', hint:'shell' },
+      { sym:'ℓ', val:'1', hint:'p subshell' },
+      { sym:'mℓ', val:'−1', hint:'leftmost p box' },
+      { sym:'ms', val:'−½', hint:'spin down' }
+    ]
+  };
+  const QN_CARD_2S = {
+    tone: 's',
+    title: '2s · spin up',
+    rows: [
+      { sym:'n', val:'2', hint:'shell' },
+      { sym:'ℓ', val:'0', hint:'s subshell' },
+      { sym:'mℓ', val:'0', hint:'the one s box' },
+      { sym:'ms', val:'+½', hint:'spin up' }
+    ]
+  };
+  const ACT5_BEATS = {
+    1: {
+      framing: 'Oxygen’s diagram is full. Eight electrons — eight seats.',
+      kicker: 'Unique seats',
+      story: 'Every electron in an atom has its own address. Four quantum numbers name that seat.',
+      help: 'Continue to look at the paired electrons in one of the 2p boxes.',
+      mode: 'intro',
+      continueLabel: 'Continue →'
+    },
+    2: {
+      framing: 'One electron in oxygen’s paired 2p box.',
+      kicker: 'Seat · 2p spin up',
+      story: 'This electron’s seat: shell, subshell, which box, and spin. Those four numbers are its quantum numbers.',
+      help: 'Same box can hold a second electron — but only with the opposite spin.',
+      mode: 'qn',
+      focusKeys: ['2p-0-up'],
+      focusTones: { '2p-0-up': 'up' },
+      dimOthers: true,
+      qnCards: [QN_CARD_2P_UP],
+      continueLabel: 'Continue →'
+    },
+    3: {
+      framing: 'Its partner in the same 2p box.',
+      kicker: 'Same box · two seats',
+      story: 'Same n, ℓ, and mℓ — only ms flips. Two electrons share a box only when their spins oppose.',
+      help: 'Now pull in a 2s electron and compare all three seats.',
+      mode: 'qn',
+      focusKeys: ['2p-0-up', '2p-0-down'],
+      focusTones: { '2p-0-up': 'up', '2p-0-down': 'down' },
+      dimOthers: true,
+      qnCards: [QN_CARD_2P_UP, QN_CARD_2P_DOWN],
+      continueLabel: 'Continue →'
+    },
+    4: {
+      framing: 'Add one electron from 2s.',
+      kicker: 'Three seats · side by side',
+      story: 'The 2s electron shares the same shell (n = 2) but a different subshell and box. All three sets differ somewhere — every electron has a unique seat.',
+      help: 'Scan the three columns: only the paired 2p electrons match until ms.',
+      mode: 'qn',
+      focusKeys: ['2p-0-up', '2p-0-down', '2s-0-up'],
+      focusTones: { '2p-0-up': 'up', '2p-0-down': 'down', '2s-0-up': 's' },
+      dimOthers: true,
+      qnCards: [QN_CARD_2P_UP, QN_CARD_2P_DOWN, QN_CARD_2S],
+      continueLabel: 'Continue →'
+    },
+    5: {
+      framing: 'You already draw the seats. The numbers just name them.',
+      kicker: 'Why they matter',
+      story: 'Quantum numbers aren’t a separate skill of assigning labels — they’re a way to say every electron in the diagram has a unique place.',
+      help: 'Next: sketch two configurations on paper, then check the model diagrams.',
+      mode: 'wrap',
+      continueLabel: 'Continue → Practice'
+    },
+    6: {
+      framing: 'Practice on paper — then check the model.',
+      kicker: 'Practice · 1 of 2',
+      story: 'Leave the builder for a minute. Sketch this one by hand.',
+      help: 'Draw boxes and arrows first. Open the model only when you’re ready to compare.',
+      mode: 'practice',
+      practice: {
+        prompt: 'In your notes, sketch the orbital diagram for nitrogen.',
+        sym: 'N',
+        Z: 7,
+        cfg: '1s² 2s² 2p³',
+        counts: [2, 2, 1, 1, 1]
+      },
+      continueLabel: 'Continue →'
+    },
+    7: {
+      framing: 'One more on paper.',
+      kicker: 'Practice · 2 of 2',
+      story: 'Same idea — draw it, then compare.',
+      help: 'When you’ve compared both, finish the module.',
+      mode: 'practice',
+      practice: {
+        prompt: 'In your notes, sketch the orbital diagram for fluorine.',
+        sym: 'F',
+        Z: 9,
+        cfg: '1s² 2s² 2p⁵',
+        counts: [2, 2, 2, 2, 1]
+      },
+      continueLabel: 'Finish →'
+    }
+  };
+
+  const STATE = {
+    act: 1,
+    act1Beat: 1,
+    act2Beat: 1,
+    act5Beat: 1,
+    tourBusy: false,
+    tourTimers: [],
+    practiceRevealed: false,
+    ieExRevealed: false,
+    sym: 'C',
+    boxes: [],       /* array of 0|1|2 electron counts; spin always up-first */
+    history: [],     /* box indices in placement order */
+    rulesNamed: false,
+    completedGate: {}, /* sym -> true when fully filled */
+    moduleComplete: false,
+    dragFromTray: false
+  };
+
+  const els = {
+    framing: document.getElementById('framing'),
+    actMeta: document.getElementById('actMeta'),
+    discoveryLine: document.getElementById('discoveryLine'),
+    neAtomHost: document.getElementById('neAtomHost'),
+    shellLimitPlate: document.getElementById('shellLimitPlate'),
+    pesPane: document.getElementById('pesPane'),
+    storyKicker: document.getElementById('storyKicker'),
+    storyText: document.getElementById('storyText'),
+    atomCaptionSub: document.getElementById('atomCaptionSub'),
+    tourKicker: document.getElementById('tourKicker'),
+    tourText: document.getElementById('tourText'),
+    tourCap: document.getElementById('tourCap'),
+    tourBoard: document.getElementById('tourBoard'),
+    elPicker: document.getElementById('elPicker'),
+    orbitalBoard: document.getElementById('orbitalBoard'),
+    trayPool: document.getElementById('trayPool'),
+    cfgReadout: document.getElementById('cfgReadout'),
+    rulesRow: document.getElementById('rulesRow'),
+    ieExChartHost: document.getElementById('ieExChartHost'),
+    ieExRevealBtn: document.getElementById('ieExRevealBtn'),
+    ieExModel: document.getElementById('ieExModel'),
+    ieExGrids: document.getElementById('ieExGrids'),
+    ieExKicker: document.getElementById('ieExKicker'),
+    ieExText: document.getElementById('ieExText'),
+    qnLayout: document.getElementById('qnLayout'),
+    qnBoard: document.getElementById('qnBoard'),
+    qnCfg: document.getElementById('qnCfg'),
+    qnCards: document.getElementById('qnCards'),
+    qnKicker: document.getElementById('qnKicker'),
+    qnText: document.getElementById('qnText'),
+    qnPractice: document.getElementById('qnPractice'),
+    qnPracticeQ: document.getElementById('qnPracticeQ'),
+    qnRevealBtn: document.getElementById('qnRevealBtn'),
+    qnModel: document.getElementById('qnModel'),
+    qnModelBoard: document.getElementById('qnModelBoard'),
+    qnModelCfg: document.getElementById('qnModelCfg'),
+    hudEl: document.getElementById('hudEl'),
+    hudPlaced: document.getElementById('hudPlaced'),
+    hudZ: document.getElementById('hudZ'),
+    backBtn: document.getElementById('backBtn'),
+    continueBtn: document.getElementById('continueBtn'),
+    helpText: document.getElementById('helpText'),
+    resetBtn: document.getElementById('resetBtn'),
+    undoBtn: document.getElementById('undoBtn')
+  };
+
+  function currentEl() {
+    return ELEMENTS.find(e => e.sym === STATE.sym) || ELEMENTS[5];
+  }
+
+  /** Subshells needed for the current element (Aufbau through its Z). */
+  function activeSubshells() {
+    const z = currentEl().Z;
+    let cap = 0;
+    const out = [];
+    for (const s of SUBSHELLS) {
+      out.push(s);
+      cap += s.boxes * 2;
+      if (cap >= z) break;
+    }
+    return out;
+  }
+
+  /** After a d-block atom is full, show shell order (3d with n=3, 4s above). */
+  function displaySubshells() {
+    const shells = activeSubshells().slice();
+    if (placedCount() !== currentEl().Z) return shells;
+    const i4s = shells.findIndex(s => s.id === '4s');
+    const i3d = shells.findIndex(s => s.id === '3d');
+    if (i4s < 0 || i3d < 0 || i4s >= i3d) return shells;
+    const tmp = shells[i4s];
+    shells[i4s] = shells[i3d];
+    shells[i3d] = tmp;
+    return shells;
+  }
+
+  /** Aufbau-order start index for each active subshell id. */
+  function aufbauStarts() {
+    const map = {};
+    let idx = 0;
+    activeSubshells().forEach(s => {
+      map[s.id] = idx;
+      idx += s.boxes;
+    });
+    return map;
+  }
+
+  function totalBoxes() {
+    return activeSubshells().reduce((n, s) => n + s.boxes, 0);
+  }
+
+  function boxMeta(index) {
+    let i = 0;
+    for (const s of activeSubshells()) {
+      for (let b = 0; b < s.boxes; b++) {
+        if (i === index) return { subshell: s, local: b, index: i };
+        i += 1;
+      }
+    }
+    return null;
+  }
+
+  function hundChoices(counts, baseIdx) {
+    const empties = [];
+    const singles = [];
+    for (let b = 0; b < counts.length; b++) {
+      if (counts[b] === 0) empties.push(baseIdx + b);
+      else if (counts[b] === 1) singles.push(baseIdx + b);
+    }
+    if (empties.length) return empties;
+    if (singles.length) return singles;
+    return [];
+  }
+
+  /** Copper: Ar core, then 4s¹, then fill 3d — never Aufbau’s 4s² 3d⁹. */
+  function nextAllowedCu(shells) {
+    let idx = 0;
+    let i4s = -1;
+    let i3d = -1;
+    let n3d = 0;
+    for (const s of shells) {
+      if (s.id === '4s') i4s = idx;
+      if (s.id === '3d') {
+        i3d = idx;
+        n3d = s.boxes;
+      }
+      if (s.id !== '4s' && s.id !== '3d') {
+        const counts = [];
+        for (let b = 0; b < s.boxes; b++) counts.push(STATE.boxes[idx + b]);
+        if (!counts.every(c => c >= 2)) return hundChoices(counts, idx);
+      }
+      idx += s.boxes;
+    }
+    if (i4s < 0 || i3d < 0) return [];
+    if (STATE.boxes[i4s] === 0) return [i4s];
+    const dCounts = [];
+    for (let b = 0; b < n3d; b++) dCounts.push(STATE.boxes[i3d + b]);
+    if (dCounts.every(c => c >= 2)) return [];
+    return hundChoices(dCounts, i3d);
+  }
+
+  /** Allowed box indices for the next electron (Aufbau + Hund + Pauli capacity). */
+  function nextAllowed() {
+    const shells = activeSubshells();
+    if (currentEl().exception === 'cu') return nextAllowedCu(shells);
+    let idx = 0;
+    for (const s of shells) {
+      const counts = [];
+      for (let b = 0; b < s.boxes; b++) {
+        counts.push(STATE.boxes[idx + b]);
+      }
+      if (counts.every(c => c >= 2)) {
+        idx += s.boxes;
+        continue;
+      }
+      const choice = hundChoices(counts, idx);
+      if (choice.length) return choice;
+      idx += s.boxes;
+    }
+    return [];
+  }
+
+  function placedCount() {
+    return STATE.boxes.reduce((a, c) => a + c, 0);
+  }
+
+  function remaining() {
+    return Math.max(0, currentEl().Z - placedCount());
+  }
+
+  function configString() {
+    const parts = [];
+    const starts = aufbauStarts();
+    displaySubshells().forEach(s => {
+      let n = 0;
+      const base = starts[s.id];
+      for (let b = 0; b < s.boxes; b++) n += STATE.boxes[base + b];
+      if (n > 0) parts.push(s.label + toSup(n));
+    });
+    return parts.length ? parts.join(' ') : '';
+  }
+
+  function toSup(n) {
+    const map = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹' };
+    return String(n).split('').map(ch => map[ch] || ch).join('');
+  }
+
+  function tryPlace(boxIndex) {
+    if (remaining() <= 0) return false;
+    const allowed = nextAllowed();
+    if (allowed.indexOf(boxIndex) === -1) {
+      refuseBox(boxIndex);
+      return false;
+    }
+    if (STATE.boxes[boxIndex] >= 2) {
+      refuseBox(boxIndex);
+      return false;
+    }
+    STATE.boxes[boxIndex] += 1;
+    STATE.history.push(boxIndex);
+    afterPlace();
+    return true;
+  }
+
+  function refuseBox(boxIndex) {
+    const node = els.orbitalBoard.querySelector('[data-box="' + boxIndex + '"]');
+    if (!node) return;
+    node.classList.remove('is-refuse');
+    void node.offsetWidth;
+    node.classList.add('is-refuse');
+    window.setTimeout(() => node.classList.remove('is-refuse'), 380);
+  }
+
+  function undoLast() {
+    const last = STATE.history.pop();
+    if (last == null) return;
+    if (STATE.boxes[last] > 0) STATE.boxes[last] -= 1;
+    renderBuilder();
+    updateDiscovery();
+  }
+
+  function resetBuilder() {
+    STATE.boxes = Array(totalBoxes()).fill(0);
+    STATE.history = [];
+    renderBuilder();
+    updateDiscovery();
+  }
+
+  function updateDiscovery() {
+    if (STATE.act !== 3) return;
+    const el = currentEl();
+    if (el.exception === 'cu' && placedCount() === el.Z) {
+      els.discoveryLine.textContent =
+        'Something funny happens with copper! What do you notice? Any idea why?';
+      els.discoveryLine.classList.add('visible');
+      return;
+    }
+    if (STATE.rulesNamed) {
+      els.discoveryLine.textContent =
+        'Those three rules have names: Aufbau (lowest first), Hund (singles before pairs), Pauli (opposite spins in a box).';
+      els.discoveryLine.classList.add('visible');
+      return;
+    }
+    els.discoveryLine.classList.remove('visible');
+    els.discoveryLine.textContent = '';
+  }
+
+  function builderHelp() {
+    if (STATE.sym === 'Cu') {
+      return 'Fill what the snap allows. When Cu is full, look at how many landed in 4s.';
+    }
+    if (STATE.sym === 'Sc' || STATE.sym === 'Fe') {
+      return '4s fills before 3d in Aufbau order — then the d boxes half-fill.';
+    }
+    return 'Try carbon: do the three 2p boxes share before any pairs?';
+  }
+
+  function afterPlace() {
+    const el = currentEl();
+    if (placedCount() === el.Z) {
+      STATE.completedGate[el.sym] = true;
+      if (STATE.completedGate.C || STATE.completedGate.N) {
+        STATE.rulesNamed = true;
+        els.rulesRow.classList.add('visible');
+      }
+    }
+    updateDiscovery();
+    renderBuilder();
+  }
+
+  function selectElement(sym) {
+    STATE.sym = sym;
+    resetBuilder();
+    els.elPicker.querySelectorAll('.el-btn').forEach(btn => {
+      btn.setAttribute('aria-pressed', btn.dataset.sym === sym ? 'true' : 'false');
+    });
+    if (STATE.rulesNamed) {
+      els.rulesRow.classList.add('visible');
+    }
+    els.helpText.textContent = builderHelp();
+    updateDiscovery();
+  }
+
+  /* —— Act 1: Ne shell plate (Module 03 default, no stipple, static markers) —— */
+  function buildNeAtom() {
+    const size = 240;
+    const cx = size / 2;
+    const cy = size / 2;
+    const rNuc = 22;
+    const rInner = 52;
+    const rOuter = 96;
+    const z = 10;
+    const uid = 'ne08';
+
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('class', 'atom-svg');
+    svg.setAttribute('viewBox', '0 0 ' + size + ' ' + size);
+    svg.setAttribute('width', String(size));
+    svg.setAttribute('height', String(size));
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Neon shell model: 2 inner electrons, 8 valence');
+
+    const defs = document.createElementNS(SVG_NS, 'defs');
+    const nucGrad = document.createElementNS(SVG_NS, 'radialGradient');
+    nucGrad.setAttribute('id', 'nuc-' + uid);
+    nucGrad.setAttribute('cx', '32%');
+    nucGrad.setAttribute('cy', '28%');
+    nucGrad.setAttribute('r', '68%');
+    [['0%','#e8b48a'],['45%','#a85a32'],['100%','#5a2c16']].forEach(([o, c]) => {
+      const s = document.createElementNS(SVG_NS, 'stop');
+      s.setAttribute('offset', o);
+      s.setAttribute('stop-color', c);
+      nucGrad.appendChild(s);
+    });
+    defs.appendChild(nucGrad);
+
+    const coreGrad = document.createElementNS(SVG_NS, 'radialGradient');
+    coreGrad.setAttribute('id', 'core-' + uid);
+    coreGrad.setAttribute('cx', '50%');
+    coreGrad.setAttribute('cy', '50%');
+    coreGrad.setAttribute('r', '50%');
+    [
+      [0, 'rgba(184,145,48,0.78)'],
+      [0.35, 'rgba(196,163,90,0.55)'],
+      [0.7, 'rgba(196,163,90,0.2)'],
+      [1, 'rgba(196,163,90,0)']
+    ].forEach(([o, c]) => {
+      const s = document.createElementNS(SVG_NS, 'stop');
+      s.setAttribute('offset', (o * 100) + '%');
+      s.setAttribute('stop-color', c);
+      coreGrad.appendChild(s);
+    });
+    defs.appendChild(coreGrad);
+    svg.appendChild(defs);
+
+    const coreDisk = document.createElementNS(SVG_NS, 'circle');
+    coreDisk.setAttribute('class', 'neg-core-disk');
+    coreDisk.setAttribute('cx', cx);
+    coreDisk.setAttribute('cy', cy);
+    coreDisk.setAttribute('r', rInner + 12);
+    coreDisk.setAttribute('fill', 'url(#core-' + uid + ')');
+    svg.appendChild(coreDisk);
+
+    [rInner, rOuter].forEach((r, i) => {
+      const ring = document.createElementNS(SVG_NS, 'circle');
+      ring.setAttribute('class', i === 1 ? 'shell shell-outer' : 'shell');
+      ring.setAttribute('cx', cx);
+      ring.setAttribute('cy', cy);
+      ring.setAttribute('r', r);
+      svg.appendChild(ring);
+    });
+
+    function place(n, r, cls, start) {
+      for (let i = 0; i < n; i++) {
+        const ang = start + (i * 2 * Math.PI) / n;
+        const e = document.createElementNS(SVG_NS, 'circle');
+        e.setAttribute('class', cls);
+        e.setAttribute('cx', String(cx + r * Math.cos(ang)));
+        e.setAttribute('cy', String(cy + r * Math.sin(ang)));
+        e.setAttribute('r', 7);
+        svg.appendChild(e);
+      }
+    }
+    place(2, rInner, 'e-marker', -Math.PI / 2);
+    place(8, rOuter, 'e-valence', 0);
+
+    const nuc = document.createElementNS(SVG_NS, 'circle');
+    nuc.setAttribute('cx', cx);
+    nuc.setAttribute('cy', cy);
+    nuc.setAttribute('r', rNuc);
+    nuc.setAttribute('fill', 'url(#nuc-' + uid + ')');
+    svg.appendChild(nuc);
+
+    const label = document.createElementNS(SVG_NS, 'text');
+    label.setAttribute('class', 'nuc-label');
+    label.setAttribute('x', cx);
+    label.setAttribute('y', cy);
+    label.textContent = '+' + z;
+    svg.appendChild(label);
+
+    const gapLab = document.createElementNS(SVG_NS, 'text');
+    gapLab.setAttribute('class', 'gap-label');
+    gapLab.setAttribute('x', cx);
+    gapLab.setAttribute('y', cy - rOuter - 10);
+    gapLab.setAttribute('text-anchor', 'middle');
+    gapLab.textContent = 'n=2 · one ring';
+    svg.appendChild(gapLab);
+
+    const sym = document.createElementNS(SVG_NS, 'text');
+    sym.setAttribute('x', cx);
+    sym.setAttribute('y', size - 8);
+    sym.setAttribute('text-anchor', 'middle');
+    sym.setAttribute('font-family', 'IBM Plex Mono, ui-monospace, monospace');
+    sym.setAttribute('font-size', '14');
+    sym.setAttribute('font-weight', '600');
+    sym.setAttribute('fill', '#16140e');
+    sym.setAttribute('letter-spacing', '0');
+    sym.textContent = 'Ne';
+    svg.appendChild(sym);
+
+    els.neAtomHost.replaceChildren(svg);
+  }
+
+  function setAct1Beat(beat) {
+    STATE.act1Beat = beat;
+    const b = ACT1_BEATS[beat];
+    els.framing.textContent = b.framing;
+    els.storyKicker.textContent = b.kicker;
+    els.storyText.textContent = b.story;
+    els.helpText.textContent = b.help;
+    els.atomCaptionSub.textContent = b.caption;
+    els.hudPlaced.textContent = b.hud;
+    els.hudEl.textContent = 'Ne';
+    els.hudZ.textContent = '10';
+    if (els.shellLimitPlate) els.shellLimitPlate.dataset.beat = String(beat);
+    const showPes = beat === 2;
+    if (els.shellLimitPlate) {
+      els.shellLimitPlate.classList.toggle('beat-show-pes', showPes);
+    }
+    if (els.pesPane) els.pesPane.setAttribute('aria-hidden', showPes ? 'false' : 'true');
+    const outer = els.neAtomHost.querySelector('.shell-outer');
+    if (outer) outer.classList.toggle('is-gap', showPes);
+    els.backBtn.hidden = beat === 1;
+    els.continueBtn.textContent = beat === 1 ? 'Continue →' : 'Continue → Orbital diagram';
+    els.continueBtn.disabled = false;
+    document.getElementById('helpPanel').classList.remove('open');
+  }
+
+  /* —— Act 2: slow orbital-diagram tour —— */
+  function clearTourTimers() {
+    STATE.tourTimers.forEach(id => window.clearTimeout(id));
+    STATE.tourTimers = [];
+    STATE.tourBusy = false;
+  }
+
+  function scheduleTour(fn, ms) {
+    const id = window.setTimeout(fn, ms);
+    STATE.tourTimers.push(id);
+    return id;
+  }
+
+  function hundSequence(nBoxes) {
+    const seq = [];
+    for (let b = 0; b < nBoxes; b++) seq.push({ box: b, dir: 'up' });
+    for (let b = 0; b < nBoxes; b++) seq.push({ box: b, dir: 'down' });
+    return seq;
+  }
+
+  function renderTourEmpty(beat) {
+    const b = ACT2_BEATS[beat];
+    els.tourBoard.innerHTML = '';
+    const lab = document.createElement('div');
+    lab.className = 'tour-label';
+    lab.textContent = b.label;
+    const row = document.createElement('div');
+    row.className = 'tour-boxes';
+    for (let i = 0; i < b.boxes; i++) {
+      const box = document.createElement('div');
+      box.className = 'orb-box';
+      box.dataset.local = String(i);
+      box.setAttribute('aria-hidden', 'true');
+      row.appendChild(box);
+    }
+    els.tourBoard.appendChild(lab);
+    els.tourBoard.appendChild(row);
+    els.tourBoard.setAttribute(
+      'aria-label',
+      b.label + ' orbital diagram, ' + b.boxes + ' empty box' + (b.boxes === 1 ? '' : 'es')
+    );
+  }
+
+  function tourBox(local) {
+    return els.tourBoard.querySelector('.orb-box[data-local="' + local + '"]');
+  }
+
+  function setTourContinueReady(beat) {
+    const b = ACT2_BEATS[beat];
+    STATE.tourBusy = false;
+    els.continueBtn.disabled = false;
+    els.continueBtn.textContent = b.continueLabel;
+    const capacity = b.boxes * 2;
+    els.tourCap.textContent = b.label + ' · ' + capacity + ' / ' + capacity;
+    els.hudPlaced.textContent = capacity + ' / ' + capacity;
+    els.tourBoard.setAttribute(
+      'aria-label',
+      b.label + ' filled, ' + capacity + ' electrons'
+    );
+  }
+
+  function runTourFill(beat) {
+    clearTourTimers();
+    const b = ACT2_BEATS[beat];
+    const seq = hundSequence(b.boxes);
+    const capacity = b.boxes * 2;
+    const reduced = SuiteChrome.prefersReduced;
+    STATE.tourBusy = true;
+    els.continueBtn.disabled = false;
+    els.continueBtn.textContent = b.continueLabel;
+    els.tourCap.textContent = b.label + ' · 0 / ' + capacity;
+    els.hudPlaced.textContent = '0 / ' + capacity;
+
+    if (reduced) {
+      seq.forEach(step => {
+        const box = tourBox(step.box);
+        if (box) box.appendChild(makeSpinArrow(step.dir));
+      });
+      setTourContinueReady(beat);
+      return;
+    }
+
+    const startDelay = 480;
+    const stepDelay = capacity <= 2 ? 520 : capacity <= 6 ? 400 : 300;
+    seq.forEach((step, i) => {
+      scheduleTour(() => {
+        const box = tourBox(step.box);
+        if (!box) return;
+        const arrow = makeSpinArrow(step.dir);
+        arrow.classList.add('is-entering');
+        box.appendChild(arrow);
+        const placed = i + 1;
+        els.tourCap.textContent = b.label + ' · ' + placed + ' / ' + capacity;
+        els.hudPlaced.textContent = placed + ' / ' + capacity;
+        if (placed === capacity) {
+          scheduleTour(() => setTourContinueReady(beat), 260);
+        }
+      }, startDelay + i * stepDelay);
+    });
+  }
+
+  function finishTourFillNow(beat) {
+    clearTourTimers();
+    const b = ACT2_BEATS[beat];
+    const seq = hundSequence(b.boxes);
+    renderTourEmpty(beat);
+    seq.forEach(step => {
+      const box = tourBox(step.box);
+      if (box) box.appendChild(makeSpinArrow(step.dir));
+    });
+    setTourContinueReady(beat);
+  }
+
+  function setAct2Beat(beat) {
+    clearTourTimers();
+    STATE.act2Beat = beat;
+    const b = ACT2_BEATS[beat];
+    els.framing.textContent = b.framing;
+    els.tourKicker.textContent = b.kicker;
+    els.tourText.textContent = b.story;
+    els.helpText.textContent = b.help;
+    els.hudEl.textContent = b.label;
+    els.hudZ.textContent = String(b.boxes * 2);
+    els.backBtn.hidden = false;
+    document.getElementById('helpPanel').classList.remove('open');
+    renderTourEmpty(beat);
+    runTourFill(beat);
+  }
+
+  /* —— Act 2 builder UI —— */
+  function buildPicker() {
+    els.elPicker.innerHTML = '';
+    ELEMENTS.forEach(e => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'el-btn';
+      btn.dataset.sym = e.sym;
+      btn.textContent = e.sym;
+      if (e.sym === 'Sc') btn.classList.add('el-gap');
+      btn.setAttribute('aria-pressed', e.sym === STATE.sym ? 'true' : 'false');
+      btn.addEventListener('click', () => selectElement(e.sym));
+      els.elPicker.appendChild(btn);
+    });
+  }
+
+  /** Moog-style half-headed (harpoon) spin arrow — one barb only. */
+  function makeSpinArrow(dir) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'spin-arrow ' + dir);
+    svg.setAttribute('viewBox', '0 0 18 38');
+    svg.setAttribute('aria-hidden', 'true');
+    const shaft = document.createElementNS(NS, 'line');
+    shaft.setAttribute('class', 'shaft');
+    const barb = document.createElementNS(NS, 'path');
+    barb.setAttribute('class', 'barb');
+    if (dir === 'up') {
+      /* Shaft right; half-head = right-triangle flag on the left only. */
+      shaft.setAttribute('x1', '12');
+      shaft.setAttribute('y1', '34');
+      shaft.setAttribute('x2', '12');
+      shaft.setAttribute('y2', '7');
+      barb.setAttribute('d', 'M12 5.5 V13 H3.2 Z');
+    } else {
+      /* Shaft left; half-head = right-triangle flag on the right only. */
+      shaft.setAttribute('x1', '6');
+      shaft.setAttribute('y1', '4');
+      shaft.setAttribute('x2', '6');
+      shaft.setAttribute('y2', '31');
+      barb.setAttribute('d', 'M6 32.5 V25 H14.8 Z');
+    }
+    svg.appendChild(shaft);
+    svg.appendChild(barb);
+    return svg;
+  }
+
+  function renderBoard() {
+    els.orbitalBoard.innerHTML = '';
+    const shells = displaySubshells();
+    const starts = aufbauStarts();
+    const maxBoxes = Math.max.apply(null, shells.map(s => s.boxes));
+    const rowWidth = 'calc(' + maxBoxes + ' * 3.15rem + ' + (maxBoxes - 1) + ' * 0.35rem)';
+    shells.forEach(s => {
+      const wrap = document.createElement('div');
+      wrap.className = 'subshell';
+      const lab = document.createElement('div');
+      lab.className = 'subshell-label';
+      lab.textContent = s.label;
+      const row = document.createElement('div');
+      row.className = 'subshell-boxes';
+      row.style.width = rowWidth;
+      const base = starts[s.id];
+      for (let b = 0; b < s.boxes; b++) {
+        const boxIndex = base + b;
+        const count = STATE.boxes[boxIndex];
+        const box = document.createElement('div');
+        box.className = 'orb-box';
+        box.dataset.box = String(boxIndex);
+        box.tabIndex = 0;
+        box.setAttribute('role', 'button');
+        box.setAttribute('aria-label', s.label + ' orbital ' + (b + 1) + ', ' + count + ' electron' + (count === 1 ? '' : 's'));
+        if (count >= 1) box.appendChild(makeSpinArrow('up'));
+        if (count >= 2) box.appendChild(makeSpinArrow('down'));
+        box.addEventListener('click', () => tryPlace(boxIndex));
+        box.addEventListener('keydown', ev => {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            ev.preventDefault();
+            tryPlace(boxIndex);
+          }
+        });
+        box.addEventListener('dragover', ev => {
+          ev.preventDefault();
+          box.classList.add('is-target');
+        });
+        box.addEventListener('dragleave', () => box.classList.remove('is-target'));
+        box.addEventListener('drop', ev => {
+          ev.preventDefault();
+          box.classList.remove('is-target');
+          tryPlace(boxIndex);
+        });
+        row.appendChild(box);
+      }
+      wrap.appendChild(lab);
+      wrap.appendChild(row);
+      els.orbitalBoard.appendChild(wrap);
+    });
+  }
+
+  function renderTray() {
+    els.trayPool.innerHTML = '';
+    const n = remaining();
+    for (let i = 0; i < n; i++) {
+      const e = document.createElement('button');
+      e.type = 'button';
+      e.className = 'tray-e';
+      e.draggable = true;
+      e.setAttribute('aria-label', 'Electron ' + (i + 1) + ' of ' + n);
+      e.addEventListener('dragstart', ev => {
+        STATE.dragFromTray = true;
+        e.classList.add('is-dragging');
+        ev.dataTransfer.setData('text/plain', 'e');
+        ev.dataTransfer.effectAllowed = 'move';
+      });
+      e.addEventListener('dragend', () => {
+        STATE.dragFromTray = false;
+        e.classList.remove('is-dragging');
+      });
+      e.addEventListener('click', () => {
+        const allowed = nextAllowed();
+        if (allowed.length === 1) tryPlace(allowed[0]);
+        else if (allowed.length > 1) {
+          const node = els.orbitalBoard.querySelector('[data-box="' + allowed[0] + '"]');
+          if (node) node.focus();
+        }
+      });
+      els.trayPool.appendChild(e);
+    }
+  }
+
+  function renderHud() {
+    const el = currentEl();
+    const placed = placedCount();
+    els.hudEl.textContent = el.sym;
+    els.hudZ.textContent = String(el.Z);
+    els.hudPlaced.textContent = placed + ' / ' + el.Z;
+    const cfg = configString();
+    els.cfgReadout.innerHTML = cfg
+      ? cfg
+      : '<span class="dim">Configuration —</span>';
+  }
+
+  function renderBuilder() {
+    if (!STATE.boxes.length) STATE.boxes = Array(totalBoxes()).fill(0);
+    renderBoard();
+    renderTray();
+    renderHud();
+    if (STATE.rulesNamed) els.rulesRow.classList.add('visible');
+    else els.rulesRow.classList.remove('visible');
+  }
+
+  /* Pointer-drag fallback for touch / non-HTML5 drag quirks */
+  let ghost = null;
+  let pointerDragging = false;
+
+  function clearGhost() {
+    if (ghost) {
+      ghost.remove();
+      ghost = null;
+    }
+    pointerDragging = false;
+  }
+
+  els.trayPool.addEventListener('pointerdown', ev => {
+    const t = ev.target.closest('.tray-e');
+    if (!t || remaining() <= 0) return;
+    if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+    pointerDragging = true;
+    t.setPointerCapture(ev.pointerId);
+    ghost = document.createElement('div');
+    ghost.className = 'ghost-drag';
+    ghost.style.left = ev.clientX + 'px';
+    ghost.style.top = ev.clientY + 'px';
+    document.body.appendChild(ghost);
+    t.classList.add('is-dragging');
+
+    function onMove(e2) {
+      if (!ghost) return;
+      ghost.style.left = e2.clientX + 'px';
+      ghost.style.top = e2.clientY + 'px';
+      const under = document.elementFromPoint(e2.clientX, e2.clientY);
+      els.orbitalBoard.querySelectorAll('.orb-box').forEach(b => b.classList.remove('is-target'));
+      const box = under && under.closest && under.closest('.orb-box');
+      if (box) box.classList.add('is-target');
+    }
+    function onUp(e2) {
+      t.releasePointerCapture(e2.pointerId);
+      t.removeEventListener('pointermove', onMove);
+      t.removeEventListener('pointerup', onUp);
+      t.removeEventListener('pointercancel', onUp);
+      t.classList.remove('is-dragging');
+      const under = document.elementFromPoint(e2.clientX, e2.clientY);
+      const box = under && under.closest && under.closest('.orb-box');
+      els.orbitalBoard.querySelectorAll('.orb-box').forEach(b => b.classList.remove('is-target'));
+      clearGhost();
+      if (box) tryPlace(Number(box.dataset.box));
+    }
+    t.addEventListener('pointermove', onMove);
+    t.addEventListener('pointerup', onUp);
+    t.addEventListener('pointercancel', onUp);
+  });
+
+  function renderStaticBoard(host, shells, counts, opts) {
+    opts = opts || {};
+    host.innerHTML = '';
+    const maxBoxes = Math.max.apply(null, shells.map(s => s.boxes));
+    const compact = !!opts.compact || host.classList.contains('ie-ex-board');
+    const boxRem = compact ? 2.15 : 3.15;
+    const gapRem = compact ? 0.28 : 0.35;
+    const rowWidth = 'calc(' + maxBoxes + ' * ' + boxRem + 'rem + ' + (maxBoxes - 1) + ' * ' + gapRem + 'rem)';
+    let idx = 0;
+    shells.forEach(s => {
+      const wrap = document.createElement('div');
+      wrap.className = 'subshell';
+      const lab = document.createElement('div');
+      lab.className = 'subshell-label';
+      lab.textContent = s.label;
+      const row = document.createElement('div');
+      row.className = 'subshell-boxes';
+      row.style.width = rowWidth;
+      for (let b = 0; b < s.boxes; b++) {
+        const count = counts[idx] || 0;
+        const box = document.createElement('div');
+        box.className = 'orb-box';
+        box.dataset.shell = s.id;
+        box.dataset.local = String(b);
+        box.setAttribute('aria-hidden', 'true');
+        const focusKeys = [];
+        if (count >= 1) {
+          const up = makeSpinArrow('up');
+          up.dataset.eKey = s.id + '-' + b + '-up';
+          focusKeys.push(up.dataset.eKey);
+          box.appendChild(up);
+        }
+        if (count >= 2) {
+          const down = makeSpinArrow('down');
+          down.dataset.eKey = s.id + '-' + b + '-down';
+          focusKeys.push(down.dataset.eKey);
+          box.appendChild(down);
+        }
+        box.dataset.focusKeys = focusKeys.join(' ');
+        row.appendChild(box);
+        idx += 1;
+      }
+      wrap.appendChild(lab);
+      wrap.appendChild(row);
+      host.appendChild(wrap);
+    });
+    applyQnFocus(host, opts);
+  }
+
+  function applyQnFocus(host, opts) {
+    opts = opts || {};
+    const keys = opts.focusKeys || [];
+    const tones = opts.focusTones || {};
+    const dimOthers = !!opts.dimOthers;
+    host.querySelectorAll('.orb-box').forEach(box => {
+      box.classList.remove('is-qn-focus', 'is-qn-dim');
+      const boxKeys = (box.dataset.focusKeys || '').split(/\s+/).filter(Boolean);
+      const hit = keys.some(k => boxKeys.indexOf(k) !== -1);
+      if (hit) box.classList.add('is-qn-focus');
+      else if (dimOthers && keys.length) box.classList.add('is-qn-dim');
+    });
+    host.querySelectorAll('.spin-arrow').forEach(arrow => {
+      arrow.classList.remove('is-qn-focus', 'is-tone-up', 'is-tone-down', 'is-tone-s');
+      const key = arrow.dataset.eKey;
+      if (keys.indexOf(key) === -1) return;
+      arrow.classList.add('is-qn-focus');
+      const tone = tones[key];
+      if (tone) arrow.classList.add('is-tone-' + tone);
+    });
+  }
+
+  function renderQnCards(cards) {
+    els.qnCards.classList.remove('is-compare', 'is-compare-3');
+    els.qnLayout.classList.remove('is-compare', 'is-compare-3');
+    if (!cards || !cards.length) {
+      els.qnCards.hidden = true;
+      els.qnCards.innerHTML = '';
+      return;
+    }
+    els.qnCards.hidden = false;
+    if (cards.length === 2) {
+      els.qnCards.classList.add('is-compare');
+      els.qnLayout.classList.add('is-compare');
+    } else if (cards.length >= 3) {
+      els.qnCards.classList.add('is-compare-3');
+      els.qnLayout.classList.add('is-compare-3');
+    }
+    els.qnCards.innerHTML = '';
+    cards.forEach(qn => {
+      const card = document.createElement('div');
+      card.className = 'qn-card' + (qn.tone ? ' is-' + qn.tone : '');
+      const kicker = document.createElement('div');
+      kicker.className = 'qn-card-kicker';
+      kicker.textContent = qn.title;
+      const rows = document.createElement('div');
+      rows.className = 'qn-rows';
+      qn.rows.forEach(r => {
+        const row = document.createElement('div');
+        row.className = 'qn-row';
+        row.innerHTML =
+          '<span class="sym">' + r.sym + '</span>' +
+          '<span class="val">' + r.val +
+          (r.hint ? '<span class="hint">' + r.hint + '</span>' : '') +
+          '</span>';
+        rows.appendChild(row);
+      });
+      card.appendChild(kicker);
+      card.appendChild(rows);
+      els.qnCards.appendChild(card);
+    });
+  }
+
+  function setAct5Beat(beat) {
+    STATE.act5Beat = beat;
+    STATE.practiceRevealed = false;
+    const b = ACT5_BEATS[beat];
+    els.framing.textContent = b.framing;
+    els.qnKicker.textContent = b.kicker;
+    els.qnText.textContent = b.story;
+    els.helpText.textContent = b.help;
+    els.backBtn.hidden = false;
+    els.continueBtn.disabled = false;
+    els.continueBtn.textContent = b.continueLabel;
+    els.discoveryLine.classList.remove('visible');
+    els.discoveryLine.textContent = '';
+    document.getElementById('helpPanel').classList.remove('open');
+
+    const isPractice = b.mode === 'practice';
+    els.qnLayout.classList.toggle('is-practice', isPractice);
+    els.qnPractice.hidden = !isPractice;
+    els.qnModel.hidden = true;
+    els.qnRevealBtn.textContent = 'Show model diagram';
+
+    if (isPractice) {
+      els.qnLayout.hidden = true;
+      renderQnCards(null);
+      els.qnPracticeQ.textContent = b.practice.prompt;
+      els.hudEl.textContent = b.practice.sym;
+      els.hudZ.textContent = String(b.practice.Z);
+      els.hudPlaced.textContent = 'on paper';
+      els.qnModelCfg.textContent = b.practice.sym + ' · ' + b.practice.cfg;
+      renderStaticBoard(els.qnModelBoard, QN_SHELLS, b.practice.counts, {});
+    } else {
+      els.qnLayout.hidden = false;
+      renderStaticBoard(els.qnBoard, QN_SHELLS, QN_O_COUNTS, {
+        focusKeys: b.focusKeys || [],
+        focusTones: b.focusTones || {},
+        dimOthers: !!b.dimOthers
+      });
+      els.qnCfg.textContent = 'O · 1s² 2s² 2p⁴';
+      renderQnCards(b.qnCards || null);
+      els.hudEl.textContent = 'O';
+      els.hudZ.textContent = '8';
+      els.hudPlaced.textContent = b.mode === 'qn' ? 'seat' : '8 / 8';
+    }
+  }
+
+  function toggleQnModel() {
+    const b = ACT5_BEATS[STATE.act5Beat];
+    if (!b || b.mode !== 'practice') return;
+    STATE.practiceRevealed = !STATE.practiceRevealed;
+    els.qnModel.hidden = !STATE.practiceRevealed;
+    els.qnRevealBtn.textContent = STATE.practiceRevealed ? 'Hide model diagram' : 'Show model diagram';
+  }
+
+  function renderIeExChart() {
+    const host = els.ieExChartHost;
+    if (!host) return;
+    const W = 640;
+    const H = 220;
+    const padL = 48;
+    const padR = 16;
+    const padT = 28;
+    const padB = 56;
+    const maxIe = 2.20;
+    const n = IE_EX_ROW.length;
+    const slot = (W - padL - padR) / n;
+    const barW = Math.min(36, slot * 0.62);
+
+    let bars = '';
+    IE_EX_ROW.forEach((atom, i) => {
+      const cx = padL + slot * i + slot / 2;
+      const h = ((atom.ie / maxIe) * (H - padT - padB));
+      const y = H - padB - h;
+      const x = cx - barW / 2;
+      const dipClass = atom.dip ? ' is-dip' : '';
+      bars +=
+        '<rect class="bar' + dipClass + '" x="' + x.toFixed(1) + '" y="' + y.toFixed(1) +
+        '" width="' + barW.toFixed(1) + '" height="' + h.toFixed(1) + '"/>' +
+        '<text class="ie-ex-val" x="' + cx.toFixed(1) + '" y="' + (y - 6).toFixed(1) +
+        '" text-anchor="middle">' + atom.ie.toFixed(2) + '</text>' +
+        '<text class="ie-ex-sym' + dipClass + '" x="' + cx.toFixed(1) + '" y="' + (H - padB + 18) +
+        '" text-anchor="middle">' + atom.sym + '</text>';
+    });
+
+    /* Brace marks under Be–B (indices 1–2) and N–O (indices 4–5). */
+    function brace(i0, i1, label) {
+      const x0 = padL + slot * i0 + slot / 2;
+      const x1 = padL + slot * i1 + slot / 2;
+      const y0 = H - padB + 28;
+      const y1 = y0 + 8;
+      const mid = (x0 + x1) / 2;
+      return (
+        '<path class="ie-ex-brace" d="M' + x0 + ' ' + y0 + ' L' + x0 + ' ' + y1 +
+        ' L' + x1 + ' ' + y1 + ' L' + x1 + ' ' + y0 + '"/>' +
+        '<text class="ie-ex-brace-label" x="' + mid + '" y="' + (y1 + 14) +
+        '" text-anchor="middle">' + label + '</text>'
+      );
+    }
+
+    host.innerHTML =
+      '<svg class="ie-ex-chart" viewBox="0 0 ' + W + ' ' + H +
+      '" role="img" aria-label="Period 2 first ionization energies in megajoules per mole">' +
+      '<line class="axis-line" x1="' + padL + '" y1="' + padT + '" x2="' + padL + '" y2="' + (H - padB) + '"/>' +
+      '<line class="axis-line" x1="' + padL + '" y1="' + (H - padB) + '" x2="' + (W - padR) + '" y2="' + (H - padB) + '"/>' +
+      '<text class="ie-ex-axis" transform="translate(16 ' + ((padT + H - padB) / 2) + ') rotate(-90)" text-anchor="middle">IE₁ (MJ/mol)</text>' +
+      bars +
+      brace(1, 2, 'drop') +
+      brace(4, 5, 'drop') +
+      '</svg>';
+  }
+
+  function renderIeExModelBoards() {
+    const host = els.ieExGrids;
+    if (!host) return;
+    host.innerHTML = '';
+    IE_EX_DIAGRAMS.forEach(d => {
+      const card = document.createElement('div');
+      card.className = 'ie-ex-card';
+      const lab = document.createElement('div');
+      lab.className = 'ie-ex-card-label';
+      lab.innerHTML = d.sym + '<span class="ie">' + d.ie.toFixed(2) + ' MJ/mol</span>';
+      const board = document.createElement('div');
+      board.className = 'orbital-board ie-ex-board';
+      board.setAttribute('role', 'img');
+      board.setAttribute('aria-label', d.sym + ' orbital diagram');
+      card.appendChild(lab);
+      card.appendChild(board);
+      host.appendChild(card);
+      renderStaticBoard(board, QN_SHELLS, d.counts, {});
+    });
+  }
+
+  function setIeExAct() {
+    STATE.ieExRevealed = false;
+    els.framing.textContent = FRAMING[4];
+    els.ieExKicker.textContent = 'Looking back';
+    els.ieExText.textContent =
+      'Now that you can place valence electrons with orbital diagrams, those diagrams can explain some ionization-energy trends that core charge alone could not.';
+    els.helpText.textContent = HELP[4];
+    els.backBtn.hidden = false;
+    els.continueBtn.disabled = false;
+    els.continueBtn.textContent = 'Continue → Unique seats';
+    els.discoveryLine.classList.remove('visible');
+    els.discoveryLine.textContent = '';
+    document.getElementById('helpPanel').classList.remove('open');
+    els.ieExModel.hidden = true;
+    els.ieExRevealBtn.textContent = 'Show model answer';
+    els.hudEl.textContent = 'period 2';
+    els.hudZ.textContent = '3–10';
+    els.hudPlaced.textContent = 'IE₁';
+    renderIeExChart();
+  }
+
+  function toggleIeExModel() {
+    STATE.ieExRevealed = !STATE.ieExRevealed;
+    els.ieExModel.hidden = !STATE.ieExRevealed;
+    els.ieExRevealBtn.textContent = STATE.ieExRevealed ? 'Hide model answer' : 'Show model answer';
+    if (STATE.ieExRevealed) {
+      renderIeExModelBoards();
+      els.discoveryLine.textContent =
+        'Filled 2s vs first 2p · half-full 2p vs a paired electron — repulsion lowers IE₁.';
+      els.discoveryLine.classList.add('visible');
+    } else {
+      els.discoveryLine.classList.remove('visible');
+      els.discoveryLine.textContent = '';
+    }
+  }
+
+  function setAct(n, opts) {
+    opts = opts || {};
+    clearTourTimers();
+    STATE.act = n;
+    document.querySelectorAll('.act-panel').forEach(p => {
+      p.hidden = Number(p.dataset.act) !== n;
+    });
+    els.actMeta.textContent = ACT_META[n];
+    document.getElementById('helpPanel').classList.remove('open');
+    els.continueBtn.disabled = false;
+    if (n === 1) {
+      const beat = opts.act1Beat || STATE.act1Beat || 1;
+      setAct1Beat(beat);
+      els.discoveryLine.classList.remove('visible');
+      els.discoveryLine.textContent = '';
+    } else if (n === 2) {
+      const beat = opts.act2Beat || STATE.act2Beat || 1;
+      els.discoveryLine.classList.remove('visible');
+      els.discoveryLine.textContent = '';
+      setAct2Beat(beat);
+    } else if (n === 3) {
+      els.framing.textContent = FRAMING[3];
+      els.helpText.textContent = builderHelp();
+      els.backBtn.hidden = false;
+      updateDiscovery();
+      renderBuilder();
+      els.continueBtn.textContent = 'Continue → IE exceptions';
+    } else if (n === 4) {
+      setIeExAct();
+    } else {
+      const beat = opts.act5Beat || STATE.act5Beat || 1;
+      setAct5Beat(beat);
+      if (STATE.moduleComplete && beat === 7) {
+        els.continueBtn.textContent = 'What this was for →';
+      }
+    }
+  }
+
+  function showDebriefStage() {
+    STATE.moduleComplete = true;
+    SuiteChrome.revealDebrief(DEBRIEF, {
+      exclusive: true,
+      onRevisit: function (target) {
+        SuiteChrome.leaveDebriefStage();
+        const n = Number(String(target).replace(/^act:/, '')) || 1;
+        if (n === 1) setAct(1, { act1Beat: 2 });
+        else if (n === 2) setAct(2, { act2Beat: 1 });
+        else if (n === 3) setAct(3);
+        else if (n === 4) setAct(4);
+        else if (n === 5) setAct(5, { act5Beat: 6 });
+        else setAct(Math.min(5, Math.max(1, n)));
+        window.scrollTo({ top: 0, behavior: SuiteChrome.prefersReduced ? 'auto' : 'smooth' });
+      }
+    });
+  }
+
+  function startModule() {
+    document.getElementById('briefing').hidden = true;
+    document.getElementById('moduleStage').hidden = false;
+    buildNeAtom();
+    buildPicker();
+    STATE.boxes = Array(totalBoxes()).fill(0);
+    STATE.act1Beat = 1;
+    STATE.act2Beat = 1;
+    STATE.act5Beat = 1;
+    STATE.ieExRevealed = false;
+    setAct(1, { act1Beat: 1 });
+  }
+
+  els.resetBtn.addEventListener('click', resetBuilder);
+  els.undoBtn.addEventListener('click', undoLast);
+  els.qnRevealBtn.addEventListener('click', toggleQnModel);
+  els.ieExRevealBtn.addEventListener('click', toggleIeExModel);
+
+  SuiteChrome.renderBriefing(DEBRIEF);
+  SuiteChrome.wireStuckHelp();
+  document.getElementById('briefingNext').addEventListener('click', startModule);
+  els.backBtn.addEventListener('click', () => {
+    if (STATE.act === 5) {
+      if (STATE.act5Beat > 1) setAct5Beat(STATE.act5Beat - 1);
+      else setAct(4);
+      return;
+    }
+    if (STATE.act === 4) {
+      setAct(3);
+      return;
+    }
+    if (STATE.act === 3) {
+      setAct(2, { act2Beat: 4 });
+      return;
+    }
+    if (STATE.act === 2) {
+      if (STATE.act2Beat > 1) setAct2Beat(STATE.act2Beat - 1);
+      else setAct(1, { act1Beat: 2 });
+      return;
+    }
+    if (STATE.act === 1 && STATE.act1Beat > 1) setAct1Beat(1);
+  });
+  els.continueBtn.addEventListener('click', () => {
+    if (STATE.act === 1 && STATE.act1Beat === 1) {
+      setAct1Beat(2);
+      return;
+    }
+    if (STATE.act === 1) {
+      setAct(2, { act2Beat: 1 });
+      return;
+    }
+    if (STATE.act === 2) {
+      if (STATE.tourBusy) {
+        finishTourFillNow(STATE.act2Beat);
+        return;
+      }
+      if (STATE.act2Beat < 4) setAct2Beat(STATE.act2Beat + 1);
+      else setAct(3);
+      return;
+    }
+    if (STATE.act === 3) {
+      setAct(4);
+      return;
+    }
+    if (STATE.act === 4) {
+      setAct(5, { act5Beat: 1 });
+      return;
+    }
+    if (STATE.act === 5) {
+      if (STATE.act5Beat < 7) setAct5Beat(STATE.act5Beat + 1);
+      else showDebriefStage();
+      return;
+    }
+    showDebriefStage();
+  });
+
+  const qs = new URLSearchParams(location.search);
+  if (qs.has('debrief') || qs.has('start')) {
+    startModule();
+    if (qs.has('debrief')) {
+      setAct(5, { act5Beat: 7 });
+      showDebriefStage();
+    } else if (qs.get('act')) {
+      const n = Math.min(5, Math.max(1, Number(qs.get('act')) || 1));
+      if (n === 1) {
+        setAct(1, { act1Beat: Number(qs.get('beat')) === 2 ? 2 : 1 });
+      } else if (n === 2) {
+        const beat = Math.min(4, Math.max(1, Number(qs.get('beat')) || 1));
+        setAct(2, { act2Beat: beat });
+      } else if (n === 3) {
+        setAct(3);
+      } else if (n === 4) {
+        setAct(4);
+      } else {
+        const beat = Math.min(7, Math.max(1, Number(qs.get('beat')) || 1));
+        setAct(5, { act5Beat: beat });
+      }
+    }
+  }
+})();
+</script>
+</body>
+</html>

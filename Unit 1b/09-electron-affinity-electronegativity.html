@@ -1,0 +1,3673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>09 — Electron Affinity &amp; Electronegativity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/suite.css">
+<style>
+.mono-label,
+.act-meta,
+.atom-kicker,
+.atom-sym,
+.atom-data,
+.atom-data dt,
+.atom-data dd,
+.bucket-label,
+.cite-line,
+.energy-readout,
+.f-ie-label,
+.f-eq,
+.f-eq-tag,
+.cases-cell-sym,
+.cases-cell-val,
+.cases-cell-lab,
+.cases-ea-sym,
+.cases-ea-val,
+.cases-trend-lab,
+.cases-reveal-btn,
+.zero-card-sym,
+.zero-card-config,
+.zero-card-data dt,
+.zero-card-data dd,
+.cases-valence-note,
+.en-slot-lab,
+.en-slot-sym,
+.en-tile,
+.en-compare dt,
+.en-compare dd,
+.en-delta,
+.en-bond-lab,
+.en-phase-lab{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+}
+.act-meta{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--dim);margin:-0.35rem 0 0.85rem;
+}
+.act-panel[hidden]{display:none !important;}
+.act-placeholder{
+  margin:1.25rem 0 0.5rem;
+  padding:1.5rem 0;
+  border-top:1px solid var(--grid);
+  border-bottom:1px solid var(--grid);
+  color:var(--faint);
+  font-size:0.95rem;
+  line-height:1.5;
+}
+
+.review-q{
+  margin:0.85rem 0 1.1rem;
+  font-size:1.05rem;
+  line-height:1.45;
+}
+.ea-stage{
+  display:flex;
+  flex-direction:column;
+  gap:1.1rem;
+}
+.atom-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:flex-end;
+  gap:1.5rem 4.5rem;
+}
+.atom-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.4rem;
+  min-width:0;
+  transition:opacity 0.45s ease, transform 0.55s ease;
+}
+.atom-card.is-enter{
+  animation:card-enter 0.55s ease both;
+}
+.cases-cell.is-enter{
+  animation:card-enter 0.55s ease both;
+}
+.atom-card.is-hot .atom-sym{color:var(--ember);}
+.atom-card.is-hot .atom-svg .shell-valence{
+  stroke:var(--ember);
+  opacity:0.9;
+}
+.atom-kicker{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--dim);
+  text-align:center;
+}
+.atom-sym{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.06em;
+  color:var(--ink);
+  text-transform:none;
+}
+.atom-host{line-height:0;}
+.atom-svg{
+  width:min(100%,240px);
+  height:auto;
+  display:block;
+}
+.atom-svg .shell{
+  fill:none;
+  stroke:var(--ink);
+  stroke-width:1.25;
+  opacity:0.55;
+}
+.atom-svg .shell-valence{opacity:0.7;}
+.atom-svg .neg-core-disk{pointer-events:none;}
+.atom-svg .e-marker,
+.atom-svg .e-valence{
+  fill:var(--electron);
+  stroke:#6a5530;
+  stroke-width:1;
+}
+.atom-svg .nuc-label{
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  fill:var(--paper);
+  text-anchor:middle;
+  dominant-baseline:central;
+}
+.atom-svg .energy-ring{
+  fill:none;
+  stroke:var(--ember);
+  stroke-width:1.5;
+  pointer-events:none;
+  opacity:0;
+}
+.atom-svg .energy-ring.is-pulse{
+  animation:ea-pulse 0.9s ease-out forwards;
+}
+.atom-svg .energy-ring.is-pulse-2{animation-delay:0.12s;}
+.atom-svg .energy-ring.is-pulse-3{animation-delay:0.24s;}
+
+.atom-data{
+  display:grid;
+  grid-template-columns:auto auto;
+  gap:0.2rem 0.85rem;
+  margin:0.15rem 0 0;
+  font-size:var(--label-xs);
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.atom-data dt{font-weight:600;margin:0;}
+.atom-data dd{
+  margin:0;
+  color:var(--ink);
+  font-weight:600;
+  letter-spacing:0.04em;
+  text-align:right;
+  text-transform:none;
+}
+
+.bucket-block{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.55rem;
+  margin-top:0.25rem;
+}
+.bucket-block[hidden]{display:none !important;}
+.affinity-note[hidden]{display:none !important;}
+.bucket-label{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--dim);
+  text-align:center;
+}
+.bucket{
+  position:relative;
+  width:min(100%,220px);
+  min-height:4.5rem;
+  border:1.5px solid var(--ink);
+  background:var(--panel);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.65rem;
+  padding:0.85rem 1rem;
+}
+.bucket-e{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:radial-gradient(circle at 32% 28%, #e8d49a 0%, var(--electron) 55%, #6a5530 100%);
+  border:1px solid #6a5530;
+  cursor:grab;
+  touch-action:none;
+  animation:bucket-wiggle 1.1s ease-in-out infinite;
+}
+.bucket-e:focus-visible{
+  outline:2px solid var(--signal);
+  outline-offset:3px;
+}
+.bucket-e.is-lifted,
+.bucket-e.is-gone{
+  visibility:hidden;
+  animation:none;
+}
+.bucket-prompt{
+  margin:0;
+  text-align:center;
+  font-size:1rem;
+  color:var(--ink-soft);
+  max-width:36rem;
+}
+.ea-reset{
+  margin-top:0.15rem;
+}
+.ea-reset[hidden]{display:none !important;}
+@keyframes bucket-wiggle{
+  0%,100%{transform:translate(0,0) rotate(0deg);}
+  20%{transform:translate(1.5px,-1px) rotate(-8deg);}
+  40%{transform:translate(-1.5px,1px) rotate(7deg);}
+  60%{transform:translate(1px,1px) rotate(-5deg);}
+  80%{transform:translate(-1px,-1.5px) rotate(6deg);}
+}
+.energy-readout{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--ember);
+  text-align:center;
+  min-height:1.2em;
+}
+.cite-line{
+  margin:0.35rem 0 0;
+  font-size:var(--label-xs);
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--faint);
+  text-align:center;
+}
+.affinity-note{
+  margin:0.35rem 0 0;
+  text-align:center;
+  font-size:1.02rem;
+  line-height:1.45;
+  color:var(--ink-soft);
+  max-width:40rem;
+  margin-inline:auto;
+}
+.affinity-note .term{
+  color:var(--ember);
+  font-weight:700;
+}
+
+/* —— Act 2: F gain / reverse as IE —— */
+.f-stage{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1rem;
+}
+.f-pair{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:flex-end;
+  gap:1.75rem 3.5rem;
+  min-width:0;
+  flex:1 1 auto;
+}
+.f-workbench{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:stretch;
+  gap:1.25rem 0.85rem;
+  width:100%;
+}
+.ie-meter{
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:0.45rem;
+  min-height:11rem;
+  align-self:center;
+  margin-left:-0.35rem;
+  pointer-events:none;
+}
+.ie-meter.is-on{display:flex;}
+.ie-meter-label{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--ember);
+  text-align:center;
+}
+.ie-meter-track{
+  position:relative;
+  flex:1;
+  width:1.35rem;
+  min-height:9.5rem;
+  border:1px solid var(--ink);
+  background:transparent;
+}
+.ie-meter-fill{
+  position:absolute;
+  left:0;right:0;bottom:0;
+  height:0%;
+  background:var(--ember);
+  opacity:0.85;
+}
+.ie-meter-tick{
+  position:absolute;
+  left:-0.35rem;right:-0.35rem;
+  height:0;
+  border-top:2px solid var(--ink);
+  pointer-events:none;
+}
+.ie-meter-tick-label{
+  position:absolute;
+  right:calc(100% + 0.45rem);
+  top:0;
+  transform:translateY(-50%);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--ember);
+  white-space:nowrap;
+}
+.ie-meter-val{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--dim);
+  text-align:center;
+  min-height:1.2em;
+}
+.f-config-card{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:0.55rem;
+  min-width:0;
+}
+.f-config-kicker{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.f-config-written{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--ink);
+  text-transform:none;
+}
+.orbital-board{
+  display:flex;
+  flex-direction:column-reverse;
+  align-items:flex-start;
+  gap:0.65rem;
+  padding:0.2rem 0;
+}
+.subshell{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:0.55rem;
+}
+.subshell-label{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.1em;
+  text-transform:lowercase;
+  color:var(--dim);
+  min-width:1.5rem;
+  text-align:right;
+}
+.subshell-boxes{
+  display:flex;
+  gap:0.3rem;
+}
+.orb-box{
+  width:2.7rem;
+  height:2.75rem;
+  border:1.5px solid var(--ink);
+  background:var(--panel);
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  gap:0.28rem;
+  padding:0.15rem 0.25rem;
+}
+.orb-box.is-extra{
+  box-shadow:inset 0 0 0 2px var(--ember);
+}
+.spin-arrow{
+  width:0.75rem;
+  height:1.9rem;
+  display:block;
+  flex-shrink:0;
+  color:var(--electron);
+  overflow:visible;
+}
+.spin-arrow.up{color:var(--mustard);}
+.spin-arrow.down{color:var(--olive-deep);}
+.spin-arrow.is-extra{color:var(--ember);}
+.spin-arrow.is-extra.e-grabbable{
+  cursor:grab;
+  outline:none;
+}
+.spin-arrow.e-grabbable:focus-visible{
+  outline:2px solid var(--signal);
+  outline-offset:2px;
+}
+.spin-arrow .shaft{
+  fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:square;
+}
+.spin-arrow .barb{fill:currentColor;stroke:none;}
+.atom-svg .e-valence.e-extra{
+  fill:var(--ember);
+  stroke:#6a3a20;
+  cursor:grab;
+}
+.atom-svg .e-grab-hit{
+  cursor:grab;
+  pointer-events:all;
+}
+.atom-svg .e-valence.e-extra.is-lifted,
+.atom-svg .e-grab-hit.is-lifted,
+.spin-arrow.is-extra.is-lifted{
+  opacity:0.15;
+}
+.f-prompt{
+  margin:0 0 0.85rem;
+  font-size:1.05rem;
+  line-height:1.45;
+}
+.f-note[hidden]{display:none !important;}
+.f-note{
+  margin:0.25rem 0 0;
+  text-align:center;
+  font-size:1.02rem;
+  line-height:1.45;
+  color:var(--ink-soft);
+  max-width:42rem;
+}
+.f-note .term{
+  color:var(--ember);
+  font-weight:700;
+}
+.energy-readout.is-in{
+  color:var(--signal);
+}
+.f-ie-label[hidden]{display:none !important;}
+.f-ie-label{
+  margin:0.15rem 0 0;
+  text-align:center;
+  font-size:var(--label-md);
+  font-weight:700;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--signal);
+}
+.f-eq-block[hidden]{display:none !important;}
+.f-eq-block{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.45rem;
+  margin:0.55rem 0 0;
+  width:100%;
+  max-width:36rem;
+}
+.f-eq{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:baseline;
+  gap:0.35rem 0.55rem;
+  margin:0;
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--ink);
+  text-align:center;
+  text-transform:none;
+  line-height:1.45;
+}
+.f-eq-tag{
+  color:var(--ember);
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+.f-eq.is-focus .f-eq-tag{
+  color:var(--signal);
+}
+.f-eq .sym{text-transform:none;}
+.e-drag-ghost{
+  position:fixed;
+  width:22px;
+  height:22px;
+  margin:-11px 0 0 -11px;
+  border-radius:50%;
+  background:radial-gradient(circle at 32% 28%, #e8d49a 0%, var(--electron) 55%, #6a5530 100%);
+  border:1px solid #6a5530;
+  pointer-events:none;
+  z-index:40;
+}
+body.is-e-dragging{cursor:grabbing;user-select:none;}
+body.is-e-dragging .bucket-e{cursor:grabbing;}
+
+@keyframes card-enter{
+  from{opacity:0;transform:translateY(12px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes ea-pulse{
+  0%{opacity:0.75;stroke-width:2;}
+  100%{opacity:0;stroke-width:1;}
+}
+@media (prefers-reduced-motion:reduce){
+  .atom-card.is-enter,
+  .cases-cell.is-enter,
+  .cases-anomaly-q.is-in{animation:none;}
+  .atom-svg .energy-ring.is-pulse,
+  .atom-svg .energy-ring.is-pulse-2,
+  .atom-svg .energy-ring.is-pulse-3{animation:none;opacity:0.45;}
+  .bucket-e{animation:none;}
+  .cases-cell.is-anomaly{transition:none;}
+  .cases-step{animation:none;}
+}
+
+/* —— Act 3: specific cases —— */
+.cases-step[hidden]{display:none !important;}
+.cases-step{
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
+.cases-prompt{
+  margin:0 0 0.15rem;
+  font-size:1.05rem;
+  line-height:1.45;
+}
+.cases-frame{
+  margin:0;
+  font-size:1.02rem;
+  line-height:1.45;
+  color:var(--ink-soft);
+}
+.cases-stage{
+  display:flex;
+  flex-direction:column;
+  gap:1.1rem;
+  align-items:center;
+}
+.cases-trend-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:stretch;
+  gap:0.65rem 0.85rem;
+  width:100%;
+}
+.cases-cell{
+  position:relative;
+  flex:1 1 5.5rem;
+  max-width:7.5rem;
+  min-width:5.2rem;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.35rem;
+  padding:0.85rem 0.55rem 0.7rem;
+  border:1px solid var(--paper-3);
+  background:var(--panel);
+  transition:border-color 0.45s ease;
+}
+.cases-cell-sym{
+  font-size:1.15rem;
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--ink);
+  text-transform:none;
+  line-height:1;
+}
+.cases-cell-lab{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.cases-cell-val{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--ink);
+  text-transform:none;
+}
+.cases-cell-val.is-ea{color:var(--ember);}
+.cases-cell-val.is-blank{
+  color:var(--signal);
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+}
+.cases-bar{
+  width:100%;
+  height:0.35rem;
+  background:var(--paper-3);
+  position:relative;
+  margin-top:0.15rem;
+}
+.cases-bar > span{
+  display:block;
+  height:100%;
+  background:var(--phosphor);
+  max-width:100%;
+}
+.cases-bar.is-ea > span{background:var(--ember);}
+.cases-bar.is-blank > span{width:0 !important;background:transparent;}
+.cases-trend-lab{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+  text-align:center;
+}
+.cases-cell.is-anomaly{
+  border-color:var(--signal);
+  z-index:1;
+}
+.cases-anomaly-q{
+  margin:0.15rem 0 0;
+  text-align:center;
+  max-width:36rem;
+}
+.cases-anomaly-q.is-in{
+  animation:card-enter 0.45s ease both;
+}
+/* Element symbols in the fig kicker — keep proper capitalization (§1.7). */
+#casesViewport1::before{
+  text-transform:none;
+  letter-spacing:0.1em;
+}
+.cases-valence-note{
+  margin:0;
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--faint);
+  text-align:center;
+}
+
+.zero-row{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:1.25rem 1.5rem;
+  width:100%;
+}
+.zero-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.55rem;
+  min-width:0;
+  padding:0.35rem 0.15rem;
+}
+.zero-card-sym{
+  font-size:1.2rem;
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--ink);
+  text-transform:none;
+}
+.zero-card-config{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.03em;
+  color:var(--ink-soft);
+  text-transform:none;
+  text-align:center;
+  line-height:1.35;
+}
+/* Shared board width = label + 3 p-boxes so every s row shares the same left edge. */
+.zero-card .orbital-board{
+  align-items:flex-start;
+  justify-content:flex-start;
+  width:calc(1.5rem + 0.55rem + 3 * 2.7rem + 2 * 0.3rem);
+  min-height:calc(2 * 2.75rem + 0.65rem);
+}
+/* Single s-box sits under the middle of the three p-boxes above. */
+.zero-card .subshell-boxes:has(> .orb-box:only-child){
+  margin-left:calc(2.7rem + 0.3rem);
+}
+.zero-card-data{
+  display:grid;
+  grid-template-columns:4.25rem 1fr;
+  gap:0.2rem 0.85rem;
+  margin:0.15rem 0 0;
+  width:calc(1.5rem + 0.55rem + 3 * 2.7rem + 2 * 0.3rem);
+  font-size:var(--label-xs);
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.zero-card-data dt{font-weight:600;margin:0;}
+.zero-card-data dd{
+  margin:0;
+  color:var(--ink);
+  font-weight:600;
+  letter-spacing:0.04em;
+  text-align:right;
+  text-transform:none;
+}
+.zero-card-data dd.is-blank{
+  color:var(--signal);
+  letter-spacing:0.04em;
+  text-transform:none;
+}
+.cases-think{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:0.75rem;
+  width:100%;
+  margin-top:0.35rem;
+  padding-top:0.85rem;
+  border-top:1px solid var(--grid);
+}
+.cases-reveal-btn{
+  align-self:flex-start;
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--signal);
+  background:transparent;
+  border:none;
+  border-bottom:1.5px solid var(--signal);
+  padding:0.2rem 0;
+  cursor:pointer;
+}
+.cases-reveal-btn:focus-visible{
+  outline:2px solid var(--signal);
+  outline-offset:3px;
+}
+.cases-reveal-btn[hidden]{display:none !important;}
+.cases-answer{
+  margin:0;
+  font-size:1.02rem;
+  line-height:1.5;
+  color:var(--ink-soft);
+  display:flex;
+  flex-direction:column;
+  gap:0.75rem;
+}
+.cases-answer[hidden]{display:none !important;}
+.cases-answer p{margin:0;}
+.cases-answer .term{
+  color:var(--signal);
+  font-weight:700;
+}
+.cases-followup{
+  margin:0.15rem 0 0;
+  padding-top:0.75rem;
+  border-top:1px solid var(--grid);
+}
+
+.cases-ea-wrap{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.cases-ea-table{
+  display:grid;
+  grid-template-columns:repeat(18, minmax(2.35rem, 1fr));
+  gap:0;
+  min-width:42rem;
+  border:1px solid var(--ink);
+  background:var(--paper);
+}
+.cases-ea-cell{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0.12rem;
+  min-height:3.5rem;
+  padding:0.3rem 0.1rem 0.35rem;
+  border-right:1px solid var(--paper-3);
+  border-bottom:1px solid var(--paper-3);
+  background:var(--paper);
+}
+.cases-ea-cell.is-empty{
+  background:transparent;
+  border-color:transparent;
+}
+.cases-ea-cell.is-blank{
+  background:rgba(26,106,163,0.08);
+}
+.cases-ea-sym{
+  font-size:0.78rem;
+  font-weight:600;
+  letter-spacing:0.02em;
+  color:var(--ink);
+  text-transform:none;
+  line-height:1;
+}
+.cases-ea-val{
+  font-size:0.62rem;
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--ember);
+  text-transform:none;
+  line-height:1;
+}
+.cases-ea-cell.is-blank .cases-ea-val{
+  color:var(--signal);
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+}
+.cases-ea-legend{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:0.85rem 1.5rem;
+  margin:0.15rem 0 0;
+  font-size:var(--label-xs);
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--dim);
+  text-align:center;
+}
+.cases-ea-legend span strong{
+  color:var(--ember);
+  font-weight:600;
+}
+.cases-ea-legend .blank-swatch{
+  color:var(--signal);
+  font-weight:600;
+}
+
+@media (max-width:760px){
+  .zero-row{grid-template-columns:1fr;gap:1.5rem;}
+  .cases-cell{max-width:none;flex:1 1 calc(33% - 0.6rem);}
+  .en-grid{grid-template-columns:repeat(4,minmax(0,1fr));}
+  .en-slots{gap:1.25rem;}
+}
+
+/* —— Act 4: electronegativity / shared pair —— */
+.en-frame{
+  margin:0 0 1rem;
+  font-size:1.02rem;
+  line-height:1.45;
+  color:var(--ink-soft);
+}
+.en-stage{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1.1rem;
+}
+.en-slots{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:stretch;
+  gap:2rem 3.5rem;
+  width:100%;
+}
+.en-slot{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.35rem;
+  min-width:5.5rem;
+  padding:0.55rem 0.85rem 0.7rem;
+  border:1.5px dashed var(--grid);
+  background:transparent;
+  cursor:pointer;
+  color:inherit;
+  font:inherit;
+}
+.en-slot:focus-visible{
+  outline:2px solid var(--signal);
+  outline-offset:3px;
+}
+.en-slot.is-active{
+  border-color:var(--signal);
+  border-style:solid;
+}
+.en-slot.is-filled{
+  border-style:solid;
+  border-color:var(--ink);
+}
+.en-slot-lab{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.en-slot-sym{
+  font-size:1.35rem;
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--ink);
+  text-transform:none;
+  min-height:1.4em;
+  line-height:1.4;
+}
+.en-slot-sym.is-empty{color:var(--faint);}
+.en-grid{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:0.45rem;
+  width:100%;
+  max-width:28rem;
+}
+.en-tile{
+  appearance:none;
+  border:1px solid var(--ink);
+  background:var(--panel);
+  color:var(--ink);
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0.04em;
+  text-transform:none;
+  padding:0.55rem 0.2rem;
+  cursor:pointer;
+  text-align:center;
+}
+.en-tile:hover{background:var(--paper-2);}
+.en-tile:focus-visible{
+  outline:2px solid var(--signal);
+  outline-offset:2px;
+}
+.en-tile.is-picked{
+  background:var(--ink);
+  color:var(--paper);
+  border-color:var(--ink);
+}
+.en-tile.is-picked:hover{background:var(--void-2);color:var(--paper);}
+.en-scene{
+  position:relative;
+  width:100%;
+  min-height:14rem;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0.75rem;
+}
+.en-scene[hidden]{display:none !important;}
+.en-pair-host{
+  position:relative;
+  width:min(100%,420px);
+  height:220px;
+  margin:0 auto;
+}
+.en-pair-host .en-atom{
+  position:absolute;
+  top:50%;
+  transform:translate(-50%,-50%);
+  transition:left 0.7s cubic-bezier(0.2,0.8,0.2,1), opacity 0.45s ease;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.2rem;
+  pointer-events:none;
+}
+.en-pair-host .en-atom-sym{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.06em;
+  color:var(--ink);
+  text-transform:none;
+}
+.en-pair-host.is-apart .en-atom-a{left:22%;}
+.en-pair-host.is-apart .en-atom-b{left:78%;}
+.en-pair-host.is-overlap .en-atom-a{left:36%;}
+.en-pair-host.is-overlap .en-atom-b{left:64%;}
+/* During pull, weaker atom drifts in; winner receives. */
+.en-pair-host.is-pull.is-pull-a .en-atom-a{left:34%;}
+.en-pair-host.is-pull.is-pull-a .en-atom-b{left:56%;}
+.en-pair-host.is-pull.is-pull-b .en-atom-a{left:44%;}
+.en-pair-host.is-pull.is-pull-b .en-atom-b{left:66%;}
+.en-pair-host.is-pull.is-pull-even .en-atom-a{left:36%;}
+.en-pair-host.is-pull.is-pull-even .en-atom-b{left:64%;}
+.en-pair-host.is-simple .en-atom{
+  opacity:0;
+  pointer-events:none;
+}
+.en-pair-host .en-atom .atom-svg{
+  transition:transform 1.15s cubic-bezier(0.2,0.75,0.2,1);
+  transform-origin:50% 55%;
+}
+.en-pair-host .en-atom .shell,
+.en-pair-host .en-atom .shell-valence,
+.en-pair-host .en-atom .valence-group{
+  transition:
+    transform 1.15s cubic-bezier(0.2,0.75,0.2,1),
+    stroke 0.7s ease,
+    opacity 0.7s ease,
+    stroke-width 0.7s ease;
+  transform-box:fill-box;
+  transform-origin:center;
+}
+/* Weaker atom: rings elongate / morph toward the stronger pull. */
+.en-pair-host.is-pull.is-pull-a .en-atom-b .atom-svg{
+  transform:translateX(-22px) scaleX(1.28) skewX(10deg);
+}
+.en-pair-host.is-pull.is-pull-a .en-atom-b .shell-valence{
+  transform:scaleX(1.55) translateX(-6px);
+  stroke:var(--ember);
+  stroke-width:2;
+  opacity:0.95;
+}
+.en-pair-host.is-pull.is-pull-a .en-atom-b .valence-group{
+  transform:scaleX(1.4) translateX(-10px);
+}
+.en-pair-host.is-pull.is-pull-a .en-atom-b .shell:not(.shell-valence){
+  transform:scaleX(1.18) translateX(-4px);
+  opacity:0.4;
+}
+.en-pair-host.is-pull.is-pull-b .en-atom-a .atom-svg{
+  transform:translateX(22px) scaleX(1.28) skewX(-10deg);
+}
+.en-pair-host.is-pull.is-pull-b .en-atom-a .shell-valence{
+  transform:scaleX(1.55) translateX(6px);
+  stroke:var(--ember);
+  stroke-width:2;
+  opacity:0.95;
+}
+.en-pair-host.is-pull.is-pull-b .en-atom-a .valence-group{
+  transform:scaleX(1.4) translateX(10px);
+}
+.en-pair-host.is-pull.is-pull-b .en-atom-a .shell:not(.shell-valence){
+  transform:scaleX(1.18) translateX(4px);
+  opacity:0.4;
+}
+/* Stronger atom: valence tightens and takes the density. */
+.en-pair-host.is-pull.is-pull-a .en-atom-a .shell-valence,
+.en-pair-host.is-pull.is-pull-b .en-atom-b .shell-valence{
+  stroke:var(--ember);
+  stroke-width:2.25;
+  opacity:1;
+  transform:scale(1.08);
+}
+.en-pair-host.is-pull.is-pull-a .en-atom-a .atom-svg{
+  transform:scale(1.04);
+}
+.en-pair-host.is-pull.is-pull-b .en-atom-b .atom-svg{
+  transform:scale(1.04);
+}
+.en-density{
+  position:absolute;
+  top:52%;
+  left:50%;
+  width:118px;
+  height:70px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse at 50% 50%,
+      rgba(196,163,90,0.58) 0%,
+      rgba(196,163,90,0.30) 42%,
+      rgba(196,163,90,0.08) 68%,
+      rgba(196,163,90,0) 78%);
+  opacity:0;
+  pointer-events:none;
+  z-index:1;
+  transition:
+    opacity 0.4s ease,
+    transform 1.15s cubic-bezier(0.2,0.75,0.2,1),
+    width 1.15s cubic-bezier(0.2,0.75,0.2,1),
+    height 1.15s cubic-bezier(0.2,0.75,0.2,1),
+    filter 1.15s ease;
+  filter:blur(0.2px);
+}
+.en-pair-host.is-overlap .en-density,
+.en-pair-host.is-pull .en-density{opacity:1;}
+.en-pair-host.is-simple .en-density{opacity:0;}
+.en-pair-host.is-pull.is-pull-a .en-density{
+  width:168px;
+  height:58px;
+  transform:translate(-82%,-50%) scale(1.05,0.92);
+  filter:blur(0.6px);
+  background:
+    radial-gradient(ellipse at 22% 50%,
+      rgba(196,163,90,0.82) 0%,
+      rgba(168,90,50,0.28) 28%,
+      rgba(196,163,90,0.35) 48%,
+      rgba(196,163,90,0.08) 72%,
+      rgba(196,163,90,0) 82%);
+}
+.en-pair-host.is-pull.is-pull-b .en-density{
+  width:168px;
+  height:58px;
+  transform:translate(-18%,-50%) scale(1.05,0.92);
+  filter:blur(0.6px);
+  background:
+    radial-gradient(ellipse at 78% 50%,
+      rgba(196,163,90,0.82) 0%,
+      rgba(168,90,50,0.28) 28%,
+      rgba(196,163,90,0.35) 48%,
+      rgba(196,163,90,0.08) 72%,
+      rgba(196,163,90,0) 82%);
+}
+.en-pair-host.is-pull.is-pull-even .en-density{
+  width:130px;
+  height:66px;
+  transform:translate(-50%,-50%);
+}
+.en-shared{
+  position:absolute;
+  top:52%;
+  left:50%;
+  width:34px;
+  height:18px;
+  transform:translate(-50%,-50%);
+  opacity:0;
+  transition:opacity 0.35s ease;
+  pointer-events:none;
+  z-index:2;
+}
+.en-pair-host.is-overlap .en-shared,
+.en-pair-host.is-pull .en-shared{opacity:1;}
+.en-pair-host.is-simple .en-shared{opacity:0;}
+.en-shared-e{
+  position:absolute;
+  top:50%;
+  width:14px;
+  height:14px;
+  margin-top:-7px;
+  border-radius:50%;
+  background:radial-gradient(circle at 32% 28%, #e8d49a 0%, var(--electron) 55%, #6a5530 100%);
+  border:1px solid #6a5530;
+}
+.en-shared-e:first-child{left:0;}
+.en-shared-e:last-child{right:0;}
+.en-simple{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.45s ease;
+}
+.en-pair-host.is-simple .en-simple{
+  opacity:1;
+  pointer-events:auto;
+}
+.en-simple-svg{
+  width:min(100%,380px);
+  height:auto;
+  display:block;
+}
+.en-simple-svg .sphere-a,
+.en-simple-svg .sphere-b{
+  stroke:var(--ink);
+  stroke-width:1.25;
+}
+.en-simple-svg .bond{
+  stroke:var(--ink);
+  stroke-width:1.5;
+  fill:none;
+}
+.en-simple-svg .pull-arrow{
+  fill:none;
+  stroke:var(--ember);
+  stroke-width:2;
+  opacity:0.95;
+}
+.en-simple-svg .delta{
+  font-family:var(--font-mono);
+  font-size:13px;
+  font-weight:600;
+  fill:var(--ember);
+  text-anchor:middle;
+}
+.en-simple-svg .delta.is-pos{fill:var(--signal);}
+.en-simple-svg .sym-lab{
+  font-family:var(--font-mono);
+  font-size:14px;
+  font-weight:600;
+  fill:var(--ink);
+  text-anchor:middle;
+}
+.en-compare{
+  display:grid;
+  grid-template-columns:auto auto auto;
+  gap:0.25rem 1.1rem;
+  margin:0;
+  font-size:var(--label-xs);
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--dim);
+}
+.en-compare[hidden]{display:none !important;}
+.en-compare dt{font-weight:600;margin:0;}
+.en-compare dd{
+  margin:0;
+  color:var(--ink);
+  font-weight:600;
+  letter-spacing:0.04em;
+  text-transform:none;
+  text-align:right;
+}
+.en-compare dd.is-winner{color:var(--ember);}
+.en-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:0.65rem;
+}
+.en-actions[hidden]{display:none !important;}
+.en-note{
+  margin:0.15rem 0 0;
+  text-align:center;
+  font-size:1.02rem;
+  line-height:1.45;
+  color:var(--ink-soft);
+  max-width:42rem;
+  margin-inline:auto;
+}
+.en-note[hidden]{display:none !important;}
+.en-note .term{
+  color:var(--signal);
+  font-weight:700;
+}
+.en-phase-lab{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--dim);
+  text-align:center;
+  min-height:1.1em;
+}
+@media (prefers-reduced-motion:reduce){
+  .en-pair-host .en-atom,
+  .en-pair-host .en-atom .atom-svg,
+  .en-pair-host .en-atom .shell,
+  .en-pair-host .en-atom .shell-valence,
+  .en-pair-host .en-atom .valence-group,
+  .en-shared,
+  .en-density,
+  .en-simple{transition:none;}
+}
+</style>
+</head>
+<body>
+<div class="module-wrap">
+  <div class="top-nav">
+    <a href="index.html" class="back-link">← Unit 1b</a>
+    <div class="mod-meta">Module 09 · Electron Affinity &amp; Electronegativity</div>
+  </div>
+
+  <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
+    <div class="briefing-kicker"><span>Before you begin</span></div>
+    <h1 id="briefingTitle">Electron Affinity &amp; Electronegativity</h1>
+    <p class="briefing-lead">Read what this module is aiming for. Then open the instrument and work through it.</p>
+    <div class="briefing-columns">
+      <div class="briefing-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="briefing-li" id="briefingIntentions"></ul>
+      </div>
+      <div class="briefing-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="briefing-cc" id="briefingCompetencies"></ul>
+      </div>
+    </div>
+    <div class="briefing-actions">
+      <button type="button" class="btn submit" id="briefingNext">Next → Start simulation</button>
+    </div>
+  </section>
+
+  <div id="moduleStage" hidden>
+    <div class="mod-tag">Module 09</div>
+    <div class="act-meta" id="actMeta">Act 1 of 4 · Electron affinity</div>
+    <h1 id="stageTitle">Electron Affinity</h1>
+
+    <div class="act-panel" id="act1" data-act="1">
+      <p class="student-q review-q" id="reviewQ">REVIEW: How do radius, IE, and core charge relate? Compare the data below, does it make sense given what you know about these two atoms?</p>
+
+      <div class="viewport" id="eaViewport" data-fig="FIG. 09A  ·  WHO TAKES THE ELECTRON?">
+        <div class="plate-body ea-stage">
+          <div class="atom-row" id="atomRow"></div>
+
+          <div class="bucket-block" id="bucketBlock" hidden>
+            <div class="bucket-label">Spare electron</div>
+            <div class="bucket" id="electronBucket" aria-label="Tray with one spare electron">
+              <button type="button" class="bucket-e" id="bucketElectron" aria-label="Toss an electron from the tray"></button>
+            </div>
+            <p class="bucket-prompt">Toss an electron, and see where it goes.</p>
+            <div class="energy-readout" id="energyReadout" aria-live="polite"></div>
+            <p class="affinity-note" id="affinityNote" hidden>
+              Chlorine pulled the electron in. Energy left the atom —
+              that pull is its <span class="term">electron affinity</span>.
+            </p>
+            <button type="button" class="btn ea-reset" id="eaResetBtn" hidden>Reset</button>
+          </div>
+
+          <p class="cite-line">Radius · PubChem &nbsp;·&nbsp; IE₁ · Moog §8.3</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act2" data-act="2" hidden>
+      <p class="student-q f-prompt" id="fPrompt">Fluorine is one electron shy of a full outer shell. Toss an electron onto it and watch the energy.</p>
+
+      <div class="viewport" id="fViewport" data-fig="FIG. 09B  ·  MEASURING AFFINITY">
+        <div class="plate-body f-stage">
+          <div class="f-workbench">
+            <div class="f-pair">
+              <div id="fAtomHost"></div>
+              <div class="f-config-card">
+                <div class="f-config-kicker mono-label">Configuration</div>
+                <div class="f-config-written mono-label" id="fConfigWritten">1s² 2s² 2p⁵</div>
+                <div class="orbital-board" id="fConfigBoard" role="img" aria-label="Fluorine orbital diagram"></div>
+              </div>
+            </div>
+            <div class="ie-meter" id="fIeMeter" aria-label="Energy put in to remove the electron" hidden>
+              <div class="ie-meter-label" id="fIeMeterLabel">Energy in</div>
+              <div class="ie-meter-track">
+                <div class="ie-meter-fill" id="fIeMeterFill"></div>
+                <div class="ie-meter-tick" id="fIeMeterTick">
+                  <span class="ie-meter-tick-label" id="fIeMeterTickLabel">EA</span>
+                </div>
+              </div>
+              <div class="ie-meter-val" id="fIeMeterVal">0.00</div>
+            </div>
+          </div>
+
+          <div class="bucket-block" id="fBucketBlock">
+            <div class="bucket-label">Spare electron</div>
+            <div class="bucket" id="fElectronBucket" aria-label="Tray with one spare electron">
+              <button type="button" class="bucket-e" id="fBucketElectron" aria-label="Toss an electron onto fluorine"></button>
+            </div>
+            <p class="bucket-prompt">Toss an electron onto fluorine.</p>
+          </div>
+
+          <div class="energy-readout" id="fEnergyReadout" aria-live="polite"></div>
+          <div class="f-ie-label" id="fIeLabel" hidden>IE of F⁻</div>
+          <div class="f-eq-block" id="fEqBlock" hidden aria-label="Comparing ionization energy and electron affinity">
+            <p class="f-eq">
+              <span><span class="sym">F</span> + energy → <span class="sym">F</span>⁺ + e⁻</span>
+              <span class="f-eq-tag">= ionization energy</span>
+            </p>
+            <p class="f-eq">
+              <span><span class="sym">F</span> + e⁻ → <span class="sym">F</span>⁻ + energy</span>
+            </p>
+            <p class="f-eq is-focus">
+              <span><span class="sym">F</span>⁻ + energy → <span class="sym">F</span> + e⁻</span>
+              <span class="f-eq-tag">= EA</span>
+            </p>
+          </div>
+          <p class="f-note" id="fNote" hidden>
+            The energy released when F gains an electron is the same magnitude as the energy needed to take it back off —
+            the <span class="term">ionization energy of the anion</span>.
+            That is how electron affinity is measured. A stronger affinity means a more stable anion —
+            and a harder electron to pull away.
+          </p>
+          <button type="button" class="btn ea-reset" id="fResetBtn" hidden>Reset</button>
+          <p class="cite-line">EA · PubChem &nbsp;·&nbsp; IE₁(F) · Moog §8.3</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act3" data-act="3" hidden>
+      <div class="cases-step" id="casesStep0" data-cases-step="0">
+        <p class="cases-frame" id="casesFrame0">Across boron to fluorine, core charge climbs and radius shrinks. Watch what that does to electron affinity.</p>
+        <div class="viewport" id="casesViewport0" data-fig="FIG. 09C  ·  B → F">
+          <div class="plate-body cases-stage">
+            <div class="cases-trend-lab">Core charge ↑ &nbsp;·&nbsp; Radius ↓ &nbsp;·&nbsp; EA ↑ ?</div>
+            <div class="cases-trend-row" id="casesTrendRow" role="list" aria-label="Boron through fluorine"></div>
+            <p class="student-q cases-anomaly-q" id="casesAnomalyQ" hidden>Which element breaks the trend? Any idea why?</p>
+            <p class="cite-line">Radius · EA · PubChem &nbsp;·&nbsp; IE₁ · Moog §8.3</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cases-step" id="casesStep1" data-cases-step="1" hidden>
+        <p class="student-q cases-prompt">Three atoms with EA blank — look at how their electrons sit.</p>
+        <div class="viewport" id="casesViewport1" data-fig="FIG. 09D  ·  Mg · N · Ar">
+          <div class="plate-body cases-stage">
+            <p class="cases-valence-note">(only valence shell shown)</p>
+            <div class="zero-row" id="casesZeroRow" role="list" aria-label="Magnesium, nitrogen, and argon"></div>
+            <div class="cases-think">
+              <p class="student-q cases-prompt" style="margin:0">All of these have an electron affinity of zero — can you hypothesize why?</p>
+              <button type="button" class="cases-reveal-btn" id="casesRevealBtn">Reveal model answer</button>
+              <div class="cases-answer" id="casesAnswer" hidden>
+                <p>
+                  <span class="term">Mg</span> and <span class="term">Ar</span> both have filled subshells
+                  (Mg ends in 3s²; Ar ends in a closed 3p⁶ shell).
+                  Adding an extra electron would mean opening a new subshell that isn’t occupied yet —
+                  so neither atom binds that electron into a stable anion.
+                </p>
+                <p>
+                  <span class="term">N</span> is different: its 2p subshell is half-full, with three electrons of the same spin.
+                  Forcing a fourth electron into that arrangement creates <span class="term">electron repulsion</span>
+                  and disrupts the stable half-filled set — again, no stable anion forms.
+                </p>
+                <p class="student-q cases-prompt cases-followup">Where on the periodic table would you find other elements with an EA of zero?</p>
+              </div>
+            </div>
+            <p class="cite-line">EA · PubChem &nbsp;·&nbsp; IE₁ · Moog §8.3</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cases-step" id="casesStep2" data-cases-step="2" hidden>
+        <p class="cases-frame">Electron affinities across the representative elements. Blanks mean no stable anion — never a measured zero.</p>
+        <div class="viewport" id="casesViewport2" data-fig="FIG. 09E  ·  EA MAP">
+          <div class="plate-body cases-stage">
+            <div class="cases-ea-wrap">
+              <div class="cases-ea-table" id="casesEaTable" role="img" aria-label="Electron affinity map for representative elements"></div>
+            </div>
+            <p class="cases-ea-legend">
+              <span><strong>fill</strong> = EA (MJ/mol)</span>
+              <span class="blank-swatch">— = no stable anion</span>
+            </p>
+            <p class="cite-line">EA · PubChem</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act4" data-act="4" hidden>
+      <p class="en-frame" id="enFrame">Pick two atoms that can share a pair. Watch who pulls harder.</p>
+
+      <div class="viewport" id="enViewport" data-fig="FIG. 09F  ·  SHARED PAIR">
+        <div class="plate-body en-stage">
+          <div class="en-slots" role="group" aria-label="Pair slots">
+            <button type="button" class="en-slot is-active" id="enSlotA" data-slot="a" aria-pressed="true">
+              <span class="en-slot-lab">Atom A</span>
+              <span class="en-slot-sym is-empty" id="enSlotASym">—</span>
+            </button>
+            <button type="button" class="en-slot" id="enSlotB" data-slot="b" aria-pressed="false">
+              <span class="en-slot-lab">Atom B</span>
+              <span class="en-slot-sym is-empty" id="enSlotBSym">—</span>
+            </button>
+          </div>
+
+          <div class="en-grid" id="enGrid" role="listbox" aria-label="Elements that share electrons"></div>
+
+          <div class="en-scene" id="enScene" hidden>
+            <div class="en-phase-lab" id="enPhaseLab" aria-live="polite"></div>
+            <div class="en-pair-host is-apart" id="enPairHost" aria-hidden="false">
+              <div class="en-atom en-atom-a" id="enAtomA"></div>
+              <div class="en-atom en-atom-b" id="enAtomB"></div>
+              <div class="en-density" id="enDensity" aria-hidden="true"></div>
+              <div class="en-shared" id="enShared" aria-hidden="true">
+                <span class="en-shared-e"></span>
+                <span class="en-shared-e"></span>
+              </div>
+              <div class="en-simple" id="enSimple" aria-hidden="true"></div>
+            </div>
+
+            <dl class="en-compare" id="enCompare" hidden></dl>
+
+            <div class="en-actions" id="enActions" hidden>
+              <button type="button" class="btn submit" id="enShareBtn">Share a pair →</button>
+              <button type="button" class="btn ea-reset" id="enResetBtn" hidden>Pick again</button>
+            </div>
+
+            <p class="en-note" id="enNote" hidden>
+              Higher core charge pulls the shared pair closer — and when core charge matches,
+              the smaller atom wins the tug. That pull is <span class="term">electronegativity</span>.
+              The pair sits unevenly: one end slightly negative (δ−), the other slightly positive (δ+).
+            </p>
+          </div>
+
+          <p class="cite-line">EN · Moog Allen §8.9 &nbsp;·&nbsp; Radius · PubChem</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="module-footer" aria-label="Section navigation">
+      <div class="module-footer-back">
+        <button type="button" class="btn" id="backBtn" hidden>← Back</button>
+      </div>
+      <div class="module-footer-help">
+        <button type="button" id="stuckBtn" hidden>Stuck?</button>
+      </div>
+      <div class="module-footer-fwd">
+        <button type="button" class="btn submit" id="continueBtn">Continue →</button>
+      </div>
+    </nav>
+    <div class="help-panel" id="helpPanel">
+      <p id="helpText"></p>
+    </div>
+
+    <section class="debrief" id="debrief" hidden aria-labelledby="debriefTitle">
+      <h2 id="debriefTitle">What this was for</h2>
+      <p class="debrief-lead">The intentions behind this module, and the competencies you just practised. Read each competency statement and decide honestly how well it fits you right now.</p>
+      <div class="debrief-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="debrief-li" id="debriefIntentions"></ul>
+      </div>
+      <div class="debrief-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="debrief-cc" id="debriefCompetencies"></ul>
+      </div>
+      <div class="debrief-block todo">
+        <div class="debrief-kicker">To do</div>
+        <ul class="debrief-todo">
+          <li>
+            <label>
+              <input type="checkbox" name="todo-notes">
+              <span>In your OneNote, make some notes that summarize each of the last four modules. Pretend you are studying for a test and you need to make quick notes to reference later. Use both the learning intentions and CCs as your guide.</span>
+            </label>
+          </li>
+          <li>
+            <label>
+              <input type="checkbox" name="todo-ap">
+              <span>Go to AP Classroom and complete quiz 09.</span>
+            </label>
+          </li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="assets/suite-chrome.js"></script>
+<script src="assets/pubchem-data.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  const prefersReduced = SuiteChrome.prefersReduced;
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const PUBCHEM = (window.SuitePubChem && SuitePubChem.PUBCHEM) || {};
+
+  const DEBRIEF = {
+    intentions: [
+      { text: 'We will discuss the patterns and trends which exist on the periodic table.',
+        target: 'cases:2', revisit: 'EA map' },
+      { text: 'We will learn about terms such as affinity, ionization, and electronegativity.',
+        target: 'act:4', revisit: 'Shared pair' },
+      { text: 'We will relate the trends to previous learnings such as radius and ionization energy.',
+        target: 'cases:0', revisit: 'B → F trend' },
+      { text: 'We will see how the trends change as electrons are gained or lost by atoms.',
+        target: 'act:2', revisit: 'Fluorine gain & loss' }
+    ],
+    competencies: [
+      { code:'Q&P', name:'Questioning and predicting',
+        text:'I can make predictions about chemical properties or reactivity based on multiple trends, including atomic radius and ionization energy, and support those predictions using prior learning.' },
+      { code:'PAI', name:'Processing and analyzing data and information',
+        text:'I can identify and explain periodic trends (e.g. atomic radius, electronegativity, ionization energy) by analyzing their patterns across periods and down groups on the periodic table and justify those patterns based on their atomic configuration and associated properties.' },
+      { code:'C', name:'Communicating',
+        text:'I can accurately define and use key terms such as electron affinity, ionization energy, and electronegativity when explaining periodic trends or comparing elements.' }
+    ]
+  };
+
+  /* IE₁ from Moog §8.3; radius / EA from PubChem (§8.0 / §8.13). */
+  const ATOMS = {
+    Cl: {
+      sym: 'Cl', z: 17, shells: [2, 8, 7], core: 7, ie1: 1.25,
+      radiusPm: PUBCHEM.Cl ? PUBCHEM.Cl.radiusPm : 175,
+      eaMjMol: PUBCHEM.Cl ? PUBCHEM.Cl.eaMjMol : 0.349
+    },
+    ClIon: {
+      sym: 'Cl⁻', z: 17, shells: [2, 8, 8], core: 7, ie1: 1.25,
+      radiusPm: 181,
+      eaMjMol: PUBCHEM.Cl ? PUBCHEM.Cl.eaMjMol : 0.349
+    },
+    Ca: {
+      sym: 'Ca', z: 20, shells: [2, 8, 8, 2], core: 2, ie1: 0.59,
+      radiusPm: PUBCHEM.Ca ? PUBCHEM.Ca.radiusPm : 231,
+      eaMjMol: null
+    },
+    F: {
+      sym: 'F', z: 9, shells: [2, 7], core: 7, ie1: 1.68,
+      radiusPm: PUBCHEM.F ? PUBCHEM.F.radiusPm : 135,
+      eaMjMol: PUBCHEM.F ? PUBCHEM.F.eaMjMol : 0.322,
+      config: '1s² 2s² 2p⁵',
+      /* orbital counts: 1s, 2s, 2p×3 */
+      boxes: [2, 2, 2, 2, 1]
+    },
+    FIon: {
+      sym: 'F⁻', z: 9, shells: [2, 8], core: 7, ie1: 1.68,
+      radiusPm: 133,
+      eaMjMol: PUBCHEM.F ? PUBCHEM.F.eaMjMol : 0.322,
+      config: '1s² 2s² 2p⁶',
+      boxes: [2, 2, 2, 2, 2]
+    },
+    B: {
+      sym: 'B', z: 5, shells: [2, 3], core: 3, ie1: 0.80,
+      radiusPm: PUBCHEM.B ? PUBCHEM.B.radiusPm : 192,
+      eaMjMol: PUBCHEM.B ? PUBCHEM.B.eaMjMol : 0.027
+    },
+    C: {
+      sym: 'C', z: 6, shells: [2, 4], core: 4, ie1: 1.09,
+      radiusPm: PUBCHEM.C ? PUBCHEM.C.radiusPm : 170,
+      eaMjMol: PUBCHEM.C ? PUBCHEM.C.eaMjMol : 0.122
+    },
+    N: {
+      sym: 'N', z: 7, shells: [2, 5], core: 5, ie1: 1.40,
+      radiusPm: PUBCHEM.N ? PUBCHEM.N.radiusPm : 155,
+      eaMjMol: null,
+      config: '1s² 2s² 2p³',
+      valenceShells: [
+        { label: '2s', boxes: 1, counts: [2] },
+        { label: '2p', boxes: 3, counts: [1, 1, 1] }
+      ]
+    },
+    O: {
+      sym: 'O', z: 8, shells: [2, 6], core: 6, ie1: 1.31,
+      radiusPm: PUBCHEM.O ? PUBCHEM.O.radiusPm : 152,
+      eaMjMol: PUBCHEM.O ? PUBCHEM.O.eaMjMol : 0.141
+    },
+    Mg: {
+      sym: 'Mg', z: 12, shells: [2, 8, 2], core: 2, ie1: 0.74,
+      radiusPm: PUBCHEM.Mg ? PUBCHEM.Mg.radiusPm : 173,
+      eaMjMol: null,
+      config: '1s² 2s² 2p⁶ 3s²',
+      valenceShells: [
+        { label: '3s', boxes: 1, counts: [2] }
+      ]
+    },
+    Ar: {
+      sym: 'Ar', z: 18, shells: [2, 8, 8], core: 8, ie1: 1.52,
+      radiusPm: PUBCHEM.Ar ? PUBCHEM.Ar.radiusPm : 188,
+      eaMjMol: null,
+      config: '1s² 2s² 2p⁶ 3s² 3p⁶',
+      valenceShells: [
+        { label: '3s', boxes: 1, counts: [2] },
+        { label: '3p', boxes: 3, counts: [2, 2, 2] }
+      ]
+    }
+  };
+
+  const CASES_TREND = ['B', 'C', 'N', 'O', 'F'];
+  const CASES_ZERO = ['Mg', 'N', 'Ar'];
+
+  /* Representative-element EA map — periods 1–4 main groups (s + p). */
+  const EA_MAP = [
+    ['H', null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 'He'],
+    ['Li', 'Be', null, null, null, null, null, null, null, null, null, null, 'B', 'C', 'N', 'O', 'F', 'Ne'],
+    ['Na', 'Mg', null, null, null, null, null, null, null, null, null, null, 'Al', 'Si', 'P', 'S', 'Cl', 'Ar'],
+    ['K', 'Ca', null, null, null, null, null, null, null, null, null, null, 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr']
+  ];
+
+  /* Covalent sharers for Act 4 — Allen EN from Moog §8.9; radius PubChem. */
+  const EN_ORDER = ['H', 'C', 'N', 'O', 'F', 'Si', 'P', 'S', 'Cl', 'As', 'Se', 'Br'];
+  const EN_ATOMS = {
+    H:  { sym: 'H',  z: 1,  shells: [1],           core: 1, allen: 2.30 },
+    C:  { sym: 'C',  z: 6,  shells: [2, 4],         core: 4, allen: 2.54 },
+    N:  { sym: 'N',  z: 7,  shells: [2, 5],         core: 5, allen: 3.07 },
+    O:  { sym: 'O',  z: 8,  shells: [2, 6],         core: 6, allen: 3.61 },
+    F:  { sym: 'F',  z: 9,  shells: [2, 7],         core: 7, allen: 4.19 },
+    Si: { sym: 'Si', z: 14, shells: [2, 8, 4],      core: 4, allen: 1.92 },
+    P:  { sym: 'P',  z: 15, shells: [2, 8, 5],      core: 5, allen: 2.25 },
+    S:  { sym: 'S',  z: 16, shells: [2, 8, 6],      core: 6, allen: 2.59 },
+    Cl: { sym: 'Cl', z: 17, shells: [2, 8, 7],      core: 7, allen: 2.87 },
+    As: { sym: 'As', z: 33, shells: [2, 8, 18, 5],  core: 5, allen: 2.21 },
+    Se: { sym: 'Se', z: 34, shells: [2, 8, 18, 6],  core: 6, allen: 2.42 },
+    Br: { sym: 'Br', z: 35, shells: [2, 8, 18, 7],  core: 7, allen: 2.69 }
+  };
+  EN_ORDER.forEach(function (sym) {
+    const row = EN_ATOMS[sym];
+    const pc = PUBCHEM[sym] || {};
+    row.radiusPm = pc.radiusPm != null ? pc.radiusPm : 170;
+  });
+
+  let enAnimTimer = null;
+
+  const ACT_META = {
+    1: 'Act 1 of 4 · Electron affinity',
+    2: 'Act 2 of 4 · Measuring affinity',
+    3: 'Act 3 of 4 · Specific cases',
+    4: 'Act 4 of 4 · Electronegativity'
+  };
+  const STAGE_TITLE = {
+    1: 'Electron Affinity',
+    2: 'Electron Affinity',
+    3: 'Specific Cases',
+    4: 'Electronegativity'
+  };
+  const HELP = {
+    act1: {
+      0: 'Compare chlorine and calcium. Which numbers climb? Which fall — and why?',
+      1: 'Lift an electron out of the tray — which atom pulls harder?'
+    },
+    act2: {
+      gain: 'Fluorine’s outer shell wants one more. Toss the spare electron onto F.',
+      hold: 'Grab the highlighted electron — keep pulling. F⁻ still holds on, like ionization in Module 02.',
+      done: 'Same energy number both ways — one released, one required. That is the measure.'
+    },
+    act3: {
+      0: 'Core charge climbs B → F and radius falls. Where does EA refuse to follow?',
+      1: 'Look at the outer electrons — full subshell, half-full, or closed shell?',
+      2: 'Blank cells are not missing data. What do those atoms share?'
+    },
+    act4: {
+      pick: 'Choose two atoms that can share a pair. Higher core charge and smaller radius usually win the tug.',
+      share: 'Bring the shells together — watch the weaker rings stretch toward the stronger pull.',
+      done: 'δ− sits on the stronger pull. Try another pair — same group, different size is a good contrast.'
+    }
+  };
+
+  const STATE = {
+    act: 1,
+    eaStep: 0, // 0 Cl+Ca review · 1 bucket · done after capture
+    captured: false,
+    /* Act 2: gain → hold (F⁻) → done (pulled back off) */
+    fPhase: 'gain',
+    /* Act 3: 0 B→F · 1 Mg/N/Ar · 2 EA map */
+    casesStep: 0,
+    casesRevealed: false,
+    /* Act 4: pick → share → done */
+    enSlot: 'a',
+    enA: null,
+    enB: null,
+    enPhase: 'pick', // pick | ready | overlap | pull | simple
+    enNamed: false,
+    moduleComplete: false,
+    free: false
+  };
+
+  const els = {
+    actMeta: document.getElementById('actMeta'),
+    stageTitle: document.getElementById('stageTitle'),
+    backBtn: document.getElementById('backBtn'),
+    continueBtn: document.getElementById('continueBtn'),
+    stuckBtn: document.getElementById('stuckBtn'),
+    helpText: document.getElementById('helpText'),
+    atomRow: document.getElementById('atomRow'),
+    bucketBlock: document.getElementById('bucketBlock'),
+    bucketElectron: document.getElementById('bucketElectron'),
+    energyReadout: document.getElementById('energyReadout'),
+    affinityNote: document.getElementById('affinityNote'),
+    eaResetBtn: document.getElementById('eaResetBtn'),
+    reviewQ: document.getElementById('reviewQ'),
+    fPrompt: document.getElementById('fPrompt'),
+    fAtomHost: document.getElementById('fAtomHost'),
+    fConfigWritten: document.getElementById('fConfigWritten'),
+    fConfigBoard: document.getElementById('fConfigBoard'),
+    fBucketBlock: document.getElementById('fBucketBlock'),
+    fBucketElectron: document.getElementById('fBucketElectron'),
+    fEnergyReadout: document.getElementById('fEnergyReadout'),
+    fIeLabel: document.getElementById('fIeLabel'),
+    fEqBlock: document.getElementById('fEqBlock'),
+    fNote: document.getElementById('fNote'),
+    fResetBtn: document.getElementById('fResetBtn'),
+    fIeMeter: document.getElementById('fIeMeter'),
+    fIeMeterLabel: document.getElementById('fIeMeterLabel'),
+    fIeMeterFill: document.getElementById('fIeMeterFill'),
+    fIeMeterTick: document.getElementById('fIeMeterTick'),
+    fIeMeterTickLabel: document.getElementById('fIeMeterTickLabel'),
+    fIeMeterVal: document.getElementById('fIeMeterVal'),
+    casesTrendRow: document.getElementById('casesTrendRow'),
+    casesAnomalyQ: document.getElementById('casesAnomalyQ'),
+    casesZeroRow: document.getElementById('casesZeroRow'),
+    casesRevealBtn: document.getElementById('casesRevealBtn'),
+    casesAnswer: document.getElementById('casesAnswer'),
+    casesEaTable: document.getElementById('casesEaTable'),
+    enFrame: document.getElementById('enFrame'),
+    enSlotA: document.getElementById('enSlotA'),
+    enSlotB: document.getElementById('enSlotB'),
+    enSlotASym: document.getElementById('enSlotASym'),
+    enSlotBSym: document.getElementById('enSlotBSym'),
+    enGrid: document.getElementById('enGrid'),
+    enScene: document.getElementById('enScene'),
+    enPhaseLab: document.getElementById('enPhaseLab'),
+    enPairHost: document.getElementById('enPairHost'),
+    enAtomA: document.getElementById('enAtomA'),
+    enAtomB: document.getElementById('enAtomB'),
+    enDensity: document.getElementById('enDensity'),
+    enShared: document.getElementById('enShared'),
+    enSimple: document.getElementById('enSimple'),
+    enCompare: document.getElementById('enCompare'),
+    enActions: document.getElementById('enActions'),
+    enShareBtn: document.getElementById('enShareBtn'),
+    enResetBtn: document.getElementById('enResetBtn'),
+    enNote: document.getElementById('enNote')
+  };
+
+  const DRAG = {
+    active: false,
+    ghost: null,
+    onMove: null,
+    onUp: null
+  };
+  let anomalyTimer = null;
+
+  /* Sticky pull — Module 02 ionization feel (lag + nucleus tug + IE meter). */
+  const PULL = {
+    mode: 'idle', // idle | drag | snap | fling
+    pointer: null,
+    ex: 0, ey: 0,
+    hx: 0, hy: 0,
+    cx: 0, cy: 0,
+    energy: 0,
+    r0: 40,
+    rFull: 120,
+    maxR: 140,
+    ie: 0.322,
+    stiff: 1.35,
+    raf: null,
+    lastT: 0,
+    ghost: null,
+    sourceEls: null
+  };
+
+  function addNegCoreDisk(defs, parent, cx, cy, radius, uid, strength) {
+    const gid = 'neg-core-' + uid;
+    const grad = document.createElementNS(SVG_NS, 'radialGradient');
+    grad.setAttribute('id', gid);
+    grad.setAttribute('cx', '50%');
+    grad.setAttribute('cy', '50%');
+    grad.setAttribute('r', '50%');
+    [
+      [0,   'rgba(184,145,48,' + (0.82 * strength) + ')'],
+      [0.28,'rgba(196,163,90,' + (0.64 * strength) + ')'],
+      [0.55,'rgba(168,130,42,' + (0.42 * strength) + ')'],
+      [0.78,'rgba(196,163,90,' + (0.18 * strength) + ')'],
+      [1,   'rgba(196,163,90,0)']
+    ].forEach(function (pair) {
+      const s = document.createElementNS(SVG_NS, 'stop');
+      s.setAttribute('offset', (pair[0] * 100) + '%');
+      s.setAttribute('stop-color', pair[1]);
+      grad.appendChild(s);
+    });
+    defs.appendChild(grad);
+    const disk = document.createElementNS(SVG_NS, 'circle');
+    disk.setAttribute('class', 'neg-core-disk');
+    disk.setAttribute('cx', cx);
+    disk.setAttribute('cy', cy);
+    disk.setAttribute('r', radius);
+    disk.setAttribute('fill', 'url(#' + gid + ')');
+    parent.appendChild(disk);
+  }
+
+  /** Suite default shell diagram — soft shade, static mustard markers, no stipple. */
+  function buildAtomSVG(opts) {
+    const z = opts.z != null ? opts.z : 17;
+    const size = opts.size || 220;
+    const canvas = opts.canvas || size;
+    const uid = opts.uid || 'a';
+    const scale = opts.scale != null ? opts.scale : 1;
+    const showCoreChargeOnNuc = opts.showCoreChargeOnNuc !== false;
+
+    let shellCounts;
+    if (Array.isArray(opts.shells) && opts.shells.length) {
+      shellCounts = opts.shells.slice();
+    } else {
+      shellCounts = [opts.inner || 0, opts.valence || 1];
+    }
+    const nShells = shellCounts.length;
+    const valenceCount = shellCounts[nShells - 1] || 0;
+    const coreCounts = shellCounts.slice(0, -1);
+    const innerTotal = coreCounts.reduce(function (a, b) { return a + b; }, 0);
+    const coreCharge = z - innerTotal;
+
+    const cx = canvas / 2;
+    const cy = canvas / 2;
+    const rNuc = 22;
+    const rOuter = Math.min(canvas * 0.46, (opts.outerBase || 88) * scale);
+    const rInnerCap = Math.min(52, canvas * 0.19);
+    const radii = [];
+    if (nShells === 1) {
+      radii.push(rOuter);
+    } else if (nShells === 2) {
+      radii.push(Math.min(rInnerCap, rOuter * 0.55), rOuter);
+    } else {
+      const rMin = Math.min(rInnerCap * 0.72, rOuter * 0.36);
+      for (let i = 0; i < nShells; i++) {
+        const t = i / (nShells - 1);
+        radii.push(rMin + (rOuter - rMin) * t);
+      }
+    }
+    const rCore = (radii[Math.max(0, nShells - 2)] || rInnerCap) + 12;
+
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('class', 'atom-svg');
+    svg.setAttribute('viewBox', '0 0 ' + canvas + ' ' + canvas);
+    svg.setAttribute('width', String(size));
+    svg.setAttribute('height', String(size));
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', opts.label || ('Atom Z=' + z));
+
+    const defs = document.createElementNS(SVG_NS, 'defs');
+    const grad = document.createElementNS(SVG_NS, 'radialGradient');
+    grad.setAttribute('id', 'nuc-' + uid);
+    grad.setAttribute('cx', '32%');
+    grad.setAttribute('cy', '28%');
+    grad.setAttribute('r', '68%');
+    [['0%', '#e8b48a'], ['45%', '#a85a32'], ['100%', '#5a2c16']].forEach(function (pair) {
+      const s = document.createElementNS(SVG_NS, 'stop');
+      s.setAttribute('offset', pair[0]);
+      s.setAttribute('stop-color', pair[1]);
+      grad.appendChild(s);
+    });
+    defs.appendChild(grad);
+    svg.appendChild(defs);
+
+    function placeShell(parent, n, r, cls, startAng) {
+      if (n <= 0) return;
+      for (let i = 0; i < n; i++) {
+        const ang = startAng + (i * 2 * Math.PI) / Math.max(n, 1);
+        const e = document.createElementNS(SVG_NS, 'circle');
+        e.setAttribute('class', cls);
+        e.setAttribute('cx', String(cx + r * Math.cos(ang)));
+        e.setAttribute('cy', String(cy + r * Math.sin(ang)));
+        e.setAttribute('r', '7');
+        parent.appendChild(e);
+      }
+    }
+
+    const corePack = document.createElementNS(SVG_NS, 'g');
+    corePack.setAttribute('class', 'core-pack');
+    coreCounts.forEach(function (count, i) {
+      const ring = document.createElementNS(SVG_NS, 'circle');
+      ring.setAttribute('class', 'shell');
+      ring.setAttribute('cx', cx);
+      ring.setAttribute('cy', cy);
+      ring.setAttribute('r', radii[i]);
+      corePack.appendChild(ring);
+    });
+    if (innerTotal > 0) {
+      const strength = Math.min(1, 0.62 + innerTotal / 16);
+      addNegCoreDisk(defs, corePack, cx, cy, rCore, uid, strength);
+    }
+    coreCounts.forEach(function (count, i) {
+      if (count <= 0 || count > 8) return;
+      const g = document.createElementNS(SVG_NS, 'g');
+      placeShell(g, count, radii[i], 'e-marker', -Math.PI / 2 + i * 0.35);
+      corePack.appendChild(g);
+    });
+    if (coreCounts.length > 0 || innerTotal > 0) svg.appendChild(corePack);
+
+    const rVal = radii[nShells - 1];
+    const outer = document.createElementNS(SVG_NS, 'circle');
+    outer.setAttribute('class', 'shell shell-valence');
+    outer.setAttribute('cx', cx);
+    outer.setAttribute('cy', cy);
+    outer.setAttribute('r', rVal);
+    svg.appendChild(outer);
+
+    const outerGroup = document.createElementNS(SVG_NS, 'g');
+    outerGroup.setAttribute('class', 'valence-group');
+    placeShell(outerGroup, valenceCount, rVal, 'e-valence', 0);
+    svg.appendChild(outerGroup);
+
+    const nuc = document.createElementNS(SVG_NS, 'circle');
+    nuc.setAttribute('cx', cx);
+    nuc.setAttribute('cy', cy);
+    nuc.setAttribute('r', rNuc);
+    nuc.setAttribute('fill', 'url(#nuc-' + uid + ')');
+    svg.appendChild(nuc);
+
+    const nucLabel = document.createElementNS(SVG_NS, 'text');
+    nucLabel.setAttribute('class', 'nuc-label');
+    nucLabel.setAttribute('x', cx);
+    nucLabel.setAttribute('y', cy);
+    nucLabel.textContent = showCoreChargeOnNuc ? ('+' + coreCharge) : ('+' + z);
+    svg.appendChild(nucLabel);
+
+    /* Pulse rings sit ready for the affinity capture moment. */
+    for (let p = 0; p < 3; p++) {
+      const ring = document.createElementNS(SVG_NS, 'circle');
+      ring.setAttribute('class', 'energy-ring');
+      ring.setAttribute('cx', cx);
+      ring.setAttribute('cy', cy);
+      ring.setAttribute('r', String(rOuter + 8 + p * 18));
+      ring.dataset.pulse = String(p);
+      svg.appendChild(ring);
+    }
+
+    svg.dataset.coreCharge = String(coreCharge);
+    return svg;
+  }
+
+  function scaleFor(atom) {
+    return Math.max(0.72, Math.min(1.25, atom.radiusPm / 175));
+  }
+
+  function makeAtomCard(atom, opts) {
+    opts = opts || {};
+    const card = document.createElement('div');
+    card.className = 'atom-card' + (opts.enter ? ' is-enter' : '');
+    card.dataset.sym = atom.sym;
+
+    if (opts.kicker) {
+      const kick = document.createElement('div');
+      kick.className = 'atom-kicker';
+      kick.textContent = opts.kicker;
+      card.appendChild(kick);
+    }
+
+    const sym = document.createElement('div');
+    sym.className = 'atom-sym';
+    sym.textContent = atom.sym;
+    card.appendChild(sym);
+
+    const host = document.createElement('div');
+    host.className = 'atom-host';
+    host.appendChild(buildAtomSVG({
+      z: atom.z,
+      shells: atom.shells,
+      uid: opts.uid || atom.sym.replace(/[^A-Za-z0-9]/g, ''),
+      size: opts.size || 220,
+      canvas: opts.canvas || 240,
+      outerBase: opts.outerBase || 86,
+      scale: opts.scale != null ? opts.scale : scaleFor(atom),
+      showCoreChargeOnNuc: true,
+      label: atom.sym + ' shell diagram, core charge +' + atom.core
+    }));
+    card.appendChild(host);
+
+    const dl = document.createElement('dl');
+    dl.className = 'atom-data';
+    [
+      ['Radius', atom.radiusPm + ' pm'],
+      ['IE₁', atom.ie1.toFixed(2) + ' MJ/mol'],
+      ['Core', '+' + atom.core]
+    ].forEach(function (row) {
+      const dt = document.createElement('dt');
+      dt.textContent = row[0];
+      const dd = document.createElement('dd');
+      dd.textContent = row[1];
+      dl.appendChild(dt);
+      dl.appendChild(dd);
+    });
+    card.appendChild(dl);
+    return card;
+  }
+
+  function clearDrag() {
+    if (DRAG.onMove) window.removeEventListener('pointermove', DRAG.onMove);
+    if (DRAG.onUp) {
+      window.removeEventListener('pointerup', DRAG.onUp);
+      window.removeEventListener('pointercancel', DRAG.onUp);
+    }
+    DRAG.active = false;
+    DRAG.onMove = null;
+    DRAG.onUp = null;
+    if (DRAG.ghost && DRAG.ghost.parentNode) DRAG.ghost.parentNode.removeChild(DRAG.ghost);
+    DRAG.ghost = null;
+    document.body.classList.remove('is-e-dragging');
+    els.bucketElectron.classList.remove('is-lifted');
+  }
+
+  function flyGhostToCl(fromX, fromY, done) {
+    const clCard = els.atomRow.querySelector('.atom-card[data-sym="Cl"], .atom-card[data-sym="Cl⁻"]');
+    if (!clCard) {
+      done();
+      return;
+    }
+    const host = clCard.querySelector('.atom-host');
+    const rect = host.getBoundingClientRect();
+    const tx = rect.left + rect.width * 0.72;
+    const ty = rect.top + rect.height * 0.5;
+
+    if (prefersReduced) {
+      done();
+      return;
+    }
+
+    const ghost = document.createElement('div');
+    ghost.className = 'e-drag-ghost';
+    ghost.style.left = fromX + 'px';
+    ghost.style.top = fromY + 'px';
+    ghost.style.transition = 'left 0.55s cubic-bezier(0.2,0.8,0.2,1), top 0.55s cubic-bezier(0.55,0,0.35,1), opacity 0.15s 0.45s';
+    document.body.appendChild(ghost);
+    requestAnimationFrame(function () {
+      ghost.style.left = tx + 'px';
+      ghost.style.top = ty + 'px';
+      ghost.style.opacity = '0';
+    });
+    window.setTimeout(function () {
+      if (ghost.parentNode) ghost.parentNode.removeChild(ghost);
+      done();
+    }, 600);
+  }
+
+  function pulseEnergy(clCard) {
+    const svg = clCard.querySelector('.atom-svg');
+    if (!svg) return;
+    svg.querySelectorAll('.energy-ring').forEach(function (ring, i) {
+      ring.classList.remove('is-pulse', 'is-pulse-2', 'is-pulse-3');
+      void ring.getBoundingClientRect();
+      ring.classList.add('is-pulse');
+      if (i === 1) ring.classList.add('is-pulse-2');
+      if (i === 2) ring.classList.add('is-pulse-3');
+    });
+  }
+
+  function completeCapture(fromX, fromY) {
+    if (STATE.captured) return;
+    STATE.captured = true;
+    clearDrag();
+    els.bucketElectron.classList.add('is-gone');
+
+    const startX = fromX != null ? fromX : els.bucketElectron.getBoundingClientRect().left + 9;
+    const startY = fromY != null ? fromY : els.bucketElectron.getBoundingClientRect().top + 9;
+
+    flyGhostToCl(startX, startY, function () {
+      /* Rebuild Cl as Cl⁻ with the gained electron. */
+      renderEaScene();
+      const clCard = els.atomRow.querySelector('.atom-card[data-sym="Cl⁻"]');
+      if (clCard) {
+        clCard.classList.add('is-hot');
+        pulseEnergy(clCard);
+      }
+      const ea = ATOMS.Cl.eaMjMol;
+      els.energyReadout.textContent = ea != null
+        ? ea.toFixed(3) + ' MJ/mol released · PubChem'
+        : 'Energy released';
+      els.affinityNote.hidden = false;
+      els.eaResetBtn.hidden = false;
+      updateContinue();
+    });
+  }
+
+  function resetToss() {
+    if (!STATE.captured) return;
+    clearDrag();
+    STATE.captured = false;
+    els.bucketElectron.classList.remove('is-gone', 'is-lifted');
+    els.affinityNote.hidden = true;
+    els.energyReadout.textContent = '';
+    els.eaResetBtn.hidden = true;
+    renderEaScene();
+    updateContinue();
+  }
+
+  function beginToss(clientX, clientY) {
+    if (STATE.captured || STATE.eaStep < 1 || DRAG.active) return;
+    DRAG.active = true;
+    els.bucketElectron.classList.add('is-lifted');
+    document.body.classList.add('is-e-dragging');
+    DRAG.ghost = document.createElement('div');
+    DRAG.ghost.className = 'e-drag-ghost';
+    document.body.appendChild(DRAG.ghost);
+    DRAG.ghost.style.left = clientX + 'px';
+    DRAG.ghost.style.top = clientY + 'px';
+
+    DRAG.onMove = function (e) {
+      if (!DRAG.active) return;
+      DRAG.ghost.style.left = e.clientX + 'px';
+      DRAG.ghost.style.top = e.clientY + 'px';
+    };
+    DRAG.onUp = function (e) {
+      if (!DRAG.active) return;
+      const x = e.clientX;
+      const y = e.clientY;
+      /* Leave the ghost for flyGhostToCl; clearDrag would remove it. */
+      DRAG.active = false;
+      if (DRAG.onMove) window.removeEventListener('pointermove', DRAG.onMove);
+      if (DRAG.onUp) {
+        window.removeEventListener('pointerup', DRAG.onUp);
+        window.removeEventListener('pointercancel', DRAG.onUp);
+      }
+      DRAG.onMove = null;
+      DRAG.onUp = null;
+      document.body.classList.remove('is-e-dragging');
+      if (DRAG.ghost && DRAG.ghost.parentNode) DRAG.ghost.parentNode.removeChild(DRAG.ghost);
+      DRAG.ghost = null;
+      els.bucketElectron.classList.add('is-gone');
+      completeCapture(x, y);
+    };
+    window.addEventListener('pointermove', DRAG.onMove);
+    window.addEventListener('pointerup', DRAG.onUp);
+    window.addEventListener('pointercancel', DRAG.onUp);
+  }
+
+  function wireBucket() {
+    /* Replace the node so re-renders never stack pointer listeners. */
+    const prev = els.bucketElectron;
+    const btn = prev.cloneNode(true);
+    prev.parentNode.replaceChild(btn, prev);
+    els.bucketElectron = btn;
+    btn.classList.toggle('is-gone', STATE.captured);
+    btn.classList.remove('is-lifted');
+
+    if (STATE.eaStep < 1 || STATE.captured) return;
+
+    btn.addEventListener('pointerdown', function (e) {
+      if (e.button != null && e.button !== 0) return;
+      e.preventDefault();
+      beginToss(e.clientX, e.clientY);
+    });
+    btn.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      const r = btn.getBoundingClientRect();
+      completeCapture(r.left + r.width / 2, r.top + r.height / 2);
+    });
+  }
+
+  function renderEaScene() {
+    const showBucket = STATE.eaStep >= 1 || STATE.free;
+    const clAtom = STATE.captured ? ATOMS.ClIon : ATOMS.Cl;
+
+    els.atomRow.replaceChildren();
+    els.atomRow.appendChild(makeAtomCard(clAtom, {
+      uid: STATE.captured ? 'ea-ClIon' : 'ea-Cl',
+      kicker: 'Core +' + clAtom.core,
+      scale: scaleFor(ATOMS.Cl)
+    }));
+    els.atomRow.appendChild(makeAtomCard(ATOMS.Ca, {
+      uid: 'ea-Ca',
+      kicker: 'Core +' + ATOMS.Ca.core,
+      scale: scaleFor(ATOMS.Ca)
+    }));
+
+    els.bucketBlock.hidden = !showBucket;
+    els.reviewQ.hidden = false;
+    if (!STATE.captured) {
+      els.affinityNote.hidden = true;
+      els.energyReadout.textContent = '';
+      els.eaResetBtn.hidden = true;
+    } else {
+      els.eaResetBtn.hidden = !showBucket;
+    }
+    wireBucket();
+  }
+
+  /** Moog-style half-headed spin arrow. */
+  function makeSpinArrow(dir, extra) {
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('class', 'spin-arrow ' + dir + (extra ? ' is-extra' : ''));
+    svg.setAttribute('viewBox', '0 0 18 38');
+    svg.setAttribute('aria-hidden', 'true');
+    const shaft = document.createElementNS(SVG_NS, 'line');
+    shaft.setAttribute('class', 'shaft');
+    const barb = document.createElementNS(SVG_NS, 'path');
+    barb.setAttribute('class', 'barb');
+    if (dir === 'up') {
+      shaft.setAttribute('x1', '12');
+      shaft.setAttribute('y1', '34');
+      shaft.setAttribute('x2', '12');
+      shaft.setAttribute('y2', '7');
+      barb.setAttribute('d', 'M12 5.5 V13 H3.2 Z');
+    } else {
+      shaft.setAttribute('x1', '6');
+      shaft.setAttribute('y1', '4');
+      shaft.setAttribute('x2', '6');
+      shaft.setAttribute('y2', '31');
+      barb.setAttribute('d', 'M6 32.5 V25 H14.8 Z');
+    }
+    svg.appendChild(shaft);
+    svg.appendChild(barb);
+    return svg;
+  }
+
+  function renderFConfig(atom, highlightExtra) {
+    const shells = [
+      { label: '1s', boxes: 1, start: 0 },
+      { label: '2s', boxes: 1, start: 1 },
+      { label: '2p', boxes: 3, start: 2 }
+    ];
+    els.fConfigWritten.textContent = atom.config;
+    els.fConfigBoard.replaceChildren();
+    els.fConfigBoard.setAttribute('aria-label', atom.sym + ' orbital diagram, ' + atom.config);
+    shells.forEach(function (s) {
+      const wrap = document.createElement('div');
+      wrap.className = 'subshell';
+      const lab = document.createElement('div');
+      lab.className = 'subshell-label';
+      lab.textContent = s.label;
+      const row = document.createElement('div');
+      row.className = 'subshell-boxes';
+      for (let b = 0; b < s.boxes; b++) {
+        const count = atom.boxes[s.start + b] || 0;
+        const box = document.createElement('div');
+        box.className = 'orb-box';
+        const isLastExtra = highlightExtra && s.label === '2p' && b === 2 && count === 2;
+        if (isLastExtra) box.classList.add('is-extra');
+        if (count >= 1) box.appendChild(makeSpinArrow('up', false));
+        if (count >= 2) box.appendChild(makeSpinArrow('down', isLastExtra));
+        row.appendChild(box);
+      }
+      wrap.appendChild(lab);
+      wrap.appendChild(row);
+      els.fConfigBoard.appendChild(wrap);
+    });
+  }
+
+  function renderFScene() {
+    const gained = STATE.fPhase === 'hold';
+    const atom = gained ? ATOMS.FIon : ATOMS.F;
+    els.fAtomHost.replaceChildren();
+    const card = makeAtomCard(atom, {
+      uid: gained ? 'ea-FIon' : 'ea-F',
+      kicker: 'Core +' + atom.core,
+      scale: scaleFor(ATOMS.F),
+      size: 200,
+      canvas: 220
+    });
+    /* Act 2 atom card: drop the radius/IE data strip — config carries the story. */
+    const data = card.querySelector('.atom-data');
+    if (data) data.remove();
+    els.fAtomHost.appendChild(card);
+    renderFConfig(atom, gained);
+
+    els.fBucketBlock.hidden = STATE.fPhase !== 'gain';
+    els.fNote.hidden = STATE.fPhase !== 'done';
+    els.fIeLabel.hidden = STATE.fPhase !== 'done';
+    els.fEqBlock.hidden = STATE.fPhase !== 'done';
+    els.fResetBtn.hidden = STATE.fPhase === 'gain';
+    els.fEnergyReadout.classList.toggle('is-in', STATE.fPhase === 'done');
+
+    if (STATE.fPhase === 'gain') {
+      els.fPrompt.className = 'f-prompt';
+      els.fPrompt.textContent = 'Fluorine is one electron shy of a full outer shell. Toss an electron onto it and watch the energy.';
+      els.fEnergyReadout.textContent = '';
+      els.fBucketElectron.classList.remove('is-gone', 'is-lifted');
+    } else if (STATE.fPhase === 'hold') {
+      els.fPrompt.className = 'student-q f-prompt';
+      els.fPrompt.textContent = 'Energy left the atom. Grab the highlighted electron and keep pulling — F⁻ still holds on.';
+      els.fEnergyReadout.textContent = atom.eaMjMol.toFixed(3) + ' MJ/mol released · PubChem';
+    } else {
+      els.fPrompt.className = 'f-prompt';
+      els.fPrompt.textContent = 'Same energy both ways — released on the way in, required on the way out.';
+      els.fEnergyReadout.textContent = ATOMS.F.eaMjMol.toFixed(3) + ' MJ/mol required to remove it';
+    }
+
+    syncFIeMeter();
+    wireFBucket();
+    wireFPullFromModels();
+  }
+
+  function syncFIeMeter() {
+    const ea = ATOMS.F.eaMjMol;
+    const show = STATE.fPhase === 'hold' || STATE.fPhase === 'done';
+    els.fIeMeter.hidden = !show;
+    els.fIeMeter.classList.toggle('is-on', show);
+    if (!show) return;
+    const maxScale = ea * 1.12;
+    const tickPct = Math.min(100, (ea / maxScale) * 100);
+    els.fIeMeterTick.style.bottom = tickPct + '%';
+    els.fIeMeterTickLabel.textContent = 'EA ' + ea.toFixed(3);
+    if (STATE.fPhase === 'done') {
+      els.fIeMeterLabel.textContent = 'IE of F⁻';
+      PULL.energy = ea;
+      els.fIeMeterFill.style.height = tickPct + '%';
+      els.fIeMeterVal.textContent = ea.toFixed(3);
+    } else {
+      els.fIeMeterLabel.textContent = 'Energy in';
+      updateFIeMeterDom();
+    }
+  }
+
+  function updateFIeMeterDom() {
+    const ea = ATOMS.F.eaMjMol;
+    const maxScale = ea * 1.12;
+    const pct = Math.min(100, (PULL.energy / maxScale) * 100);
+    els.fIeMeterFill.style.height = pct + '%';
+    els.fIeMeterVal.textContent = PULL.energy.toFixed(3);
+  }
+
+  function fEnergyFromPull(dist) {
+    const span = Math.max(1, PULL.rFull - PULL.r0);
+    const t = Math.max(0, Math.min(1, (dist - PULL.r0) / span));
+    const shaped = Math.pow(t, 1.25 + PULL.stiff * 0.2);
+    return shaped * PULL.ie;
+  }
+
+  function stopPullLoop() {
+    if (PULL.raf != null) {
+      cancelAnimationFrame(PULL.raf);
+      PULL.raf = null;
+    }
+  }
+
+  function clearPullGhost() {
+    if (PULL.ghost && PULL.ghost.parentNode) PULL.ghost.parentNode.removeChild(PULL.ghost);
+    PULL.ghost = null;
+  }
+
+  function placePullGhost() {
+    if (!PULL.ghost) {
+      PULL.ghost = document.createElement('div');
+      PULL.ghost.className = 'e-drag-ghost';
+      document.body.appendChild(PULL.ghost);
+    }
+    PULL.ghost.style.left = PULL.ex + 'px';
+    PULL.ghost.style.top = PULL.ey + 'px';
+    PULL.ghost.style.opacity = '1';
+    PULL.ghost.style.transition = 'none';
+  }
+
+  function nucleusCenter() {
+    const svg = els.fAtomHost.querySelector('.atom-svg');
+    if (svg) {
+      const r = svg.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }
+    const r = els.fAtomHost.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+
+  function beginPullLoop() {
+    if (PULL.raf != null) return;
+    PULL.lastT = performance.now();
+    function frame(now) {
+      PULL.raf = requestAnimationFrame(frame);
+      const dt = Math.min(0.033, Math.max(0.008, (now - PULL.lastT) / 1000));
+      PULL.lastT = now;
+      stepPull(dt);
+    }
+    PULL.raf = requestAnimationFrame(frame);
+  }
+
+  function stepPull(dt) {
+    if (PULL.mode === 'drag' && PULL.pointer) {
+      const px = PULL.pointer.x;
+      const py = PULL.pointer.y;
+      const toCursorX = px - PULL.ex;
+      const toCursorY = py - PULL.ey;
+      const toNucX = PULL.cx - PULL.ex;
+      const toNucY = PULL.cy - PULL.ey;
+      const dist = Math.hypot(PULL.ex - PULL.cx, PULL.ey - PULL.cy) || 1;
+
+      const follow = (2.1 / (0.65 + PULL.stiff)) * dt;
+      PULL.ex += toCursorX * follow;
+      PULL.ey += toCursorY * follow;
+
+      const pull = (180 * PULL.stiff) / (dist * dist + 40);
+      PULL.ex += (toNucX / dist) * pull * dt * 60;
+      PULL.ey += (toNucY / dist) * pull * dt * 60;
+
+      const nd = Math.hypot(PULL.ex - PULL.cx, PULL.ey - PULL.cy) || 1;
+      if (nd > PULL.maxR) {
+        PULL.ex = PULL.cx + (PULL.ex - PULL.cx) / nd * PULL.maxR;
+        PULL.ey = PULL.cy + (PULL.ey - PULL.cy) / nd * PULL.maxR;
+      }
+
+      const dNow = Math.hypot(PULL.ex - PULL.cx, PULL.ey - PULL.cy);
+      PULL.energy = fEnergyFromPull(dNow);
+      placePullGhost();
+      updateFIeMeterDom();
+
+      if (PULL.energy >= PULL.ie - 0.001) startFPullFling();
+      return;
+    }
+
+    if (PULL.mode === 'snap') {
+      PULL.ex += (PULL.hx - PULL.ex) * Math.min(1, 5.5 * dt);
+      PULL.ey += (PULL.hy - PULL.ey) * Math.min(1, 5.5 * dt);
+      PULL.energy = Math.max(0, PULL.energy - PULL.ie * 2.4 * dt);
+      placePullGhost();
+      updateFIeMeterDom();
+      const err = Math.hypot(PULL.ex - PULL.hx, PULL.ey - PULL.hy);
+      if (err < 1.5 && PULL.energy < 0.01) {
+        PULL.energy = 0;
+        PULL.mode = 'idle';
+        clearPullGhost();
+        if (PULL.sourceEls) {
+          PULL.sourceEls.forEach(function (el) { el.classList.remove('is-lifted'); });
+        }
+        updateFIeMeterDom();
+        stopPullLoop();
+        els.fPrompt.textContent = 'It snapped back. Put more energy in — keep pulling.';
+      }
+      return;
+    }
+
+    if (PULL.mode === 'fling') {
+      PULL.ex += PULL.evx * dt;
+      PULL.ey += PULL.evy * dt;
+      PULL.energy = PULL.ie;
+      placePullGhost();
+      updateFIeMeterDom();
+      if (
+        PULL.ex < -80 || PULL.ey < -80 ||
+        PULL.ex > window.innerWidth + 80 || PULL.ey > window.innerHeight + 80
+      ) {
+        stopPullLoop();
+        clearPullGhost();
+        finishFPull();
+      }
+    }
+  }
+
+  function startFPullFling() {
+    if (PULL.onMove) window.removeEventListener('pointermove', PULL.onMove);
+    if (PULL.onUp) {
+      window.removeEventListener('pointerup', PULL.onUp);
+      window.removeEventListener('pointercancel', PULL.onUp);
+    }
+    PULL.onMove = null;
+    PULL.onUp = null;
+    PULL.mode = 'fling';
+    PULL.energy = PULL.ie;
+    PULL.pointer = null;
+    document.body.classList.remove('is-e-dragging');
+    const dx = PULL.ex - PULL.cx;
+    const dy = PULL.ey - PULL.cy;
+    const dist = Math.hypot(dx, dy) || 1;
+    const speed = 520;
+    PULL.evx = (dx / dist) * speed;
+    PULL.evy = (dy / dist) * speed;
+    els.fIeMeterLabel.textContent = 'IE of F⁻';
+    updateFIeMeterDom();
+    beginPullLoop();
+  }
+
+  function finishFPull() {
+    PULL.mode = 'idle';
+    STATE.fPhase = 'done';
+    els.helpText.textContent = HELP.act2.done;
+    renderFScene();
+    updateContinue();
+  }
+
+  function wireFBucket() {
+    const prev = els.fBucketElectron;
+    const btn = prev.cloneNode(true);
+    prev.parentNode.replaceChild(btn, prev);
+    els.fBucketElectron = btn;
+    btn.classList.toggle('is-gone', STATE.fPhase !== 'gain');
+    if (STATE.fPhase !== 'gain') return;
+
+    btn.addEventListener('pointerdown', function (e) {
+      if (e.button != null && e.button !== 0) return;
+      e.preventDefault();
+      beginFGain(e.clientX, e.clientY);
+    });
+    btn.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      const r = btn.getBoundingClientRect();
+      completeFGain(r.left + r.width / 2, r.top + r.height / 2);
+    });
+  }
+
+  /** Make the extra electron grabbable on the shell diagram and the orbital boxes. */
+  function wireFPullFromModels() {
+    if (STATE.fPhase !== 'hold') return;
+
+    const targets = [];
+    const sourceEls = [];
+
+    const valence = els.fAtomHost.querySelectorAll('.e-valence');
+    if (valence.length) {
+      const extra = valence[valence.length - 1];
+      extra.classList.add('e-extra', 'e-grabbable');
+      extra.setAttribute('tabindex', '0');
+      extra.setAttribute('role', 'button');
+      extra.setAttribute('aria-label', 'Extra electron on F⁻. Drag outward and keep pulling until the energy bar fills.');
+      const hit = document.createElementNS(SVG_NS, 'circle');
+      hit.setAttribute('class', 'e-grab-hit');
+      hit.setAttribute('cx', extra.getAttribute('cx'));
+      hit.setAttribute('cy', extra.getAttribute('cy'));
+      hit.setAttribute('r', '20');
+      hit.setAttribute('fill', 'transparent');
+      hit.setAttribute('aria-hidden', 'true');
+      extra.parentNode.insertBefore(hit, extra);
+      targets.push(extra, hit);
+      sourceEls.push(extra, hit);
+    }
+
+    const arrow = els.fConfigBoard.querySelector('.spin-arrow.is-extra');
+    if (arrow) {
+      arrow.classList.add('e-grabbable');
+      arrow.setAttribute('tabindex', '0');
+      arrow.setAttribute('role', 'button');
+      arrow.setAttribute('aria-label', 'Extra electron in 2p. Drag outward and keep pulling until the energy bar fills.');
+      targets.push(arrow);
+      sourceEls.push(arrow);
+    }
+
+    targets.forEach(function (el) {
+      el.addEventListener('pointerdown', function (e) {
+        if (e.button != null && e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        beginFPull(e.clientX, e.clientY, sourceEls);
+      });
+      el.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        if (prefersReduced) {
+          PULL.energy = ATOMS.F.eaMjMol;
+          finishFPull();
+          return;
+        }
+        const home = el.getBoundingClientRect();
+        const hx = home.left + home.width / 2;
+        const hy = home.top + home.height / 2;
+        beginFPull(hx, hy, sourceEls);
+        const ang = Math.atan2(PULL.hy - PULL.cy, PULL.hx - PULL.cx);
+        PULL.pointer = {
+          x: PULL.cx + Math.cos(ang) * (PULL.rFull + 36),
+          y: PULL.cy + Math.sin(ang) * (PULL.rFull + 36)
+        };
+        window.setTimeout(function () {
+          if (PULL.mode === 'drag') endFPullDrag();
+        }, 1200);
+      });
+    });
+  }
+
+  function beginFPull(clientX, clientY, sourceEls) {
+    if (STATE.fPhase !== 'hold') return;
+    if (PULL.mode === 'fling' || PULL.mode === 'drag') return;
+
+    clearDrag();
+    stopPullLoop();
+
+    const nuc = nucleusCenter();
+    const homeEl = sourceEls && sourceEls[0];
+    let hx = clientX;
+    let hy = clientY;
+    if (homeEl && homeEl.getBoundingClientRect) {
+      const r = homeEl.getBoundingClientRect();
+      hx = r.left + r.width / 2;
+      hy = r.top + r.height / 2;
+    }
+
+    PULL.mode = 'drag';
+    PULL.pointer = { x: clientX, y: clientY };
+    PULL.cx = nuc.x;
+    PULL.cy = nuc.y;
+    PULL.hx = hx;
+    PULL.hy = hy;
+    PULL.ex = hx;
+    PULL.ey = hy;
+    PULL.energy = 0;
+    PULL.ie = ATOMS.F.eaMjMol;
+    PULL.stiff = 1.35;
+    PULL.r0 = Math.hypot(hx - nuc.x, hy - nuc.y) || 48;
+    PULL.rFull = PULL.r0 + 95;
+    PULL.maxR = PULL.r0 + 115;
+    PULL.sourceEls = sourceEls || [];
+    PULL.sourceEls.forEach(function (el) { el.classList.add('is-lifted'); });
+
+    document.body.classList.add('is-e-dragging');
+    placePullGhost();
+    updateFIeMeterDom();
+    els.fPrompt.textContent = 'Keep pulling — the anion still holds on.';
+    beginPullLoop();
+
+    PULL.onMove = function (e) {
+      if (PULL.mode !== 'drag') return;
+      PULL.pointer = { x: e.clientX, y: e.clientY };
+    };
+    PULL.onUp = function () {
+      endFPullDrag();
+    };
+    window.addEventListener('pointermove', PULL.onMove);
+    window.addEventListener('pointerup', PULL.onUp);
+    window.addEventListener('pointercancel', PULL.onUp);
+  }
+
+  function endFPullDrag() {
+    if (PULL.onMove) window.removeEventListener('pointermove', PULL.onMove);
+    if (PULL.onUp) {
+      window.removeEventListener('pointerup', PULL.onUp);
+      window.removeEventListener('pointercancel', PULL.onUp);
+    }
+    PULL.onMove = null;
+    PULL.onUp = null;
+    document.body.classList.remove('is-e-dragging');
+    PULL.pointer = null;
+
+    if (PULL.mode !== 'drag') return;
+    if (PULL.energy >= PULL.ie - 0.001) {
+      startFPullFling();
+      return;
+    }
+    PULL.mode = 'snap';
+    beginPullLoop();
+  }
+
+  function beginFGain(clientX, clientY) {
+    if (STATE.fPhase !== 'gain' || DRAG.active) return;
+    DRAG.active = true;
+    els.fBucketElectron.classList.add('is-lifted');
+    document.body.classList.add('is-e-dragging');
+    DRAG.ghost = document.createElement('div');
+    DRAG.ghost.className = 'e-drag-ghost';
+    document.body.appendChild(DRAG.ghost);
+    DRAG.ghost.style.left = clientX + 'px';
+    DRAG.ghost.style.top = clientY + 'px';
+
+    DRAG.onMove = function (e) {
+      if (!DRAG.active) return;
+      DRAG.ghost.style.left = e.clientX + 'px';
+      DRAG.ghost.style.top = e.clientY + 'px';
+    };
+    DRAG.onUp = function (e) {
+      if (!DRAG.active) return;
+      const x = e.clientX;
+      const y = e.clientY;
+      DRAG.active = false;
+      if (DRAG.onMove) window.removeEventListener('pointermove', DRAG.onMove);
+      if (DRAG.onUp) {
+        window.removeEventListener('pointerup', DRAG.onUp);
+        window.removeEventListener('pointercancel', DRAG.onUp);
+      }
+      DRAG.onMove = null;
+      DRAG.onUp = null;
+      document.body.classList.remove('is-e-dragging');
+      if (DRAG.ghost && DRAG.ghost.parentNode) DRAG.ghost.parentNode.removeChild(DRAG.ghost);
+      DRAG.ghost = null;
+      els.fBucketElectron.classList.add('is-gone');
+      completeFGain(x, y);
+    };
+    window.addEventListener('pointermove', DRAG.onMove);
+    window.addEventListener('pointerup', DRAG.onUp);
+    window.addEventListener('pointercancel', DRAG.onUp);
+  }
+
+  function flyGhostToF(fromX, fromY, done) {
+    const host = els.fAtomHost;
+    const rect = host.getBoundingClientRect();
+    const tx = rect.left + rect.width * 0.55;
+    const ty = rect.top + rect.height * 0.45;
+    if (prefersReduced) {
+      done();
+      return;
+    }
+    const ghost = document.createElement('div');
+    ghost.className = 'e-drag-ghost';
+    ghost.style.left = fromX + 'px';
+    ghost.style.top = fromY + 'px';
+    ghost.style.transition = 'left 0.55s cubic-bezier(0.2,0.8,0.2,1), top 0.55s cubic-bezier(0.55,0,0.35,1), opacity 0.15s 0.45s';
+    document.body.appendChild(ghost);
+    requestAnimationFrame(function () {
+      ghost.style.left = tx + 'px';
+      ghost.style.top = ty + 'px';
+      ghost.style.opacity = '0';
+    });
+    window.setTimeout(function () {
+      if (ghost.parentNode) ghost.parentNode.removeChild(ghost);
+      done();
+    }, 600);
+  }
+
+  function completeFGain(fromX, fromY) {
+    if (STATE.fPhase !== 'gain') return;
+    clearDrag();
+    els.fBucketElectron.classList.add('is-gone');
+    const startX = fromX != null ? fromX : 0;
+    const startY = fromY != null ? fromY : 0;
+    flyGhostToF(startX, startY, function () {
+      STATE.fPhase = 'hold';
+      els.helpText.textContent = HELP.act2.hold;
+      PULL.energy = 0;
+      renderFScene();
+      const card = els.fAtomHost.querySelector('.atom-card');
+      if (card) pulseEnergy(card);
+      updateContinue();
+    });
+  }
+
+  function resetFDemo() {
+    clearDrag();
+    stopPullLoop();
+    clearPullGhost();
+    PULL.mode = 'idle';
+    PULL.energy = 0;
+    PULL.pointer = null;
+    STATE.fPhase = 'gain';
+    els.helpText.textContent = HELP.act2.gain;
+    renderFScene();
+    updateContinue();
+  }
+
+  function eaFromSym(sym) {
+    if (ATOMS[sym] && Object.prototype.hasOwnProperty.call(ATOMS[sym], 'eaMjMol')) {
+      return ATOMS[sym].eaMjMol;
+    }
+    const pc = PUBCHEM[sym];
+    return pc ? pc.eaMjMol : null;
+  }
+
+  function renderValenceBoard(host, atom) {
+    host.replaceChildren();
+    host.setAttribute('aria-label', atom.sym + ' valence orbital diagram');
+    (atom.valenceShells || []).forEach(function (s) {
+      const wrap = document.createElement('div');
+      wrap.className = 'subshell';
+      const lab = document.createElement('div');
+      lab.className = 'subshell-label';
+      lab.textContent = s.label;
+      const row = document.createElement('div');
+      row.className = 'subshell-boxes';
+      for (let b = 0; b < s.boxes; b++) {
+        const count = s.counts[b] || 0;
+        const box = document.createElement('div');
+        box.className = 'orb-box';
+        if (count >= 1) box.appendChild(makeSpinArrow('up', false));
+        if (count >= 2) box.appendChild(makeSpinArrow('down', false));
+        row.appendChild(box);
+      }
+      wrap.appendChild(lab);
+      wrap.appendChild(row);
+      host.appendChild(wrap);
+    });
+  }
+
+  function renderCasesTrend() {
+    const maxR = Math.max.apply(null, CASES_TREND.map(function (s) { return ATOMS[s].radiusPm; }));
+    const maxEa = Math.max.apply(null, CASES_TREND.map(function (s) {
+      return ATOMS[s].eaMjMol != null ? ATOMS[s].eaMjMol : 0;
+    }));
+    els.casesTrendRow.replaceChildren();
+    CASES_TREND.forEach(function (sym, i) {
+      const atom = ATOMS[sym];
+      const blank = atom.eaMjMol == null;
+      const cell = document.createElement('div');
+      cell.className = 'cases-cell';
+      if (sym === 'N') cell.dataset.anomaly = '1';
+      cell.setAttribute('role', 'listitem');
+      cell.setAttribute('aria-label',
+        atom.sym + ', core +' + atom.core + ', radius ' + atom.radiusPm + ' pm, EA ' +
+        (blank ? '0' : atom.eaMjMol.toFixed(3) + ' MJ/mol')
+      );
+
+      const elSym = document.createElement('div');
+      elSym.className = 'cases-cell-sym';
+      elSym.textContent = atom.sym;
+      cell.appendChild(elSym);
+
+      const coreLab = document.createElement('div');
+      coreLab.className = 'cases-cell-lab';
+      coreLab.textContent = 'Core';
+      cell.appendChild(coreLab);
+      const coreVal = document.createElement('div');
+      coreVal.className = 'cases-cell-val';
+      coreVal.textContent = '+' + atom.core;
+      cell.appendChild(coreVal);
+
+      const rLab = document.createElement('div');
+      rLab.className = 'cases-cell-lab';
+      rLab.textContent = 'Radius';
+      cell.appendChild(rLab);
+      const rVal = document.createElement('div');
+      rVal.className = 'cases-cell-val';
+      rVal.textContent = atom.radiusPm + ' pm';
+      cell.appendChild(rVal);
+      const rBar = document.createElement('div');
+      rBar.className = 'cases-bar';
+      const rFill = document.createElement('span');
+      rFill.style.width = Math.round((atom.radiusPm / maxR) * 100) + '%';
+      rBar.appendChild(rFill);
+      cell.appendChild(rBar);
+
+      const eaLab = document.createElement('div');
+      eaLab.className = 'cases-cell-lab';
+      eaLab.textContent = 'EA';
+      cell.appendChild(eaLab);
+      const eaVal = document.createElement('div');
+      eaVal.className = 'cases-cell-val' + (blank ? ' is-blank' : ' is-ea');
+      eaVal.textContent = blank ? '0' : atom.eaMjMol.toFixed(3);
+      cell.appendChild(eaVal);
+      const eaBar = document.createElement('div');
+      eaBar.className = 'cases-bar is-ea' + (blank ? ' is-blank' : '');
+      const eaFill = document.createElement('span');
+      eaFill.style.width = blank ? '0%' : Math.round((atom.eaMjMol / maxEa) * 100) + '%';
+      eaBar.appendChild(eaFill);
+      cell.appendChild(eaBar);
+
+      if (!prefersReduced) {
+        cell.classList.add('is-enter');
+        cell.style.animationDelay = (i * 0.06) + 's';
+      }
+      els.casesTrendRow.appendChild(cell);
+    });
+
+    els.casesAnomalyQ.hidden = true;
+    els.casesAnomalyQ.classList.remove('is-in');
+    if (anomalyTimer) {
+      window.clearTimeout(anomalyTimer);
+      anomalyTimer = null;
+    }
+    function markAnomaly() {
+      const cell = els.casesTrendRow.querySelector('[data-anomaly="1"]');
+      if (cell) cell.classList.add('is-anomaly');
+      els.casesAnomalyQ.hidden = false;
+      if (!prefersReduced) els.casesAnomalyQ.classList.add('is-in');
+      anomalyTimer = null;
+    }
+    if (prefersReduced) markAnomaly();
+    else anomalyTimer = window.setTimeout(markAnomaly, 1400);
+  }
+
+  function renderCasesZero() {
+    els.casesZeroRow.replaceChildren();
+    CASES_ZERO.forEach(function (sym) {
+      const atom = ATOMS[sym];
+      const card = document.createElement('div');
+      card.className = 'zero-card';
+      card.setAttribute('role', 'listitem');
+
+      const elSym = document.createElement('div');
+      elSym.className = 'zero-card-sym';
+      elSym.textContent = atom.sym;
+      card.appendChild(elSym);
+
+      const cfg = document.createElement('div');
+      cfg.className = 'zero-card-config';
+      cfg.textContent = atom.config;
+      card.appendChild(cfg);
+
+      const board = document.createElement('div');
+      board.className = 'orbital-board';
+      renderValenceBoard(board, atom);
+      card.appendChild(board);
+
+      const dl = document.createElement('dl');
+      dl.className = 'zero-card-data';
+      [
+        ['IE₁', atom.ie1.toFixed(2) + ' MJ/mol'],
+        ['Radius', atom.radiusPm + ' pm'],
+        ['Core', '+' + atom.core],
+        ['EA', '0']
+      ].forEach(function (row, idx) {
+        const dt = document.createElement('dt');
+        dt.textContent = row[0];
+        const dd = document.createElement('dd');
+        dd.textContent = row[1];
+        if (idx === 3) dd.className = 'is-blank';
+        dl.appendChild(dt);
+        dl.appendChild(dd);
+      });
+      card.appendChild(dl);
+      els.casesZeroRow.appendChild(card);
+    });
+
+    els.casesAnswer.hidden = !STATE.casesRevealed;
+    els.casesRevealBtn.hidden = STATE.casesRevealed;
+  }
+
+  function renderCasesEaMap() {
+    els.casesEaTable.replaceChildren();
+    EA_MAP.forEach(function (period) {
+      period.forEach(function (sym) {
+        const cell = document.createElement('div');
+        if (!sym) {
+          cell.className = 'cases-ea-cell is-empty';
+          els.casesEaTable.appendChild(cell);
+          return;
+        }
+        const ea = eaFromSym(sym);
+        const blank = ea == null;
+        cell.className = 'cases-ea-cell' + (blank ? ' is-blank' : '');
+        if (!blank) {
+          const t = Math.min(1, ea / 0.35);
+          cell.style.background = 'rgba(168,90,50,' + (0.08 + t * 0.42).toFixed(2) + ')';
+        }
+        const sEl = document.createElement('div');
+        sEl.className = 'cases-ea-sym';
+        sEl.textContent = sym;
+        cell.appendChild(sEl);
+        const vEl = document.createElement('div');
+        vEl.className = 'cases-ea-val';
+        vEl.textContent = blank ? '—' : ea.toFixed(2);
+        cell.appendChild(vEl);
+        cell.title = blank
+          ? sym + ' · no stable anion'
+          : sym + ' · EA ' + ea.toFixed(3) + ' MJ/mol';
+        els.casesEaTable.appendChild(cell);
+      });
+    });
+  }
+
+  function setCasesStep(n) {
+    STATE.casesStep = Math.max(0, Math.min(2, n));
+    document.querySelectorAll('#act3 .cases-step').forEach(function (p) {
+      p.hidden = Number(p.dataset.casesStep) !== STATE.casesStep;
+    });
+    els.helpText.textContent = HELP.act3[STATE.casesStep];
+    els.stuckBtn.hidden = false;
+
+    if (STATE.casesStep === 0) renderCasesTrend();
+    else if (STATE.casesStep === 1) renderCasesZero();
+    else renderCasesEaMap();
+
+    els.backBtn.hidden = false;
+    updateContinue();
+  }
+
+  function revealCasesAnswer() {
+    STATE.casesRevealed = true;
+    els.casesAnswer.hidden = false;
+    els.casesRevealBtn.hidden = true;
+  }
+
+  function clearEnAnim() {
+    if (enAnimTimer) {
+      clearTimeout(enAnimTimer);
+      enAnimTimer = null;
+    }
+  }
+
+  function enAtom(sym) {
+    return EN_ATOMS[sym] || null;
+  }
+
+  function enWinner(a, b) {
+    if (!a || !b) return null;
+    if (a.allen === b.allen) return 'tie';
+    return a.allen > b.allen ? 'a' : 'b';
+  }
+
+  function setEnActiveSlot(slot) {
+    STATE.enSlot = slot;
+    els.enSlotA.classList.toggle('is-active', slot === 'a');
+    els.enSlotB.classList.toggle('is-active', slot === 'b');
+    els.enSlotA.setAttribute('aria-pressed', slot === 'a' ? 'true' : 'false');
+    els.enSlotB.setAttribute('aria-pressed', slot === 'b' ? 'true' : 'false');
+  }
+
+  function updateEnSlotLabels() {
+    function paint(symEl, sym) {
+      if (sym) {
+        symEl.textContent = sym;
+        symEl.classList.remove('is-empty');
+      } else {
+        symEl.textContent = '—';
+        symEl.classList.add('is-empty');
+      }
+    }
+    paint(els.enSlotASym, STATE.enA);
+    paint(els.enSlotBSym, STATE.enB);
+    els.enSlotA.classList.toggle('is-filled', !!STATE.enA);
+    els.enSlotB.classList.toggle('is-filled', !!STATE.enB);
+  }
+
+  function renderEnGrid() {
+    els.enGrid.replaceChildren();
+    EN_ORDER.forEach(function (sym) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'en-tile';
+      btn.textContent = sym;
+      btn.setAttribute('role', 'option');
+      btn.setAttribute('aria-selected', (STATE.enA === sym || STATE.enB === sym) ? 'true' : 'false');
+      if (STATE.enA === sym || STATE.enB === sym) btn.classList.add('is-picked');
+      btn.addEventListener('click', function () { pickEnElement(sym); });
+      els.enGrid.appendChild(btn);
+    });
+  }
+
+  function buildEnMiniAtom(atom, uid) {
+    const wrap = document.createElement('div');
+    const sym = document.createElement('div');
+    sym.className = 'en-atom-sym';
+    sym.textContent = atom.sym;
+    wrap.appendChild(sym);
+    wrap.appendChild(buildAtomSVG({
+      z: atom.z,
+      shells: atom.shells,
+      uid: uid,
+      size: 150,
+      canvas: 200,
+      outerBase: 78,
+      scale: Math.max(0.68, Math.min(1.15, atom.radiusPm / 175)),
+      showCoreChargeOnNuc: true,
+      label: atom.sym + ' shell diagram, core charge +' + atom.core
+    }));
+    return wrap;
+  }
+
+  function renderEnCompare(a, b, winner) {
+    els.enCompare.replaceChildren();
+    els.enCompare.hidden = false;
+    const showEn = STATE.enNamed || STATE.enPhase === 'simple' || STATE.free;
+    const rows = [
+      ['', a.sym, b.sym],
+      ['Core', '+' + a.core, '+' + b.core],
+      ['Radius', a.radiusPm + ' pm', b.radiusPm + ' pm']
+    ];
+    if (showEn) {
+      rows.push(['EN', a.allen.toFixed(2), b.allen.toFixed(2)]);
+    }
+    rows.forEach(function (row, ri) {
+      row.forEach(function (cell, ci) {
+        const el = document.createElement(ci === 0 ? 'dt' : 'dd');
+        el.textContent = cell;
+        if (ri > 0 && ci > 0) {
+          const side = ci === 1 ? 'a' : 'b';
+          if (winner === side && (row[0] === 'Core' || row[0] === 'EN' ||
+              (row[0] === 'Radius' && ((side === 'a' && a.radiusPm < b.radiusPm) ||
+                (side === 'b' && b.radiusPm < a.radiusPm))))) {
+            el.className = 'is-winner';
+          }
+        }
+        els.enCompare.appendChild(el);
+      });
+    });
+  }
+
+  function renderEnSimple(a, b, winner) {
+    els.enSimple.replaceChildren();
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('class', 'en-simple-svg');
+    svg.setAttribute('viewBox', '0 0 380 160');
+    svg.setAttribute('role', 'img');
+    const aria = winner === 'tie'
+      ? a.sym + ' and ' + b.sym + ' share the pair evenly'
+      : (winner === 'a' ? a.sym : b.sym) + ' pulls the shared pair; δ− on the stronger side';
+    svg.setAttribute('aria-label', aria);
+
+    const defs = document.createElementNS(SVG_NS, 'defs');
+    function sphereGrad(id, hot) {
+      const g = document.createElementNS(SVG_NS, 'radialGradient');
+      g.setAttribute('id', id);
+      g.setAttribute('cx', '34%');
+      g.setAttribute('cy', '30%');
+      g.setAttribute('r', '68%');
+      const stops = hot
+        ? [['0%', '#f0c9a8'], ['45%', '#c47a4a'], ['100%', '#6a3420']]
+        : [['0%', '#ddd6b8'], ['45%', '#b7ae8e'], ['100%', '#6f6b59']];
+      stops.forEach(function (pair) {
+        const s = document.createElementNS(SVG_NS, 'stop');
+        s.setAttribute('offset', pair[0]);
+        s.setAttribute('stop-color', pair[1]);
+        g.appendChild(s);
+      });
+      defs.appendChild(g);
+    }
+    sphereGrad('enSphA', winner === 'a');
+    sphereGrad('enSphB', winner === 'b');
+
+    const marker = document.createElementNS(SVG_NS, 'marker');
+    marker.setAttribute('id', 'enArrowHead');
+    marker.setAttribute('markerWidth', '8');
+    marker.setAttribute('markerHeight', '8');
+    marker.setAttribute('refX', '6');
+    marker.setAttribute('refY', '3');
+    marker.setAttribute('orient', 'auto');
+    const tip = document.createElementNS(SVG_NS, 'path');
+    tip.setAttribute('d', 'M0,0 L6,3 L0,6 Z');
+    tip.setAttribute('fill', '#a85a32');
+    marker.appendChild(tip);
+    defs.appendChild(marker);
+    svg.appendChild(defs);
+
+    const rA = 28 + Math.min(22, a.radiusPm / 12);
+    const rB = 28 + Math.min(22, b.radiusPm / 12);
+    const cxA = 110;
+    const cxB = 270;
+    const cy = 78;
+
+    const bond = document.createElementNS(SVG_NS, 'line');
+    bond.setAttribute('class', 'bond');
+    bond.setAttribute('x1', String(cxA + rA - 4));
+    bond.setAttribute('y1', String(cy));
+    bond.setAttribute('x2', String(cxB - rB + 4));
+    bond.setAttribute('y2', String(cy));
+    svg.appendChild(bond);
+
+    const circA = document.createElementNS(SVG_NS, 'circle');
+    circA.setAttribute('class', 'sphere-a');
+    circA.setAttribute('cx', String(cxA));
+    circA.setAttribute('cy', String(cy));
+    circA.setAttribute('r', String(rA));
+    circA.setAttribute('fill', 'url(#enSphA)');
+    svg.appendChild(circA);
+
+    const circB = document.createElementNS(SVG_NS, 'circle');
+    circB.setAttribute('class', 'sphere-b');
+    circB.setAttribute('cx', String(cxB));
+    circB.setAttribute('cy', String(cy));
+    circB.setAttribute('r', String(rB));
+    circB.setAttribute('fill', 'url(#enSphB)');
+    svg.appendChild(circB);
+
+    function label(x, y, text, cls) {
+      const t = document.createElementNS(SVG_NS, 'text');
+      t.setAttribute('class', cls);
+      t.setAttribute('x', String(x));
+      t.setAttribute('y', String(y));
+      t.textContent = text;
+      svg.appendChild(t);
+    }
+    label(cxA, cy + 5, a.sym, 'sym-lab');
+    label(cxB, cy + 5, b.sym, 'sym-lab');
+
+    if (winner === 'tie') {
+      label(190, 28, 'equal share', 'delta');
+    } else {
+      const negX = winner === 'a' ? cxA : cxB;
+      const posX = winner === 'a' ? cxB : cxA;
+      label(negX, cy - rA - 14, 'δ−', 'delta');
+      label(posX, cy - rB - 14, 'δ+', 'delta is-pos');
+
+      const arrow = document.createElementNS(SVG_NS, 'line');
+      arrow.setAttribute('class', 'pull-arrow');
+      const fromX = winner === 'a' ? cxB - rB - 8 : cxA + rA + 8;
+      const toX = winner === 'a' ? cxA + rA + 10 : cxB - rB - 10;
+      arrow.setAttribute('x1', String(fromX));
+      arrow.setAttribute('y1', String(cy + 36));
+      arrow.setAttribute('x2', String(toX));
+      arrow.setAttribute('y2', String(cy + 36));
+      arrow.setAttribute('marker-end', 'url(#enArrowHead)');
+      svg.appendChild(arrow);
+    }
+
+    els.enSimple.appendChild(svg);
+    els.enSimple.setAttribute('aria-hidden', 'false');
+  }
+
+  function setEnPhaseClass(phase, winner) {
+    const host = els.enPairHost;
+    host.classList.remove(
+      'is-apart', 'is-overlap', 'is-pull', 'is-simple',
+      'is-pull-a', 'is-pull-b', 'is-pull-even'
+    );
+    if (phase === 'ready' || phase === 'pick') {
+      host.classList.add('is-apart');
+    } else if (phase === 'overlap') {
+      host.classList.add('is-overlap');
+    } else if (phase === 'pull') {
+      host.classList.add('is-pull');
+      if (winner === 'a') host.classList.add('is-pull-a');
+      else if (winner === 'b') host.classList.add('is-pull-b');
+      else host.classList.add('is-pull-even');
+    } else if (phase === 'simple') {
+      host.classList.add('is-simple');
+    }
+  }
+
+  function renderEnScene() {
+    const a = enAtom(STATE.enA);
+    const b = enAtom(STATE.enB);
+    const both = !!(a && b);
+    const winner = both ? enWinner(a, b) : null;
+
+    updateEnSlotLabels();
+    renderEnGrid();
+
+    els.enScene.hidden = !both;
+    els.enActions.hidden = !both;
+    els.enCompare.hidden = !both;
+
+    if (!both) {
+      clearEnAnim();
+      STATE.enPhase = 'pick';
+      els.enPhaseLab.textContent = '';
+      els.enNote.hidden = true;
+      els.enShareBtn.hidden = true;
+      els.enResetBtn.hidden = true;
+      els.enDensity.setAttribute('aria-hidden', 'true');
+      els.enShared.setAttribute('aria-hidden', 'true');
+      els.helpText.textContent = HELP.act4.pick;
+      updateContinue();
+      return;
+    }
+
+    const aHostEmpty = !els.enAtomA.firstChild;
+    const bHostEmpty = !els.enAtomB.firstChild;
+    const needAtomRebuild = aHostEmpty || bHostEmpty ||
+      els.enAtomA.dataset.sym !== a.sym ||
+      els.enAtomB.dataset.sym !== b.sym ||
+      STATE.enPhase === 'ready' || STATE.enPhase === 'pick';
+    if (needAtomRebuild) {
+      els.enAtomA.replaceChildren(buildEnMiniAtom(a, 'enA'));
+      els.enAtomB.replaceChildren(buildEnMiniAtom(b, 'enB'));
+      els.enAtomA.dataset.sym = a.sym;
+      els.enAtomB.dataset.sym = b.sym;
+    }
+    renderEnCompare(a, b, winner);
+    setEnPhaseClass(STATE.enPhase === 'pick' ? 'ready' : STATE.enPhase, winner);
+
+    if (STATE.enPhase === 'ready' || STATE.enPhase === 'pick') {
+      STATE.enPhase = 'ready';
+      setEnPhaseClass('ready');
+      els.enPhaseLab.textContent = 'Shells apart';
+      els.enShared.setAttribute('aria-hidden', 'true');
+      els.enDensity.setAttribute('aria-hidden', 'true');
+      els.enSimple.replaceChildren();
+      els.enSimple.setAttribute('aria-hidden', 'true');
+      els.enShareBtn.hidden = false;
+      els.enShareBtn.textContent = 'Share a pair →';
+      els.enResetBtn.hidden = true;
+      els.enNote.hidden = !STATE.enNamed;
+      els.helpText.textContent = HELP.act4.share;
+    } else if (STATE.enPhase === 'overlap') {
+      els.enPhaseLab.textContent = 'Sharing a pair';
+      els.enShared.setAttribute('aria-hidden', 'false');
+      els.enDensity.setAttribute('aria-hidden', 'false');
+      els.enShareBtn.hidden = true;
+      els.enResetBtn.hidden = true;
+      els.helpText.textContent = HELP.act4.share;
+    } else if (STATE.enPhase === 'pull') {
+      els.enPhaseLab.textContent = winner === 'tie'
+        ? 'Even density'
+        : 'Density pulled toward ' + (winner === 'a' ? a.sym : b.sym);
+      els.enShared.setAttribute('aria-hidden', 'false');
+      els.enDensity.setAttribute('aria-hidden', 'false');
+      els.enShareBtn.hidden = true;
+      els.enResetBtn.hidden = true;
+      els.helpText.textContent = HELP.act4.share;
+    } else if (STATE.enPhase === 'simple') {
+      els.enPhaseLab.textContent = winner === 'tie' ? 'Equal share' : 'δ− · δ+';
+      els.enShared.setAttribute('aria-hidden', 'true');
+      els.enDensity.setAttribute('aria-hidden', 'true');
+      renderEnSimple(a, b, winner);
+      els.enShareBtn.hidden = true;
+      els.enResetBtn.hidden = false;
+      STATE.enNamed = true;
+      els.enNote.hidden = false;
+      renderEnCompare(a, b, winner);
+      els.helpText.textContent = HELP.act4.done;
+    }
+    updateContinue();
+  }
+
+  function pickEnElement(sym) {
+    if (STATE.enPhase !== 'pick' && STATE.enPhase !== 'ready') {
+      /* Changing mid-animation resets to ready with new pick. */
+      clearEnAnim();
+      STATE.enPhase = 'ready';
+    }
+    if (STATE.enSlot === 'a') {
+      STATE.enA = sym;
+      if (!STATE.enB) setEnActiveSlot('b');
+    } else {
+      STATE.enB = sym;
+      if (!STATE.enA) setEnActiveSlot('a');
+    }
+    if (STATE.enA && STATE.enB) STATE.enPhase = 'ready';
+    renderEnScene();
+  }
+
+  function runEnShareSequence() {
+    const a = enAtom(STATE.enA);
+    const b = enAtom(STATE.enB);
+    if (!a || !b) return;
+    const winner = enWinner(a, b);
+    clearEnAnim();
+
+    if (prefersReduced) {
+      STATE.enPhase = 'simple';
+      STATE.enNamed = true;
+      renderEnScene();
+      return;
+    }
+
+    /* 1) Shells meet — shared pair stays centered between them. */
+    STATE.enPhase = 'overlap';
+    setEnPhaseClass('overlap');
+    els.enPhaseLab.textContent = 'Sharing a pair';
+    els.enShared.setAttribute('aria-hidden', 'false');
+    els.enDensity.setAttribute('aria-hidden', 'false');
+    els.enShareBtn.hidden = true;
+    els.enResetBtn.hidden = true;
+    els.helpText.textContent = HELP.act4.share;
+    updateContinue();
+
+    enAnimTimer = setTimeout(function () {
+      /* 2) Density + weaker rings morph toward the stronger pull; hold the beat. */
+      STATE.enPhase = 'pull';
+      setEnPhaseClass('pull', winner);
+      els.enPhaseLab.textContent = winner === 'tie'
+        ? 'Even density'
+        : 'Density pulled toward ' + (winner === 'a' ? a.sym : b.sym);
+      enAnimTimer = setTimeout(function () {
+        /* 3) Simplify to δ+/δ− spheres. */
+        STATE.enPhase = 'simple';
+        renderEnScene();
+      }, 2400);
+    }, 900);
+  }
+
+  function resetEnPair() {
+    clearEnAnim();
+    STATE.enA = null;
+    STATE.enB = null;
+    STATE.enPhase = 'pick';
+    setEnActiveSlot('a');
+    renderEnScene();
+  }
+
+  function initEnAct() {
+    clearEnAnim();
+    if (!STATE.free || !STATE.enA || !STATE.enB) {
+      STATE.enPhase = (STATE.enA && STATE.enB) ? 'ready' : 'pick';
+    }
+    setEnActiveSlot(STATE.enSlot || 'a');
+    els.helpText.textContent = HELP.act4[STATE.enPhase === 'simple' ? 'done' : (STATE.enA && STATE.enB ? 'share' : 'pick')];
+    els.stuckBtn.hidden = false;
+    renderEnScene();
+  }
+
+  function updateContinue() {
+    const btn = els.continueBtn;
+    btn.disabled = false;
+    if (STATE.act === 1) {
+      if (STATE.eaStep === 0) btn.textContent = 'Continue → Spare electron';
+      else if (!STATE.captured && !STATE.free) {
+        btn.textContent = 'Toss an electron first';
+        btn.disabled = true;
+      } else {
+        btn.textContent = 'Continue → Measuring affinity';
+      }
+      return;
+    }
+    if (STATE.act === 2) {
+      if (STATE.fPhase === 'gain' && !STATE.free) {
+        btn.textContent = 'Toss an electron first';
+        btn.disabled = true;
+      } else if (STATE.fPhase === 'hold' && !STATE.free) {
+        btn.textContent = 'Pull the electron off first';
+        btn.disabled = true;
+      } else {
+        btn.textContent = 'Continue → Specific cases';
+      }
+      return;
+    }
+    if (STATE.act === 3) {
+      if (STATE.casesStep === 0) btn.textContent = 'Continue → Mg · N · Ar';
+      else if (STATE.casesStep === 1) btn.textContent = 'Continue → EA map';
+      else btn.textContent = 'Continue → Electronegativity';
+      return;
+    }
+    if (STATE.act === 4) {
+      if (STATE.enPhase !== 'simple' && !STATE.free) {
+        btn.textContent = 'Share a pair first';
+        btn.disabled = true;
+      } else if (STATE.moduleComplete) {
+        btn.textContent = 'What this was for →';
+      } else {
+        btn.textContent = 'Finish →';
+      }
+      return;
+    }
+    btn.textContent = 'Continue →';
+  }
+
+  function setEaStep(n) {
+    STATE.eaStep = Math.max(0, Math.min(1, n));
+    if (!STATE.free) {
+      if (STATE.eaStep < 1) {
+        STATE.captured = false;
+        els.bucketElectron.classList.remove('is-gone');
+        els.eaResetBtn.hidden = true;
+      }
+    }
+    els.helpText.textContent = HELP.act1[STATE.eaStep];
+    els.stuckBtn.hidden = false;
+    renderEaScene();
+    updateContinue();
+  }
+
+  function setAct(n) {
+    STATE.act = n;
+    document.querySelectorAll('.act-panel').forEach(function (p) {
+      p.hidden = Number(p.dataset.act) !== n;
+    });
+    els.actMeta.textContent = ACT_META[n];
+    els.stageTitle.textContent = STAGE_TITLE[n];
+    els.backBtn.hidden = n === 1 && STATE.eaStep === 0;
+    els.stuckBtn.hidden = false;
+
+    if (n === 1) {
+      els.helpText.textContent = HELP.act1[STATE.eaStep];
+      renderEaScene();
+    } else if (n === 2) {
+      clearDrag();
+      els.helpText.textContent = HELP.act2[STATE.fPhase] || HELP.act2.gain;
+      renderFScene();
+    } else if (n === 3) {
+      clearDrag();
+      setCasesStep(STATE.casesStep);
+      return;
+    } else if (n === 4) {
+      clearDrag();
+      initEnAct();
+      return;
+    }
+    updateContinue();
+  }
+
+  function goBack() {
+    if (STATE.act === 1 && STATE.eaStep > 0) {
+      setEaStep(STATE.eaStep - 1);
+      els.backBtn.hidden = STATE.eaStep === 0;
+      return;
+    }
+    if (STATE.act === 2) {
+      if (STATE.fPhase === 'hold' || STATE.fPhase === 'done') {
+        resetFDemo();
+        return;
+      }
+      setAct(1);
+      return;
+    }
+    if (STATE.act === 3) {
+      if (STATE.casesStep > 0) {
+        setCasesStep(STATE.casesStep - 1);
+        return;
+      }
+      setAct(2);
+      return;
+    }
+    if (STATE.act === 4) {
+      if (STATE.enPhase === 'overlap' || STATE.enPhase === 'pull' || STATE.enPhase === 'simple') {
+        clearEnAnim();
+        STATE.enPhase = 'ready';
+        renderEnScene();
+        return;
+      }
+      setAct(3);
+      return;
+    }
+    if (STATE.act > 1) setAct(STATE.act - 1);
+  }
+
+  function goForward() {
+    if (STATE.act === 1) {
+      if (STATE.eaStep < 1) {
+        setEaStep(STATE.eaStep + 1);
+        els.backBtn.hidden = false;
+        return;
+      }
+      if (!STATE.captured && !STATE.free) return;
+      STATE.fPhase = 'gain';
+      setAct(2);
+      return;
+    }
+    if (STATE.act === 2) {
+      if (STATE.fPhase !== 'done' && !STATE.free) return;
+      STATE.casesStep = 0;
+      STATE.casesRevealed = false;
+      setAct(3);
+      return;
+    }
+    if (STATE.act === 3) {
+      if (STATE.casesStep < 2) {
+        setCasesStep(STATE.casesStep + 1);
+        return;
+      }
+      setAct(4);
+      return;
+    }
+    if (STATE.act === 4) {
+      if (STATE.enPhase !== 'simple' && !STATE.free) return;
+      showDebriefStage();
+      return;
+    }
+  }
+
+  function showDebriefStage() {
+    STATE.moduleComplete = true;
+    SuiteChrome.revealDebrief(DEBRIEF, {
+      exclusive: true,
+      onRevisit: function (target) {
+        SuiteChrome.leaveDebriefStage();
+        STATE.free = true;
+        const key = String(target || '');
+        if (key.indexOf('cases:') === 0) {
+          STATE.casesStep = Number(key.replace(/^cases:/, '')) || 0;
+          STATE.casesRevealed = true;
+          setAct(3);
+        } else {
+          const n = Number(key.replace(/^act:/, '')) || 1;
+          if (n === 1) {
+            STATE.captured = true;
+            STATE.eaStep = 1;
+            setAct(1);
+            els.bucketElectron.classList.add('is-gone');
+            els.affinityNote.hidden = false;
+            els.eaResetBtn.hidden = false;
+            els.energyReadout.textContent = ATOMS.Cl.eaMjMol.toFixed(3) + ' MJ/mol released · PubChem';
+            renderEaScene();
+          } else if (n === 2) {
+            STATE.fPhase = 'done';
+            setAct(2);
+          } else if (n === 4) {
+            STATE.enNamed = true;
+            STATE.enPhase = 'simple';
+            if (!STATE.enA) STATE.enA = 'H';
+            if (!STATE.enB) STATE.enB = 'F';
+            setAct(4);
+          } else {
+            STATE.casesStep = 0;
+            STATE.casesRevealed = true;
+            setAct(3);
+          }
+        }
+        window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
+      }
+    });
+  }
+
+  function startModule() {
+    document.getElementById('briefing').hidden = true;
+    document.getElementById('moduleStage').hidden = false;
+    STATE.free = false;
+    STATE.captured = false;
+    STATE.eaStep = 0;
+    STATE.fPhase = 'gain';
+    STATE.casesStep = 0;
+    STATE.casesRevealed = false;
+    STATE.enSlot = 'a';
+    STATE.enA = null;
+    STATE.enB = null;
+    STATE.enPhase = 'pick';
+    STATE.enNamed = false;
+
+    /* Optional deep-link: #cases:0 | #cases:1 | #cases:2 | #act:4 */
+    const hash = (location.hash || '').replace(/^#/, '');
+    const casesMatch = /^cases:([0-2])$/.exec(hash);
+    if (casesMatch) {
+      STATE.free = true;
+      STATE.captured = true;
+      STATE.fPhase = 'done';
+      STATE.casesStep = Number(casesMatch[1]);
+      setAct(3);
+      return;
+    }
+    if (hash === 'act:4' || hash === 'en') {
+      STATE.free = true;
+      STATE.captured = true;
+      STATE.fPhase = 'done';
+      STATE.casesStep = 2;
+      setAct(4);
+      return;
+    }
+
+    setAct(1);
+    setEaStep(0);
+  }
+
+  SuiteChrome.renderBriefing(DEBRIEF);
+  SuiteChrome.wireStuckHelp();
+  document.getElementById('briefingNext').addEventListener('click', startModule);
+  els.backBtn.addEventListener('click', goBack);
+  els.continueBtn.addEventListener('click', goForward);
+  els.eaResetBtn.addEventListener('click', resetToss);
+  els.fResetBtn.addEventListener('click', resetFDemo);
+  els.casesRevealBtn.addEventListener('click', revealCasesAnswer);
+  els.enSlotA.addEventListener('click', function () { setEnActiveSlot('a'); });
+  els.enSlotB.addEventListener('click', function () { setEnActiveSlot('b'); });
+  els.enShareBtn.addEventListener('click', runEnShareSequence);
+  els.enResetBtn.addEventListener('click', resetEnPair);
+})();
+</script>
+</body>
+</html>

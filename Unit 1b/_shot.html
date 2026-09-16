@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><style>
+  html,body{margin:0;background:#e6e1cf;}
+  iframe{display:block;border:0;width:900px;height:1400px;}
+</style></head>
+<body>
+<iframe id="f" src="01-nucleus-isotopes.html"></iframe>
+<script>
+const f = document.getElementById('f');
+f.addEventListener('load', () => {
+  const w = f.contentWindow;
+  const stop = Number(new URLSearchParams(location.search).get('stop') || 9);
+  try {
+    if (typeof w.startModule === 'function') w.startModule();
+    else {
+      const b = f.contentDocument.getElementById('briefing');
+      if (b) b.hidden = true;
+    }
+    w.applyDevStop(stop);
+  } catch (e) { document.title = 'ERR ' + e.message; }
+  setTimeout(() => {
+    const vp = f.contentDocument.getElementById('viewport');
+    if (vp) vp.scrollIntoView({ block: 'center' });
+    document.title = 'READY';
+  }, 1200);
+});
+</script>
+</body>
+</html>

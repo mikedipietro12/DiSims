@@ -6,213 +6,1457 @@
 <title>06 — Photoelectron Spectroscopy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --void:#0a0912;
-  --void-2:#0c0b1c;
-  --panel:#151330;
-  --panel-edge:#2a2660;
-  --grid:#211d47;
-  --phosphor:#3fe0cf;
-  --phosphor-dim:#1c6b66;
-  --ember:#ffb24d;
-  --signal:#b579ff;
-  --ink:#e9e7fb;
-  --dim:#797597;
+  --paper:#e6e1cf;
+  --paper-2:#d8d2bc;
+  --paper-3:#c9c2a8;
+  --void:#050505;
+  --void-2:#0c0c0c;
+  --panel:#efe9d4;
+  --panel-edge:#1a1810;
+  --grid:#cfc8ae;
+  --phosphor:#5c6b28;
+  --ember:#a85a32;
+  --signal:#1a6aa3;
+  --ink:#16140e;
+  --ink-soft:#33301f;
+  --dim:#55513f;
+  --faint:#6f6b59;
+  --proton:#a85a32;
+  --neutron:#7e8c45;
+  --electron:#c4a35a;
+  --success:#4f5a28;
+  --error:#a85a32;
+  --neon:#c4a35a;
+  --olive:#7e8c45;
+  --olive-deep:#4f5a28;
+  --mustard:#c4a35a;
+  --plate:#050505;
+  --plate-ink:#e8e6d9;
+  /* Module 06 — photon packet (not suite-wide) */
+  --photon:#6b4a78;
+
+  --font-display:'Archivo Black',Helvetica,sans-serif;
+  --font-body:Barlow,Helvetica,Univers,'Helvetica Neue',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  --label-xs:0.72rem;
+  --label-sm:0.78rem;
+  --label-md:0.85rem;
+  --track-wide:0.13em;
+  --track-tight:0.08em;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;-webkit-text-size-adjust:100%;}
 body{
-  background:var(--void);
+  background-color:var(--paper);
   color:var(--ink);
-  font-family:'IBM Plex Mono',monospace;
+  font-family:var(--font-body);
+  font-size:1.0625rem;
   min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+.mono-label,
+.back-link,.mod-meta,.task-kicker,.hud,.debrief-kicker,.briefing-kicker,#stuckBtn,.btn,.mod-tag,.viewport::before,
+.act-meta,.slider-label,.hud-item .k,.eq-line,.eq-filled,.det-kicker,.gun-kicker,.atom-label,.stage-chip,
+.spectrum-axis-label,.discovery-line,.trial-log th,.trial-log td,.trial-log-kicker,.energy-rail .energy-val,
+.energy-rail .energy-unit{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
 }
 body::before{
   content:'';
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   z-index:9999;
   pointer-events:none;
-  opacity:0.045;
-  mix-blend-mode:screen;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:0.14;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:256px 256px;
 }
-.module-wrap{
-  max-width:900px;
-  margin:0 auto;
-  padding:2rem 1.5rem;
+.module-wrap{max-width:920px;margin:0 auto;padding:1.35rem 1.35rem 3.5rem;position:relative;z-index:1;}
+.top-nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap;border-bottom:1px solid var(--ink);padding-bottom:0.7rem;}
+.back-link{font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color 0.2s;}
+.back-link:hover{color:var(--olive-deep);}
+.mod-meta{font-size:var(--label-xs);font-weight:600;color:var(--ink);letter-spacing:var(--track-wide);text-transform:uppercase;}
+
+.task-kicker,.mod-tag{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--olive-deep);
+  margin-bottom:0.7rem;
 }
-.back-link{
-  display:inline-block;
-  color:var(--dim);
-  text-decoration:none;
-  font-size:0.85rem;
-  margin-bottom:1.5rem;
-  transition:color 0.2s;
+.task-kicker::before,.mod-tag::before{
+  content:'';
+  width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);
+  flex:none;
+  transform:translateY(-0.12em);
 }
-.back-link:hover{color:var(--phosphor);}
-.mod-tag{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.55rem;
-  color:var(--dim);
-  text-transform:uppercase;
-  letter-spacing:0.15em;
-  margin-bottom:0.5rem;
+.act-meta{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--dim);margin:-0.35rem 0 0.85rem;
 }
-h1{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.9rem;
-  color:var(--phosphor);
-  text-shadow:0 0 12px rgba(63,224,207,0.4),0 0 30px rgba(63,224,207,0.15);
-  margin-bottom:0.75rem;
-  line-height:1.6;
+h1,.task-title{
+  font-family:var(--font-display);
+  font-size:clamp(1.9rem,4.7vw,2.75rem);
+  font-weight:400;
+  letter-spacing:-0.025em;
+  line-height:0.98;
+  color:var(--ink);
+  margin-bottom:0.7rem;
 }
 .framing{
-  font-family:'IBM Plex Mono',monospace;
-  color:var(--dim);
-  font-style:italic;
-  font-size:0.85rem;
-  line-height:1.6;
-  margin-bottom:1rem;
+  font-size:1.15rem;
+  font-weight:400;
+  line-height:1.5;
+  color:var(--ink-soft);
+  max-width:none;
+  text-wrap:pretty;
+  margin-bottom:0.85rem;
 }
+.discovery-line{
+  display:none;
+  margin:0.35rem 0 0.9rem;
+  padding:0.55rem 0;
+  border-top:1px solid var(--grid);
+  border-bottom:1px solid var(--grid);
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:var(--track-tight);
+  text-transform:uppercase;
+  color:var(--signal);
+  line-height:1.45;
+}
+.discovery-line.visible{display:block;}
+
 .viewport{
   position:relative;
-  background:var(--void-2);
-  border:2px solid var(--panel-edge);
-  border-radius:4px;
-  box-shadow:
-    0 0 0 4px var(--void),
-    0 0 0 6px var(--panel-edge),
-    0 0 30px rgba(63,224,207,0.06);
+  background:transparent;
+  border:3px solid var(--ink);
+  border-radius:0;
   padding:0;
-  margin:1.5rem 0;
+  margin:0.35rem 0 1rem;
   overflow:hidden;
+  user-select:none;-webkit-user-select:none;
+  box-shadow:none;
 }
-#simCanvas{width:100%;display:block;}
-.controls{/* placeholder for simulation controls */}
-.hud{
+.viewport::before{
+  content:attr(data-fig);
+  display:block;
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--ink);
+  background:transparent;
+  padding:0.55rem 1rem 0.42rem;
+  border-bottom:2px solid var(--ink);
+}
+.viewport:not([data-fig])::before{display:none;}
+.plate-host{
+  position:relative;
+  width:100%;
+  min-height:280px;
+  background:transparent;
+}
+.plate-host[hidden]{display:none !important;}
+.apparatus-row{
+  display:flex;
+  align-items:stretch;
+  gap:0;
+  min-height:280px;
+}
+.apparatus-main{
+  position:relative;
+  flex:1 1 auto;
+  min-width:0;
+}
+.energy-rail{
+  flex:0 0 4.75rem;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0.45rem;
+  padding:1.1rem 0.55rem 1rem;
+  border-right:1px solid var(--ink);
+  background:transparent;
+}
+.energy-rail[hidden]{display:none !important;}
+.energy-rail .slider-label{
+  writing-mode:horizontal-tb;
+  text-align:center;
+  line-height:1.25;
+  font-size:var(--label-xs);
+  letter-spacing:var(--track-wide);
+  margin:0;
+}
+.energy-rail .energy-val{
+  font-family:var(--font-mono);
+  font-size:var(--label-md);
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+  color:var(--photon);
+  line-height:1;
+}
+.energy-rail .energy-unit{
+  font-family:var(--font-mono);
+  font-size:0.62rem;
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
   color:var(--dim);
-  font-size:0.75rem;
-  padding:0.75rem 0;
-  min-height:1.5rem;
+  margin-top:-0.2rem;
 }
+.v-slider-wrap{
+  position:relative;
+  width:2rem;
+  height:9.5rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0.15rem 0 0.25rem;
+}
+.v-slider-wrap input[type="range"]{
+  width:9.5rem;
+  height:2px;
+  margin:0;
+  transform:rotate(-90deg);
+  transform-origin:center center;
+  background:var(--ink);
+}
+.energy-rail .btn{
+  width:100%;
+  padding:0.45rem 0.35rem;
+  font-size:var(--label-xs);
+  letter-spacing:var(--track-wide);
+}
+.apparatus-actions{
+  position:absolute;
+  left:50%;
+  top:42%;
+  transform:translate(-50%, -50%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.45rem;
+  z-index:3;
+  pointer-events:none;
+}
+.apparatus-actions[hidden]{display:none !important;}
+.apparatus-actions .btn{
+  pointer-events:auto;
+  min-width:9.5rem;
+  box-shadow:0 0 0 4px var(--paper);
+}
+.apparatus-actions.is-loaded{
+  top:auto;
+  bottom:0.85rem;
+  transform:translate(-50%, 0);
+}
+.apparatus-actions.is-running{
+  display:none !important;
+}
+.plate-svg{display:block;width:100%;height:auto;}
+#spectrumCanvas{width:100%;display:block;background:transparent;}
+
+/* Act 2 — hypothetical atom reference plate */
+.hypo-plate{
+  border-bottom:2px solid var(--ink);
+  padding:0.85rem 1rem 1rem;
+  background:transparent;
+}
+.hypo-plate[hidden]{display:none !important;}
+.hypo-kicker{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin:0 0 0.55rem;
+}
+.hypo-kicker::before{
+  content:'';
+  display:inline-block;
+  width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);
+  margin-right:0.55rem;
+  vertical-align:middle;
+}
+.hypo-svg{display:block;width:100%;height:auto;max-height:200px;}
+.hypo-panel-label{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  fill:var(--dim);
+}
+.hypo-level-line{stroke:var(--ink);stroke-width:1.5;fill:none;}
+.hypo-level-tick{stroke:var(--ink);stroke-width:1.25;}
+.hypo-level-val{
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  fill:var(--ink-soft);
+  letter-spacing:0.02em;
+}
+.hypo-level-count{
+  font-family:var(--font-mono);
+  font-size:10px;
+  fill:var(--dim);
+  letter-spacing:0.04em;
+  text-transform:none;
+}
+.hypo-e{fill:url(#hypoEGrad);stroke:#6a5530;stroke-width:1;}
+.hypo-shell-nuc{fill:url(#hypoNucGrad);stroke:var(--ink);stroke-width:1.1;}
+.hypo-shell-e{fill:url(#hypoEGrad);stroke:#6a5530;stroke-width:1;}
+.hypo-shell-ring{fill:none;stroke:var(--ink);stroke-width:1.25;opacity:0.55;}
+.hypo-shell-sym{
+  font-family:var(--font-body);
+  font-size:13px;
+  font-weight:700;
+  fill:var(--paper);
+  text-transform:none;
+  letter-spacing:0;
+  text-anchor:middle;
+  dominant-baseline:central;
+}
+.sample-cloud{pointer-events:none;}
+.sample-cloud .sample-orb-shell{
+  fill:rgba(196,163,90,0.14);
+  stroke:var(--ink);
+  stroke-width:1;
+  opacity:0.85;
+}
+.sample-cloud .sample-orb-nuc{
+  fill:var(--proton);
+  stroke:var(--ink);
+  stroke-width:0.8;
+}
+.sample-cloud .sample-orb-e{
+  fill:var(--electron);
+  stroke:#6a5530;
+  stroke-width:0.7;
+}
+.readout-kicker{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--dim);
+  padding:0;
+  margin:0;
+}
+.readout-bar{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:0.55rem 1rem;
+  padding:0.45rem 1rem 0.15rem;
+}
+.readout-bar .stage-row{margin:0;}
+.readout-bar .stage-chip{
+  font-size:var(--label-xs);
+  padding:0.2rem 0.55rem;
+}
+.act2-outro{
+  display:none;
+  margin:1rem 0 0.35rem;
+  padding:1rem 0 0;
+  border-top:1px solid var(--grid);
+}
+.act2-outro.visible{display:block;}
+.act2-outro .outro-kicker{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin:0 0 0.45rem;
+}
+.act2-outro .outro-kicker::before{
+  content:'';
+  display:inline-block;
+  width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);
+  margin-right:0.55rem;
+  vertical-align:middle;
+}
+.act2-outro p{
+  font-size:1.05rem;
+  line-height:1.55;
+  color:var(--ink-soft);
+  margin:0.55rem 0;
+  text-wrap:pretty;
+  max-width:none;
+}
+
+/* Act 1 / 2 — apparatus */
+.apparatus-svg{display:block;width:100%;height:auto;}
+
+/* laser / photon source */
+.laser-body{fill:var(--paper-2);stroke:var(--ink);stroke-width:1.5;}
+.laser-fin{fill:var(--paper-3);stroke:var(--ink);stroke-width:1.25;}
+.laser-rail{fill:none;stroke:var(--ink);stroke-width:1;opacity:0.45;}
+.laser-collar{fill:var(--ink);opacity:0.82;}
+.laser-nose{fill:var(--void);stroke:var(--ink);stroke-width:1;}
+.laser-cone{fill:var(--photon);opacity:0.22;stroke:var(--photon);stroke-width:1;}
+.laser-aperture{fill:var(--photon);stroke:var(--ink);stroke-width:1;}
+.laser-aperture-ring{fill:none;stroke:var(--photon);stroke-width:1.5;opacity:0.7;}
+.laser-slot{fill:var(--paper);stroke:var(--ink);stroke-width:1;}
+.source-wave{
+  fill:none;
+  stroke:var(--photon);
+  stroke-width:1.5;
+  stroke-linejoin:round;
+  stroke-linecap:round;
+  pointer-events:none;
+}
+.source-wave.is-idle{stroke:var(--grid);}
+.gun-kicker,.det-kicker,.atom-label,.ke-readout-kicker{
+  font-size:11px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  fill:var(--dim);
+}
+.gun-energy{
+  font-family:var(--font-mono);
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:0.04em;
+  fill:var(--photon);
+  text-transform:none;
+}
+
+/* beam — live wash only (no permanent guide dashes) */
+.beam-wash{
+  fill:url(#beamWashGrad);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.2s;
+}
+.beam-wash.on{opacity:1;}
+.beam-core{
+  stroke:var(--photon);
+  stroke-width:1.5;
+  fill:none;
+  opacity:0;
+  pointer-events:none;
+}
+.beam-core.on{opacity:0.85;}
+
+/* SVG groups that must stay fully off when inactive */
+#sampleCloud[hidden],
+#atomCaption[hidden]{
+  display:none !important;
+}
+#sampleCloud:not([hidden]){
+  display:inline !important;
+}
+
+.photon-packet{
+  opacity:0;
+  pointer-events:none;
+}
+.photon-packet.flying{opacity:1;}
+.photon-glow{fill:var(--photon);opacity:0.28;}
+.photon-core{fill:var(--photon);stroke:var(--ink);stroke-width:1;}
+.photon-tip{fill:var(--paper);opacity:0.9;}
+
+/* shell-model atom (Module 03 default) */
+.atom-shell{
+  fill:none;
+  stroke:var(--ink);
+  stroke-width:1.25;
+  opacity:0.55;
+}
+.atom-core-wash{pointer-events:none;}
+.atom-nuc{
+  fill:url(#nucGrad);
+  stroke:var(--ink);
+  stroke-width:1.1;
+}
+.atom-e{
+  fill:url(#eGrad);
+  stroke:#6a5530;
+  stroke-width:1;
+}
+.atom-e.gone{opacity:0;}
+.atom-sym{
+  font-family:var(--font-body);
+  font-size:13px;
+  font-weight:700;
+  fill:var(--paper);
+  text-transform:none;
+  letter-spacing:0;
+  text-anchor:middle;
+  dominant-baseline:central;
+}
+.atom-label{
+  text-anchor:middle;
+}
+
+/* detector + collision relic + off-plate readout */
+.detector-box{fill:var(--panel);stroke:var(--ink);stroke-width:1.5;}
+.detector-face{fill:var(--phosphor);opacity:0.32;stroke:var(--olive-deep);stroke-width:1.25;}
+.detector-face.hit{opacity:0.78;}
+.detector-grid{
+  stroke:var(--olive-deep);
+  stroke-width:0.75;
+  opacity:0.35;
+}
+.impact-relic{
+  opacity:0;
+  pointer-events:none;
+}
+.impact-relic.show{opacity:1;}
+.relic-bloom{fill:var(--electron);opacity:0.5;}
+.relic-fleck{fill:url(#eGrad);stroke:#6a5530;stroke-width:0.85;}
+.relic-spark{stroke:var(--ember);stroke-width:1.75;stroke-linecap:square;fill:none;}
+.relic-scar{
+  fill:none;
+  stroke:var(--olive-deep);
+  stroke-width:1.5;
+  opacity:0.9;
+}
+.detector-peak{
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.35s;
+}
+.detector-peak.show{opacity:1;}
+.det-peak-baseline{
+  stroke:var(--ink);
+  stroke-width:1.25;
+  opacity:0.55;
+}
+.det-peak-fill{
+  fill:rgba(92,107,40,0.2);
+}
+.det-peak-stroke{
+  fill:none;
+  stroke:var(--phosphor);
+  stroke-width:1.75;
+  stroke-linejoin:round;
+}
+
+.ke-readout-val{
+  font-family:var(--font-mono);
+  font-size:18px;
+  font-weight:700;
+  fill:var(--phosphor);
+  text-anchor:middle;
+  letter-spacing:0.02em;
+}
+.ke-readout-unit{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  fill:var(--dim);
+  text-anchor:middle;
+}
+.ke-readout-rule{
+  stroke:var(--ink);
+  stroke-width:1.5;
+}
+
+.flight-e{
+  fill:url(#eGrad);
+  stroke:#6a5530;
+  stroke-width:1;
+  opacity:0;
+  pointer-events:none;
+}
+.flight-e.flying,
+.flight-e.lodged{opacity:1;}
+.miss-label{
+  font-family:var(--font-mono);
+  font-size:12px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  fill:var(--ember);
+  opacity:0;
+  transition:opacity 0.3s;
+}
+.miss-label.show{opacity:1;}
+
+.controls{margin:0.5rem 0 0;}
+.controls[hidden]{display:none !important;}
+.controls-fire-below{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.35rem;
+}
+.controls-fire-below .preset-hint{
+  align-self:stretch;
+  text-align:center;
+  margin:0.45rem 0 0.25rem;
+}
+.slider-label{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:var(--track-tight);
+  text-transform:uppercase;
+  color:var(--ink);
+}
+.slider-label .sym{text-transform:none;letter-spacing:0;}
+input[type="range"]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:2px;background:var(--ink);outline:none;border-radius:0;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:16px;height:16px;background:var(--paper);border:2px solid var(--ink);
+  border-radius:0;cursor:pointer;
+}
+input[type="range"]::-moz-range-thumb{
+  width:16px;height:16px;background:var(--paper);border:2px solid var(--ink);
+  border-radius:0;cursor:pointer;
+}
+input[type="range"]:focus-visible{outline:2px solid var(--olive-deep);outline-offset:6px;}
+.control-actions{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;margin-top:0.35rem;}
+.preset-hint{
+  font-size:0.95rem;
+  color:var(--dim);
+  line-height:1.45;
+  margin:0.35rem 0 0.15rem;
+  text-wrap:pretty;
+}
+.student-q{color:var(--signal);font-weight:700;}
+.atom-picker{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:0.45rem;
+  margin:0.35rem 0 0.15rem;
+}
+.atom-picker[hidden]{display:none !important;}
+.atom-picker-label{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-right:0.25rem;
+}
+.atom-tile{
+  width:2.35rem;
+  height:2.35rem;
+  padding:0;
+  margin:0;
+  border:1px solid var(--ink);
+  background:transparent;
+  color:var(--ink);
+  font-family:var(--font-mono);
+  font-size:var(--label-md);
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0;
+  text-transform:none;
+  border-radius:0;
+  cursor:pointer;
+  transition:background 0.15s,color 0.15s;
+}
+.atom-tile:hover{background:var(--paper-2);}
+.atom-tile:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.atom-tile.on,
+.atom-tile[aria-pressed="true"]{
+  background:var(--ink);
+  color:var(--paper);
+}
+.atom-tile:disabled{opacity:0.35;cursor:not-allowed;}
+.trial-log{
+  margin:0.55rem 0 0.15rem;
+  padding:0.75rem 0 0;
+  border-top:1px solid var(--grid);
+  align-self:stretch;
+  width:100%;
+}
+.trial-log[hidden]{display:none !important;}
+.trial-log-kicker{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin:0 0 0.45rem;
+}
+.trial-log-wrap{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.trial-log table{
+  width:100%;
+  border-collapse:collapse;
+  font-variant-numeric:tabular-nums;
+}
+.trial-log th,
+.trial-log td{
+  text-align:left;
+  padding:0.4rem 0.55rem 0.4rem 0;
+  border-bottom:1px solid var(--paper-3);
+  font-size:var(--label-sm);
+  color:var(--ink);
+}
+.trial-log th{
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--dim);
+  border-bottom:1px solid var(--ink);
+  padding-bottom:0.5rem;
+}
+.trial-log td.trial-n{width:4.5rem;color:var(--ink-soft);}
+.trial-log td.trial-el{
+  width:5rem;
+  text-transform:none;
+  letter-spacing:0;
+  font-weight:600;
+}
+.trial-log td.trial-e{color:var(--photon);}
+.trial-log td.trial-ke{color:var(--phosphor);font-weight:600;}
+.trial-log td.trial-ke.is-none{color:var(--faint);font-weight:500;}
+.trial-log-empty{
+  margin:0.55rem 0 0.15rem;
+  font-family:var(--font-body);
+  font-size:0.9rem;
+  color:var(--faint);
+  font-style:italic;
+}
+.trial-log-empty[hidden]{display:none !important;}
+.discover-prompts{
+  margin:0.85rem 0 0.25rem;
+  padding:0.75rem 0 0;
+  border-top:1px solid var(--grid);
+}
+.discover-prompts[hidden]{display:none !important;}
+.discover-prompts .prompt-kicker{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin:0 0 0.4rem;
+}
+.discover-prompts .student-q{
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  line-height:1.5;
+  margin:0.45rem 0;
+  text-wrap:pretty;
+}
+.discover-prompts .control-actions{margin-top:0.65rem;}
+.stage-row{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;margin:0.4rem 0 0.2rem;}
+.stage-chip{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+  padding:0.35rem 0.65rem;
+  border:1px solid var(--grid);
+}
+.stage-chip.on{
+  color:var(--ink);
+  border-color:var(--ink);
+  background:var(--panel);
+}
+
+.hud{
+  display:flex;flex-wrap:wrap;gap:0.15rem 1.35rem;
+  font-size:var(--label-sm);
+  font-weight:500;
+  letter-spacing:var(--track-tight);
+  text-transform:uppercase;
+  color:var(--ink);
+  padding:0.65rem 0 0.2rem;
+  border-top:2px solid var(--ink);
+  margin-top:0.35rem;
+  background:transparent;
+}
+.hud[hidden]{display:none !important;}
+.hud-item{display:flex;flex-direction:column;gap:0.15rem;min-width:5.5rem;}
+.hud-item .k{font-size:var(--label-xs);color:var(--dim);letter-spacing:0.12em;}
+.hud-item .k.sym,.hud-item .v .sym{text-transform:none;letter-spacing:0;}
+.hud-item .v{font-size:var(--label-md);color:var(--ink);font-weight:600;}
+.hud-item.photon .v{color:var(--photon);}
+.hud-item.ke .v{color:var(--phosphor);}
+.hud-item.ie .v{color:var(--ember);}
+.hud-item[hidden]{display:none !important;}
+
+.eq-reveal{
+  display:none;
+  margin:0.75rem 0 0.15rem;
+  padding:0.85rem 0 0.55rem;
+  border-top:1px solid var(--grid);
+  line-height:1.35;
+}
+.eq-reveal.visible{display:block;}
+.eq-line{
+  font-family:var(--font-mono);
+  font-size:clamp(1.55rem, 4.2vw, 2.15rem);
+  font-weight:700;
+  letter-spacing:0.02em;
+  text-transform:uppercase;
+  color:var(--ink);
+  line-height:1.2;
+}
+.eq-line sub{text-transform:none;font-size:0.62em;letter-spacing:0;}
+.eq-numbers{
+  display:none;
+  margin:0.15rem 0 0.25rem;
+  padding:0.35rem 0 0.85rem;
+  border-bottom:1px solid var(--grid);
+  line-height:1.45;
+}
+.eq-numbers.visible{display:block;}
+.eq-filled{
+  margin-top:0.15rem;
+  font-family:var(--font-mono);
+  font-size:1.15rem;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0.02em;
+}
+.eq-filled .unit{
+  display:inline-block;
+  margin-left:0.55rem;
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+  vertical-align:middle;
+}
+.eq-reveal .eq-ie,
+.eq-numbers .eq-ie{color:var(--ember);}
+.eq-reveal .eq-e,
+.eq-numbers .eq-e{color:var(--photon);}
+.eq-reveal .eq-ke,
+.eq-numbers .eq-ke{color:var(--phosphor);}
+.eq-reveal .eq-op,
+.eq-numbers .eq-op{color:var(--ink);font-weight:600;}
+.eq-note{
+  display:block;
+  margin-top:0.45rem;
+  color:var(--ink-soft);
+  font-family:var(--font-body);
+  font-size:0.95rem;
+  font-weight:500;
+  letter-spacing:0;
+  text-transform:none;
+  text-wrap:pretty;
+}
+
+.act-nav,
+.module-footer{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;
+  column-gap:0.75rem;
+  row-gap:0.5rem;
+  width:100%;
+  margin-top:1.25rem;
+  min-height:2.6rem;
+}
+.module-footer[hidden],
+.act-nav[hidden]{display:none !important;}
+.module-footer-back,
+.module-footer-help,
+.module-footer-fwd{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:0.5rem;
+  min-width:0;
+}
+.module-footer-back{justify-self:start;justify-content:flex-start;}
+.module-footer-help{justify-self:center;justify-content:center;}
+.module-footer-fwd{justify-self:end;justify-content:flex-end;}
+.module-footer .btn,
+.module-footer #stuckBtn,
+.act-nav .btn{margin:0;}
+.module-footer #stuckBtn[hidden],
+.module-footer .btn[hidden],
+.act-nav .btn[hidden]{display:none !important;}
+@media (max-width:520px){
+  .module-footer,
+  .act-nav{
+    grid-template-columns:1fr 1fr;
+    grid-template-areas:
+      "back fwd"
+      "help help";
+  }
+  .module-footer-back{grid-area:back;}
+  .module-footer-help{grid-area:help;}
+  .module-footer-fwd{grid-area:fwd;}
+}
+
 [data-gate]{opacity:0;transition:opacity 0.6s;pointer-events:none;}
 [data-gate].discovered{opacity:1;pointer-events:auto;}
 
-#stuckBtn{
-  background:none;
-  border:1px solid var(--signal);
-  color:var(--signal);
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.8rem;
-  padding:0.5rem 1.2rem;
-  border-radius:4px;
-  cursor:pointer;
-  transition:background 0.2s,color 0.2s;
-  margin-top:1rem;
-}
-#stuckBtn:hover{background:rgba(181,121,255,0.1);}
-#stuckBtn:focus-visible{outline:2px solid var(--signal);outline-offset:2px;}
+.btn{background:transparent;border:1px solid var(--ink);color:var(--ink);font-size:var(--label-md);letter-spacing:0.09em;text-transform:uppercase;font-weight:600;padding:0.65rem 1.3rem;border-radius:0;cursor:pointer;transition:background 0.15s,color 0.15s;margin-right:0.5rem;margin-top:0.4rem;}
+.btn:hover{background:var(--ink);color:var(--paper);}
+.btn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.btn.submit{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+.btn.submit:hover{background:var(--olive-deep);border-color:var(--olive-deep);}
+.btn:disabled{opacity:0.35;cursor:not-allowed;}
+.btn:disabled:hover{background:transparent;color:var(--ink);}
+.btn.submit:disabled:hover{background:var(--ink);color:var(--paper);}
 
-.help-panel{
-  opacity:0;
-  max-height:0;
-  overflow:hidden;
-  transition:opacity 0.3s,max-height 0.3s;
-  border:1px solid var(--signal);
-  background:var(--panel);
-  border-radius:4px;
-  padding:0 1.2rem;
-  margin-top:0.75rem;
-  color:var(--dim);
-  font-size:0.85rem;
-  line-height:1.6;
+#stuckBtn{background:none;border:1px solid var(--ink);color:var(--ink);font-size:var(--label-sm);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:0.55rem 1.2rem;border-radius:0;cursor:pointer;transition:background 0.15s,color 0.15s;margin:0;}
+#stuckBtn:hover{background:var(--ink);color:var(--paper);}
+#stuckBtn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.help-panel{opacity:0;max-height:0;overflow:hidden;transition:opacity 0.3s,max-height 0.3s;border:1px solid transparent;background:var(--plate);border-radius:0;padding:0 1.2rem;margin-top:0.75rem;color:var(--plate-ink);font-size:1.05rem;line-height:1.6;max-width:none;text-wrap:pretty;}
+.help-panel.open{opacity:1;max-height:320px;padding:1rem 1.2rem;border-color:var(--neon);}
+
+.part-end{
+  display:none;
+  margin:1rem 0 0.5rem;
+  padding:0.85rem 0 0;
+  border-top:1px solid var(--ink);
+  color:var(--ink-soft);
+  line-height:1.5;
+  text-wrap:pretty;
 }
-.help-panel.open{
-  opacity:1;
-  max-height:200px;
-  padding:1rem 1.2rem;
+.part-end.visible{display:block;}
+
+/* Exclusive debrief stage — beat .visible / display overrides on siblings */
+#moduleStage.is-debriefing > :not(#debrief){display:none !important;}
+#moduleStage.is-debriefing #debrief{display:block;}
+
+.briefing{margin:0 0 0.5rem;padding:0.2rem 0 0;width:100%;}
+.briefing[hidden]{display:none;}
+.module-wrap:has(#briefing:not([hidden])){max-width:1120px;padding-left:clamp(1.35rem,4vw,2.75rem);padding-right:clamp(1.35rem,4vw,2.75rem);}
+.briefing-kicker{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.7rem;
+}
+.briefing-kicker::before{
+  content:'';width:1.6rem;height:0.28rem;background:var(--olive-deep);flex:none;
+  transform:translateY(-0.12em);
+}
+.briefing h1{
+  font-family:var(--font-display);font-size:clamp(1.85rem,4.5vw,2.55rem);
+  font-weight:400;letter-spacing:-0.025em;line-height:1.02;color:var(--ink);
+  margin-bottom:0.55rem;
+}
+.briefing-lead{font-size:1.15rem;line-height:1.55;color:var(--ink-soft);max-width:none;margin:0 0 1.5rem;text-wrap:pretty;}
+.briefing-columns{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.75rem 2.5rem;
+  align-items:start;
+}
+.briefing-actions{
+  display:flex;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  margin-top:1.75rem;
+  padding-top:1.25rem;
+  border-top:1px solid var(--ink);
+}
+.briefing .btn.submit{margin-top:0;}
+#moduleStage[hidden]{display:none;}
+
+.debrief{margin:0.25rem 0 1.25rem;padding:1.2rem 0 0;border-top:1px solid var(--ink);}
+.debrief[hidden]{display:none;}
+.briefing h2,
+.debrief h2{font-family:var(--font-display);font-size:1.5rem;font-weight:400;letter-spacing:-0.02em;line-height:1.1;color:var(--ink);margin-bottom:0.35rem;}
+.debrief-lead{font-size:1.05rem;line-height:1.5;color:var(--dim);max-width:none;margin:0 0 1.15rem;text-wrap:pretty;}
+.briefing-block,
+.debrief-block{border-left:4px solid var(--olive);padding:0.1rem 0 0.1rem 1.05rem;margin-bottom:1.15rem;}
+.briefing-block{margin-bottom:0;}
+.briefing-block:last-of-type,
+.debrief-block:last-child{margin-bottom:0;}
+.briefing-block.cc,
+.debrief-block.cc{border-left-color:var(--signal);}
+.debrief-kicker{font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.5rem;}
+.briefing-block.cc .debrief-kicker,
+.debrief-block.cc .debrief-kicker{color:var(--signal);}
+.briefing ul,
+.debrief ul{list-style:none;margin:0;padding:0;}
+.briefing li,
+.debrief li{position:relative;padding-left:1.6rem;margin:0.45rem 0;font-size:1rem;line-height:1.5;color:var(--ink-soft);max-width:none;text-wrap:pretty;}
+.briefing li{font-size:1.05rem;line-height:1.55;margin:0.55rem 0;}
+.briefing-li li::before{content:'\25B8';position:absolute;left:0;color:var(--olive-deep);}
+.debrief-li li::before{content:'\2713';position:absolute;left:0;color:var(--olive-deep);font-weight:700;}
+.briefing-li li.elsewhere::before,
+.debrief-li li.elsewhere::before{content:'\270E';color:var(--ember);}
+.debrief-tag{font-family:var(--font-mono);font-size:var(--label-xs);letter-spacing:0.1em;text-transform:uppercase;color:var(--ember);white-space:nowrap;}
+.debrief-revisit{
+  display:block;margin:0.35rem 0 0;padding:0;
+  border:none;background:none;cursor:pointer;text-align:left;
+  font-family:var(--font-mono);font-size:var(--label-sm);font-weight:600;
+  letter-spacing:var(--track-tight);text-transform:uppercase;
+  color:var(--signal);line-height:1.4;
+}
+.debrief-revisit:hover{color:var(--olive-deep);text-decoration:underline;}
+.debrief-revisit:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.briefing-cc li::before,
+.debrief-cc li::before{content:'\25B8';position:absolute;left:0;color:var(--signal);}
+.briefing-cc .cc-name,
+.debrief-cc .cc-name{display:block;font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--signal);margin-bottom:0.15rem;}
+.debrief-block.todo{border-left-color:var(--ember);}
+.debrief-block.todo .debrief-kicker{color:var(--ember);}
+.debrief-todo{list-style:none;margin:0;padding:0;}
+.debrief-todo li{position:static;padding-left:0;margin:0.65rem 0;}
+.debrief-todo label{
+  display:flex;align-items:flex-start;gap:0.7rem;
+  cursor:pointer;font-size:1rem;line-height:1.5;color:var(--ink-soft);
+  text-wrap:pretty;
+}
+.debrief-todo input[type="checkbox"]{
+  appearance:none;-webkit-appearance:none;
+  flex:0 0 auto;width:1.05rem;height:1.05rem;margin:0.2rem 0 0;
+  border:1.5px solid var(--ink);border-radius:0;background:var(--paper);
+  cursor:pointer;
+}
+.debrief-todo input[type="checkbox"]:checked{
+  background:var(--olive-deep);border-color:var(--olive-deep);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.5 L4.5 9 L10 3' fill='none' stroke='%23e6e1cf' stroke-width='1.8'/%3E%3C/svg%3E");
+  background-size:0.75rem 0.75rem;background-position:center;background-repeat:no-repeat;
+}
+.debrief-todo input[type="checkbox"]:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+@media(max-width:760px){
+  .briefing-columns{grid-template-columns:1fr;gap:1.35rem;}
+  .apparatus-row{flex-direction:column;}
+  .energy-rail{
+    flex:none;
+    flex-direction:row;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+    gap:0.65rem 0.85rem;
+    border-right:none;
+    border-bottom:1px solid var(--ink);
+    padding:0.75rem 0.85rem;
+  }
+  .energy-rail .slider-label{text-align:left;}
+  .v-slider-wrap{
+    width:min(14rem,55vw);
+    height:2rem;
+  }
+  .v-slider-wrap input[type="range"]{
+    width:100%;
+    height:2px;
+    transform:none;
+  }
+  .energy-rail .btn{width:auto;min-width:5.5rem;padding:0.5rem 0.9rem;}
+}
+@media (prefers-reduced-motion: reduce){
+  .photon-packet,.flight-e,.gap-reject,.discovery-line,.eq-reveal,.eq-numbers,.detector-peak{transition:none;}
+}
+@media print{
+  .debrief{break-inside:avoid;border-top-color:#000;}
+  .briefing h1,.briefing h2,.briefing li,.debrief h2,.debrief li,.debrief-kicker,.briefing-cc .cc-name,.debrief-cc .cc-name,.debrief-tag{color:#000;}
+  #stuckBtn,.module-footer,.controls,.energy-rail,input[type="range"]{display:none;}
 }
 </style>
 </head>
 <body>
 <div class="module-wrap">
-  <a href="index.html" class="back-link">← Unit 1b</a>
+  <div class="top-nav">
+    <a href="index.html" class="back-link">← Unit 1b</a>
+    <div class="mod-meta">Module 06 · Photoelectron Spectroscopy</div>
+  </div>
+
+  <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
+    <div class="briefing-kicker"><span>Before you begin</span></div>
+    <h1 id="briefingTitle">Photoelectron Spectroscopy</h1>
+    <p class="briefing-lead">Read what this module is aiming for. Then open the instrument and work through it.</p>
+    <div class="briefing-columns">
+      <div class="briefing-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="briefing-li" id="briefingIntentions"></ul>
+      </div>
+      <div class="briefing-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="briefing-cc" id="briefingCompetencies"></ul>
+      </div>
+    </div>
+    <div class="briefing-actions">
+      <button type="button" class="btn submit" id="briefingNext">Next → Start simulation</button>
+    </div>
+  </section>
+
+  <div id="moduleStage" hidden>
   <div class="mod-tag">Module 06</div>
+  <div class="act-meta" id="actMeta">Act 1 of 2 · Photon &amp; detector</div>
   <h1>Photoelectron Spectroscopy</h1>
-  <p class="framing">This is a spectrometer. Pick an atom and read what comes out.</p>
+  <p class="framing" id="framing" aria-live="polite">Let's fire a photon at an atom and see what happens.</p>
+  <p class="discovery-line" id="discoveryLine" aria-live="polite"></p>
 
-  <div class="viewport">
-    <canvas id="simCanvas"></canvas>
+  <div class="viewport" id="viewport" data-fig="FIG. 06  ·  PHOTON &amp; DETECTOR">
+    <!-- Act 2 — hypothetical atom (energy levels + shell), side by side -->
+    <div class="hypo-plate" id="hypoPlate" hidden>
+      <div class="hypo-kicker">Hypothetical atom</div>
+      <svg class="hypo-svg" id="hypoSvg" viewBox="0 0 720 180" role="img" aria-label="Hypothetical atom: energy-level diagram and shell model">
+        <defs>
+          <radialGradient id="hypoNucGrad" cx="32%" cy="28%" r="68%">
+            <stop offset="0%" stop-color="#e8b48a"/>
+            <stop offset="45%" stop-color="#a85a32"/>
+            <stop offset="100%" stop-color="#5a2c16"/>
+          </radialGradient>
+          <radialGradient id="hypoEGrad" cx="35%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#e8d9a8"/>
+            <stop offset="55%" stop-color="#c4a35a"/>
+            <stop offset="100%" stop-color="#6a5530"/>
+          </radialGradient>
+          <radialGradient id="hypoCoreWash" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="rgba(184,145,48,0.72)"/>
+            <stop offset="35%" stop-color="rgba(196,163,90,0.48)"/>
+            <stop offset="70%" stop-color="rgba(196,163,90,0.16)"/>
+            <stop offset="100%" stop-color="rgba(196,163,90,0)"/>
+          </radialGradient>
+        </defs>
+        <g id="hypoLevels"></g>
+        <g id="hypoShell"></g>
+      </svg>
+    </div>
+
+    <!-- Act 1 / 2 apparatus -->
+    <div class="plate-host" id="plateApparatus">
+      <div class="apparatus-row" id="apparatusRow">
+        <aside class="energy-rail" id="energyRail" aria-label="Photon energy control">
+          <label class="slider-label" for="energySlider">Photon energy (<span class="sym">E</span>)</label>
+          <div class="energy-val" id="energyVal" aria-live="polite">0.0</div>
+          <div class="energy-unit">MJ/mol</div>
+          <div class="v-slider-wrap">
+            <input type="range" id="energySlider" min="0" max="2000" step="1" value="0" aria-label="Photon energy in megajoules per mole" aria-valuetext="0.0 megajoules per mole">
+          </div>
+          <button type="button" class="btn submit" id="fireBtn">Fire</button>
+        </aside>
+        <div class="apparatus-main">
+      <svg class="apparatus-svg" id="apparatusSvg" viewBox="0 0 720 300" role="img" aria-label="Photon source, atom, and kinetic-energy detector">
+        <defs>
+          <radialGradient id="nucGrad" cx="32%" cy="28%" r="68%">
+            <stop offset="0%" stop-color="#e8b48a"/>
+            <stop offset="45%" stop-color="#a85a32"/>
+            <stop offset="100%" stop-color="#5a2c16"/>
+          </radialGradient>
+          <radialGradient id="eGrad" cx="35%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#e8d9a8"/>
+            <stop offset="55%" stop-color="#c4a35a"/>
+            <stop offset="100%" stop-color="#6a5530"/>
+          </radialGradient>
+          <radialGradient id="coreWashGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="rgba(184,145,48,0.72)"/>
+            <stop offset="35%" stop-color="rgba(196,163,90,0.48)"/>
+            <stop offset="70%" stop-color="rgba(196,163,90,0.16)"/>
+            <stop offset="100%" stop-color="rgba(196,163,90,0)"/>
+          </radialGradient>
+          <linearGradient id="beamWashGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(107,74,120,0.45)"/>
+            <stop offset="70%" stop-color="rgba(107,74,120,0.18)"/>
+            <stop offset="100%" stop-color="rgba(107,74,120,0)"/>
+          </linearGradient>
+          <clipPath id="sourceWaveClip">
+            <rect x="39" y="115" width="46" height="14"/>
+          </clipPath>
+        </defs>
+
+        <!-- live beam (only while a photon is in flight) -->
+        <rect id="beamWash" class="beam-wash" x="148" y="124" width="140" height="12"/>
+        <path id="beamCore" class="beam-core" d="M148 130 H288"/>
+
+        <!-- laser / photon source -->
+        <g id="laser">
+          <rect class="laser-fin" x="16" y="94" width="12" height="72"/>
+          <rect class="laser-body" x="28" y="100" width="72" height="60"/>
+          <line class="laser-rail" x1="34" y1="108" x2="92" y2="108"/>
+          <line class="laser-rail" x1="34" y1="152" x2="92" y2="152"/>
+          <rect class="laser-slot" x="38" y="114" width="48" height="16"/>
+          <g clip-path="url(#sourceWaveClip)">
+            <path id="sourceWave" class="source-wave is-idle" d="M40 122 H84"/>
+          </g>
+          <rect class="laser-collar" x="100" y="116" width="14" height="28"/>
+          <rect class="laser-nose" x="114" y="123" width="18" height="14"/>
+          <polygon class="laser-cone" points="132,120 146,130 132,140"/>
+          <circle class="laser-aperture-ring" cx="146" cy="130" r="9"/>
+          <circle class="laser-aperture" cx="146" cy="130" r="4.5"/>
+          <text class="gun-kicker" x="64" y="88" text-anchor="middle">Photon source</text>
+          <text class="gun-energy" x="64" y="182" text-anchor="middle" id="gunEnergyLabel">E = 0.0</text>
+        </g>
+
+        <!-- shell-model atom (Act 1) / sample cloud (Act 2) -->
+        <g id="atomMount"></g>
+        <text class="atom-label" x="340" y="214" text-anchor="middle" id="atomCaption">Carbon</text>
+        <g id="sampleCloud" class="sample-cloud" hidden aria-hidden="true"></g>
+
+        <!-- detector -->
+        <g id="detector">
+          <rect class="detector-box" x="548" y="72" width="128" height="116"/>
+          <rect class="detector-face" id="detectorFace" x="548" y="72" width="14" height="116"/>
+          <line class="detector-grid" x1="574" y1="88" x2="660" y2="88"/>
+          <line class="detector-grid" x1="574" y1="108" x2="660" y2="108"/>
+          <line class="detector-grid" x1="574" y1="128" x2="660" y2="128"/>
+          <line class="detector-grid" x1="574" y1="148" x2="660" y2="148"/>
+          <line class="detector-grid" x1="574" y1="168" x2="660" y2="168"/>
+          <text class="det-kicker" x="612" y="64" text-anchor="middle">Detector</text>
+          <!-- mini peak — hints at the spectrum once an electron arrives -->
+          <g id="detectorPeak" class="detector-peak" aria-hidden="true">
+            <line class="det-peak-baseline" x1="574" y1="176" x2="666" y2="176"/>
+            <path class="det-peak-fill" id="detPeakFill"
+              d="M580 176 C592 176, 600 108, 612 100 C624 108, 632 176, 644 176 Z"/>
+            <path class="det-peak-stroke" id="detPeakStroke"
+              d="M580 176 C592 176, 600 108, 612 100 C624 108, 632 176, 644 176"/>
+          </g>
+          <!-- collision relic — stays after a hit -->
+          <g id="impactRelic" class="impact-relic" aria-hidden="true">
+            <ellipse class="relic-bloom" cx="555" cy="130" rx="7" ry="22"/>
+            <path class="relic-scar" d="M551 112 C556 122, 556 138, 551 148"/>
+            <circle class="relic-fleck" cx="560" cy="122" r="3.2"/>
+            <circle class="relic-fleck" cx="566" cy="134" r="2.4"/>
+            <circle class="relic-fleck" cx="561" cy="142" r="2"/>
+            <path class="relic-spark" d="M556 118 l10 -7"/>
+            <path class="relic-spark" d="M556 130 l12 0"/>
+            <path class="relic-spark" d="M556 142 l9 6"/>
+          </g>
+        </g>
+
+        <!-- KE readout — off the detector plate -->
+        <g id="keReadout" class="ke-readout" aria-live="polite">
+          <line class="ke-readout-rule" x1="548" y1="204" x2="676" y2="204"/>
+          <text class="ke-readout-kicker" x="612" y="222" text-anchor="middle">KE detected</text>
+          <text class="ke-readout-val" id="detReadout" x="612" y="246">—</text>
+          <text class="ke-readout-unit" x="612" y="264" id="detUnit">MJ/mol</text>
+        </g>
+
+        <!-- flying photon (group, translated) -->
+        <g id="photonPacket" class="photon-packet" transform="translate(146,130)">
+          <ellipse class="photon-glow" cx="-2" cy="0" rx="16" ry="6"/>
+          <polygon class="photon-core" points="-10,-5 -10,5 8,0"/>
+          <circle class="photon-tip" cx="6" cy="0" r="2.2"/>
+        </g>
+        <circle id="flightElectron" class="flight-e" cx="390" cy="130" r="7"/>
+        <text id="missLabel" class="miss-label" x="340" y="36" text-anchor="middle">Photon energy too low — no electron detected</text>
+      </svg>
+      <div class="apparatus-actions" id="apparatusActions" hidden>
+        <button type="button" class="btn submit" id="loadSampleBtn">Load sample</button>
+        <button type="button" class="btn submit" id="startRunBtn" disabled>Start</button>
+        <button type="button" class="btn" id="resetPeakBtn" hidden>Watch again</button>
+      </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Act 2 spectrum strip (below apparatus, same viewport stacking) -->
+    <div class="plate-host" id="plateSpectrum" hidden style="border-top:2px solid var(--ink);min-height:0;">
+      <div class="readout-bar">
+        <p class="readout-kicker" id="readoutKicker">Readout</p>
+        <div class="stage-row" id="milestoneRow" aria-live="polite">
+          <span class="stage-chip" id="chipReady">Ready</span>
+          <span class="stage-chip" id="chipDetecting">Detecting</span>
+          <span class="stage-chip" id="chipFinished">Finished</span>
+        </div>
+      </div>
+      <canvas id="spectrumCanvas" aria-label="Binding-energy spectrum building from detections"></canvas>
+    </div>
   </div>
 
-  <div class="controls"><!-- simulation controls go here --></div>
-  <div class="hud"><!-- live readout values --></div>
+  <div class="controls controls-fire-below" id="controlsFire">
+    <p class="preset-hint" id="fireHint">Tune the photon energy, then fire. Watch the detector.</p>
+    <div class="atom-picker" id="atomPicker" role="group" aria-label="Choose atom" hidden>
+      <span class="atom-picker-label">Atom</span>
+      <button type="button" class="atom-tile" data-atom="H" aria-pressed="false">H</button>
+      <button type="button" class="atom-tile" data-atom="F" aria-pressed="false">F</button>
+      <button type="button" class="atom-tile" data-atom="Li" aria-pressed="false">Li</button>
+      <button type="button" class="atom-tile on" data-atom="C" aria-pressed="true">C</button>
+    </div>
+    <div class="trial-log" id="trialLog" aria-live="polite">
+      <div class="trial-log-kicker">Trial log</div>
+      <div class="trial-log-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Trial</th>
+              <th scope="col">Element</th>
+              <th scope="col">Photon Source energy</th>
+              <th scope="col">KE Detected</th>
+            </tr>
+          </thead>
+          <tbody id="trialLogBody"></tbody>
+        </table>
+      </div>
+      <p class="trial-log-empty" id="trialLogEmpty">Fire to log a trial.</p>
+    </div>
+  </div>
 
-  <button id="stuckBtn">Stuck?</button>
+  <div class="discover-prompts" id="discoverPrompts" hidden>
+    <div class="prompt-kicker">Pause and think</div>
+    <p class="student-q">What do you notice?</p>
+    <p class="student-q">What is the difference between the photon source and the detector? Where did that energy go?</p>
+    <p class="student-q">What is the difference between the energy detected when changing atoms, but keeping the photon energy the same? Does that make sense based on what you've learned in the past sections?</p>
+    <div class="control-actions" id="revealEqActions">
+      <button type="button" class="btn submit" id="revealEqBtn">Reveal equation</button>
+    </div>
+  </div>
+
+  <div class="controls" id="controlsPeak" hidden>
+    <p class="preset-hint" id="peakHint">Load a sample of the hypothetical atom into the spectrometer, then start the photon source.</p>
+  </div>
+
+  <div class="act2-outro" id="act2Outro" aria-live="polite">
+    <div class="outro-kicker">What the readout shows</div>
+    <p>The graph under the instrument is a photoelectron spectrum. The horizontal axis is <strong>binding energy</strong> (ionization energy) in MJ/mol — how tightly each electron was held. The vertical axis is <strong>peak height</strong> — how many electrons arrived at that energy.</p>
+    <p>Electrons from this atom only appear at two places on the axis: <strong>0.85</strong> and <strong>4.25 MJ/mol</strong>. Nothing in between. Those are <strong>quantized energy levels</strong> — discrete allowed energies, the same idea as the levels on an energy-level diagram (and on the Bohr-style diagram you may have drawn on paper), without needing orbits.</p>
+    <p>Peak height tracks how many electrons share each level: <strong>3</strong> at the shallower (valence) energy, <strong>2</strong> at the deeper (core) one. Position tells you the energy; height tells you the count.</p>
+  </div>
+
+  <div class="eq-reveal" id="eqReveal" aria-live="polite">
+    <div class="eq-line">
+      <span class="eq-ie">IE</span>
+      <span class="eq-op"> = </span>
+      <span class="eq-e">E<sub>photon</sub></span>
+      <span class="eq-op"> − </span>
+      <span class="eq-ke">KE</span>
+    </div>
+  </div>
+
+  <div class="hud" id="hud" hidden>
+    <div class="hud-item photon"><span class="k"><span class="sym">E</span> photon</span><span class="v" id="hudE">0.0 MJ/mol</span></div>
+    <div class="hud-item ke" id="hudKeItem" hidden><span class="k"><span class="sym">KE</span> detected</span><span class="v" id="hudKE">—</span></div>
+    <div class="hud-item ie" id="hudIeItem" hidden><span class="k"><span class="sym">IE</span> (inferred)</span><span class="v" id="hudIE">—</span></div>
+    <div class="hud-item" id="hudAtomItem" hidden><span class="k">Atom</span><span class="v" id="hudAtom">C</span></div>
+    <div class="hud-item" id="hudCountItem" hidden><span class="k">Electrons in level</span><span class="v" id="hudCount">1</span></div>
+    <div class="hud-item" id="hudPeakItem" hidden><span class="k">Peak height</span><span class="v" id="hudPeak">0</span></div>
+  </div>
+
+  <div class="eq-numbers" id="eqNumbers" aria-live="polite">
+    <div class="eq-filled" id="eqFilled">
+      <span class="eq-ie" id="eqIeVal">1.09</span>
+      <span class="eq-op"> = </span>
+      <span class="eq-e" id="eqEVal">5.0</span>
+      <span class="eq-op"> − </span>
+      <span class="eq-ke" id="eqKeVal">3.91</span>
+      <span class="unit">MJ/mol</span>
+    </div>
+    <p class="eq-note">The detector measures kinetic energy. Binding energy is what is left.</p>
+  </div>
+
+  <nav class="module-footer" id="actNav" aria-label="Section navigation">
+    <div class="module-footer-back">
+      <button type="button" class="btn" id="backBtn" hidden>← Back</button>
+    </div>
+    <div class="module-footer-help">
+      <button type="button" id="stuckBtn">Stuck?</button>
+    </div>
+    <div class="module-footer-fwd">
+      <button type="button" class="btn submit" id="continueBtn" hidden disabled>Move to next section →</button>
+    </div>
+  </nav>
+
+  <p class="part-end" id="partEnd">
+    Photon in, kinetic energy out, binding energy inferred — and peak height counting how many electrons share each quantized level.
+    The full spectrometer — real atoms through neon — comes in the next build.
+  </p>
+
   <div class="help-panel" id="helpPanel">
-    <p>Predict Ne's peaks from the shell model first — then run it.</p>
-    <p style="margin-top:0.5rem;">The n=2 shell gave you one peak for Li. Why two for Ne?</p>
+    <p id="helpText">Try one shot below the energy that ejects an electron, and one well above. What does the detector report each time?</p>
   </div>
+
+  <section class="debrief" id="debrief" hidden aria-labelledby="debriefTitle">
+    <h2 id="debriefTitle">What this was for</h2>
+    <p class="debrief-lead">The intentions behind this module, and the competencies you just practised. Read each competency statement and decide honestly how well it fits you right now.</p>
+    <div class="debrief-block">
+      <div class="debrief-kicker">Learning intentions</div>
+      <ul class="debrief-li" id="debriefIntentions"></ul>
+    </div>
+    <div class="debrief-block cc">
+      <div class="debrief-kicker">Curricular competencies</div>
+      <ul class="debrief-cc" id="debriefCompetencies"></ul>
+    </div>
+    <div class="debrief-block todo">
+      <div class="debrief-kicker">To do</div>
+      <ul class="debrief-todo">
+        <li>
+          <label>
+            <input type="checkbox" name="todo-notes">
+            <span>In your OneNote, make some notes that summarize each of the last four modules. Pretend you are studying for a test and you need to make quick notes to reference later. Use both the learning intentions and CCs as your guide.</span>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox" name="todo-ap">
+            <span>Go to AP Classroom and complete quiz 05–06.</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+  </section>
+  </div><!-- /#moduleStage -->
 </div>
 
 <script>
-const canvas = document.getElementById('simCanvas');
-const ctx = canvas.getContext('2d');
-let W, H, dpr;
-
-function resize(){
-  dpr = window.devicePixelRatio || 1;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  W = rect.width;
-  H = Math.min(W * 0.6, 500);
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.height = H + 'px';
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-window.addEventListener('resize', resize);
-resize();
-
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function glowLine(x1, y1, x2, y2, color, width = 2){
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 12;
-  ctx.strokeStyle = color;
-  ctx.globalAlpha = 0.3;
-  ctx.lineWidth = width + 4;
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.lineWidth = width;
-  ctx.stroke();
-  ctx.restore();
-}
+/* ---------- REFERENCE DATA ---------- */
+const DATA = {
+  // Act 1 — outermost (first) IE from §8.3 / §8.6 valence peak
+  atoms: {
+    H:  { symbol: 'H',  name: 'Hydrogen', shells: [1],    IE: 1.31 },
+    F:  { symbol: 'F',  name: 'Fluorine', shells: [2, 7], IE: 1.68 },
+    Li: { symbol: 'Li', name: 'Lithium',  shells: [2, 1], IE: 0.52 },
+    C:  { symbol: 'C',  name: 'Carbon',   shells: [2, 4], IE: 1.09 }
+  },
+  // Act 2 — CA9 hypothetical practice levels (−0.85 / −4.25)
+  // valence (shallower, easiest to remove): 3 e⁻ · core (deeper): 2 e⁻
+  hypo: {
+    levels: [
+      { ie: 0.85, count: 3, label: '−0.85' }, // valence / outer
+      { ie: 4.25, count: 2, label: '−4.25' }  // core / inner
+    ],
+    shells: [2, 3], // inner core (2), outer valence (3)
+    photonE: 10.0
+  }
+};
 
-function glowCircle(x, y, r, color){
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 15;
-  ctx.fillStyle = color;
-  ctx.globalAlpha = 0.2;
-  ctx.beginPath(); ctx.arc(x,y,r+4,0,Math.PI*2); ctx.fill();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-  ctx.restore();
-}
+const FRAMING = {
+  1: "Let's fire a photon at an atom and see what happens.",
+  2: 'This is a hypothetical atom. Load a sample, start the source, and watch the readout build.'
+};
+const HELP = {
+  1: 'Try one shot below the energy that ejects an electron, and one well above. What does the detector report each time?',
+  '1b': 'On C, fire once below 1.09 MJ/mol and once well above. Check that IE = E − KE.',
+  2: 'Watch both peak position (binding energy) and peak height as detections accumulate.'
+};
+const FIG = {
+  1: 'FIG. 06  ·  PHOTON & DETECTOR',
+  2: 'FIG. 06  ·  QUANTIZED LEVELS'
+};
+const ACT_META = {
+  1: 'Act 1 of 2 · Photon & detector',
+  2: 'Act 2 of 2 · Quantized levels'
+};
 
-function drawGrid(spacing = 40, color = 'rgba(33,29,71,0.6)'){
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1;
-  for(let x = 0; x < W; x += spacing){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for(let y = 0; y < H; y += spacing){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-  ctx.restore();
-}
+/** Predetermined spectrum milestones — one electron per photon (5 total). */
+const ACT2_MILESTONES = [
+  { heights: { 0.85: 1, 4.25: 0 }, pulseIE: 0.85 },
+  { heights: { 0.85: 1, 4.25: 1 }, pulseIE: 4.25 },
+  { heights: { 0.85: 2, 4.25: 1 }, pulseIE: 0.85 },
+  { heights: { 0.85: 3, 4.25: 1 }, pulseIE: 0.85 },
+  { heights: { 0.85: 3, 4.25: 2 }, pulseIE: 4.25 }
+];
 
 const gates = {};
 function setGate(name, val){
@@ -223,6 +1467,1222 @@ function setGate(name, val){
     el.classList.toggle('discovered', unlocked);
   });
 }
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const ATOM_CX = 340;
+const ATOM_CY = 130;
+const LASER_EXIT = { x: 146, y: 130 };
+const DETECTOR_HIT = { x: 555, y: 130 };
+
+const els = {
+  framing: document.getElementById('framing'),
+  discoveryLine: document.getElementById('discoveryLine'),
+  actMeta: document.getElementById('actMeta'),
+  viewport: document.getElementById('viewport'),
+  plateApparatus: document.getElementById('plateApparatus'),
+  plateSpectrum: document.getElementById('plateSpectrum'),
+  controlsFire: document.getElementById('controlsFire'),
+  controlsPeak: document.getElementById('controlsPeak'),
+  hud: document.getElementById('hud'),
+  hudE: document.getElementById('hudE'),
+  hudKE: document.getElementById('hudKE'),
+  hudIE: document.getElementById('hudIE'),
+  hudKeItem: document.getElementById('hudKeItem'),
+  hudIeItem: document.getElementById('hudIeItem'),
+  hudAtomItem: document.getElementById('hudAtomItem'),
+  hudCountItem: document.getElementById('hudCountItem'),
+  hudPeakItem: document.getElementById('hudPeakItem'),
+  hudAtom: document.getElementById('hudAtom'),
+  hudCount: document.getElementById('hudCount'),
+  hudPeak: document.getElementById('hudPeak'),
+  eqReveal: document.getElementById('eqReveal'),
+  eqNumbers: document.getElementById('eqNumbers'),
+  eqIeVal: document.getElementById('eqIeVal'),
+  eqEVal: document.getElementById('eqEVal'),
+  eqKeVal: document.getElementById('eqKeVal'),
+  energySlider: document.getElementById('energySlider'),
+  energyVal: document.getElementById('energyVal'),
+  fireBtn: document.getElementById('fireBtn'),
+  resetPeakBtn: document.getElementById('resetPeakBtn'),
+  backBtn: document.getElementById('backBtn'),
+  continueBtn: document.getElementById('continueBtn'),
+  helpText: document.getElementById('helpText'),
+  partEnd: document.getElementById('partEnd'),
+  atomMount: document.getElementById('atomMount'),
+  photonPacket: document.getElementById('photonPacket'),
+  flightElectron: document.getElementById('flightElectron'),
+  detectorFace: document.getElementById('detectorFace'),
+  impactRelic: document.getElementById('impactRelic'),
+  detectorPeak: document.getElementById('detectorPeak'),
+  detPeakFill: document.getElementById('detPeakFill'),
+  detPeakStroke: document.getElementById('detPeakStroke'),
+  beamWash: document.getElementById('beamWash'),
+  beamCore: document.getElementById('beamCore'),
+  detReadout: document.getElementById('detReadout'),
+  missLabel: document.getElementById('missLabel'),
+  gunEnergyLabel: document.getElementById('gunEnergyLabel'),
+  sourceWave: document.getElementById('sourceWave'),
+  atomCaption: document.getElementById('atomCaption'),
+  fireHint: document.getElementById('fireHint'),
+  peakHint: document.getElementById('peakHint'),
+  atomPicker: document.getElementById('atomPicker'),
+  discoverPrompts: document.getElementById('discoverPrompts'),
+  revealEqBtn: document.getElementById('revealEqBtn'),
+  revealEqActions: document.getElementById('revealEqActions'),
+  actNav: document.getElementById('actNav'),
+  hypoPlate: document.getElementById('hypoPlate'),
+  hypoLevels: document.getElementById('hypoLevels'),
+  hypoShell: document.getElementById('hypoShell'),
+  sampleCloud: document.getElementById('sampleCloud'),
+  apparatusActions: document.getElementById('apparatusActions'),
+  loadSampleBtn: document.getElementById('loadSampleBtn'),
+  startRunBtn: document.getElementById('startRunBtn'),
+  act2Outro: document.getElementById('act2Outro'),
+  chipReady: document.getElementById('chipReady'),
+  chipDetecting: document.getElementById('chipDetecting'),
+  chipFinished: document.getElementById('chipFinished'),
+  trialLog: document.getElementById('trialLog'),
+  trialLogBody: document.getElementById('trialLogBody'),
+  trialLogEmpty: document.getElementById('trialLogEmpty'),
+  energyRail: document.getElementById('energyRail')
+};
+
+const STATE = {
+  act: 1,
+  atomKey: 'C',
+  E: 0,
+  lastKE: null,
+  lastE: null,
+  firing: false,
+  fireCount: 0,
+  hasSeenKE: false,
+  promptsShown: false,
+  namedIE: false,
+  // Act 2
+  act2Phase: 'intro', // intro | loaded | running | done
+  act2Milestone: 0,   // 0..5
+  peakHeights: { 0.85: 0, 4.25: 0 },
+  lastPulseIE: null,
+  partDone: false,
+  ejectFrom: { x: ATOM_CX, y: ATOM_CY }
+};
+
+function currentAtom(){
+  return DATA.atoms[STATE.atomKey];
+}
+
+function mountAct1Atom(){
+  const a = currentAtom();
+  mountAtom({ symbol: a.symbol, shells: a.shells, caption: a.name });
+  if(els.hudAtom) els.hudAtom.textContent = a.symbol + ' · IE ' + a.IE.toFixed(2);
+}
+
+function svgEl(name, attrs){
+  const el = document.createElementNS(SVG_NS, name);
+  Object.entries(attrs || {}).forEach(([k, v]) => el.setAttribute(k, String(v)));
+  return el;
+}
+
+/** Module 03 shell-model atom — suite default (§6). */
+function mountAtom({ symbol, shells, caption }){
+  const mount = els.atomMount;
+  mount.replaceChildren();
+  const g = svgEl('g', { class: 'atom-fig', transform: `translate(${ATOM_CX},${ATOM_CY})` });
+
+  const nShells = shells.length;
+  const radii = nShells === 1
+    ? [42]
+    : nShells === 2
+      ? [24, 48]
+      : shells.map((_, i) => 18 + (i / (nShells - 1)) * 30);
+
+  // Soft mustard core wash when inner shell(s) hold electrons
+  const innerTotal = shells.slice(0, -1).reduce((a, b) => a + b, 0);
+  if(innerTotal > 0){
+    const rWash = (radii[Math.max(0, nShells - 2)] || 24) + 10;
+    g.appendChild(svgEl('circle', {
+      class: 'atom-core-wash',
+      cx: 0, cy: 0, r: rWash,
+      fill: 'url(#coreWashGrad)'
+    }));
+  }
+
+  radii.forEach(r => {
+    g.appendChild(svgEl('circle', { class: 'atom-shell', cx: 0, cy: 0, r }));
+  });
+
+  g.appendChild(svgEl('circle', { class: 'atom-nuc', cx: 0, cy: 0, r: 14 }));
+  const sym = svgEl('text', { class: 'atom-sym', x: 0, y: 0 });
+  sym.textContent = symbol;
+  g.appendChild(sym);
+
+  // Place electrons; rightmost outer-shell marker is the ejectable one
+  let ejectable = null;
+  let bestX = -Infinity;
+  shells.forEach((count, si) => {
+    const r = radii[si];
+    const isOuter = si === nShells - 1;
+    // Start angles: outer opens toward detector (0° = +x)
+    const start = isOuter
+      ? (count === 1 ? 0 : -Math.PI / 2)
+      : Math.PI / 6;
+    for(let i = 0; i < count; i++){
+      const ang = start + (i * 2 * Math.PI) / Math.max(count, 1);
+      const ex = r * Math.cos(ang);
+      const ey = r * Math.sin(ang);
+      const e = svgEl('circle', {
+        class: 'atom-e',
+        cx: ex, cy: ey, r: 6.5
+      });
+      if(isOuter && ex > bestX){
+        bestX = ex;
+        ejectable = e;
+      }
+      g.appendChild(e);
+    }
+  });
+
+  if(ejectable){
+    ejectable.id = 'atomElectron';
+    STATE.ejectFrom = {
+      x: ATOM_CX + parseFloat(ejectable.getAttribute('cx')),
+      y: ATOM_CY + parseFloat(ejectable.getAttribute('cy'))
+    };
+  } else {
+    STATE.ejectFrom = { x: ATOM_CX + (radii[radii.length - 1] || 42), y: ATOM_CY };
+  }
+
+  mount.appendChild(g);
+  els.atomElectron = document.getElementById('atomElectron');
+  if(caption != null) els.atomCaption.textContent = caption;
+}
+
+function setEqValues(ie, e, ke){
+  els.eqIeVal.textContent = ie.toFixed(2);
+  els.eqEVal.textContent = e.toFixed(1);
+  els.eqKeVal.textContent = ke.toFixed(2);
+}
+
+function setPhotonPos(x, y){
+  els.photonPacket.setAttribute('transform', `translate(${x},${y})`);
+}
+function setCirclePos(el, x, y){
+  el.setAttribute('cx', String(x));
+  el.setAttribute('cy', String(y));
+}
+
+function setBeamLive(on){
+  els.beamWash.classList.toggle('on', on);
+  els.beamCore.classList.toggle('on', on);
+}
+
+/* ---------- ACT 1: trial log ---------- */
+function appendTrialLog(trial, element, photonE, ke){
+  if(!els.trialLogBody) return;
+  const tr = document.createElement('tr');
+  const n = document.createElement('td');
+  n.className = 'trial-n';
+  n.textContent = String(trial);
+  const el = document.createElement('td');
+  el.className = 'trial-el';
+  el.textContent = element;
+  const e = document.createElement('td');
+  e.className = 'trial-e';
+  e.textContent = photonE.toFixed(1) + ' MJ/mol';
+  const k = document.createElement('td');
+  k.className = 'trial-ke' + (ke == null ? ' is-none' : '');
+  k.textContent = ke == null ? 'none' : ke.toFixed(2) + ' MJ/mol';
+  tr.appendChild(n);
+  tr.appendChild(el);
+  tr.appendChild(e);
+  tr.appendChild(k);
+  els.trialLogBody.appendChild(tr);
+  if(els.trialLogEmpty) els.trialLogEmpty.hidden = true;
+}
+
+/* ---------- ACT 1: fire ---------- */
+function sliderToE(){
+  // slider 0..2000 → 0.0 .. 200.0 MJ/mol (0.1 precision)
+  return Math.round(els.energySlider.value) / 10;
+}
+function setE(val){
+  STATE.E = Math.round(val * 10) / 10;
+  els.energySlider.value = String(Math.round(STATE.E * 10));
+  els.energyVal.textContent = STATE.E.toFixed(1);
+  els.energySlider.setAttribute('aria-valuetext', STATE.E.toFixed(1) + ' megajoules per mole');
+  els.hudE.textContent = STATE.E.toFixed(1) + ' MJ/mol';
+  els.gunEnergyLabel.textContent = 'E = ' + STATE.E.toFixed(1);
+  updateSourceWave(STATE.E);
+}
+
+/** Mini sinusoid in the source window — higher E → shorter λ, higher f. */
+function updateSourceWave(E){
+  const path = els.sourceWave;
+  if(!path) return;
+  const x0 = 40, x1 = 84, midY = 122, width = x1 - x0;
+  const t = Math.min(1, Math.max(0, E / 200));
+  const idle = E < 0.05;
+  path.classList.toggle('is-idle', idle);
+
+  if(idle){
+    path.setAttribute('d', `M${x0} ${midY} H${x1}`);
+    return;
+  }
+
+  // ~0.6 cycles at low E (long λ) → ~6.5 at max (short λ / high f)
+  const cycles = 0.6 + t * 5.9;
+  const amp = 1.4 + t * 4.4;
+  const steps = 56;
+  let d = '';
+  for(let i = 0; i <= steps; i++){
+    const u = i / steps;
+    const x = x0 + u * width;
+    const y = midY + amp * Math.sin(u * cycles * Math.PI * 2);
+    d += (i === 0 ? 'M' : 'L') + x.toFixed(2) + ' ' + y.toFixed(2) + ' ';
+  }
+  path.setAttribute('d', d.trim());
+}
+
+function resetApparatusVisual(){
+  els.photonPacket.classList.remove('flying');
+  els.flightElectron.classList.remove('flying', 'lodged');
+  setPhotonPos(LASER_EXIT.x, LASER_EXIT.y);
+  setCirclePos(els.flightElectron, STATE.ejectFrom.x, STATE.ejectFrom.y);
+  els.detectorFace.classList.remove('hit');
+  els.impactRelic.classList.remove('show');
+  if(els.detectorPeak) els.detectorPeak.classList.remove('show');
+  els.missLabel.classList.remove('show');
+  setBeamLive(false);
+  if(els.atomElectron) els.atomElectron.classList.remove('gone');
+}
+
+function animatePos(from, to, apply, ms){
+  return new Promise(resolve => {
+    if(prefersReduced){
+      apply(to.x, to.y);
+      resolve();
+      return;
+    }
+    const t0 = performance.now();
+    function frame(now){
+      const u = Math.min(1, (now - t0) / ms);
+      apply(from.x + (to.x - from.x) * u, from.y + (to.y - from.y) * u);
+      if(u < 1) requestAnimationFrame(frame);
+      else resolve();
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+async function fireShot(){
+  if(STATE.firing || STATE.act !== 1) return;
+  STATE.firing = true;
+  els.fireBtn.disabled = true;
+  resetApparatusVisual();
+  els.detReadout.textContent = '—';
+  // During discovery: plate detector only — no HUD spoilers
+  if(STATE.namedIE){
+    els.hudKeItem.hidden = true;
+    els.hudIeItem.hidden = true;
+  }
+
+  const E = STATE.E;
+  const IE = currentAtom().IE;
+  const atomEdge = { x: ATOM_CX - 52, y: ATOM_CY };
+
+  els.photonPacket.classList.add('flying');
+  setBeamLive(true);
+  await animatePos(LASER_EXIT, atomEdge, setPhotonPos, 420);
+  els.photonPacket.classList.remove('flying');
+  setBeamLive(false);
+
+  STATE.fireCount += 1;
+  let loggedKE = null;
+
+  if(E < IE){
+    els.missLabel.classList.add('show');
+    els.detReadout.textContent = 'none';
+    STATE.lastKE = null;
+    STATE.lastE = E;
+  } else {
+    const KE = Math.round((E - IE) * 100) / 100;
+    loggedKE = KE;
+    STATE.lastKE = KE;
+    STATE.lastE = E;
+    if(els.atomElectron) els.atomElectron.classList.add('gone');
+    els.flightElectron.classList.add('flying');
+    setCirclePos(els.flightElectron, STATE.ejectFrom.x, STATE.ejectFrom.y);
+    await animatePos(STATE.ejectFrom, DETECTOR_HIT, (x, y) => setCirclePos(els.flightElectron, x, y), 480);
+    els.flightElectron.classList.remove('flying');
+    els.flightElectron.classList.add('lodged');
+    setCirclePos(els.flightElectron, DETECTOR_HIT.x, DETECTOR_HIT.y);
+    els.detectorFace.classList.add('hit');
+    els.impactRelic.classList.add('show');
+    if(els.detectorPeak) els.detectorPeak.classList.add('show');
+    els.detReadout.textContent = KE.toFixed(2);
+    STATE.hasSeenKE = true;
+
+    if(STATE.namedIE){
+      setEqValues(IE, E, KE);
+      els.hudKE.textContent = KE.toFixed(2) + ' MJ/mol';
+      els.hudKeItem.hidden = false;
+      els.hudIE.textContent = IE.toFixed(2) + ' MJ/mol';
+      els.hudIeItem.hidden = false;
+      els.eqReveal.classList.add('visible');
+      if(els.eqNumbers) els.eqNumbers.classList.add('visible');
+    }
+  }
+
+  appendTrialLog(STATE.fireCount, currentAtom().symbol, E, loggedKE);
+
+  // After the first detected electron, offer other atoms to try
+  if(STATE.hasSeenKE && els.atomPicker.hidden){
+    els.atomPicker.hidden = false;
+  }
+  // After a couple of fires, surface the pause-and-think questions
+  if(STATE.fireCount >= 2 && !STATE.promptsShown){
+    STATE.promptsShown = true;
+    els.discoverPrompts.hidden = false;
+    if(els.revealEqActions) els.revealEqActions.hidden = false;
+    if(!prefersReduced){
+      els.discoverPrompts.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  // restore bound electron on the atom; leave the lodged hit on the detector
+  setTimeout(() => {
+    if(els.atomElectron) els.atomElectron.classList.remove('gone');
+  }, prefersReduced ? 0 : 650);
+
+  STATE.firing = false;
+  els.fireBtn.disabled = false;
+  updateContinue();
+}
+
+function selectAtom(key){
+  if(!DATA.atoms[key] || STATE.act !== 1 || STATE.firing) return;
+  STATE.atomKey = key;
+  els.atomPicker.querySelectorAll('.atom-tile').forEach(btn => {
+    const on = btn.dataset.atom === key;
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  mountAct1Atom();
+  resetApparatusVisual();
+  els.detReadout.textContent = '—';
+  STATE.lastKE = null;
+  if(STATE.namedIE){
+    els.hudKeItem.hidden = true;
+    els.hudIeItem.hidden = false;
+    els.hudIE.textContent = currentAtom().IE.toFixed(2) + ' MJ/mol';
+    els.hudAtom.textContent = currentAtom().symbol + ' · IE ' + currentAtom().IE.toFixed(2);
+  }
+}
+
+function revealEquation(){
+  if(STATE.namedIE) return;
+  STATE.namedIE = true;
+  const a = currentAtom();
+  const IE = a.IE;
+  const E = STATE.lastE != null ? STATE.lastE : STATE.E;
+  const KE = STATE.lastKE != null
+    ? STATE.lastKE
+    : Math.max(0, Math.round((Math.max(IE, E) - IE) * 100) / 100);
+
+  if(STATE.lastKE != null){
+    setEqValues(IE, E, KE);
+  } else {
+    const sampleE = Math.max(IE + 2, E > 0 ? E : IE + 2);
+    setEqValues(IE, sampleE, Math.round((sampleE - IE) * 100) / 100);
+  }
+
+  els.eqReveal.classList.add('visible');
+  if(els.eqNumbers) els.eqNumbers.classList.add('visible');
+  els.discoveryLine.textContent = 'IE = E_photon − KE. The instrument measures KE and infers binding energy.';
+  els.discoveryLine.classList.add('visible');
+  els.hud.hidden = false;
+  els.hudAtomItem.hidden = false;
+  els.hudAtom.textContent = a.symbol + ' · IE ' + IE.toFixed(2);
+  els.hudE.textContent = STATE.E.toFixed(1) + ' MJ/mol';
+  if(STATE.lastKE != null){
+    els.hudKE.textContent = STATE.lastKE.toFixed(2) + ' MJ/mol';
+    els.hudKeItem.hidden = false;
+  }
+  els.hudIE.textContent = IE.toFixed(2) + ' MJ/mol';
+  els.hudIeItem.hidden = false;
+  if(els.revealEqActions) els.revealEqActions.hidden = true;
+  els.helpText.textContent = HELP['1b'];
+  els.fireHint.textContent = 'Try another atom, or move on when you are ready.';
+  updateContinue();
+  if(!prefersReduced){
+    els.eqReveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+/* ---------- ACT 2: hypothetical atom → spectrum ---------- */
+const spectrumCanvas = document.getElementById('spectrumCanvas');
+const sctx = spectrumCanvas.getContext('2d');
+let sW = 0, sH = 0, sDpr = 1;
+
+function resizeSpectrum(){
+  if(!els.plateSpectrum || els.plateSpectrum.hidden) return;
+  sDpr = window.devicePixelRatio || 1;
+  const rect = els.plateSpectrum.getBoundingClientRect();
+  sW = Math.max(280, rect.width);
+  sH = Math.min(240, Math.max(170, sW * 0.34));
+  spectrumCanvas.width = sW * sDpr;
+  spectrumCanvas.height = sH * sDpr;
+  spectrumCanvas.style.height = sH + 'px';
+  sctx.setTransform(sDpr, 0, 0, sDpr, 0, 0);
+  drawSpectrum();
+}
+
+function gaussian(x, cx, sigma){
+  const d = (x - cx) / sigma;
+  return Math.exp(-0.5 * d * d);
+}
+
+function drawSpectrum(){
+  if(!sW) return;
+  sctx.clearRect(0, 0, sW, sH);
+  const left = 52, right = sW - 28, top = 36, axisY = sH - 40;
+  const plotW = right - left;
+  const eMax = 5.5;
+  // PES convention: larger binding energy nearer the origin (left)
+  const eToX = (e) => left + (1 - e / eMax) * plotW;
+  const eToNorm = (e) => 1 - e / eMax;
+  const hMax = 3;
+
+  // axes
+  sctx.strokeStyle = '#16140e';
+  sctx.lineWidth = 1.5;
+  sctx.beginPath();
+  sctx.moveTo(left, top);
+  sctx.lineTo(left, axisY);
+  sctx.lineTo(right, axisY);
+  sctx.stroke();
+
+  sctx.fillStyle = '#55513f';
+  sctx.font = '600 0.62rem "IBM Plex Mono"';
+  sctx.textAlign = 'center';
+  sctx.fillText('←  Binding energy / IE (MJ/mol)  ·  higher toward origin', (left + right) / 2, sH - 12);
+  sctx.save();
+  sctx.translate(16, (top + axisY) / 2);
+  sctx.rotate(-Math.PI / 2);
+  sctx.fillText('Relative number of e⁻', 0, 0);
+  sctx.restore();
+
+  const heights = STATE.peakHeights;
+  const hasAny = (heights[0.85] || 0) + (heights[4.25] || 0) > 0;
+
+  if(!hasAny){
+    sctx.fillStyle = '#6f6b59';
+    sctx.font = '500 0.78rem Barlow';
+    sctx.textAlign = 'center';
+    sctx.fillText('Readout empty — start the source to collect electrons', (left + right) / 2, (top + axisY) / 2);
+    return;
+  }
+
+  // soft fills + strokes for each peak
+  const ies = [0.85, 4.25];
+  ies.forEach(ie => {
+    const h = heights[ie] || 0;
+    if(h <= 0) return;
+    const amp = (h / hMax) * 0.92;
+    const cx = eToNorm(ie);
+    const sigma = 0.028;
+    const peakX = eToX(ie);
+
+    sctx.beginPath();
+    sctx.moveTo(peakX - plotW * 0.1, axisY);
+    for(let i = 0; i <= plotW; i += 2){
+      const xNorm = i / plotW;
+      const val = amp * gaussian(xNorm, cx, sigma);
+      const y = axisY - val * (axisY - top);
+      sctx.lineTo(left + i, y);
+    }
+    sctx.lineTo(peakX + plotW * 0.1, axisY);
+    sctx.closePath();
+    sctx.fillStyle = 'rgba(92,107,40,0.14)';
+    sctx.fill();
+
+    sctx.beginPath();
+    let started = false;
+    for(let i = 0; i <= plotW; i += 2){
+      const xNorm = i / plotW;
+      const val = amp * gaussian(xNorm, cx, sigma);
+      if(val < 0.002){ started = false; continue; }
+      const y = axisY - val * (axisY - top);
+      if(!started){ sctx.moveTo(left + i, y); started = true; }
+      else sctx.lineTo(left + i, y);
+    }
+    sctx.strokeStyle = '#5c6b28';
+    sctx.lineWidth = 1.75;
+    sctx.stroke();
+
+    const peakY = axisY - amp * (axisY - top);
+    sctx.fillStyle = '#5c6b28';
+    sctx.font = '600 0.68rem "IBM Plex Mono"';
+    sctx.textAlign = 'center';
+    sctx.fillText('h × ' + h, peakX, peakY - 10);
+    sctx.fillStyle = '#55513f';
+    sctx.font = '600 0.62rem "IBM Plex Mono"';
+    sctx.fillText(ie.toFixed(2), peakX, axisY + 16);
+  });
+}
+
+function buildHypoDiagrams(){
+  const levels = DATA.hypo.levels;
+  const shellHost = els.hypoShell;
+  const levelHost = els.hypoLevels;
+  if(!shellHost || !levelHost) return;
+  shellHost.replaceChildren();
+  levelHost.replaceChildren();
+
+  // --- Energy-level diagram (left) — CA9 style, negative energies ---
+  const lx = 40, ly0 = 28, ly1 = 150, lw = 280;
+  levelHost.appendChild(svgEl('text', {
+    class: 'hypo-panel-label', x: lx + lw / 2, y: 16, 'text-anchor': 'middle'
+  })).textContent = 'Energy levels';
+
+  // axis (more negative = deeper = down)
+  levelHost.appendChild(svgEl('line', {
+    class: 'hypo-level-tick', x1: lx + 36, y1: ly0, x2: lx + 36, y2: ly1
+  }));
+  const yFor = (ie) => {
+    // map 0.85 → higher on page, 4.25 → lower
+    const t = (ie - 0.85) / (4.25 - 0.85);
+    return ly0 + 28 + t * 78;
+  };
+
+  levels.forEach(lev => {
+    const y = yFor(lev.ie);
+    levelHost.appendChild(svgEl('line', {
+      class: 'hypo-level-line',
+      x1: lx + 48, y1: y, x2: lx + 200, y2: y
+    }));
+    const lab = svgEl('text', {
+      class: 'hypo-level-val', x: lx + 8, y: y + 4
+    });
+    lab.textContent = lev.label;
+    levelHost.appendChild(lab);
+
+    const startX = lx + 70;
+    for(let i = 0; i < lev.count; i++){
+      levelHost.appendChild(svgEl('circle', {
+        class: 'hypo-e',
+        cx: startX + i * 22, cy: y, r: 7
+      }));
+    }
+    const cnt = svgEl('text', {
+      class: 'hypo-level-count', x: lx + 220, y: y + 4
+    });
+    cnt.textContent = lev.count + ' e⁻';
+    levelHost.appendChild(cnt);
+  });
+
+  // zero reference tick
+  const zeroLab = svgEl('text', {
+    class: 'hypo-level-count', x: lx + 44, y: ly0 + 10
+  });
+  zeroLab.textContent = '0';
+  levelHost.appendChild(zeroLab);
+
+  // --- Shell-model atom (right) ---
+  const cx = 540, cy = 95;
+  shellHost.appendChild(svgEl('text', {
+    class: 'hypo-panel-label', x: cx, y: 16, 'text-anchor': 'middle'
+  })).textContent = 'Shell model';
+
+  const shells = DATA.hypo.shells;
+  const radii = [28, 54];
+  shellHost.appendChild(svgEl('circle', {
+    cx, cy, r: radii[0] + 10, fill: 'url(#hypoCoreWash)'
+  }));
+  radii.forEach(r => {
+    shellHost.appendChild(svgEl('circle', { class: 'hypo-shell-ring', cx, cy, r }));
+  });
+  shellHost.appendChild(svgEl('circle', { class: 'hypo-shell-nuc', cx, cy, r: 14 }));
+  const sym = svgEl('text', { class: 'hypo-shell-sym', x: cx, y: cy });
+  sym.textContent = '?';
+  shellHost.appendChild(sym);
+
+  shells.forEach((count, si) => {
+    const r = radii[si];
+    const start = si === 0 ? Math.PI / 6 : -Math.PI / 2;
+    for(let i = 0; i < count; i++){
+      const ang = start + (i * 2 * Math.PI) / count;
+      shellHost.appendChild(svgEl('circle', {
+        class: 'hypo-shell-e',
+        cx: cx + r * Math.cos(ang),
+        cy: cy + r * Math.sin(ang),
+        r: 6.5
+      }));
+    }
+  });
+}
+
+function buildSampleCloud(){
+  const g = els.sampleCloud;
+  if(!g) return;
+  g.replaceChildren();
+  // Soft orbs — a sample of the hypothetical atom (larger / denser so they read on the plate)
+  const spots = [
+    [0, 0, 1.15], [34, -22, 0.9], [-32, 20, 0.88], [26, 28, 0.82],
+    [-36, -18, 0.85], [10, -38, 0.78], [-12, 36, 0.8], [44, 8, 0.72],
+    [-46, 6, 0.74], [18, 10, 0.7], [-20, -32, 0.68], [4, 22, 0.66],
+    [-8, -8, 0.64], [30, -6, 0.7]
+  ];
+  spots.forEach(([dx, dy, s]) => {
+    const og = svgEl('g', {
+      transform: `translate(${ATOM_CX + dx},${ATOM_CY + dy}) scale(${s})`
+    });
+    og.appendChild(svgEl('circle', { class: 'sample-orb-shell', cx: 0, cy: 0, r: 18 }));
+    og.appendChild(svgEl('circle', { class: 'sample-orb-nuc', cx: 0, cy: 0, r: 6 }));
+    [[11, 0], [-8, 9], [-7, -10]].forEach(([ex, ey]) => {
+      og.appendChild(svgEl('circle', { class: 'sample-orb-e', cx: ex, cy: ey, r: 3.6 }));
+    });
+    g.appendChild(og);
+  });
+  STATE.ejectFrom = { x: ATOM_CX + 22, y: ATOM_CY - 6 };
+}
+
+function setSampleCloudVisible(show){
+  const g = els.sampleCloud;
+  if(!g) return;
+  if(show){
+    buildSampleCloud();
+    g.removeAttribute('hidden');
+    g.setAttribute('aria-hidden', 'false');
+    g.style.display = 'inline';
+  } else {
+    g.setAttribute('hidden', '');
+    g.setAttribute('aria-hidden', 'true');
+    g.style.display = 'none';
+    g.replaceChildren();
+  }
+}
+
+function showAct2Chamber(mode){
+  if(els.atomCaption){
+    els.atomCaption.textContent = '';
+    els.atomCaption.setAttribute('hidden', '');
+    els.atomCaption.setAttribute('aria-hidden', 'true');
+  }
+  els.atomMount.replaceChildren();
+  setSampleCloudVisible(mode === 'sample');
+}
+
+function loadSample(){
+  if(STATE.act !== 2 || STATE.act2Phase !== 'intro') return;
+  STATE.act2Phase = 'loaded';
+  showAct2Chamber('sample');
+  setAct2Chrome();
+  els.discoveryLine.textContent = 'Sample in the chamber — a cloud of the same hypothetical atom.';
+  els.discoveryLine.classList.add('visible');
+}
+
+function setAct2Chrome(){
+  const phase = STATE.act2Phase;
+
+  const status = phase === 'done' ? 'finished'
+    : (phase === 'running' ? 'detecting' : 'ready');
+  if(els.chipReady) els.chipReady.classList.toggle('on', status === 'ready');
+  if(els.chipDetecting) els.chipDetecting.classList.toggle('on', status === 'detecting');
+  if(els.chipFinished) els.chipFinished.classList.toggle('on', status === 'finished');
+
+  if(els.apparatusActions){
+    els.apparatusActions.hidden = false;
+    els.apparatusActions.classList.toggle('is-loaded', phase === 'loaded' || phase === 'done');
+    els.apparatusActions.classList.toggle('is-running', phase === 'running');
+  }
+
+  els.loadSampleBtn.disabled = phase !== 'intro';
+  els.loadSampleBtn.hidden = phase !== 'intro';
+  els.startRunBtn.hidden = phase === 'running' || phase === 'done';
+  els.startRunBtn.disabled = phase !== 'loaded';
+  if(phase === 'intro'){
+    els.startRunBtn.hidden = false;
+    els.startRunBtn.disabled = true;
+  }
+  els.resetPeakBtn.hidden = phase !== 'done';
+
+  if(phase === 'intro'){
+    els.peakHint.textContent = 'Load a sample of the hypothetical atom into the spectrometer, then start the photon source.';
+  } else if(phase === 'loaded'){
+    els.peakHint.textContent = 'Sample loaded. Photon energy is fixed above both levels — start the source.';
+  } else if(phase === 'running'){
+    els.peakHint.textContent = 'Source running — watch peak position (IE) and height on the readout.';
+  } else {
+    els.peakHint.textContent = 'Spectrum complete. Read the description below, or watch again.';
+  }
+
+  updateAct2Hud();
+}
+
+function updateAct2Hud(){
+  const E = DATA.hypo.photonE;
+  els.hudE.textContent = E.toFixed(1) + ' MJ/mol';
+  els.gunEnergyLabel.textContent = 'E = ' + E.toFixed(1);
+  updateSourceWave(E);
+
+  const hLo = STATE.peakHeights[0.85] || 0;
+  const hHi = STATE.peakHeights[4.25] || 0;
+  if(els.hudCount){
+    els.hudCount.textContent = hLo + ' @ 0.85 · ' + hHi + ' @ 4.25';
+  }
+  if(els.hudPeak){
+    els.hudPeak.textContent = STATE.lastPulseIE != null
+      ? STATE.lastPulseIE.toFixed(2) + ' MJ/mol'
+      : '—';
+  }
+  if(STATE.lastPulseIE != null){
+    const KE = Math.round((E - STATE.lastPulseIE) * 100) / 100;
+    els.hudKE.textContent = KE.toFixed(2) + ' MJ/mol';
+    els.hudKeItem.hidden = false;
+    els.hudIE.textContent = STATE.lastPulseIE.toFixed(2) + ' MJ/mol';
+    els.hudIeItem.hidden = false;
+  } else {
+    els.hudKeItem.hidden = true;
+    els.hudIeItem.hidden = true;
+  }
+}
+
+function sleep(ms){
+  return new Promise(resolve => setTimeout(resolve, prefersReduced ? 0 : ms));
+}
+
+async function pulseElectron(ie){
+  const E = DATA.hypo.photonE;
+  const KE = Math.round((E - ie) * 100) / 100;
+  resetApparatusVisual();
+  // keep sample cloud visible after reset
+  if(els.sampleCloud){
+    els.sampleCloud.removeAttribute('hidden');
+    els.sampleCloud.style.display = 'inline';
+  }
+
+  const atomEdge = { x: ATOM_CX - 48, y: ATOM_CY };
+  els.photonPacket.classList.add('flying');
+  setBeamLive(true);
+  await animatePos(LASER_EXIT, atomEdge, setPhotonPos, 320);
+  els.photonPacket.classList.remove('flying');
+  setBeamLive(false);
+
+  const from = STATE.ejectFrom;
+  els.flightElectron.classList.add('flying');
+  setCirclePos(els.flightElectron, from.x, from.y);
+  await animatePos(from, DETECTOR_HIT, (x, y) => setCirclePos(els.flightElectron, x, y), 380);
+  els.flightElectron.classList.remove('flying');
+  els.flightElectron.classList.add('lodged');
+  setCirclePos(els.flightElectron, DETECTOR_HIT.x, DETECTOR_HIT.y);
+  els.detectorFace.classList.add('hit');
+  els.impactRelic.classList.add('show');
+  if(els.detectorPeak) els.detectorPeak.classList.add('show');
+  els.detReadout.textContent = KE.toFixed(2);
+
+  STATE.lastPulseIE = ie;
+  updateAct2Hud();
+}
+
+async function startAct2Run(){
+  if(STATE.act !== 2 || STATE.act2Phase !== 'loaded' || STATE.firing) return;
+  STATE.firing = true;
+  STATE.act2Phase = 'running';
+  setAct2Chrome();
+  els.discoveryLine.classList.remove('visible');
+
+  for(let i = 0; i < ACT2_MILESTONES.length; i++){
+    const step = ACT2_MILESTONES[i];
+    await pulseElectron(step.pulseIE);
+    await sleep(280);
+    // snap / hold milestone
+    STATE.peakHeights = { 0.85: step.heights[0.85], 4.25: step.heights[4.25] };
+    STATE.act2Milestone = i + 1;
+    setAct2Chrome();
+    drawSpectrum();
+
+    if(i === 0){
+      els.discoveryLine.textContent = 'One binding energy so far — a peak at 0.85 MJ/mol.';
+      els.discoveryLine.classList.add('visible');
+    } else if(i === 1){
+      els.discoveryLine.textContent = 'Two energies — equal height for now.';
+      els.discoveryLine.classList.add('visible');
+    } else if(i === 4){
+      els.discoveryLine.classList.remove('visible');
+      els.discoveryLine.textContent = '';
+    } else {
+      const h085 = step.heights[0.85];
+      const h425 = step.heights[4.25];
+      els.discoveryLine.textContent = 'Peaks growing — height ' + h085 + ' at 0.85, height ' + h425 + ' at 4.25 MJ/mol.';
+      els.discoveryLine.classList.add('visible');
+    }
+    await sleep(900);
+  }
+
+  STATE.act2Phase = 'done';
+  STATE.firing = false;
+  setAct2Chrome();
+  if(els.act2Outro){
+    els.act2Outro.classList.add('visible');
+    if(!prefersReduced){
+      els.act2Outro.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+  updateContinue();
+}
+
+function resetAct2(){
+  STATE.act2Phase = 'intro';
+  STATE.act2Milestone = 0;
+  STATE.peakHeights = { 0.85: 0, 4.25: 0 };
+  STATE.lastPulseIE = null;
+  STATE.partDone = false;
+  if(els.act2Outro) els.act2Outro.classList.remove('visible');
+  els.partEnd.classList.remove('visible');
+  els.discoveryLine.classList.remove('visible');
+  els.discoveryLine.textContent = '';
+  els.detReadout.textContent = '—';
+  resetApparatusVisual();
+  showAct2Chamber('empty');
+  setAct2Chrome();
+  drawSpectrum();
+  updateContinue();
+}
+
+function setupAct2(){
+  buildHypoDiagrams();
+  els.hypoPlate.hidden = false;
+  els.hud.hidden = false;
+  els.hudAtomItem.hidden = false;
+  els.hudAtom.textContent = 'Hypothetical';
+  // repurpose count/peak labels for dual-peak focus
+  const countK = els.hudCountItem && els.hudCountItem.querySelector('.k');
+  const peakK = els.hudPeakItem && els.hudPeakItem.querySelector('.k');
+  if(countK) countK.textContent = 'Peak heights';
+  if(peakK) peakK.textContent = 'Last IE';
+  els.hudCountItem.hidden = false;
+  els.hudPeakItem.hidden = false;
+  els.eqReveal.classList.remove('visible');
+  if(els.eqNumbers) els.eqNumbers.classList.remove('visible');
+  resetAct2();
+  requestAnimationFrame(() => { resizeSpectrum(); });
+}
+
+/* ---------- navigation ---------- */
+function updateContinue(){
+  const btn = els.continueBtn;
+  if(STATE.act === 1){
+    const ready = STATE.namedIE;
+    btn.disabled = !ready;
+    btn.hidden = !ready;
+    btn.textContent = 'Move to next section →';
+  } else if(STATE.partDone){
+    btn.hidden = false;
+    btn.disabled = false;
+    btn.textContent = 'What this was for →';
+  } else {
+    const ready = STATE.act2Phase === 'done';
+    btn.disabled = !ready;
+    btn.hidden = false;
+    btn.textContent = 'Finish this part →';
+  }
+  els.backBtn.hidden = STATE.act === 1;
+}
+
+function setAct(n){
+  STATE.act = n;
+  els.actMeta.textContent = ACT_META[n];
+  els.framing.textContent = FRAMING[n];
+  els.helpText.textContent = n === 1
+    ? (STATE.namedIE ? HELP['1b'] : HELP[1])
+    : HELP[n];
+  els.viewport.setAttribute('data-fig', FIG[n]);
+  els.partEnd.classList.remove('visible');
+
+  if(n === 1 && STATE.namedIE){
+    els.discoveryLine.textContent = 'IE = E_photon − KE. The instrument measures KE and infers binding energy.';
+    els.discoveryLine.classList.add('visible');
+  } else if(n === 2 && STATE.act2Milestone === 1){
+    els.discoveryLine.textContent = 'One binding energy so far — a peak at 0.85 MJ/mol.';
+    els.discoveryLine.classList.add('visible');
+  } else if(n === 2 && STATE.act2Milestone === 2){
+    els.discoveryLine.textContent = 'Two energies — equal height for now.';
+    els.discoveryLine.classList.add('visible');
+  } else if(n === 2 && STATE.act2Milestone >= 3 && STATE.act2Milestone < 5){
+    const h = STATE.peakHeights || {};
+    els.discoveryLine.textContent = 'Peaks growing — height ' + (h[0.85] || 0) + ' at 0.85, height ' + (h[4.25] || 0) + ' at 4.25 MJ/mol.';
+    els.discoveryLine.classList.add('visible');
+  } else {
+    els.discoveryLine.classList.remove('visible');
+    els.discoveryLine.textContent = '';
+  }
+
+  els.plateSpectrum.hidden = n !== 2;
+  if(els.hypoPlate) els.hypoPlate.hidden = n !== 2;
+  if(els.act2Outro){
+    els.act2Outro.classList.toggle('visible', n === 2 && STATE.act2Phase === 'done');
+  }
+  els.controlsFire.hidden = n !== 1;
+  if(els.energyRail) els.energyRail.hidden = n !== 1;
+  els.controlsPeak.hidden = n !== 2;
+  els.discoverPrompts.hidden = !(n === 1 && STATE.promptsShown);
+  if(els.revealEqActions) els.revealEqActions.hidden = !(n === 1 && STATE.promptsShown && !STATE.namedIE);
+  els.atomPicker.hidden = !(n === 1 && STATE.hasSeenKE);
+  els.eqReveal.classList.toggle('visible', n === 1 && STATE.namedIE);
+  if(els.eqNumbers) els.eqNumbers.classList.toggle('visible', n === 1 && STATE.namedIE);
+
+  if(n === 1){
+    if(els.apparatusActions) els.apparatusActions.hidden = true;
+    if(els.atomCaption){
+      els.atomCaption.hidden = false;
+      els.atomCaption.removeAttribute('aria-hidden');
+      els.atomCaption.style.display = '';
+    }
+    if(els.sampleCloud){
+      setSampleCloudVisible(false);
+    }
+    els.hud.hidden = !STATE.namedIE;
+    const countK = els.hudCountItem && els.hudCountItem.querySelector('.k');
+    const peakK = els.hudPeakItem && els.hudPeakItem.querySelector('.k');
+    if(countK) countK.textContent = 'Electrons in level';
+    if(peakK) peakK.textContent = 'Peak height';
+    mountAct1Atom();
+    els.hudAtomItem.hidden = !STATE.namedIE;
+    els.hudCountItem.hidden = true;
+    els.hudPeakItem.hidden = true;
+    setE(STATE.E);
+    resetApparatusVisual();
+    if(STATE.namedIE && STATE.hasSeenKE && STATE.lastKE != null){
+      els.hudKeItem.hidden = false;
+      els.hudKE.textContent = STATE.lastKE.toFixed(2) + ' MJ/mol';
+      els.hudIeItem.hidden = false;
+      els.hudIE.textContent = currentAtom().IE.toFixed(2) + ' MJ/mol';
+      setEqValues(currentAtom().IE, STATE.lastE != null ? STATE.lastE : STATE.E, STATE.lastKE);
+      els.detReadout.textContent = STATE.lastKE.toFixed(2);
+      els.impactRelic.classList.add('show');
+      els.detectorFace.classList.add('hit');
+      if(els.detectorPeak) els.detectorPeak.classList.add('show');
+      els.flightElectron.classList.add('lodged');
+      setCirclePos(els.flightElectron, DETECTOR_HIT.x, DETECTOR_HIT.y);
+    } else if(STATE.namedIE){
+      els.hudKeItem.hidden = true;
+      els.hudIeItem.hidden = false;
+      els.hudIE.textContent = currentAtom().IE.toFixed(2) + ' MJ/mol';
+      els.detReadout.textContent = '—';
+    } else {
+      els.hudKeItem.hidden = true;
+      els.hudIeItem.hidden = true;
+      els.detReadout.textContent = '—';
+    }
+    els.fireHint.textContent = STATE.namedIE
+      ? 'Try another atom, or move on when you are ready.'
+      : 'Tune the photon energy, then fire. Watch the detector.';
+  }
+
+  if(n === 2){
+    setupAct2();
+  }
+
+  updateContinue();
+  document.getElementById('helpPanel').classList.remove('open');
+}
+
+/* ---------- briefing / debrief ---------- */
+const DEBRIEF = {
+  intentions: [
+    { text: 'We will develop an understanding of the relationship between ionization energy, energy of a photon, and kinetic energy, using the equation IE = E_photon − KE.',
+      target: 'act:1', revisit: 'Photon & detector' },
+    { text: 'We will analyze graphs to understand how the electrons in an atom are organized.',
+      target: 'act:2', revisit: 'Quantized levels' },
+    { text: 'We will begin to see how electrons are organized in an atom based on “quantized energy levels”.',
+      target: 'act:2', revisit: 'Quantized levels' }
+  ],
+  competencies: [
+    { code: 'PAI',
+      name: 'Processing and analyzing data and information',
+      text: 'I can analyze and interpret spectral data or ionization energy graphs to identify unknown elements by comparing patterns and values.' },
+    { code: 'PAI',
+      name: 'Processing and analyzing data and information',
+      text: 'I can construct a model showing the relationship between energy levels and electron configuration.',
+      note: 'diagram on paper' },
+    { code: 'C',
+      name: 'Communicating',
+      text: 'I can model and explain, using diagrams or mental images, how photons interact with electrons to cause ionization.' }
+  ]
+};
+
+function fillIntentionList(ul, items, opts) {
+  if(!ul || ul.childElementCount) return;
+  opts = opts || {};
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.appendChild(document.createTextNode(item.text));
+    if(item.note) {
+      li.className = 'elsewhere';
+      const tag = document.createElement('span');
+      tag.className = 'debrief-tag';
+      tag.textContent = ` — ${item.note}`;
+      li.appendChild(tag);
+    }
+    if(opts.showRevisit && item.target && item.revisit) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'debrief-revisit';
+      btn.dataset.target = item.target;
+      btn.textContent = 'Explore again → ' + item.revisit;
+      li.appendChild(btn);
+    }
+    ul.appendChild(li);
+  });
+}
+
+function fillCompetencyList(ul, items) {
+  if(!ul || ul.childElementCount) return;
+  items.forEach(item => {
+    const li = document.createElement('li');
+    const name = document.createElement('span');
+    name.className = 'cc-name';
+    name.textContent = item.name;
+    li.appendChild(name);
+    li.appendChild(document.createTextNode(item.text));
+    if(item.note) {
+      const tag = document.createElement('span');
+      tag.className = 'debrief-tag';
+      tag.textContent = ` — ${item.note}`;
+      li.appendChild(tag);
+    }
+    ul.appendChild(li);
+  });
+}
+
+function renderBriefing() {
+  fillIntentionList(document.getElementById('briefingIntentions'), DEBRIEF.intentions);
+  fillCompetencyList(document.getElementById('briefingCompetencies'), DEBRIEF.competencies);
+}
+
+function scrollToPageTop(){
+  const top = document.querySelector('.module-wrap') || document.body;
+  if(prefersReduced){
+    window.scrollTo(0, 0);
+    if(top && top.scrollIntoView) top.scrollIntoView({ block: 'start' });
+    return;
+  }
+  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+}
+
+function startModule() {
+  const briefing = document.getElementById('briefing');
+  const stage = document.getElementById('moduleStage');
+  if(briefing) briefing.hidden = true;
+  if(stage) stage.hidden = false;
+  setAct(1);
+  scrollToPageTop();
+}
+
+function renderDebrief() {
+  fillIntentionList(document.getElementById('debriefIntentions'), DEBRIEF.intentions, { showRevisit: true });
+  fillCompetencyList(document.getElementById('debriefCompetencies'), DEBRIEF.competencies);
+}
+
+function enterDebriefStage() {
+  const stage = document.getElementById('moduleStage');
+  const debrief = document.getElementById('debrief');
+  if(!stage || !debrief) return;
+  Array.from(stage.children).forEach(child => {
+    if(child === debrief) return;
+    if(!child.hasAttribute('data-pre-debrief-hidden')) {
+      child.setAttribute('data-pre-debrief-hidden', child.hidden ? '1' : '0');
+    }
+    child.hidden = true;
+  });
+  stage.classList.add('is-debriefing');
+  debrief.hidden = false;
+}
+
+function leaveDebriefStage() {
+  const stage = document.getElementById('moduleStage');
+  const debrief = document.getElementById('debrief');
+  if(!stage) return;
+  stage.classList.remove('is-debriefing');
+  Array.from(stage.children).forEach(child => {
+    if(child === debrief) return;
+    if(child.hasAttribute('data-pre-debrief-hidden')) {
+      child.hidden = child.getAttribute('data-pre-debrief-hidden') === '1';
+      child.removeAttribute('data-pre-debrief-hidden');
+    }
+  });
+  if(debrief) debrief.hidden = true;
+}
+
+let debriefRevisitWired = false;
+function wireDebriefRevisit() {
+  if(debriefRevisitWired) return;
+  debriefRevisitWired = true;
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.debrief-revisit');
+    if(!btn || !btn.dataset.target) return;
+    e.preventDefault();
+    leaveDebriefStage();
+    const n = Number(String(btn.dataset.target).replace(/^act:/, '')) || 1;
+    if(n >= 1) STATE.namedIE = true;
+    if(n === 2){
+      STATE.act2Phase = 'done';
+      STATE.partDone = true;
+    }
+    setAct(Math.min(2, Math.max(1, n)));
+    if(els.continueBtn && STATE.partDone){
+      els.continueBtn.hidden = false;
+      els.continueBtn.disabled = false;
+      els.continueBtn.textContent = 'What this was for →';
+    }
+    scrollToPageTop();
+  });
+}
+
+function revealDebrief() {
+  const section = document.getElementById('debrief');
+  if(!section) return;
+  renderDebrief();
+  wireDebriefRevisit();
+  enterDebriefStage();
+  section.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+}
+
+/* ---------- wire UI ---------- */
+els.energySlider.addEventListener('input', () => setE(sliderToE()));
+els.fireBtn.addEventListener('click', () => fireShot());
+if(els.loadSampleBtn) els.loadSampleBtn.addEventListener('click', () => loadSample());
+if(els.startRunBtn) els.startRunBtn.addEventListener('click', () => startAct2Run());
+if(els.resetPeakBtn) els.resetPeakBtn.addEventListener('click', () => resetAct2());
+if(els.revealEqBtn) els.revealEqBtn.addEventListener('click', () => revealEquation());
+if(els.atomPicker){
+  els.atomPicker.addEventListener('click', (e) => {
+    const btn = e.target.closest('.atom-tile');
+    if(!btn || !btn.dataset.atom) return;
+    selectAtom(btn.dataset.atom);
+  });
+}
+
+els.continueBtn.addEventListener('click', () => {
+  if(STATE.act === 1 && STATE.namedIE){
+    setAct(2);
+    scrollToPageTop();
+  } else if(STATE.act === 2 && STATE.act2Phase === 'done'){
+    STATE.partDone = true;
+    updateContinue();
+    revealDebrief();
+  } else if(STATE.partDone){
+    revealDebrief();
+  }
+});
+
+els.backBtn.addEventListener('click', () => {
+  if(STATE.act === 2){
+    setAct(1);
+    scrollToPageTop();
+  }
+});
 
 const stuckBtn = document.getElementById('stuckBtn');
 const helpPanel = document.getElementById('helpPanel');
@@ -238,126 +2698,30 @@ if(stuckBtn && helpPanel){
   });
 }
 
-/* ---------- REFERENCE DATA ---------- */
-const DATA = {
-  pes: {
-    H:  {1:[1.31,1]},
-    He: {1:[2.37,2]},
-    Li: {1:[6.26,2], 2:[0.52,1]},
-    Be: {1:[11.5,2], 2:[0.90,2]},
-    B:  {1:[19.3,2], 2:[1.36,2], 3:[0.80,1]},
-    C:  {1:[28.6,2], 2:[1.72,2], 3:[1.09,2]},
-    N:  {1:[39.6,2], 2:[2.45,2], 3:[1.40,3]},
-    O:  {1:[52.6,2], 2:[3.04,2], 3:[1.31,4]},
-    F:  {1:[67.2,2], 2:[3.88,2], 3:[1.68,5]},
-    Ne: {1:[84.0,2], 2:[4.68,2], 3:[2.08,6]},
-    Na: {1:[104,2],  2:[6.84,2], 3:[3.67,6], 4:[0.50,1]},
-    Mg: {1:[126,2],  2:[9.07,2], 3:[5.31,6], 4:[0.74,2]},
-    Al: {1:[151,2],  2:[12.1,2], 3:[7.19,6], 4:[1.09,2], 5:[0.58,1]},
-    Si: {1:[178,2],  2:[15.1,2], 3:[10.3,6], 4:[1.46,2], 5:[0.79,2]},
-    P:  {1:[208,2],  2:[18.7,2], 3:[13.5,6], 4:[1.95,2], 5:[1.06,3]},
-    S:  {1:[239,2],  2:[22.7,2], 3:[16.5,6], 4:[2.05,2], 5:[1.00,4]},
-    Cl: {1:[273,2],  2:[26.8,2], 3:[20.2,6], 4:[2.44,2], 5:[1.25,5]},
-    Ar: {1:[309,2],  2:[31.5,2], 3:[24.1,6], 4:[2.82,2], 5:[1.52,6]},
-    K:  {1:[347,2],  2:[37.1,2], 3:[29.1,6], 4:[3.93,2], 5:[2.38,6], 6:[0.42,1]},
-    Ca: {1:[390,2],  2:[42.7,2], 3:[34.0,6], 4:[4.65,2], 5:[2.90,6], 6:[0.59,2]},
-    Sc: {1:[433,2],  2:[48.5,2], 3:[39.2,6], 4:[5.44,2], 5:[3.24,6], 6:[0.77,1], 7:[0.63,2]}
+window.addEventListener('resize', () => {
+  if(STATE.act === 2) resizeSpectrum();
+});
+
+renderBriefing();
+const briefingNext = document.getElementById('briefingNext');
+if(briefingNext) briefingNext.addEventListener('click', startModule);
+
+// Teacher / iterate shortcuts
+const _qs = new URLSearchParams(location.search);
+if(_qs.has('start') || _qs.has('debrief') || _qs.has('act')) {
+  startModule();
+  const a = parseInt(_qs.get('act'), 10);
+  if(a === 2){
+    STATE.hasSeenKE = true;
+    STATE.namedIE = true;
+    STATE.promptsShown = true;
+    STATE.fireCount = 2;
+    STATE.lastE = 5.0;
+    STATE.lastKE = Math.round((STATE.lastE - DATA.atoms.C.IE) * 100) / 100;
+    STATE.atomKey = 'C';
+    setAct(2);
   }
-};
-// pes format: peak_number: [binding_energy_MJ_mol, electron_count]
-// peaks ordered from highest to lowest binding energy (1s first)
-
-/* Discovery gates */
-gates.hasRunNeon = false;
-gates.hasInspectedSubshells = false;
-
-/* === SIMULATION LOGIC — TO BE DESIGNED === */
-
-/* ---------- STANDBY ANIMATION ---------- */
-const ghostPeaks = [
-  {cx: 0.15, sigma: 0.03, h: 0.8, phase: 0},
-  {cx: 0.35, sigma: 0.025, h: 0.55, phase: 1.2},
-  {cx: 0.45, sigma: 0.02, h: 0.35, phase: 2.8},
-  {cx: 0.65, sigma: 0.035, h: 0.65, phase: 4.1},
-  {cx: 0.82, sigma: 0.02, h: 0.25, phase: 5.5}
-];
-
-function gaussian(x, cx, sigma){
-  const d = (x - cx) / sigma;
-  return Math.exp(-0.5 * d * d);
-}
-
-let t = 0;
-function standbyFrame(){
-  ctx.clearRect(0, 0, W, H);
-
-  const axisY = H * 0.82;
-  const plotLeft = 50;
-  const plotRight = W - 30;
-  const plotW = plotRight - plotLeft;
-  const plotTop = H * 0.12;
-
-  // axis glow
-  ctx.save();
-  ctx.shadowColor = '#3fe0cf';
-  ctx.shadowBlur = 8;
-  ctx.strokeStyle = '#3fe0cf';
-  ctx.globalAlpha = 0.25;
-  ctx.lineWidth = 5;
-  ctx.beginPath(); ctx.moveTo(plotLeft, axisY); ctx.lineTo(plotRight, axisY); ctx.stroke();
-  ctx.globalAlpha = 0.8;
-  ctx.shadowBlur = 0;
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-  ctx.restore();
-
-  // axis label
-  ctx.save();
-  ctx.fillStyle = '#797597';
-  ctx.font = '0.65rem "IBM Plex Mono"';
-  ctx.textAlign = 'center';
-  ctx.fillText('Binding Energy (MJ/mol) →', (plotLeft + plotRight) / 2, axisY + 24);
-  ctx.restore();
-
-  // ghost peaks
-  ghostPeaks.forEach(pk => {
-    const fade = 0.3 + 0.3 * Math.sin(t * 0.0015 + pk.phase);
-    const drift = Math.sin(t * 0.0008 + pk.phase * 2) * 0.015;
-    ctx.save();
-    ctx.shadowColor = '#3fe0cf';
-    ctx.shadowBlur = 10;
-    ctx.strokeStyle = '#3fe0cf';
-    ctx.globalAlpha = fade;
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    for(let px = 0; px <= plotW; px += 2){
-      const xNorm = px / plotW;
-      const val = pk.h * gaussian(xNorm, pk.cx + drift, pk.sigma);
-      const y = axisY - val * (axisY - plotTop);
-      px === 0 ? ctx.moveTo(plotLeft + px, y) : ctx.lineTo(plotLeft + px, y);
-    }
-    ctx.lineTo(plotRight, axisY);
-    ctx.lineTo(plotLeft, axisY);
-    ctx.closePath();
-    ctx.stroke();
-
-    ctx.globalAlpha = fade * 0.08;
-    ctx.fillStyle = '#3fe0cf';
-    ctx.fill();
-    ctx.restore();
-  });
-
-  if(!prefersReduced){
-    t++;
-    requestAnimationFrame(standbyFrame);
-  }
-}
-
-if(prefersReduced){
-  t = 0;
-  standbyFrame();
-} else {
-  requestAnimationFrame(standbyFrame);
+  if(_qs.has('debrief')) revealDebrief();
 }
 </script>
 </body>

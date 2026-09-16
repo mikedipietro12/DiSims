@@ -1,290 +1,374 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Unit 1b — Atomic Structure</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ═══════════════════════════════════════════════════
-   DESIGN TOKENS — §7 (paste identically everywhere)
-   ═══════════════════════════════════════════════════ */
 :root{
-  --void:#0a0912;
-  --void-2:#0c0b1c;
-  --panel:#151330;
-  --panel-edge:#2a2660;
-  --grid:#211d47;
-  --phosphor:#3fe0cf;
-  --phosphor-dim:#1c6b66;
-  --ember:#ffb24d;
-  --signal:#b579ff;
-  --ink:#e9e7fb;
-  --dim:#797597;
-}
+  --paper:#e6e1cf;
+  --paper-2:#d8d2bc;
+  --paper-3:#c9c2a8;
+  --void:#050505;
+  --void-2:#0c0c0c;
+  --panel:#efe9d4;
+  --panel-edge:#1a1810;
+  --grid:#cfc8ae;
+  --phosphor:#5c6b28;
+  --ember:#a85a32;
+  --signal:#1a6aa3;
+  --ink:#16140e;
+  --ink-soft:#33301f;
+  --dim:#55513f;
+  --faint:#6f6b59;
+  --proton:#a85a32;
+  --neutron:#7e8c45;
+  --electron:#c4a35a;
+  --success:#4f5a28;
+  --error:#a85a32;
+  --neon:#c4a35a;
+  --olive:#7e8c45;
+  --olive-deep:#4f5a28;
+  --mustard:#c4a35a;
+  --plate:#050505;
+  --plate-ink:#e8e6d9;
 
-/* ═══════════════════════════════════════════════════
-   RESET & BASE
-   ═══════════════════════════════════════════════════ */
+  --font-display:'Archivo Black',Helvetica,sans-serif;
+  --font-body:Barlow,Helvetica,Univers,'Helvetica Neue',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  /* micro-label scale — mono, uppercase, tracked */
+  --label-xs:0.72rem;
+  --label-sm:0.78rem;
+  --label-md:0.85rem;
+  --track-wide:0.13em;
+  --track-tight:0.08em;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{font-size:16px;-webkit-text-size-adjust:100%;}
 body{
-  background:var(--void);
+  background-color:var(--paper);
   color:var(--ink);
-  font-family:'IBM Plex Mono',monospace;
+  font-family:var(--font-body);
+  font-size:1.0625rem;
   min-height:100vh;
-  display:flex;
-  justify-content:center;
+  overflow-x:hidden;
   line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
 }
-
-/* noise grain overlay */
+/* every mono micro-label shares one recipe */
+.mono-label,
+.back-link,.unit-tag,.progress,.mod-num,.mod-go,.colophon{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+}
 body::before{
   content:'';
   position:fixed;inset:0;
   z-index:9999;
   pointer-events:none;
-  opacity:0.045;
-  mix-blend-mode:screen;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat:repeat;
+  opacity:0.14;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size:256px 256px;
 }
 
-/* ═══════════════════════════════════════════════════
-   HUB LAYOUT
-   ═══════════════════════════════════════════════════ */
-.hub{
-  max-width:680px;
-  width:100%;
-  padding:2.5rem 1.5rem 4rem;
-}
+.hub{max-width:920px;margin:0 auto;padding:1.35rem 1.35rem 3.5rem;position:relative;z-index:1;}
 
-/* header */
-.hub-header{
-  text-align:center;
-  margin-bottom:3rem;
+.top-nav{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  border-bottom:1px solid var(--ink);padding-bottom:0.7rem;margin-bottom:2.1rem;
 }
-.hub-header .unit-tag{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.6rem;
-  letter-spacing:0.15em;
-  color:var(--signal);
-  text-transform:uppercase;
-  margin-bottom:0.75rem;
-  display:block;
+.back-link{
+  font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color 0.2s;
+}
+.back-link:hover{color:var(--olive-deep);}
+.back-link:focus-visible{outline:2px solid var(--olive-deep);outline-offset:3px;}
+.progress{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--ink);
+}
+.progress .count{color:var(--olive-deep);}
+
+/* ── header ───────────────────────────────────────── */
+.hub-header{margin-bottom:2.2rem;}
+.unit-tag{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.7rem;
+}
+/* anchor bar ties the eyebrow to the headline below it */
+.unit-tag::before{
+  content:'';
+  width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);
+  flex:none;
+  transform:translateY(-0.12em);
 }
 .hub-header h1{
-  font-family:'Press Start 2P',monospace;
-  font-size:1.05rem;
-  color:var(--phosphor);
-  text-shadow:0 0 18px rgba(63,224,207,0.4);
-  line-height:1.5;
-  margin-bottom:0.75rem;
+  font-family:var(--font-display);
+  font-size:clamp(2.15rem,5.4vw,3.15rem);
+  font-weight:400;
+  letter-spacing:-0.025em;
+  line-height:0.98;
+  color:var(--ink);
+  margin-bottom:0.7rem;
 }
 .hub-header .subtitle{
-  color:var(--dim);
-  font-size:0.85rem;
-  max-width:480px;
-  margin:0 auto;
+  font-size:1.15rem;
+  line-height:1.5;
+  color:var(--ink-soft);
+  max-width:52ch;
+  text-wrap:pretty;
 }
 
-/* module path */
+/* ── the ordered path ─────────────────────────────── */
 .path{
   list-style:none;
   position:relative;
+  border-top:1px solid var(--ink);
+  border-bottom:1px solid var(--ink);
 }
-/* vertical connector line */
+/* vertical connector rule down the gutter */
 .path::before{
   content:'';
   position:absolute;
-  left:18px;
-  top:0;bottom:0;
-  width:2px;
-  background:var(--panel-edge);
+  left:6px;top:0;bottom:0;
+  width:1px;
+  background:var(--ink);
+  opacity:0.45;
 }
+.path li{position:relative;}
+.path li + li{border-top:1px solid var(--ink);}
 
-.path li{
-  position:relative;
-  padding-left:52px;
-  margin-bottom:0;
+/* node marker on the path — square, printed, never glowing */
+.path li::before{
+  content:'';
+  position:absolute;
+  left:0;top:50%;
+  transform:translateY(-50%);
+  width:13px;height:13px;
+  background:var(--paper);
+  border:1px solid var(--ink);
+  z-index:1;
+  transition:background 0.25s;
 }
+.path li.visited::before{background:var(--olive-deep);}
 
 .path li a{
   display:block;
   text-decoration:none;
   color:inherit;
-  padding:1.1rem 1.25rem;
-  border:1px solid var(--panel-edge);
-  border-radius:4px;
-  background:var(--panel);
-  transition:border-color 0.2s, box-shadow 0.2s, background 0.2s;
-  position:relative;
+  padding:1.15rem 1.1rem 1.2rem 2.35rem;
+  transition:background 0.15s;
 }
-.path li a:hover,
-.path li a:focus-visible{
-  border-color:var(--phosphor-dim);
-  box-shadow:0 0 20px rgba(63,224,207,0.08);
-  background:var(--void-2);
-  outline:none;
-}
+.path li a:hover{background:rgba(126,140,69,0.16);}
+.path li a:focus-visible{outline:2px solid var(--olive-deep);outline-offset:-2px;}
 
-/* node dot on the timeline */
-.path li::before{
-  content:'';
-  position:absolute;
-  left:12px;
-  top:50%;
-  transform:translateY(-50%);
-  width:14px;height:14px;
-  border-radius:50%;
-  border:2px solid var(--panel-edge);
-  background:var(--void);
-  z-index:1;
-  transition:border-color 0.3s, box-shadow 0.3s, background 0.3s;
-}
-/* visited state */
-.path li.visited::before{
-  border-color:var(--phosphor);
-  background:var(--phosphor);
-  box-shadow:0 0 10px rgba(63,224,207,0.5);
-}
-
-/* spacer between cards */
-.path li + li{
-  margin-top:0.6rem;
-}
-
-/* module number */
+.mod-head{display:flex;align-items:baseline;justify-content:space-between;gap:0.8rem;}
 .mod-num{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.55rem;
-  color:var(--dim);
-  letter-spacing:0.1em;
-  margin-bottom:0.3rem;
   display:block;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--dim);margin-bottom:0.3rem;
 }
+.path li.visited .mod-num{color:var(--olive-deep);}
+.mod-go{
+  font-size:var(--label-xs);font-weight:600;color:var(--faint);
+  opacity:0;transition:opacity 0.15s,color 0.15s;flex:none;
+}
+.path li a:hover .mod-go,
+.path li a:focus-visible .mod-go{opacity:1;color:var(--olive-deep);}
 .mod-title{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.72rem;
+  display:block;
+  font-family:var(--font-display);
+  font-size:1.25rem;
+  font-weight:400;
+  letter-spacing:-0.02em;
+  line-height:1.15;
   color:var(--ink);
-  line-height:1.6;
-  margin-bottom:0.35rem;
+  margin-bottom:0.3rem;
 }
 .mod-teaser{
-  font-size:0.8rem;
-  color:var(--dim);
+  display:block;
+  font-size:1rem;
   line-height:1.5;
+  color:var(--ink-soft);
+  max-width:60ch;
+  text-wrap:pretty;
 }
 
-/* back link */
-.back-link{
-  display:inline-block;
-  margin-bottom:1.5rem;
-  font-size:0.75rem;
-  color:var(--dim);
-  text-decoration:none;
-  transition:color 0.2s;
+.colophon{
+  margin-top:1.5rem;
+  font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--faint);
 }
-.back-link:hover{color:var(--phosphor);}
 
-/* responsive */
-@media(max-width:520px){
-  .hub{padding:1.5rem 1rem 3rem;}
-  .hub-header h1{font-size:0.8rem;}
-  .path li a{padding:0.9rem 1rem;}
+@media(max-width:560px){
+  .hub{padding:1.1rem 1rem 3rem;}
+  .path li a{padding:1rem 0.35rem 1.05rem 2.1rem;}
+  .mod-go{display:none;}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important;}
+}
+@media print{
+  body::before{display:none;}
+  body{background:#fff;color:#000;}
+  .path li a,.hub-header h1,.mod-title,.mod-teaser{color:#000;}
+  .back-link,.mod-go{display:none;}
 }
 </style>
 </head>
 <body>
 <div class="hub">
-  <a href="../index.html" class="back-link">← All Sims</a>
+  <div class="top-nav">
+    <a href="../chemistry-11h/" class="back-link">← Chemistry 11H</a>
+    <div class="progress" id="progress">Visited <span class="count" id="progressCount">0</span> / 9</div>
+  </div>
+
   <header class="hub-header">
-    <span class="unit-tag">Unit 1b</span>
+    <div class="unit-tag"><span>Unit 1b</span></div>
     <h1>Atomic Structure</h1>
-    <p class="subtitle">Eight instruments. Build the atom from what you measure.</p>
+    <p class="subtitle">Nine instruments. Build the atom from what you measure.</p>
   </header>
 
   <ol class="path" id="modulePath">
     <li data-module="01">
       <a href="01-nucleus-isotopes.html">
-        <span class="mod-num">Module 01</span>
+        <div class="mod-head">
+          <span class="mod-num">Module 01</span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
         <span class="mod-title">Nucleus &amp; Isotopes</span>
-        <span class="mod-teaser">Build atoms. Mix isotopes. Watch the average shift.</span>
+        <span class="mod-teaser">The core building blocks.</span>
       </a>
     </li>
     <li data-module="02">
       <a href="02-coulomb-ionization.html">
-        <span class="mod-num">Module 02</span>
+        <div class="mod-head">
+          <span class="mod-num">Module 02</span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
         <span class="mod-title">Coulomb &amp; Ionization</span>
-        <span class="mod-teaser">Two charges on a track. Feel the energy well.</span>
+        <span class="mod-teaser">Energy of attraction.</span>
       </a>
     </li>
     <li data-module="03">
       <a href="03-shell-core-charge.html">
-        <span class="mod-num">Module 03</span>
+        <div class="mod-head">
+          <span class="mod-num">Module 03</span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
         <span class="mod-title">Shell Model &amp; Core Charge</span>
-        <span class="mod-teaser">IE data hides a pattern. Find the jumps.</span>
+        <span class="mod-teaser">Using IE to find patterns.</span>
       </a>
     </li>
     <li data-module="04">
       <a href="04-atomic-size.html">
-        <span class="mod-num">Module 04</span>
+        <div class="mod-head">
+          <span class="mod-num">Module 04</span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
         <span class="mod-title">Atomic Size</span>
-        <span class="mod-teaser">Line up atoms. Watch them shrink — or grow.</span>
+        <span class="mod-teaser">Relative size.</span>
       </a>
     </li>
     <li data-module="05">
       <a href="05-light-energy.html">
-        <span class="mod-num">Module 05</span>
+        <div class="mod-head">
+          <span class="mod-num">Module 05</span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
         <span class="mod-title">Light &amp; Energy</span>
-        <span class="mod-teaser">A wave, a slider. How does colour carry energy?</span>
+        <span class="mod-teaser">Electrons…Particles &amp; Waves?</span>
       </a>
     </li>
     <li data-module="06">
       <a href="06-photoelectron-spectroscopy.html">
-        <span class="mod-num">Module 06</span>
+        <div class="mod-head">
+          <span class="mod-num">Module 06</span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
         <span class="mod-title">Photoelectron Spectroscopy</span>
-        <span class="mod-teaser">The spectrometer shows what the shell model missed.</span>
+        <span class="mod-teaser">The tools that draw the atom's fingerprint.</span>
       </a>
     </li>
     <li data-module="07">
       <a href="07-electron-configurations.html">
-        <span class="mod-num">Module 07</span>
+        <div class="mod-head">
+          <span class="mod-num">Module 07</span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
         <span class="mod-title">Electron Configurations</span>
-        <span class="mod-teaser">Read the peaks. Fill the subshells. Derive the config.</span>
+        <span class="mod-teaser">PES peaks → written configurations.</span>
       </a>
     </li>
     <li data-module="08">
-      <a href="08-electron-spin.html">
-        <span class="mod-num">Module 08</span>
-        <span class="mod-title">Electron Spin</span>
-        <span class="mod-teaser">Place the arrows. The magnet knows if you're wrong.</span>
+      <a href="08-electron-diagrams-spin.html">
+        <div class="mod-head">
+          <span class="mod-num">Module 08</span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Electron Configuration Diagrams, Quantum Numbers, and Spin</span>
+        <span class="mod-teaser">Orbital boxes · Aufbau · Hund · Pauli.</span>
+      </a>
+    </li>
+    <li data-module="09">
+      <a href="09-electron-affinity-electronegativity.html">
+        <div class="mod-head">
+          <span class="mod-num">Module 09</span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Electron Affinity &amp; Electronegativity</span>
+        <span class="mod-teaser">Atomic behaviors.</span>
+      </a>
+    </li>
+    <li data-module="10">
+      <a href="10-summary.html">
+        <div class="mod-head">
+          <span class="mod-num">Module 10</span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Summary</span>
       </a>
     </li>
   </ol>
+
+  <p class="colophon">Worked in order — 06 · 07 · 08 build on each other. Revisit any of them freely.</p>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════
-   VISITED STATE (localStorage)
-   ═══════════════════════════════════════════════════ */
 (function(){
   const KEY = 'unit1b_visited';
   let visited = {};
   try { visited = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){}
 
-  document.querySelectorAll('#modulePath li').forEach(li => {
-    const mod = li.dataset.module;
-    if(visited[mod]) li.classList.add('visited');
+  const items = document.querySelectorAll('#modulePath li');
+  const countEl = document.getElementById('progressCount');
 
+  function paint(){
+    let n = 0;
+    items.forEach(li => {
+      if(visited[li.dataset.module]){ li.classList.add('visited'); n++; }
+    });
+    countEl.textContent = n;
+  }
+
+  items.forEach(li => {
     li.querySelector('a').addEventListener('click', () => {
-      visited[mod] = true;
+      visited[li.dataset.module] = true;
       try { localStorage.setItem(KEY, JSON.stringify(visited)); } catch(e){}
     });
   });
+
+  paint();
 })();
 </script>
 </body>

@@ -6,165 +6,885 @@
 <title>01 — Nucleus &amp; Isotopes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* §7 DESIGN TOKENS */
 :root{
-  --void:#0a0912;
-  --void-2:#0c0b1c;
-  --panel:#151330;
-  --panel-edge:#2a2660;
-  --grid:#211d47;
-  --phosphor:#3fe0cf;
-  --phosphor-dim:#1c6b66;
-  --ember:#ffb24d;
-  --signal:#b579ff;
-  --ink:#e9e7fb;
-  --dim:#797597;
-  --proton:#ff6b5b;
-  --neutron:#6b8bff;
-  --electron:#3fe0cf;
-  --success:#44cc66;
-  --error:#ff5555;
+  --paper:#e6e1cf;
+  --paper-2:#d8d2bc;
+  --paper-3:#c9c2a8;
+  --void:#050505;
+  --void-2:#0c0c0c;
+  --panel:#efe9d4;
+  --panel-edge:#1a1810;
+  --grid:#cfc8ae;
+  --phosphor:#5c6b28;
+  --ember:#a85a32;
+  --signal:#1a6aa3;
+  --ink:#16140e;
+  --ink-soft:#33301f;
+  --dim:#55513f;
+  --faint:#6f6b59;
+  --proton:#a85a32;
+  --neutron:#7e8c45;
+  --electron:#c4a35a;
+  --success:#4f5a28;
+  --error:#a85a32;
+  --neon:#c4a35a;
+  --olive:#7e8c45;
+  --olive-deep:#4f5a28;
+  --mustard:#c4a35a;
+  --plate:#050505;
+  --plate-ink:#e8e6d9;
+
+  --font-display:'Archivo Black',Helvetica,sans-serif;
+  --font-body:Barlow,Helvetica,Univers,'Helvetica Neue',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  /* micro-label scale — mono, uppercase, tracked */
+  --label-xs:0.72rem;
+  --label-sm:0.78rem;
+  --label-md:0.85rem;
+  --track-wide:0.13em;
+  --track-tight:0.08em;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--void);color:var(--ink);font-family:'IBM Plex Mono',monospace;min-height:100vh;overflow-x:hidden;}
-body::before{
-  content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:0.045;mix-blend-mode:screen;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+html{font-size:16px;-webkit-text-size-adjust:100%;}
+body{
+  background-color:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:1.0625rem;
+  min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
 }
-.module-wrap{max-width:900px;margin:0 auto;padding:1.5rem 1rem 3rem;}
-.back-link{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;color:var(--dim);text-decoration:none;margin-bottom:1.2rem;transition:color 0.2s;}
-.back-link:hover{color:var(--phosphor);}
-.mod-tag{font-family:'Press Start 2P',monospace;font-size:0.55rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.15em;margin-bottom:0.5rem;}
-h1{font-family:'Press Start 2P',monospace;font-size:0.9rem;color:var(--phosphor);text-shadow:0 0 12px rgba(63,224,207,0.4),0 0 30px rgba(63,224,207,0.15);margin-bottom:0.75rem;line-height:1.6;}
-.framing{font-family:'IBM Plex Mono',monospace;color:var(--dim);font-style:italic;font-size:0.85rem;line-height:1.6;margin-bottom:0.5rem;}
-.viewport{position:relative;background:var(--void-2);border:2px solid var(--panel-edge);border-radius:4px;box-shadow:0 0 0 4px var(--void),0 0 0 6px var(--panel-edge),0 0 30px rgba(63,224,207,0.06);padding:0;margin:1.5rem 0;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:none;}
-#simCanvas{width:100%;display:block;cursor:default;}
-.hud{font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--dim);padding:0.5rem 0.75rem;border-top:1px solid var(--panel-edge);background:var(--panel);display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.3rem;}
-.hud .counts span{margin-right:1rem;}
+/* every mono micro-label shares one recipe */
+.mono-label,
+.back-link,.mod-meta,.dev-skip,.task-kicker,.hud,.tier-label,
+.particle-btn .sym,.btn,.t2-field label,.t3-pct,.t3-result .label,
+.t3-eq-kicker,.summary-kicker,.debrief-kicker,.briefing-kicker,.sandbox-mode-toggle label,#stuckBtn,.ms-kicker,.ms-sample-btn,.ms-run-btn,.ms-readout .label,.ms-axis-label,.ms-peak-mass,.ms-source-cite,
+.pt-cell .z,.viewport::before{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  z-index:9999;
+  pointer-events:none;
+  opacity:0.14;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:256px 256px;
+}
+.module-wrap{max-width:920px;margin:0 auto;padding:1.35rem 1.35rem 3.5rem;position:relative;z-index:1;}
+.top-nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap;border-bottom:1px solid var(--ink);padding-bottom:0.7rem;}
+.back-link{font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color 0.2s;}
+.back-link:hover{color:var(--olive-deep);}
+.mod-meta{font-size:var(--label-xs);font-weight:600;color:var(--ink);letter-spacing:var(--track-wide);text-transform:uppercase;}
+/* DEV-ONLY-SKIP — delete this rule before publish */
+.dev-skip{
+  font-size:0.68rem;font-weight:500;letter-spacing:var(--track-tight);text-transform:uppercase;
+  background:transparent;border:1px dashed var(--ember);
+  color:var(--ember);padding:0.25rem 0.55rem;border-radius:0;cursor:pointer;
+}
+.dev-skip:hover{background:rgba(168,90,50,0.1);}
+.dev-nav{display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;}
+
+.task-card{
+  background:transparent;
+  border:none;
+  border-radius:0;
+  padding:1.15rem 0 1.25rem;
+  margin-bottom:0.6rem;
+  position:relative;
+}
+.task-kicker{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--olive-deep);
+  margin-bottom:0.7rem;
+}
+/* anchor bar ties the eyebrow to the headline below it */
+.task-kicker::before{
+  content:'';
+  width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);
+  flex:none;
+  transform:translateY(-0.12em);
+}
+.task-kicker .step{
+  font-weight:500;
+  color:var(--dim);
+  letter-spacing:0.1em;
+}
+.task-title{
+  font-family:var(--font-display);
+  font-size:clamp(1.9rem,4.7vw,2.75rem);
+  font-weight:400;
+  letter-spacing:-0.025em;
+  line-height:0.98;
+  color:var(--ink);
+  margin-bottom:0.7rem;
+}
+/* "Your task:" sits on the same line as the task itself, one step back in weight */
+.task-lead{color:var(--faint);}
+.task-sub{
+  font-size:1.15rem;
+  font-weight:400;
+  line-height:1.5;
+  color:var(--ink-soft);
+  max-width:none;
+  text-wrap:pretty;
+}
+
+.viewport{
+  position:relative;
+  background:transparent;
+  border:3px solid var(--ink);
+  border-radius:0;
+  padding:0;
+  margin:0.35rem 0 1rem;
+  overflow:hidden;
+  user-select:none;-webkit-user-select:none;
+  box-shadow:none;
+}
+.viewport::before{
+  content:attr(data-fig);
+  display:block;
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--ink);
+  background:transparent;
+  padding:0.55rem 1rem 0.42rem;
+  border-bottom:2px solid var(--ink);
+}
+#simCanvas{width:100%;display:block;cursor:pointer;position:relative;z-index:0;background:transparent;}
+.hud{
+  font-size:var(--label-sm);
+  font-weight:500;
+  letter-spacing:var(--track-tight);
+  text-transform:uppercase;
+  color:var(--ink);
+  padding:0.55rem 1rem;
+  border-top:2px solid var(--ink);
+  background:transparent;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;
+  position:relative;z-index:1;
+}
+.hud .counts span{margin-right:1.15rem;font-variant-numeric:tabular-nums;font-weight:600;}
 .hud .counts .proton-count{color:var(--proton);}
-.hud .counts .neutron-count{color:var(--neutron);}
-.hud .counts .electron-count{color:var(--electron);}
+.hud .counts .neutron-count{color:var(--olive-deep);}
+.hud .counts .mass-count{color:var(--ink);}
+.hud .counts .electron-count{color:var(--mustard);}
+
+.particle-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:0 0 1rem;border:1px solid var(--ink);}
+.particle-btn{
+  display:flex;align-items:center;justify-content:center;gap:0.6rem;
+  background:transparent;border:none;border-right:1px solid var(--ink);color:var(--ink);
+  font-family:var(--font-body);font-size:1.05rem;font-weight:600;letter-spacing:0.01em;
+  padding:0.9rem 0.75rem;border-radius:0;cursor:pointer;
+  transition:background 0.15s;
+}
+.particle-btn:last-child{border-right:none;}
+.particle-btn:hover{background:rgba(126,140,69,0.16);}
+.particle-btn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:-2px;}
+.particle-btn .orb{
+  width:18px;height:18px;border-radius:50%;flex-shrink:0;
+  border:1px solid var(--ink);
+  box-shadow:inset -2px -2px 0 rgba(22,20,14,0.28), inset 2px 2px 0 rgba(255,255,240,0.25);
+}
+.particle-btn .sym{color:var(--faint);font-weight:500;font-size:var(--label-sm);letter-spacing:0.04em;}
+.particle-btn.proton .orb{background:radial-gradient(circle at 32% 28%, #e8b48a, #a85a32 58%, #5a2c16);}
+.particle-btn.neutron .orb{background:radial-gradient(circle at 32% 28%, #d4dc90, #7e8c45 58%, #3d4420);}
+.particle-btn.electron .orb{background:radial-gradient(circle at 32% 28%, #e8d9a8, #c4a35a 58%, #6a5530);border-color:#6a5530;}
+.particle-hint{
+  font-size:0.95rem;line-height:1.5;color:var(--dim);
+  text-align:center;text-wrap:pretty;
+  max-width:56ch;margin:0.6rem auto 1.1rem;
+}
 
 /* Tier progress */
-.tier-bar{display:flex;align-items:center;gap:0.5rem;margin:1rem 0 0.75rem;flex-wrap:wrap;}
-.tier-group{display:flex;align-items:center;gap:0.25rem;}
-.tier-label{font-family:'Press Start 2P',monospace;font-size:0.45rem;color:var(--dim);margin-right:0.3rem;white-space:nowrap;}
-.tier-label.active{color:var(--phosphor);}
-.tier-label.done{color:var(--success);}
-.tier-dot{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--panel-edge);background:transparent;transition:all 0.3s;}
-.tier-dot.complete{background:var(--success);border-color:var(--success);box-shadow:0 0 6px rgba(68,204,102,0.5);}
-.tier-dot.current{border-color:var(--phosphor);box-shadow:0 0 6px rgba(63,224,207,0.4);}
-.tier-sep{width:16px;height:1px;background:var(--panel-edge);margin:0 0.25rem;}
+.tier-bar{display:flex;align-items:center;justify-content:center;gap:0.65rem;margin:0 0 0.85rem;flex-wrap:wrap;}
+.tier-group{display:flex;align-items:center;gap:0.3rem;}
+.tier-label{font-size:var(--label-xs);letter-spacing:0.11em;text-transform:uppercase;font-weight:500;color:var(--faint);margin-right:0.4rem;white-space:nowrap;}
+.tier-label.active{color:var(--olive-deep);font-weight:600;}
+.tier-label.done{color:var(--olive-deep);}
+.tier-dot{width:9px;height:9px;border-radius:0;border:1px solid var(--ink);background:transparent;transition:all 0.3s;transform:rotate(45deg);}
+.tier-dot.complete{background:var(--olive);border-color:var(--olive-deep);}
+.tier-dot.current{border-color:var(--olive-deep);background:var(--mustard);}
+.tier-sep{width:18px;height:1px;background:var(--ink);margin:0 0.2rem;opacity:0.35;}
 
-/* Challenge prompt */
-.challenge-area{margin:0.75rem 0;}
-.challenge-prompt{font-family:'Press Start 2P',monospace;font-size:0.6rem;color:var(--ember);line-height:1.8;min-height:1.5em;}
-.challenge-sub{font-size:0.75rem;color:var(--dim);margin-top:0.3rem;line-height:1.5;}
-
-/* Feedback */
-.feedback{font-family:'IBM Plex Mono',monospace;font-size:0.8rem;min-height:1.5em;margin:0.5rem 0;line-height:1.5;transition:color 0.3s;}
-.feedback.correct{color:var(--success);}
+.feedback{font-size:1.05rem;font-weight:500;min-height:1.5em;margin:0.8rem 0;line-height:1.5;text-wrap:pretty;transition:color 0.3s;}
+.feedback.correct{color:var(--olive-deep);}
 .feedback.incorrect{color:var(--ember);}
 
-/* Buttons */
-.btn{background:none;border:1px solid var(--phosphor);color:var(--phosphor);font-family:'IBM Plex Mono',monospace;font-size:0.8rem;padding:0.5rem 1.2rem;border-radius:4px;cursor:pointer;transition:background 0.2s,color 0.2s;margin-right:0.5rem;margin-top:0.5rem;}
-.btn:hover{background:rgba(63,224,207,0.1);}
-.btn:focus-visible{outline:2px solid var(--phosphor);outline-offset:2px;}
-.btn.submit{border-color:var(--success);color:var(--success);}
-.btn.submit:hover{background:rgba(68,204,102,0.1);}
-.btn.reset{border-color:var(--ember);color:var(--ember);}
-.btn.reset:hover{background:rgba(255,178,77,0.1);}
+.btn{background:transparent;border:1px solid var(--ink);color:var(--ink);font-size:var(--label-md);letter-spacing:0.09em;text-transform:uppercase;font-weight:600;padding:0.65rem 1.3rem;border-radius:0;cursor:pointer;transition:background 0.15s,color 0.15s;margin-right:0.5rem;margin-top:0.4rem;}
+.btn:hover{background:var(--ink);color:var(--paper);}
+.btn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.btn.submit{background:var(--ink);border-color:var(--ink);color:var(--paper);}
+.btn.submit:hover{background:var(--olive-deep);border-color:var(--olive-deep);}
+.btn.reset{color:var(--ember);border-color:var(--ember);}
+.btn.reset:hover{background:var(--ember);color:var(--paper);}
 .btn:disabled{opacity:0.3;cursor:default;}
+.btn:disabled:hover{border-color:var(--ink);background:transparent;color:var(--ink);filter:none;}
 
-/* Tier 2 inputs */
-.t2-inputs{display:flex;gap:1rem;flex-wrap:wrap;margin:0.5rem 0;align-items:flex-end;}
-.t2-field{display:flex;flex-direction:column;gap:0.2rem;}
-.t2-field label{font-size:0.6rem;color:var(--dim);font-family:'Press Start 2P',monospace;}
-.t2-field input{background:var(--panel);border:1px solid var(--panel-edge);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:0.9rem;padding:0.4rem 0.6rem;border-radius:3px;width:80px;text-align:center;}
-.t2-field input:focus{outline:none;border-color:var(--phosphor);box-shadow:0 0 8px rgba(63,224,207,0.2);}
+.t2-inputs{display:flex;gap:1rem;flex-wrap:wrap;margin:0.5rem 0 0.75rem;align-items:flex-end;}
+.t2-field{display:flex;flex-direction:column;gap:0.3rem;}
+.t2-field label{font-size:var(--label-xs);font-weight:600;color:var(--dim);letter-spacing:0.13em;text-transform:uppercase;}
+.t2-field input{background:transparent;border:none;border-bottom:1px solid var(--ink);color:var(--ink);font-family:var(--font-mono);font-size:1.35rem;font-weight:500;padding:0.45rem 0.2rem;border-radius:0;width:104px;text-align:center;}
+.t2-field input:focus{outline:none;border-bottom-width:2px;background:rgba(126,140,69,0.1);}
 
-/* Tier 3 sliders */
 .t3-sliders{margin:0.5rem 0;}
-.t3-row{display:flex;align-items:center;gap:0.75rem;margin:0.5rem 0;flex-wrap:wrap;}
-.t3-isotope-label{font-family:'Press Start 2P',monospace;font-size:0.5rem;color:var(--ink);min-width:70px;}
-.t3-mass{font-size:0.7rem;color:var(--dim);min-width:90px;}
-.t3-slider{flex:1;min-width:120px;-webkit-appearance:none;appearance:none;height:6px;background:var(--panel-edge);border-radius:3px;outline:none;}
-.t3-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--phosphor);cursor:pointer;box-shadow:0 0 8px rgba(63,224,207,0.4);}
-.t3-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--phosphor);cursor:pointer;border:none;}
-.t3-pct{font-size:0.75rem;color:var(--phosphor);min-width:50px;text-align:right;}
-.t3-result{margin:0.75rem 0;padding:0.75rem;background:var(--panel);border:1px solid var(--panel-edge);border-radius:4px;}
-.t3-result .label{font-family:'Press Start 2P',monospace;font-size:0.45rem;color:var(--dim);margin-bottom:0.3rem;}
-.t3-result .value{font-size:1.1rem;color:var(--phosphor);font-weight:600;}
-.t3-result .target{font-size:0.75rem;color:var(--dim);margin-top:0.2rem;}
+.t3-row{display:flex;align-items:center;gap:0.75rem;margin:0.55rem 0;flex-wrap:wrap;}
+.t3-isotope-label{font-size:1rem;font-weight:600;color:var(--ink);min-width:78px;}
+.t3-mass{font-family:var(--font-mono);font-size:var(--label-sm);font-weight:500;color:var(--dim);min-width:104px;}
+.t3-slider{flex:1;min-width:120px;-webkit-appearance:none;appearance:none;height:2px;background:var(--ink);border-radius:0;outline:none;}
+.t3-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--olive);border:1px solid var(--ink);cursor:pointer;box-shadow:none;}
+.t3-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--olive);cursor:pointer;border:1px solid var(--ink);box-shadow:none;}
+.t3-slider.t3-thumb-yellow::-webkit-slider-thumb{background:var(--mustard);box-shadow:none;}
+.t3-slider.t3-thumb-yellow::-moz-range-thumb{background:var(--mustard);box-shadow:none;}
+.t3-slider.t3-thumb-signal::-webkit-slider-thumb{background:var(--signal);box-shadow:none;}
+.t3-slider.t3-thumb-signal::-moz-range-thumb{background:var(--signal);box-shadow:none;}
+.t3-slider.t3-thumb-coral::-webkit-slider-thumb{background:var(--ember);box-shadow:none;}
+.t3-slider.t3-thumb-coral::-moz-range-thumb{background:var(--ember);box-shadow:none;}
+.t3-pct{font-size:var(--label-md);color:var(--olive-deep);min-width:58px;text-align:right;font-variant-numeric:tabular-nums;font-weight:600;}
+.t3-pct.t3-thumb-yellow{color:#8a6e22;}
+.t3-pct.t3-thumb-signal{color:var(--signal);}
+.t3-pct.t3-thumb-coral{color:var(--ember);}
+.t3-sim-controls{display:none;padding:0.45rem 1rem 0.55rem;border-top:2px solid var(--ink);background:transparent;color:var(--ink);position:relative;z-index:1;}
+.t3-sim-controls.open{display:block;}
+.t3-sim-controls.t3-grid{display:grid;grid-template-columns:1fr 1fr;column-gap:1rem;}
+.t3-sim-controls .t3-row{margin:0.28rem 0;}
+.t3-sim-controls .t3-isotope-label,
+.t3-sim-controls .t3-mass,
+.t3-sim-controls .t3-note{color:var(--ink);}
+.t3-sim-controls .t3-pct{color:var(--olive-deep);}
+.t3-sim-controls .t3-pct.t3-thumb-yellow{color:#8a6e22;}
+.t3-sim-controls .t3-pct.t3-thumb-signal{color:var(--signal);}
+.t3-sim-controls .t3-pct.t3-thumb-coral{color:var(--ember);}
+.t3-cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:0;border:2px solid var(--ink);}
+.t3-cat-card{
+  background:transparent;
+  border:none;
+  border-right:1.5px solid var(--ink);
+  border-left:3px solid var(--cat, var(--olive));
+  border-radius:0;
+  padding:0.5rem 0.55rem 0.45rem;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:0.08rem;
+}
+.t3-cat-card:last-child{border-right:none;}
+.t3-cat-title{font-family:var(--font-body);font-size:0.95rem;font-weight:700;letter-spacing:-0.005em;color:var(--ink);line-height:1.25;margin-bottom:0.14rem;}
+.t3-cat-line{font-size:0.82rem;color:var(--dim);line-height:1.4;font-variant-numeric:tabular-nums;}
+.t3-cat-line strong{color:var(--ink);font-weight:600;}
+.t3-cat-card .t3-slider{width:100%;min-width:0;margin-top:0.28rem;}
+.t3-cat-card .t3-pct{min-width:0;text-align:left;font-size:inherit;}
+.t3-result{margin:0.55rem 0;padding:0.7rem 0;background:transparent;border:none;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);border-radius:0;}
+.t3-result .label{font-size:var(--label-xs);font-weight:600;letter-spacing:0.13em;text-transform:uppercase;color:var(--dim);margin-bottom:0.28rem;}
+.t3-result .value{font-family:var(--font-display);font-size:1.55rem;letter-spacing:-0.015em;color:var(--olive-deep);font-weight:400;display:inline-block;}
+.t3-result .target{font-size:0.9rem;color:var(--dim);margin-top:0.25rem;}
+.t3-eq-block{margin:0.55rem 0 0.15rem;}
+.t3-eq-compare{margin-top:0.85rem;padding-top:0.75rem;border-top:1px solid var(--grid);}
+.t3-eq-kicker{font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.4rem;}
+.t3-eq-compare .t3-eq-kicker{color:var(--dim);}
+.t3-formula-desc{font-size:1.05rem;color:var(--ink-soft);margin-bottom:0.6rem;line-height:1.5;max-width:60ch;text-wrap:pretty;}
+.t3-eq-compare .t3-formula-desc{font-size:0.95rem;max-width:68ch;}
+.t3-formula{font-size:clamp(1.2rem,3.2vw,1.7rem);color:var(--ink);line-height:1.55;font-weight:600;font-variant-numeric:tabular-nums;word-break:break-word;}
+.t3-eq-compare .t3-formula{font-size:clamp(1.05rem,2.6vw,1.4rem);color:var(--ink-soft);font-weight:500;}
+.t3-formula-avg{color:var(--olive-deep);font-weight:700;}
+.t3-eq-compare .t3-formula-avg{color:var(--dim);font-weight:600;}
+.t3-term,.t3-num,.t3-formula-avg,.t3-result .value{display:inline-block;}
+.t3-num.t3-tip{
+  cursor:help;
+  border-bottom:1.5px dotted currentColor;
+  padding-bottom:0.02em;
+}
+.t3-num.t3-tip:hover,.t3-num.t3-tip:focus-visible{
+  background:rgba(126,140,69,0.16);
+  border-radius:0;
+}
+.t3-num.t3-tip:focus-visible{outline:2px solid var(--olive-deep);outline-offset:3px;}
+.t3-eq-tip{
+  position:fixed;
+  z-index:60;
+  max-width:min(22rem, calc(100vw - 1.5rem));
+  padding:0.7rem 0.85rem;
+  background:var(--plate);
+  border:1px solid var(--neon);
+  border-radius:0;
+  color:var(--plate-ink);
+  font-size:0.92rem;
+  font-weight:400;
+  line-height:1.5;
+  box-shadow:4px 4px 0 rgba(22,20,14,0.25);
+  pointer-events:none;
+}
+.t3-eq-tip[hidden]{display:none !important;}
+@keyframes t3-nudge{
+  0%{transform:translateY(0) scale(1);}
+  28%{transform:translateY(-7px) scale(1.16);}
+  100%{transform:translateY(0) scale(1);}
+}
+.t3-flash{animation:t3-nudge 0.42s ease;}
+.t3-tut-hint{font-size:1rem;line-height:1.5;color:var(--dim);margin:0.35rem 0 0.5rem;min-height:1.3em;text-wrap:pretty;}
+.t3-tut-hint.student-q,
+.student-q{color:var(--signal);font-weight:700;}
+/* Bridge page before the weighted-average tutorial — no equation yet */
+#t3Panel.t3-bridge .t3-eq-block,
+#t3Panel.t3-bridge .t3-result{display:none;}
+/* the legend dot is the plate's shaded sphere in miniature — the isotope colour
+   arrives inline, so the light-to-shadow ramp rides on top as a pseudo-element */
+.t3-swatch{width:11px;height:11px;border-radius:50%;display:inline-block;margin-right:0.35rem;vertical-align:middle;border:1px solid var(--ink);position:relative;overflow:hidden;box-shadow:inset -1.5px -1.5px 0 rgba(22,20,14,0.26), inset 1.5px 1.5px 0 rgba(255,255,240,0.24);}
+.t3-swatch::after{content:'';position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 32% 28%, rgba(255,246,220,0.62), rgba(255,246,220,0) 54%, rgba(18,14,8,0.34));}
+.t3-note{font-size:0.88rem;color:var(--dim);margin-top:0.2rem;}
+.module-wrap.t3-compact .task-card{padding:0.7rem 0 0.7rem;margin-bottom:0.55rem;}
+.module-wrap.t3-compact .task-kicker{margin-bottom:0.35rem;}
+.module-wrap.t3-compact .task-title{font-size:clamp(1.5rem,3.4vw,2rem);margin-bottom:0.3rem;}
+.module-wrap.t3-compact .task-sub{font-size:1rem;}
+.module-wrap.t3-compact .tier-bar{margin-bottom:0.5rem;}
+.module-wrap.t3-compact .viewport{margin:0.1rem 0 0.5rem;}
+.module-wrap.t3-compact .hud{display:none;}
+.module-wrap.t3-compact .t3-formula-desc{font-size:0.98rem;margin-bottom:0.35rem;}
+.module-wrap.t3-compact .t3-tut-hint{margin:0.2rem 0 0.3rem;min-height:1.1em;}
+@media (prefers-reduced-motion: reduce){
+  .t3-flash{animation:none;}
+}
 
-/* Sandbox mini periodic table */
-.sandbox-panel{margin:1rem 0;padding:1rem;background:var(--panel);border:1px solid var(--panel-edge);border-radius:4px;}
-.sandbox-panel h3{font-family:'Press Start 2P',monospace;font-size:0.5rem;color:var(--dim);margin-bottom:0.75rem;}
+.sandbox-panel{margin:1rem 0;padding:1.1rem 0;background:transparent;border:none;border-top:1px solid var(--ink);border-radius:0;}
+.sandbox-panel h3{font-family:var(--font-display);font-size:1.5rem;font-weight:400;letter-spacing:-0.02em;line-height:1.1;color:var(--ink);margin-bottom:0.5rem;}
+.sandbox-lead{font-size:1.05rem;line-height:1.5;color:var(--dim);margin:0 0 1rem;max-width:56ch;}
+.sandbox-stage{margin-top:1rem;}
+.sandbox-stage .viewport{margin:0.5rem 0 0.75rem;}
+.sandbox-stage .feedback{min-height:0;margin:0;}
+.sandbox-stage .feedback:not(:empty){min-height:1.5em;margin:0.5rem 0 0;}
 .mini-pt{display:grid;grid-template-columns:repeat(18,1fr);gap:2px;margin-bottom:1rem;}
-.pt-cell{background:var(--void-2);border:1px solid var(--panel-edge);border-radius:2px;padding:2px;text-align:center;cursor:pointer;transition:all 0.2s;min-height:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.pt-cell:hover{border-color:var(--phosphor);background:rgba(63,224,207,0.05);}
-.pt-cell.selected{border-color:var(--phosphor);background:rgba(63,224,207,0.12);box-shadow:0 0 8px rgba(63,224,207,0.2);}
-.pt-cell .z{font-size:0.4rem;color:var(--dim);line-height:1;}
-.pt-cell .sym{font-family:'Press Start 2P',monospace;font-size:0.4rem;color:var(--ink);line-height:1.4;}
+.pt-cell{background:rgba(255,255,250,0.35);border:1px solid var(--ink);border-radius:0;padding:4px 2px;text-align:center;cursor:pointer;transition:background 0.15s;min-height:38px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.pt-cell:hover{border-color:var(--ink);background:rgba(126,140,69,0.2);}
+.pt-cell.selected{border-color:var(--ink);background:var(--olive);color:var(--paper);}
+.pt-cell.selected .z,.pt-cell.selected .sym{color:var(--paper);}
+.pt-cell .z{font-size:0.58rem;font-weight:500;color:var(--faint);line-height:1;}
+.pt-cell .sym{font-size:0.85rem;font-weight:700;color:var(--ink);line-height:1.3;letter-spacing:-0.01em;}
 .pt-cell.empty{background:transparent;border-color:transparent;cursor:default;}
 .pt-cell.empty:hover{border-color:transparent;background:transparent;}
 .sandbox-mode-toggle{display:flex;align-items:center;gap:0.75rem;margin:0.75rem 0;}
-.sandbox-mode-toggle label{font-size:0.7rem;color:var(--dim);}
-.sandbox-mode-toggle select{background:var(--panel);border:1px solid var(--panel-edge);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:0.75rem;padding:0.3rem 0.5rem;border-radius:3px;}
+.sandbox-mode-toggle label{font-size:var(--label-xs);font-weight:600;letter-spacing:0.13em;text-transform:uppercase;color:var(--dim);}
+.sandbox-mode-toggle select{background:transparent;border:1px solid var(--ink);color:var(--ink);font-family:var(--font-body);font-size:1rem;font-weight:500;padding:0.45rem 0.6rem;border-radius:0;}
 
-/* Help */
-#stuckBtn{background:none;border:1px solid var(--signal);color:var(--signal);font-family:'IBM Plex Mono',monospace;font-size:0.8rem;padding:0.5rem 1.2rem;border-radius:4px;cursor:pointer;transition:background 0.2s,color 0.2s;margin-top:1rem;}
-#stuckBtn:hover{background:rgba(181,121,255,0.1);}
-#stuckBtn:focus-visible{outline:2px solid var(--signal);outline-offset:2px;}
-.help-panel{opacity:0;max-height:0;overflow:hidden;transition:opacity 0.3s,max-height 0.3s;border:1px solid var(--signal);background:var(--panel);border-radius:4px;padding:0 1.2rem;margin-top:0.75rem;color:var(--dim);font-size:0.85rem;line-height:1.6;}
-.help-panel.open{opacity:1;max-height:200px;padding:1rem 1.2rem;}
+/* Mass spectrometer (tier 4) */
+#msPanel{display:none;margin:0.35rem 0 0.85rem;}
+#msPanel.open{display:block;}
+.ms-layout{display:grid;gap:0.75rem;}
+.ms-guide{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0.55rem;
+  margin:0.15rem 0 0.25rem;
+}
+.ms-guide-step{
+  padding:0.45rem 0 0.35rem;
+  border-top:0.28rem solid var(--olive-deep);
+}
+.ms-guide-step .ms-kicker{margin:0 0 0.2rem;width:auto;}
+.ms-guide-step p{
+  margin:0;font-size:0.92rem;line-height:1.4;color:var(--ink-soft);
+  text-wrap:pretty;
+}
+.ms-instrument{
+  border:none;
+  background:transparent;
+  padding:0;
+  position:relative;
+  overflow:visible;
+}
+.ms-instrument svg{display:block;width:100%;height:auto;}
+.ms-callout{
+  font-family:var(--font-mono);font-size:10px;font-weight:700;
+  letter-spacing:0.12em;text-transform:uppercase;fill:var(--ink);
+}
+.ms-callout-box{fill:var(--panel);stroke:var(--ink);stroke-width:1.2;}
+.ms-anno{
+  font-family:var(--font-body);font-size:11px;font-weight:500;fill:var(--dim);
+}
+.ms-tube{fill:rgba(255,255,250,0.55);stroke:var(--ink);stroke-width:2;}
+.ms-plate{fill:var(--ember);stroke:var(--ink);stroke-width:1.2;opacity:0.85;}
+.ms-magnet{fill:#c4a07a;stroke:var(--ink);stroke-width:1.4;}
+.ms-field{fill:var(--signal);opacity:0.14;}
+.ms-cloud{fill:var(--phosphor);opacity:0.28;}
+.ms-recorder{fill:var(--panel);stroke:var(--ink);stroke-width:1.3;}
+.ms-ion{
+  fill:var(--electron);stroke:var(--ink);stroke-width:0.8;
+  opacity:0;
+  offset-rotate:auto;
+  offset-distance:0%;
+}
+/* Curved-tube paths: light = inner (most deflection), heavy = outer */
+.ms-ion.ms-light{offset-path:path('M118 120 H278 Q344 120 390 176 Q428 226 464 292 L492 354');fill:var(--mustard);}
+.ms-ion.ms-mid{offset-path:path('M118 120 H280 Q355 120 405 177 Q450 230 485 297 L512 354');fill:var(--signal);}
+.ms-ion.ms-heavy{offset-path:path('M118 120 H282 Q366 120 420 178 Q468 234 505 302 L533 354');fill:var(--ember);}
+.ms-instrument.running .ms-ion.fly{animation:ms-fly 2.6s ease-in-out both;}
+.ms-instrument.running .ms-ion.ms-light{animation-delay:0.05s;}
+.ms-instrument.running .ms-ion.ms-mid{animation-delay:0.22s;}
+.ms-instrument.running .ms-ion.ms-heavy{animation-delay:0.4s;}
+@keyframes ms-fly{
+  0%{opacity:0;offset-distance:0%;}
+  8%{opacity:1;}
+  82%{opacity:1;}
+  100%{opacity:0;offset-distance:100%;}
+}
+/* Flight traces: hidden until an ion draws them (pathLength=100 → dash units are %) */
+.ms-path-guide{
+  fill:none;stroke-width:2.2;stroke-linecap:round;opacity:0;
+  stroke-dasharray:100;stroke-dashoffset:100;
+}
+.ms-path-guide.ms-path-light{stroke:var(--mustard);}
+.ms-path-guide.ms-path-mid{stroke:var(--signal);}
+.ms-path-guide.ms-path-heavy{stroke:var(--ember);}
+.ms-path-guide.lit{opacity:1;stroke-dashoffset:0;}
+.ms-instrument.running .ms-path-guide.lit{animation:ms-trace-draw 2.6s ease-in-out both;}
+.ms-instrument.running .ms-path-light.lit{animation-delay:0.05s;}
+.ms-instrument.running .ms-path-mid.lit{animation-delay:0.22s;}
+.ms-instrument.running .ms-path-heavy.lit{animation-delay:0.4s;}
+@keyframes ms-trace-draw{
+  from{stroke-dashoffset:100;}
+  to{stroke-dashoffset:0;}
+}
+.ms-controls{display:flex;flex-wrap:wrap;gap:0.45rem;align-items:center;margin:0.1rem 0 0.25rem;}
+.ms-kicker{
+  width:100%;margin:0 0 0.15rem;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--olive-deep);
+}
+.ms-sample-btn{
+  background:transparent;border:1px solid var(--ink);color:var(--ink);
+  font-size:var(--label-xs);letter-spacing:0.1em;text-transform:uppercase;
+  font-weight:600;padding:0.55rem 0.75rem;cursor:pointer;min-width:5.5rem;
+}
+.ms-sample-btn:hover{background:rgba(126,140,69,0.16);}
+.ms-sample-btn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.ms-sample-btn.active{background:var(--ink);color:var(--paper);}
+.ms-sample-btn.done{border-color:var(--olive-deep);}
+.ms-sample-btn.unknown{border-style:dashed;}
+.ms-sample-btn .ms-tag{display:block;font-size:0.72rem;letter-spacing:0.04em;opacity:0.8;margin-top:0.15rem;text-transform:none;font-weight:600;}
+.ms-sample-btn.unknown .ms-tag{font-size:1rem;letter-spacing:0.12em;}
+.ms-run-btn{margin-top:0;}
+.ms-run-wrap{position:absolute;top:0;right:0;z-index:2;}
+.ms-spectrum{
+  border:3px solid var(--ink);
+  background:var(--paper);
+  padding:0.7rem 0.85rem 0.55rem;min-height:11rem;
+}
+.ms-spectrum.empty .ms-spectrum-body{display:none;}
+.ms-spectrum.empty .ms-spectrum-placeholder{display:block;}
+.ms-spectrum-placeholder{display:none;color:var(--dim);font-size:1rem;line-height:1.5;margin:0.2rem 0 0.4rem;}
+.ms-spectrum-body{display:grid;gap:0.55rem;}
+.ms-chart-wrap{
+  display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:0.55rem;
+  padding:0.35rem 0.35rem 0;
+}
+.ms-y-title{
+  grid-column:1;grid-row:1;justify-self:center;align-self:center;
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--dim);
+}
+.ms-chart{grid-column:2;grid-row:1;min-width:0;}
+.ms-plot{
+  position:relative;height:10.5rem;margin-left:2.6rem;
+  border-left:2px solid var(--ink);border-bottom:2px solid var(--ink);
+}
+.ms-gridline{position:absolute;left:0;right:0;height:0;border-top:1px solid var(--grid);}
+.ms-gridline.zero{border-top:none;}
+.ms-gridline span{
+  position:absolute;right:100%;top:0;transform:translate(-0.5rem,-50%);
+  font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;color:var(--ink);
+  font-variant-numeric:tabular-nums;letter-spacing:0.04em;
+}
+.ms-cols{
+  position:absolute;inset:0;display:grid;
+  grid-template-columns:repeat(var(--ms-cols,3),minmax(0,1fr));align-items:end;
+}
+.ms-peak{display:flex;align-items:flex-end;justify-content:center;height:100%;min-width:0;}
+.ms-bar{
+  width:58%;max-width:2.8rem;min-height:2px;
+  background:var(--phosphor);border:1px solid var(--ink);
+  transform-origin:bottom center;transform:scaleY(0);
+  transition:transform 0.55s ease;
+}
+.ms-spectrum.printed .ms-bar{transform:scaleY(1);}
+.ms-x-ticks{
+  display:grid;grid-template-columns:repeat(var(--ms-cols,3),minmax(0,1fr));
+  margin-left:2.6rem;padding-top:0.3rem;
+}
+.ms-peak-mass{font-family:var(--font-mono);font-size:var(--label-sm);font-weight:600;color:var(--ink);text-align:center;letter-spacing:0.04em;font-variant-numeric:tabular-nums;}
+.ms-axis-label{grid-column:2;grid-row:2;display:block;margin-top:0.35rem;font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--dim);text-align:center;}
+.ms-readouts{display:grid;grid-template-columns:1fr 1fr;gap:0.65rem;padding:0 0 0.45rem;border-bottom:1px solid var(--grid);margin-bottom:0.2rem;}
+.ms-readout .label{font-size:var(--label-xs);font-weight:600;letter-spacing:0.13em;text-transform:uppercase;color:var(--dim);margin-bottom:0.2rem;}
+.ms-readout .value{font-family:var(--font-display);font-size:1.35rem;letter-spacing:-0.015em;color:var(--olive-deep);line-height:1.15;}
+.ms-readout .detail{font-size:0.92rem;color:var(--dim);margin-top:0.2rem;line-height:1.4;}
+.ms-unknown-box{margin-top:0.35rem;padding-top:0.65rem;border-top:1px solid var(--grid);display:none;}
+.ms-unknown-box.open{display:block;}
+.ms-unknown-box .ms-id-row{display:flex;flex-wrap:wrap;gap:0.45rem;align-items:center;margin-top:0.45rem;}
+.ms-unknown-box input{
+  background:transparent;border:1px solid var(--ink);color:var(--ink);
+  font-family:var(--font-body);font-size:1rem;font-weight:600;
+  padding:0.45rem 0.55rem;width:4.5rem;border-radius:0;
+}
+.ms-unknown-box input:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.ms-source-cite{display:block;margin-top:0.55rem;font-size:0.68rem;color:var(--faint);letter-spacing:0.06em;line-height:1.45;text-transform:none;font-weight:500;}
+.ms-path-key{display:flex;flex-wrap:wrap;gap:0.85rem;margin:0.15rem 0 0.35rem;font-size:0.9rem;color:var(--dim);}
+.ms-path-key span{display:inline-flex;align-items:center;gap:0.35rem;}
+.ms-path-key i{width:12px;height:12px;border-radius:50%;border:1px solid var(--ink);display:inline-block;}
+.ms-path-key .k-light i{background:var(--mustard);}
+.ms-path-key .k-mid i{background:var(--signal);}
+.ms-path-key .k-heavy i{background:var(--ember);}
+@media (max-width:720px){
+  .ms-guide{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:640px){
+  .ms-readouts{grid-template-columns:1fr;}
+  .ms-plot{height:8rem;}
+  .ms-guide{grid-template-columns:1fr;}
+}
+@media (prefers-reduced-motion: reduce){
+  .ms-instrument.running .ms-ion{animation:none;opacity:0;}
+  .ms-instrument.running .ms-path-guide.lit{animation:none;} /* traces appear instantly */
+  .ms-spectrum.printed .ms-bar{transition:none;}
+}
+.title-tip{position:relative;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:0.18em;cursor:help;}
+.title-tip::after{
+  content:attr(data-tip);
+  position:absolute;
+  left:50%;transform:translateX(-50%);
+  top:calc(100% + 0.45rem);
+  width:max-content;max-width:32ch;
+  padding:0.45rem 0.7rem;
+  background:var(--plate);color:var(--plate-ink);
+  font-family:var(--font-body);font-size:0.92rem;font-weight:400;
+  letter-spacing:0;text-transform:none;line-height:1.4;
+  border:1px solid var(--dim);
+  pointer-events:none;opacity:0;transition:opacity 0.15s;
+  z-index:10;
+}
+.title-tip:hover::after,.title-tip:focus::after{opacity:1;}
+.inline-pt-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:0.35rem;
+  margin-left:0.5rem;
+  padding:0.32rem 0.62rem;
+  border:1px solid var(--ink);
+  background:transparent;
+  color:var(--ink);
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  cursor:pointer;
+}
+.inline-pt-btn:hover{background:var(--ink);color:var(--paper);}
+.inline-pt-btn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.pt-overlay[hidden]{display:none !important;}
+.pt-overlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:grid;
+  place-items:center;
+  padding:1.5rem;
+}
+.pt-overlay-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(5,5,5,0.82);
+}
+.pt-overlay-card{
+  position:relative;
+  z-index:1;
+  width:min(100%, 980px);
+  max-height:calc(100vh - 3rem);
+  overflow:auto;
+  padding:1rem 1rem 0.8rem;
+  background:var(--paper);
+  border:3px solid var(--ink);
+}
+.pt-overlay-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  margin-bottom:0.8rem;
+}
+.pt-overlay-title{
+  margin:0;
+  font-family:var(--font-display);
+  font-size:clamp(1.2rem,2.7vw,1.8rem);
+  line-height:1;
+  letter-spacing:-0.02em;
+  color:var(--ink);
+}
+.pt-overlay-close{
+  flex:0 0 auto;
+}
+.pt-overlay-figure{margin:0;}
+.pt-overlay-figure img{
+  display:block;
+  width:100%;
+  height:auto;
+  border:1px solid var(--ink);
+  background:#fff;
+}
+@media (max-width: 720px){
+  .pt-overlay{padding:0.75rem;}
+  .pt-overlay-card{max-height:calc(100vh - 1.5rem);padding:0.85rem 0.85rem 0.7rem;}
+  .pt-overlay-head{align-items:flex-start;}
+}
 
-/* Discovery gates */
-[data-gate]{opacity:0;transition:opacity 0.6s;pointer-events:none;max-height:0;overflow:hidden;}
-[data-gate].discovered{opacity:1;pointer-events:auto;max-height:none;}
+#stuckBtn{background:none;border:1px solid var(--ink);color:var(--ink);font-size:var(--label-sm);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:0.55rem 1.2rem;border-radius:0;cursor:pointer;transition:background 0.15s,color 0.15s;margin:0;}
+#stuckBtn:hover{background:var(--ink);color:var(--paper);}
+#stuckBtn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.module-footer{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;
+  column-gap:0.75rem;
+  row-gap:0.5rem;
+  width:100%;
+  margin-top:1.25rem;
+  min-height:2.6rem;
+}
+.module-footer[hidden]{display:none !important;}
+.module-footer-back,
+.module-footer-help,
+.module-footer-fwd{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:0.5rem;
+  min-width:0;
+}
+.module-footer-back{justify-self:start;justify-content:flex-start;}
+.module-footer-help{justify-self:center;justify-content:center;}
+.module-footer-fwd{justify-self:end;justify-content:flex-end;}
+.module-footer .btn,
+.module-footer #stuckBtn{margin:0;}
+.module-footer #stuckBtn[hidden],
+.module-footer .btn[hidden]{display:none !important;}
+@media (max-width:520px){
+  .module-footer{
+    grid-template-columns:1fr 1fr;
+    grid-template-areas:
+      "back fwd"
+      "help help";
+  }
+  .module-footer-back{grid-area:back;}
+  .module-footer-help{grid-area:help;}
+  .module-footer-fwd{grid-area:fwd;}
+}
+.help-panel{opacity:0;max-height:0;overflow:hidden;transition:opacity 0.3s,max-height 0.3s;border:1px solid transparent;background:var(--plate);border-radius:0;padding:0 1.2rem;margin-top:0.75rem;color:var(--plate-ink);font-size:1.05rem;line-height:1.6;max-width:62ch;text-wrap:pretty;}
+.help-panel.open{opacity:1;max-height:320px;padding:1rem 1.2rem;border-color:var(--neon);}
 
-/* Completion banner */
-.complete-banner{text-align:center;padding:1.5rem;margin:1rem 0;border:2px solid var(--success);border-radius:4px;background:rgba(68,204,102,0.05);}
-.complete-banner h2{font-family:'Press Start 2P',monospace;font-size:0.7rem;color:var(--success);margin-bottom:0.5rem;}
-.complete-banner p{font-size:0.8rem;color:var(--dim);}
+.complete-banner{text-align:center;padding:1.6rem 0.5rem;margin:1rem 0;border:1px solid var(--olive-deep);border-radius:0;background:rgba(126,140,69,0.12);}
+.complete-banner h2{font-family:var(--font-display);font-size:clamp(1.65rem,4vw,2.25rem);font-weight:400;letter-spacing:-0.025em;line-height:1.05;color:var(--olive-deep);margin-bottom:0.5rem;}
+.complete-banner p{font-size:1.05rem;line-height:1.5;color:var(--dim);max-width:52ch;margin:0 auto;text-wrap:pretty;}
+.summary-page{margin:0.5rem 0 1.25rem;}
+.summary-grid{display:grid;gap:0;margin:0.85rem 0 0.4rem;border:1px solid var(--ink);}
+.summary-card{
+  background:transparent;border:none;border-bottom:1px solid var(--ink);border-radius:0;
+  padding:0.95rem 1.05rem 1rem;border-left:4px solid var(--olive);
+}
+.summary-card:last-child{border-bottom:none;}
+.summary-card.identify{border-left-color:var(--ember);}
+.summary-card.aam{border-left-color:var(--signal);}
+.summary-kicker{font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.3rem;}
+.summary-card.identify .summary-kicker{color:var(--ember);}
+.summary-card.aam .summary-kicker{color:var(--signal);}
+.summary-card h3{font-family:var(--font-display);font-size:1.25rem;font-weight:400;letter-spacing:-0.02em;line-height:1.15;margin-bottom:0.45rem;}
+.summary-card ul{margin:0.15rem 0 0;padding-left:1.15rem;color:var(--ink-soft);font-size:1rem;line-height:1.5;}
+.summary-card li{margin:0.25rem 0;text-wrap:pretty;}
+.summary-card .result{color:var(--ink);font-weight:600;}
+.summary-card .muted{color:var(--dim);font-weight:500;}
 
-@media(max-width:500px){
+/* module briefing — intentions & competencies before the sim */
+.briefing{margin:0 0 0.5rem;padding:0.2rem 0 0;width:100%;}
+.briefing[hidden]{display:none;}
+.module-wrap:has(#briefing:not([hidden])){max-width:1120px;padding-left:clamp(1.35rem,4vw,2.75rem);padding-right:clamp(1.35rem,4vw,2.75rem);}
+.briefing-kicker{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.7rem;
+}
+.briefing-kicker::before{
+  content:'';width:1.6rem;height:0.28rem;background:var(--olive-deep);flex:none;
+  transform:translateY(-0.12em);
+}
+.briefing h1{
+  font-family:var(--font-display);font-size:clamp(1.85rem,4.5vw,2.55rem);
+  font-weight:400;letter-spacing:-0.025em;line-height:1.02;color:var(--ink);
+  margin-bottom:0.55rem;
+}
+.briefing-lead{font-size:1.15rem;line-height:1.55;color:var(--ink-soft);max-width:none;margin:0 0 1.5rem;text-wrap:pretty;}
+.briefing-columns{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.75rem 2.5rem;
+  align-items:start;
+}
+.briefing-actions{
+  display:flex;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  margin-top:1.75rem;
+  padding-top:1.25rem;
+  border-top:1px solid var(--ink);
+}
+.briefing .btn.submit{margin-top:0;}
+#moduleStage[hidden]{display:none;}
+
+/* module debrief — learning intentions & curricular competencies */
+.debrief{margin:0.25rem 0 1.25rem;padding:1.2rem 0 0;border-top:1px solid var(--ink);}
+.debrief[hidden]{display:none;}
+.briefing h2,
+.debrief h2{font-family:var(--font-display);font-size:1.5rem;font-weight:400;letter-spacing:-0.02em;line-height:1.1;color:var(--ink);margin-bottom:0.35rem;}
+.briefing h2{font-size:1.15rem;margin:0 0 0.85rem;letter-spacing:-0.015em;}
+.debrief-lead{font-size:1.05rem;line-height:1.5;color:var(--dim);max-width:none;margin:0 0 1.15rem;text-wrap:pretty;}
+.briefing-block,
+.debrief-block{border-left:4px solid var(--olive);padding:0.1rem 0 0.1rem 1.05rem;margin-bottom:1.15rem;}
+.briefing-block{margin-bottom:0;}
+.briefing-block:last-of-type,
+.debrief-block:last-child{margin-bottom:0;}
+.briefing-block.cc,
+.debrief-block.cc{border-left-color:var(--signal);}
+.debrief-kicker{font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.5rem;}
+.briefing-block.cc .debrief-kicker,
+.debrief-block.cc .debrief-kicker{color:var(--signal);}
+.briefing ul,
+.debrief ul{list-style:none;margin:0;padding:0;}
+.briefing li,
+.debrief li{position:relative;padding-left:1.6rem;margin:0.45rem 0;font-size:1rem;line-height:1.5;color:var(--ink-soft);max-width:none;text-wrap:pretty;}
+.briefing li{font-size:1.05rem;line-height:1.55;margin:0.55rem 0;}
+/* briefing: open markers (not yet done); debrief: ticks (work completed) */
+.briefing-li li::before{content:'\25B8';position:absolute;left:0;color:var(--olive-deep);}
+.debrief-li li::before{content:'\2713';position:absolute;left:0;color:var(--olive-deep);font-weight:700;}
+.briefing-li li.elsewhere::before,
+.debrief-li li.elsewhere::before{content:'\270E';color:var(--ember);}
+.debrief-tag{font-family:var(--font-mono);font-size:var(--label-xs);letter-spacing:0.1em;text-transform:uppercase;color:var(--ember);white-space:nowrap;}
+.debrief-revisit{
+  display:block;margin:0.35rem 0 0;padding:0;
+  border:none;background:none;cursor:pointer;text-align:left;
+  font-family:var(--font-mono);font-size:var(--label-sm);font-weight:600;
+  letter-spacing:var(--track-tight);text-transform:uppercase;
+  color:var(--signal);line-height:1.4;
+}
+.debrief-revisit:hover{color:var(--olive-deep);text-decoration:underline;}
+.debrief-revisit:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.briefing-cc li::before,
+.debrief-cc li::before{content:'\25B8';position:absolute;left:0;color:var(--signal);}
+.briefing-cc .cc-name,
+.debrief-cc .cc-name{display:block;font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--signal);margin-bottom:0.15rem;}
+@media(max-width:760px){
+  .briefing-columns{grid-template-columns:1fr;gap:1.35rem;}
+}
+@media print{
+  .debrief{break-inside:avoid;border-top-color:#000;}
+  .briefing h1,.briefing h2,.briefing li,.debrief h2,.debrief li,.debrief-kicker,.briefing-cc .cc-name,.debrief-cc .cc-name,.debrief-tag{color:#000;}
+}
+
+@media(max-width:560px){
+  .particle-bar{grid-template-columns:1fr;}
+  .particle-btn{border-right:none;border-bottom:1px solid var(--ink);}
+  .particle-btn:last-child{border-bottom:none;}
   .t2-inputs{flex-direction:column;}
   .t3-row{flex-direction:column;align-items:flex-start;}
+  .t3-slider{width:100%;min-width:0;}
+  .t3-formula{font-size:1.15rem;}
+  .t3-sim-controls.t3-grid{grid-template-columns:1fr;}
+  .t3-cat-grid{grid-template-columns:1fr 1fr;}
   .mini-pt{grid-template-columns:repeat(9,1fr);}
+}
+@media(max-width:720px){
+  .t3-cat-grid{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
 <body>
 <div class="module-wrap">
-  <a href="index.html" class="back-link">← Unit 1b</a>
-  <header>
-    <div class="mod-tag">Module 01</div>
-    <h1>Nucleus &amp; Isotopes</h1>
-    <p class="framing">A handful of particles. Drag them together and see what you've made.</p>
-  </header>
-
-  <!-- Tier progress -->
-  <div class="tier-bar" id="tierBar"></div>
-
-  <!-- Challenge prompt -->
-  <div class="challenge-area">
-    <div class="challenge-prompt" id="prompt"></div>
-    <div class="challenge-sub" id="promptSub"></div>
+  <div class="top-nav">
+    <a href="index.html" class="back-link">← Unit 1b</a>
+    <div class="mod-meta">Module 01 · Nucleus &amp; Isotopes</div>
+    <!-- DEV-ONLY-SKIP — delete this nav before publish -->
+    <div class="dev-nav">
+      <button type="button" class="dev-skip" id="devNext">DEV next</button>
+    </div>
   </div>
 
-  <div class="viewport" id="viewport">
+  <!-- Briefing — read intentions & competencies before the sim -->
+  <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
+    <div class="briefing-kicker"><span>Before you begin</span></div>
+    <h1 id="briefingTitle">Nucleus &amp; Isotopes</h1>
+    <p class="briefing-lead">Read what this module is aiming for. Then open the instrument and work through it.</p>
+    <div class="briefing-columns">
+      <div class="briefing-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="briefing-li" id="briefingIntentions"></ul>
+      </div>
+      <div class="briefing-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="briefing-cc" id="briefingCompetencies"></ul>
+      </div>
+    </div>
+    <div class="briefing-actions">
+      <button type="button" class="btn submit" id="briefingNext">Next → Start simulation</button>
+    </div>
+  </section>
+
+  <div id="moduleStage" hidden>
+  <div class="task-card">
+    <div class="task-kicker">
+      <span class="step" id="taskStep">Build · 1 of 3</span>
+    </div>
+    <h1 class="task-title"><span class="task-lead" id="promptLead">Your task: </span><span id="prompt">Build He-4</span></h1>
+    <p class="task-sub" id="promptSub">Click protons, neutrons, and electrons to build a neutral Helium-4 atom.</p>
+  </div>
+
+  <div class="tier-bar" id="tierBar"></div>
+
+  <div class="viewport" id="viewport" data-fig="FIG. 01  ·  NUCLEAR MODEL">
     <canvas id="simCanvas"></canvas>
+    <div class="t3-sim-controls" id="t3SimControls"></div>
     <div class="hud">
       <div class="counts" id="hudCounts">
         <span class="proton-count">p⁺ 0</span>
         <span class="neutron-count">n⁰ 0</span>
+        <span class="mass-count">atomic mass 0</span>
         <span class="electron-count">e⁻ 0</span>
       </div>
-      <div id="hudRight">— standby —</div>
+      <div id="hudRight"></div>
     </div>
+  </div>
+
+  <div id="particleControls">
+    <div class="particle-bar" id="particleBar">
+      <button type="button" class="particle-btn proton" data-type="proton">
+        <span class="orb"></span> Proton <span class="sym">p⁺</span>
+      </button>
+      <button type="button" class="particle-btn neutron" data-type="neutron">
+        <span class="orb"></span> Neutron <span class="sym">n⁰</span>
+      </button>
+      <button type="button" class="particle-btn electron" data-type="electron">
+        <span class="orb"></span> Electron <span class="sym">e⁻</span>
+      </button>
+    </div>
+    <p class="particle-hint" id="particleHint">Click a particle to add it. Electrons fill shells 2 then 8 then 8.<br>Click in the nucleus to remove it.</p>
   </div>
 
   <!-- Tier 2 inputs -->
@@ -176,9 +896,21 @@ h1{font-family:'Press Start 2P',monospace;font-size:0.9rem;color:var(--phosphor)
     </div>
   </div>
 
-  <!-- Tier 3 sliders -->
+  <!-- Tier 3: tutorial + sliders -->
   <div id="t3Panel" style="display:none;">
-    <div class="t3-sliders" id="t3Sliders"></div>
+    <div id="t3Tutorial" style="display:none;">
+      <p class="t3-tut-hint" id="t3TutHint"></p>
+    </div>
+    <div class="t3-eq-block">
+      <div class="t3-eq-kicker">Equation</div>
+      <p class="t3-formula-desc" id="t3FormulaDesc"></p>
+      <div class="t3-formula" id="t3Formula"></div>
+    </div>
+    <div class="t3-eq-block t3-eq-compare" id="t3EqCompare" hidden>
+      <div class="t3-eq-kicker">Equal mix comparison</div>
+      <p class="t3-formula-desc" id="t3CompareDesc"></p>
+      <div class="t3-formula" id="t3CompareFormula"></div>
+    </div>
     <div class="t3-result">
       <div class="label">Your Weighted Average</div>
       <div class="value" id="t3Avg">— amu</div>
@@ -186,25 +918,194 @@ h1{font-family:'Press Start 2P',monospace;font-size:0.9rem;color:var(--phosphor)
     </div>
   </div>
 
-  <!-- Action buttons -->
-  <div id="actionButtons">
-    <button class="btn submit" id="checkBtn" style="display:none;">Check</button>
-    <button class="btn reset" id="clearBtn" style="display:none;">Clear</button>
-    <button class="btn" id="nextBtn" style="display:none;">Next →</button>
+  <!-- Tier 4: mass spectrometer -->
+  <div id="msPanel">
+    <div class="ms-layout">
+      <div class="ms-guide" aria-label="How the instrument works">
+        <div class="ms-guide-step">
+          <div class="ms-kicker">1 · Ionisation</div>
+          <p>The sample is vaporised. An electron beam knocks electrons off atoms → positive ions.</p>
+        </div>
+        <div class="ms-guide-step">
+          <div class="ms-kicker">2 · Acceleration</div>
+          <p>Electric plates pull the ions into a fast beam through a slit.</p>
+        </div>
+        <div class="ms-guide-step">
+          <div class="ms-kicker">3 · Deflection</div>
+          <p>A magnetic field bends the beam. Lighter ions curve more sharply.</p>
+        </div>
+        <div class="ms-guide-step">
+          <div class="ms-kicker">4 · Detection</div>
+          <p>Ions hit the collector. The chart recorder prints a spectrum — peak height = abundance.</p>
+        </div>
+      </div>
+
+      <div class="ms-controls" id="msSamplePicker" role="group" aria-label="Choose a sample"></div>
+
+      <div class="ms-instrument" id="msInstrument" aria-label="Stylized mass spectrometer">
+        <div class="ms-run-wrap">
+          <button type="button" class="btn submit ms-run-btn" id="msRunBtn">Run spectrum →</button>
+        </div>
+        <svg viewBox="0 0 760 380" role="img" aria-labelledby="msSvgTitle">
+          <title id="msSvgTitle">Curved-tube mass spectrometer: ionisation, acceleration, magnetic deflection, detection</title>
+
+          <!-- Electromagnet poles flanking the bend, rotated to lie along the beam -->
+          <rect class="ms-field" x="357" y="140" width="96" height="74" transform="rotate(51 405 177)"/>
+          <rect class="ms-magnet" x="398" y="126" width="96" height="36" transform="rotate(51 446 144)"/>
+          <rect class="ms-magnet" x="313" y="194" width="96" height="36" transform="rotate(51 361 212)"/>
+          <text class="ms-anno" x="455" y="78" text-anchor="middle">electromagnet</text>
+
+          <!-- Tube walls: outer then inner (open pipe) -->
+          <path fill="none" stroke="var(--ink)" stroke-width="2.2" d="
+            M48 95
+            H275
+            Q365 95 420 160
+            Q470 220 510 295
+            L540 350"/>
+          <path fill="none" stroke="var(--ink)" stroke-width="2.2" d="
+            M48 145
+            H275
+            Q345 145 390 195
+            Q430 240 460 300
+            L485 350"/>
+          <!-- End flange caps at the tube mouth -->
+          <path fill="none" stroke="var(--ink)" stroke-width="2.2" d="M485 350 H473 M540 350 H553"/>
+          <line x1="48" y1="95" x2="48" y2="145" stroke="var(--ink)" stroke-width="2.2"/>
+
+          <!-- Sample inlet stub -->
+          <path fill="none" stroke="var(--ink)" stroke-width="1.6" d="M48 112 H22 V128 H48"/>
+          <text class="ms-anno" x="8" y="108">vaporised</text>
+          <text class="ms-anno" x="18" y="122">sample</text>
+
+          <!-- Ionisation region -->
+          <ellipse class="ms-cloud" cx="105" cy="120" rx="26" ry="14"/>
+          <line x1="105" y1="152" x2="105" y2="134" stroke="var(--phosphor)" stroke-width="1.8"/>
+          <circle cx="105" cy="156" r="4" fill="var(--phosphor)" stroke="var(--ink)" stroke-width="1"/>
+          <text class="ms-anno" x="105" y="176" text-anchor="middle">e⁻ beam</text>
+
+          <!-- Acceleration plates -->
+          <rect class="ms-plate" x="160" y="102" width="7" height="40"/>
+          <rect class="ms-plate" x="182" y="102" width="7" height="40"/>
+          <rect class="ms-plate" x="204" y="102" width="7" height="40"/>
+          <text class="ms-anno" x="185" y="92" text-anchor="middle">accel. plates</text>
+
+          <!-- Vacuum pump stub off the straight section -->
+          <path d="M232 145 V166 M248 145 V166" fill="none" stroke="var(--ink)" stroke-width="1.5"/>
+          <text class="ms-anno" x="240" y="180" text-anchor="middle">to vacuum</text>
+
+          <!-- Flight traces: light bends most (inner), all land on the detector.
+               Hidden until an ion draws them during a run. -->
+          <path id="msPathLight" class="ms-path-guide ms-path-light" pathLength="100" d="M118 120 H278 Q344 120 390 176 Q428 226 464 292 L492 354"/>
+          <path id="msPathMid" class="ms-path-guide ms-path-mid" pathLength="100" d="M118 120 H280 Q355 120 405 177 Q450 230 485 297 L512 354"/>
+          <path id="msPathHeavy" class="ms-path-guide ms-path-heavy" pathLength="100" d="M118 120 H282 Q366 120 420 178 Q468 234 505 302 L533 354"/>
+
+          <!-- Detector plate across the tube mouth -->
+          <rect x="473" y="354" width="80" height="20" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.5"/>
+          <rect x="479" y="358" width="68" height="9" fill="var(--phosphor)" stroke="var(--ink)" stroke-width="1"/>
+          <text class="ms-anno" x="465" y="368" text-anchor="end">detector</text>
+
+          <!-- Amplifier + chart recorder -->
+          <path fill="none" stroke="var(--ink)" stroke-width="1.2" d="M553 364 H596 V331 H640"/>
+          <rect class="ms-recorder" x="640" y="318" width="90" height="26"/>
+          <text class="ms-anno" x="685" y="335" text-anchor="middle">amplifier</text>
+          <rect class="ms-recorder" x="640" y="350" width="90" height="26"/>
+          <text class="ms-anno" x="685" y="367" text-anchor="middle">chart recorder</text>
+
+          <!-- cx/cy stay 0: offset-path alone positions the ions (cx adds to it) -->
+          <circle class="ms-ion ms-light" r="5" cx="0" cy="0"/>
+          <circle class="ms-ion ms-mid" r="6" cx="0" cy="0"/>
+          <circle class="ms-ion ms-heavy" r="7" cx="0" cy="0"/>
+        </svg>
+      </div>
+
+      <div class="ms-path-key" aria-hidden="true">
+        <span class="k-light"><i></i> Lighter → bends most</span>
+        <span class="k-mid"><i></i> Mid mass</span>
+        <span class="k-heavy"><i></i> Heavier → bends least</span>
+      </div>
+
+      <div class="ms-spectrum empty" id="msSpectrum" aria-live="polite">
+        <div class="ms-kicker">Printed spectrum</div>
+        <p class="ms-spectrum-placeholder">Choose a sample and run it. Peak height tracks how common each mass is.</p>
+        <div class="ms-spectrum-body">
+          <div class="ms-readouts">
+            <div class="ms-readout">
+              <div class="label">Average from this spectrum</div>
+              <div class="value" id="msAvgValue">— amu</div>
+              <div class="detail" id="msAvgDetail">Weighted average of the peak masses.</div>
+            </div>
+            <div class="ms-readout">
+              <div class="label">Sample</div>
+              <div class="value" id="msSampleName">—</div>
+              <div class="detail" id="msSampleDetail"></div>
+            </div>
+          </div>
+          <div class="ms-chart-wrap">
+            <span class="ms-y-title" aria-hidden="true">Relative abundance (%)</span>
+            <div class="ms-chart" id="msChart"></div>
+            <span class="ms-axis-label">Mass number (amu)</span>
+          </div>
+          <div class="ms-unknown-box" id="msUnknownBox">
+            <p class="student-q" id="msUnknownPrompt">What element produced this spectrum? Use the average mass and the periodic table. <button type="button" class="inline-pt-btn" data-open-periodic-table>See periodic table</button></p>
+            <div class="ms-id-row">
+              <label class="ms-kicker" for="msGuess" style="width:auto;margin:0;">Symbol</label>
+              <input id="msGuess" maxlength="2" placeholder="?" aria-label="Element symbol guess">
+              <button type="button" class="btn submit" id="msCheckBtn">Check</button>
+              <button type="button" class="btn" id="msRevealBtn">Show answer</button>
+            </div>
+            <p class="t3-note" id="msGuessFeedback"></p>
+          </div>
+        </div>
+        <span class="ms-source-cite">Isotope masses &amp; natural abundances from the University of Alberta mass spectrometry table (Audi / IUPAC).</span>
+      </div>
+    </div>
   </div>
+
+  <!-- Section footer: Back | Stuck? | Check / Clear / Next -->
+  <nav class="module-footer" id="actionButtons" aria-label="Section navigation">
+    <div class="module-footer-back">
+      <button class="btn" id="backBtn" style="display:none;">← Back</button>
+    </div>
+    <div class="module-footer-help">
+      <button type="button" id="stuckBtn">Stuck?</button>
+    </div>
+    <div class="module-footer-fwd">
+      <button class="btn reset" id="clearBtn" style="display:none;">Clear</button>
+      <button class="btn submit" id="checkBtn" style="display:none;">Check</button>
+      <button class="btn" id="nextBtn" style="display:none;">Next →</button>
+    </div>
+  </nav>
 
   <div class="feedback" id="feedback"></div>
 
-  <!-- Completion banner -->
-  <div class="complete-banner" id="completeBanner" style="display:none;">
-    <h2>Module Complete!</h2>
-    <p>You've mastered nucleus building, isotope identification, and weighted average atomic mass.</p>
+  <!-- Completion + summary -->
+  <div class="summary-page" id="summaryPage" style="display:none;">
+    <div class="complete-banner" id="completeBanner">
+      <h2>Module Complete!</h2>
+      <p>A recap of what you built, identified, and averaged — then free play in the sandbox.</p>
+    </div>
+    <div class="summary-grid" id="summaryGrid"></div>
   </div>
+
+  <!-- Debrief — learning intentions & curricular competencies -->
+  <section class="debrief" id="debrief" hidden aria-labelledby="debriefTitle">
+    <h2 id="debriefTitle">What This Was For</h2>
+    <p class="debrief-lead">The intentions behind this module, and the competencies you just practised. Read each competency statement and decide honestly how well it fits you right now.</p>
+    <div class="debrief-block">
+      <div class="debrief-kicker">Learning intentions</div>
+      <ul class="debrief-li" id="debriefIntentions"></ul>
+    </div>
+    <div class="debrief-block cc">
+      <div class="debrief-kicker">Curricular competencies</div>
+      <ul class="debrief-cc" id="debriefCompetencies"></ul>
+    </div>
+  </section>
 
   <!-- Sandbox -->
   <div id="sandboxArea" style="display:none;">
     <div class="sandbox-panel">
       <h3>Sandbox — Free Play</h3>
+      <p class="sandbox-lead" id="sandboxPrompt">Pick an element, then build its atom or explore average mass.</p>
       <div class="sandbox-mode-toggle">
         <label>Mode:</label>
         <select id="sandboxMode">
@@ -213,13 +1114,27 @@ h1{font-family:'Press Start 2P',monospace;font-size:0.9rem;color:var(--phosphor)
         </select>
       </div>
       <div class="mini-pt" id="miniPT"></div>
-      <div id="sandboxInfo" style="font-size:0.75rem;color:var(--dim);"></div>
+      <div id="sandboxInfo" style="font-size:0.95rem;line-height:1.5;color:var(--dim);max-width:60ch;"></div>
+      <div id="sandboxStage" class="sandbox-stage"></div>
     </div>
   </div>
 
-  <button id="stuckBtn">Stuck?</button>
   <div class="help-panel" id="helpPanel">
     <p id="helpText">Two atoms, same element, different mass — what did you change?</p>
+  </div>
+  </div><!-- /#moduleStage -->
+
+  <div class="pt-overlay" id="ptOverlay" hidden aria-hidden="true">
+    <div class="pt-overlay-backdrop" data-close-periodic-table></div>
+    <div class="pt-overlay-card" role="dialog" aria-modal="true" aria-labelledby="ptOverlayTitle">
+      <div class="pt-overlay-head">
+        <h2 class="pt-overlay-title" id="ptOverlayTitle">Periodic Table Reference</h2>
+        <button type="button" class="btn pt-overlay-close" id="ptOverlayClose">Close</button>
+      </div>
+      <figure class="pt-overlay-figure">
+        <img src="assets/periodic-table-reference.png" alt="Periodic table reference image.">
+      </figure>
+    </div>
   </div>
 </div>
 
@@ -274,7 +1189,10 @@ function getElementByZ(z) { return ELEMENTS.find(e => e.Z === z); }
 function acceptedAvgMass(sym) {
   const isos = ISOTOPES[sym];
   if (!isos) return 0;
-  return isos.reduce((s, i) => s + i.mass * (i.abundance / 100), 0);
+  return isos.reduce((s, i) => {
+    const mass = sym === 'B' ? Number(i.mass.toFixed(1)) : i.mass;
+    return s + mass * (i.abundance / 100);
+  }, 0);
 }
 
 // ============================================================
@@ -289,40 +1207,243 @@ function resize() {
   dpr = window.devicePixelRatio || 1;
   const rect = canvas.parentElement.getBoundingClientRect();
   W = rect.width;
-  H = Math.min(W * 0.6, 480);
+  const wrap = document.querySelector('.module-wrap');
+  if (wrap) wrap.classList.toggle('t3-compact', !!(STATE && (STATE.tier === 3 || STATE.tier === 4)));
+  if (STATE && STATE.tier === 4) {
+    H = Math.min(Math.max(W * 0.22, 120), 160);
+  } else if (STATE && STATE.tier === 3) {
+    // Carbon bridge: three mini shell diagrams + labels — keep the plate tight.
+    if (STATE.t3Phase === 'tutorial' && STATE.tutorialStep === 0) {
+      H = Math.min(Math.max(W * 0.34, 250), 290);
+    } else {
+      const isoClump = !(STATE.t3Phase === 'tutorial' && STATE.tutorialStep <= 3);
+      H = isoClump
+        ? Math.min(Math.max(W * 0.44, 290), 360)
+        : Math.min(Math.max(W * 0.38, 250), 300);
+    }
+  } else {
+    H = Math.min(W * 0.6, 480);
+  }
   canvas.width = W * dpr;
   canvas.height = H * dpr;
   canvas.style.height = H + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-window.addEventListener('resize', () => { resize(); layoutTray(); });
-resize();
+window.addEventListener('resize', resize);
 
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ============================================================
-// GLOW HELPERS
+// TEXTBOOK ILLUSTRATION — soft shade, ink, hairline
 // ============================================================
-function glowCircle(x, y, r, color, alpha = 0.2) {
+const FONT_DISPLAY = 'Archivo Black, Helvetica, sans-serif';
+const FONT_UI = 'Barlow, Helvetica, sans-serif';
+const FONT_TECH = '"IBM Plex Mono", ui-monospace, Menlo, monospace';
+const INK = '#16140e';
+const INK_LINE = 'rgba(22,20,14,0.78)';
+const INK_MID = 'rgba(22,20,14,0.52)';
+const INK_SOFT = 'rgba(22,20,14,0.62)';
+const OLIVE_DEEP = '#4f5a28';
+const PARTICLE_HEX = { proton: '#a85a32', neutron: '#7e8c45', electron: '#c4a35a' };
+
+function hexToRgb(hex) {
+  const h = String(hex).replace('#', '');
+  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+}
+function mixRgb(a, b, t) {
+  return a.map((v, i) => Math.round(v + (b[i] - v) * t));
+}
+function rgbCss(rgb, a) {
+  return a == null ? `rgb(${rgb[0]},${rgb[1]},${rgb[2]})` : `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`;
+}
+
+// Nucleon / electron orb — soft radial shade, no ink rim (rim fights the haze).
+function drawParticleSphere(x, y, r, hex) {
+  const rgb = hexToRgb(hex);
+  const light = mixRgb(rgb, [255, 246, 220], 0.55);
+  const mid = rgb;
+  const dark = mixRgb(rgb, [18, 14, 8], 0.55);
+
   ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 15;
-  ctx.fillStyle = color;
-  ctx.globalAlpha = alpha;
-  ctx.beginPath(); ctx.arc(x, y, r + 4, 0, Math.PI * 2); ctx.fill();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  const grad = ctx.createRadialGradient(
+    x - r * 0.34, y - r * 0.40, r * 0.06,
+    x + r * 0.1, y + r * 0.12, r
+  );
+  grad.addColorStop(0, rgbCss(light));
+  grad.addColorStop(0.42, rgbCss(mid));
+  grad.addColorStop(1, rgbCss(dark));
+  ctx.fillStyle = grad;
+  ctx.fill();
   ctx.restore();
 }
 
-function drawGrid(spacing = 40) {
+// Flat counting token — pale tint of the item colour, solid rim. Deliberately
+// plainer than the nucleus spheres so the number on top stays readable.
+function drawFlatToken(x, y, r, hex, label) {
+  const rgb = hexToRgb(hex);
+  const tint = mixRgb(rgb, [240, 235, 214], 0.68);
+  const rim = Math.max(1.6, r * 0.13);
+
   ctx.save();
-  ctx.strokeStyle = 'rgba(33,29,71,0.6)';
-  ctx.lineWidth = 1;
-  for (let x = 0; x < W; x += spacing) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
-  for (let y = 0; y < H; y += spacing) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = rgbCss(tint);
+  ctx.fill();
   ctx.restore();
+
+  ctx.strokeStyle = rgbCss(rgb, 0.95);
+  ctx.lineWidth = rim;
+  ctx.beginPath();
+  ctx.arc(x, y, r - rim / 2, 0, Math.PI * 2);
+  ctx.stroke();
+
+  if (label == null) return;
+  let px = Math.max(10, r * 0.86);
+  ctx.font = canvasFont(700, px + 'px', FONT_UI);
+  const maxW = (r - rim) * 1.62;
+  while (px > 8 && ctx.measureText(label).width > maxW) {
+    px -= 1;
+    ctx.font = canvasFont(700, px + 'px', FONT_UI);
+  }
+  ctx.fillStyle = INK;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x, y);
+}
+
+// An atom in the isotope sample — a smooth shaded sphere in the isotope
+// colour (same light/mid/dark mix as the particle orbs), no ink rim.
+// Mass number sits on top with a soft halo for contrast.
+function drawAtomSphere(x, y, r, hex, label) {
+  const rgb = hexToRgb(hex);
+  const light = mixRgb(rgb, [255, 246, 220], 0.62);
+  const mid = rgb;
+  const dark = mixRgb(rgb, [18, 14, 8], 0.48);
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.closePath();
+
+  // soft contact shadow so the ball lifts off the page
+  ctx.shadowColor = 'rgba(22,20,14,0.28)';
+  ctx.shadowBlur = Math.max(4, r * 0.35);
+  ctx.shadowOffsetX = r * 0.08;
+  ctx.shadowOffsetY = r * 0.12;
+
+  const grad = ctx.createRadialGradient(
+    x - r * 0.32, y - r * 0.38, r * 0.08,
+    x + r * 0.08, y + r * 0.14, r * 0.98
+  );
+  grad.addColorStop(0, rgbCss(light));
+  grad.addColorStop(0.45, rgbCss(mid));
+  grad.addColorStop(1, rgbCss(dark));
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // specular highlight — keeps the silhouette round without a stroked rim
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+  const gloss = ctx.createRadialGradient(
+    x - r * 0.32, y - r * 0.38, 0,
+    x - r * 0.32, y - r * 0.38, r * 0.55
+  );
+  gloss.addColorStop(0, 'rgba(255,250,230,0.55)');
+  gloss.addColorStop(0.55, 'rgba(255,250,230,0.12)');
+  gloss.addColorStop(1, 'rgba(255,250,230,0)');
+  ctx.fillStyle = gloss;
+  ctx.fill();
+  ctx.restore();
+
+  if (label == null) return;
+
+  let px = Math.max(8, r * 0.82);
+  ctx.font = canvasFont(700, px + 'px', FONT_UI);
+  const maxW = r * 1.5;
+  while (px > 6 && ctx.measureText(label).width > maxW) {
+    px -= 1;
+    ctx.font = canvasFont(700, px + 'px', FONT_UI);
+  }
+
+  const onPale = readableOn(hex) === INK;
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = Math.max(1.6, r * 0.18);
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = onPale ? 'rgba(239,233,212,0.94)' : 'rgba(10,8,4,0.88)';
+  ctx.strokeText(label, x, y);
+  ctx.fillStyle = onPale ? INK : '#efe9d4';
+  ctx.fillText(label, x, y);
+  ctx.restore();
+}
+
+// pick ink or paper for text sitting on a filled colour
+function readableOn(hex) {
+  const [r, g, b] = hexToRgb(hex);
+  return (r * 0.299 + g * 0.587 + b * 0.114) > 150 ? INK : '#efe9d4';
+}
+
+function strokeHandCircle(cx, cy, r, seed) {
+  const steps = Math.max(40, Math.floor(r * 0.85));
+  ctx.beginPath();
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const a = t * Math.PI * 2;
+    const wob = Math.sin(a * 3 + seed) * 0.85 + Math.sin(a * 8 + seed * 1.7) * 0.32;
+    const rr = r + wob;
+    const x = cx + Math.cos(a) * rr;
+    const y = cy + Math.sin(a) * rr;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.stroke();
+}
+
+function fillPlate() {
+  ctx.clearRect(0, 0, W, H);
+}
+
+function drawSoftCloud(cx, cy, r, hex, strength) {
+  const rgb = hexToRgb(hex);
+  const a = 0.10 + Math.min(0.28, (strength == null ? 0.55 : strength) * 0.32);
+  ctx.save();
+  const wash = ctx.createRadialGradient(cx, cy, r * 0.12, cx, cy, r);
+  wash.addColorStop(0, rgbCss(rgb, a));
+  wash.addColorStop(0.55, rgbCss(rgb, a * 0.45));
+  wash.addColorStop(1, rgbCss(rgb, 0));
+  ctx.fillStyle = wash;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+// Soft rust haze behind the nucleons — a bit larger than the packed cluster so
+// the nucleus reads as a diffuse region, not a hard outline.
+function nucleusCloudRadius(packed) {
+  const base = NUCLEUS.radius * 1.25;
+  if (!packed || !packed.length) return base;
+  let reach = 0;
+  packed.forEach(p => {
+    const d = Math.hypot(p.x - NUCLEUS.cx, p.y - NUCLEUS.cy) + p.r;
+    if (d > reach) reach = d;
+  });
+  return Math.max(base, reach * 1.28);
+}
+
+function setFigureCaption(text) {
+  if (viewportEl) viewportEl.dataset.fig = text;
+}
+
+function canvasFont(weight, size, family) {
+  return `${weight} ${size} ${family}`;
 }
 
 // ============================================================
@@ -339,52 +1460,92 @@ const STATE = {
   electrons: [],
   // Current challenge target
   target: null,
-  // Drag state
-  dragging: null,
-  completed: false
+  completed: false,
+  // Tier 3 tutorial → play
+  t3Phase: 'tutorial', // 'tutorial' | 'play'
+  tutorialStep: 0,
+  tutorialHeavy: 5,
+  tutorialTriedLopsided: false,
+  tutorialCl35: 50,
+  tutorialLi6: 50,
+  tutorialWeights: [25, 25, 25, 25],
+  t3RevealTarget: false,
+  t3CheckAttempts: 0,
+  boronResult: null,
+  // Tier 4 — mass spectrometer
+  msSampleId: 'C',
+  msPhase: 'idle', // idle | running | printed
+  msRunTimer: null,
+  msSeen: {},
+  msSolved: {}
 };
 
-// Nucleus zone: center of canvas
-const NUCLEUS = { get cx() { return W / 2; }, get cy() { return H / 2 - 30; }, get radius() { return Math.min(W, H) * 0.18; } };
-const ELECTRON_RING = { get radius() { return NUCLEUS.radius * 2.2; } };
-const TRAY_H = 60;
-const PARTICLE_R = 10;
-
-// ============================================================
-// TRAY PARTICLES (bottom of canvas)
-// ============================================================
-const trayItems = [
-  { type: 'proton', label: 'p⁺', color: '#ff6b5b' },
-  { type: 'neutron', label: 'n⁰', color: '#6b8bff' },
-  { type: 'electron', label: 'e⁻', color: '#3fe0cf' }
+const ISO_COLORS = ['#7e8c45', '#c4a35a', '#1a6aa3', '#a85a32'];
+const T3_THUMB = ['', 't3-thumb-yellow', 't3-thumb-signal', 't3-thumb-coral'];
+const TOKEN_YELLOW = '#c4a35a';
+const TUTORIAL_BAG = { lightMass: 10, heavyMass: 12, n: 10 };
+// Isotope sample size — large enough that a student can count and read a
+// ratio (Cl at nature’s mix lands 36 : 12). Kept even so allocateTokens
+// can hit clean whole-number counts at common abundances.
+const ISO_SAMPLE_N = 48;
+const TUTORIAL_COURSE = [
+  { label: 'Labs', short: 'L', mass: 82, color: ISO_COLORS[0] },
+  { label: 'Tests', short: 'T', mass: 74, color: ISO_COLORS[1] },
+  { label: 'Quizzes', short: 'Q', mass: 88, color: ISO_COLORS[2] },
+  { label: 'Exam', short: 'E', mass: 70, color: ISO_COLORS[3] }
 ];
-let trayPositions = [];
+const T3_LEARN_STEPS = 6;
+const T3_INVERSE_SYM = 'Li';
+const T3_BRIDGE_SYM = 'C';
+resize();
 
-function layoutTray() {
-  const trayY = H - TRAY_H / 2;
-  const gap = 80;
-  const startX = W / 2 - gap;
-  trayPositions = trayItems.map((item, i) => ({
-    ...item,
-    x: startX + i * gap,
-    y: trayY,
-    r: PARTICLE_R + 2
-  }));
+// Nucleus + Bohr shells (2-8-8)
+const SHELL_CAPS = [2, 8, 8];
+const NUCLEUS = {
+  get cx() { return W / 2; },
+  get cy() { return H / 2; },
+  get radius() { return Math.min(W, H) * 0.11; }
+};
+function shellRadii() {
+  const m = Math.min(W, H);
+  return [m * 0.20, m * 0.32, m * 0.44];
 }
-layoutTray();
+function shellFill(count) {
+  const fill = [0, 0, 0];
+  let remaining = Math.max(0, count);
+  for (let i = 0; i < SHELL_CAPS.length; i++) {
+    fill[i] = Math.min(SHELL_CAPS[i], remaining);
+    remaining -= fill[i];
+  }
+  return fill;
+}
+function shellConfigText(count) {
+  if (count <= 0) return '';
+  const shown = [];
+  let leftover = count;
+  for (let i = 0; i < SHELL_CAPS.length && leftover > 0; i++) {
+    const n = Math.min(SHELL_CAPS[i], leftover);
+    shown.push(n);
+    leftover -= n;
+  }
+  return shown.join('-');
+}
+
+let lastPacked = [];
+let lastElectrons = [];
 
 // ============================================================
 // CIRCLE PACKING for nucleus
 // ============================================================
-function packParticles(protonCount, neutronCount) {
+function packParticles(protonCount, neutronCount, cx, cy, r) {
   const all = [];
-  for (let i = 0; i < protonCount; i++) all.push({ type: 'proton', color: '#ff6b5b' });
-  for (let i = 0; i < neutronCount; i++) all.push({ type: 'neutron', color: '#6b8bff' });
+  for (let i = 0; i < protonCount; i++) all.push({ type: 'proton', color: PARTICLE_HEX.proton });
+  for (let i = 0; i < neutronCount; i++) all.push({ type: 'neutron', color: PARTICLE_HEX.neutron });
   if (all.length === 0) return [];
 
-  const r = 8;
-  const cx = NUCLEUS.cx;
-  const cy = NUCLEUS.cy;
+  if (cx == null) cx = NUCLEUS.cx;
+  if (cy == null) cy = NUCLEUS.cy;
+  if (r == null) r = 8;
 
   // Place in spiral
   all.forEach((p, i) => {
@@ -425,15 +1586,42 @@ function packParticles(protonCount, neutronCount) {
   return all;
 }
 
-function layoutElectrons(count) {
+// each shell orbits at its own rate, inner ones faster, alternating direction
+const SHELL_SPIN = [0.00040, -0.00026, 0.00017];
+
+function layoutElectrons(count, t) {
   const els = [];
   const cx = NUCLEUS.cx, cy = NUCLEUS.cy;
-  const ringR = ELECTRON_RING.radius;
-  for (let i = 0; i < count; i++) {
-    const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
-    els.push({ x: cx + Math.cos(angle) * ringR, y: cy + Math.sin(angle) * ringR, r: 5 });
-  }
+  const radii = shellRadii();
+  const fill = shellFill(count);
+  const time = prefersReduced ? 0 : (t || 0);
+  fill.forEach((n, shell) => {
+    const ringR = radii[shell];
+    const start = -Math.PI / 2 + shell * 0.18 + time * SHELL_SPIN[shell];
+    for (let i = 0; i < n; i++) {
+      const angle = start + (i / n) * Math.PI * 2;
+      // the ring is a hand-drawn wobble, so ride a matching wave in and out of it
+      const wave = Math.sin(angle * 3 + shell * 1.7) * ringR * 0.045
+        + Math.sin(angle * 5 - time / 780) * ringR * 0.022;
+      const rr = ringR + wave;
+      els.push({ x: cx + Math.cos(angle) * rr, y: cy + Math.sin(angle) * rr, r: 5, shell });
+    }
+  });
   return els;
+}
+
+function drawShellRings() {
+  const cx = NUCLEUS.cx, cy = NUCLEUS.cy;
+  const radii = shellRadii();
+  ctx.save();
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  radii.forEach((r, i) => {
+    ctx.strokeStyle = INK_MID;
+    ctx.lineWidth = 2.05;
+    strokeHandCircle(cx, cy, r, 0.6 + i * 1.3);
+  });
+  ctx.restore();
 }
 
 // ============================================================
@@ -443,98 +1631,57 @@ let animTime = 0;
 
 function draw(t) {
   animTime = t || 0;
-  ctx.clearRect(0, 0, W, H);
-  drawGrid();
+  fillPlate();
+
+  if (STATE.tier === 3) {
+    if (STATE.t3Phase === 'tutorial' && STATE.tutorialStep === 0) {
+      drawCarbonBridge();
+      return;
+    }
+    drawWeightedAverage();
+    return;
+  }
 
   if (STATE.mode === 'challenge' && STATE.tier === 2) {
     drawPrebuiltAtom();
     return;
   }
 
-  // Nucleus zone indicator
-  ctx.save();
-  ctx.strokeStyle = 'rgba(63,224,207,0.15)';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
-  ctx.beginPath();
-  ctx.arc(NUCLEUS.cx, NUCLEUS.cy, NUCLEUS.radius, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  // Label
-  if (STATE.protons.length === 0 && STATE.neutrons.length === 0) {
-    ctx.fillStyle = 'rgba(63,224,207,0.2)';
-    ctx.font = "0.6rem 'Press Start 2P'";
-    ctx.textAlign = 'center';
-    ctx.fillText('NUCLEUS', NUCLEUS.cx, NUCLEUS.cy - 5);
-    ctx.font = "0.5rem 'IBM Plex Mono'";
-    ctx.fillText('drag particles here', NUCLEUS.cx, NUCLEUS.cy + 12);
-  }
-  ctx.restore();
+  // pack first so the haze can be sized to sit behind the nucleons
+  lastPacked = packParticles(STATE.protons.length, STATE.neutrons.length);
+  lastElectrons = layoutElectrons(STATE.electrons.length, animTime);
 
-  // Electron ring indicator
-  ctx.save();
-  ctx.strokeStyle = 'rgba(63,224,207,0.08)';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([2, 6]);
-  ctx.beginPath();
-  ctx.arc(NUCLEUS.cx, NUCLEUS.cy, ELECTRON_RING.radius, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.restore();
-
-  // Draw placed nucleus particles
-  const packed = packParticles(STATE.protons.length, STATE.neutrons.length);
-  packed.forEach(p => {
-    glowCircle(p.x, p.y, p.r, p.color, 0.3);
-  });
-
-  // Draw electrons on ring
-  const elLayouts = layoutElectrons(STATE.electrons.length);
-  elLayouts.forEach(e => {
-    const wobble = prefersReduced ? 0 : Math.sin(animTime / 800 + e.x) * 1.5;
-    glowCircle(e.x, e.y + wobble, e.r, '#3fe0cf', 0.3);
-  });
-
-  // Tray
-  drawTray();
-
-  // Dragging particle
-  if (STATE.dragging) {
-    const d = STATE.dragging;
-    glowCircle(d.x, d.y, PARTICLE_R, d.color, 0.5);
+  drawSoftCloud(NUCLEUS.cx, NUCLEUS.cy, nucleusCloudRadius(lastPacked), PARTICLE_HEX.proton, 0.55);
+  drawShellRings();
+  // no hard nucleus outline — the cluster of protons/neutrons plus the
+  // soft haze behind them imply the nucleus
+  if (STATE.protons.length === 0 && STATE.neutrons.length === 0 && STATE.electrons.length === 0) {
     ctx.save();
-    ctx.fillStyle = '#fff';
-    ctx.font = "bold 0.5rem 'IBM Plex Mono'";
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(d.label, d.x, d.y);
+    // paper knockout so the haze and shell rings don't chew up the letterforms
+    ctx.font = canvasFont(600, '0.72rem', FONT_TECH);
+    const nucW = ctx.measureText('NUCLEUS').width;
+    ctx.fillStyle = 'rgba(230,225,207,0.82)';
+    ctx.fillRect(NUCLEUS.cx - nucW / 2 - 5, NUCLEUS.cy - 8, nucW + 10, 16);
+    ctx.fillStyle = INK;
+    ctx.fillText('NUCLEUS', NUCLEUS.cx, NUCLEUS.cy);
+
+    // park the call to action at the foot of the plate so it never fights the
+    // shell rings on a narrow canvas
+    const hint = 'ADD PARTICLES BELOW';
+    const hintY = H - 16;
+    ctx.font = canvasFont(500, '0.7rem', FONT_TECH);
+    const hintW = ctx.measureText(hint).width;
+    ctx.fillStyle = 'rgba(230,225,207,0.9)';
+    ctx.fillRect(NUCLEUS.cx - hintW / 2 - 8, hintY - 9, hintW + 16, 18);
+    ctx.fillStyle = INK_MID;
+    ctx.fillText(hint, NUCLEUS.cx, hintY);
     ctx.restore();
   }
-}
 
-function drawTray() {
-  // Tray background
-  ctx.save();
-  ctx.fillStyle = 'rgba(21,19,48,0.8)';
-  ctx.fillRect(0, H - TRAY_H, W, TRAY_H);
-  ctx.strokeStyle = 'rgba(42,38,96,0.6)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(0, H - TRAY_H);
-  ctx.lineTo(W, H - TRAY_H);
-  ctx.stroke();
-  ctx.restore();
-
-  trayPositions.forEach(tp => {
-    glowCircle(tp.x, tp.y, tp.r, tp.color, 0.4);
-    ctx.save();
-    ctx.fillStyle = '#fff';
-    ctx.font = "bold 0.5rem 'IBM Plex Mono'";
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(tp.label, tp.x, tp.y);
-    ctx.restore();
-  });
+  lastPacked.forEach(p => drawParticleSphere(p.x, p.y, p.r, p.color));
+  lastElectrons.forEach(e => drawParticleSphere(e.x, e.y, e.r, PARTICLE_HEX.electron));
 }
 
 // Pre-built atom for Tier 2
@@ -546,34 +1693,742 @@ function drawPrebuiltAtom() {
   const { Z, A } = STATE.target;
   const N = A - Z;
   t2Packed = packParticles(Z, N);
-  t2Electrons = layoutElectrons(Z);
+  t2Electrons = layoutElectrons(Z, animTime);
+  lastPacked = t2Packed;
+  lastElectrons = t2Electrons;
 
-  // Electron ring
+  // the counts sit in a ruled key along the foot of the plate, so lift the atom
+  // by half the band's height to keep the outer shell clear of it
+  const bandH = Math.max(26, Math.min(34, H * 0.09));
+  const bandY = H - bandH;
+  const outerShell = shellRadii()[SHELL_CAPS.length - 1];
+  const lift = Math.max(0, Math.min(bandH / 2, H / 2 - outerShell - 6));
+
   ctx.save();
-  ctx.strokeStyle = 'rgba(63,224,207,0.08)';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([2, 6]);
-  ctx.beginPath();
-  ctx.arc(NUCLEUS.cx, NUCLEUS.cy, ELECTRON_RING.radius, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.setLineDash([]);
+  ctx.translate(0, -lift);
+  drawSoftCloud(NUCLEUS.cx, NUCLEUS.cy, nucleusCloudRadius(t2Packed), PARTICLE_HEX.proton, 0.55);
+  drawShellRings();
+
+  t2Packed.forEach(p => drawParticleSphere(p.x, p.y, p.r, p.color));
+  t2Electrons.forEach(e => drawParticleSphere(e.x, e.y, e.r, PARTICLE_HEX.electron));
   ctx.restore();
 
-  t2Packed.forEach(p => glowCircle(p.x, p.y, p.r, p.color, 0.3));
-  t2Electrons.forEach(e => {
-    const wobble = prefersReduced ? 0 : Math.sin(animTime / 800 + e.x) * 1.5;
-    glowCircle(e.x, e.y + wobble, e.r, '#3fe0cf', 0.3);
+  drawParticleKey(Z, N, Z, bandY, bandH);
+}
+
+// Particle counts as a figure key ruled off along the bottom edge of the plate,
+// rather than type floating over the atom.
+function drawParticleKey(protons, neutrons, electrons, bandY, bandH) {
+  const items = [
+    { text: `${protons} PROTONS`, hex: PARTICLE_HEX.proton },
+    { text: `${neutrons} NEUTRONS`, hex: PARTICLE_HEX.neutron },
+    { text: `${electrons} ELECTRONS`, hex: PARTICLE_HEX.electron }
+  ];
+  const swatch = 5.5;
+
+  ctx.save();
+  ctx.fillStyle = 'rgba(230,225,207,0.94)';
+  ctx.fillRect(0, bandY, W, bandH);
+  ctx.strokeStyle = INK_LINE;
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.moveTo(0, bandY + 0.8);
+  ctx.lineTo(W, bandY + 0.8);
+  ctx.stroke();
+
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  let px = 12;
+  let gap = 20;
+  const measure = () => {
+    ctx.font = canvasFont(500, px + 'px', FONT_TECH);
+    const widths = items.map(it => swatch * 2 + 7 + ctx.measureText(it.text).width);
+    return { widths, total: widths.reduce((a, b) => a + b, 0) + gap * (items.length - 1) };
+  };
+  let box = measure();
+  while (box.total > W - 16 && px > 8) {
+    px -= 0.5;
+    gap = Math.max(10, gap - 1);
+    box = measure();
+  }
+
+  let x = Math.max(8, (W - box.total) / 2);
+  const midY = bandY + bandH / 2 + 1;
+  items.forEach((it, i) => {
+    ctx.beginPath();
+    ctx.arc(x + swatch, midY, swatch, 0, Math.PI * 2);
+    ctx.fillStyle = it.hex;
+    ctx.fill();
+    ctx.lineWidth = 1.1;
+    ctx.strokeStyle = INK_LINE;
+    ctx.stroke();
+    ctx.fillStyle = INK_SOFT;
+    ctx.fillText(it.text, x + swatch * 2 + 7, midY);
+    x += box.widths[i] + gap;
+  });
+  ctx.restore();
+}
+
+// ============================================================
+// TIER 3 — WEIGHTED AVERAGE VISUAL
+// ============================================================
+let t3MarkerAvg = null;
+let t3PulseT = -9999;
+let t3PrevTerms = {};
+
+function allocateTokens(model, n) {
+  const raw = model.items.map(it => it.frac * n);
+  const counts = raw.map(x => Math.floor(x));
+  let leftover = n - counts.reduce((a, b) => a + b, 0);
+  const order = raw.map((x, i) => ({ i, frac: x - Math.floor(x) })).sort((a, b) => b.frac - a.frac);
+  for (let k = 0; k < leftover; k++) {
+    if (!order.length) break;
+    counts[order[k % order.length].i]++;
+  }
+  return counts;
+}
+
+function shuffleInPlace(arr, seed) {
+  let s = seed | 0;
+  const rand = () => {
+    s = (Math.imul(s, 1664525) + 1013904223) | 0;
+    return (s >>> 0) / 4294967296;
+  };
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    const tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+  }
+  return arr;
+}
+
+function hexClusterPositions(n, cx, cy, gap) {
+  const s3 = Math.sqrt(3);
+  const pts = [];
+
+  if (n === 12) {
+    const rows = [4, 4, 4];
+    const rowH = gap * s3 / 2;
+    const totalH = (rows.length - 1) * rowH;
+    rows.forEach((count, i) => {
+      const y = -totalH / 2 + i * rowH;
+      const stagger = i * (gap / 2);
+      const x0 = -((count - 1) * gap) / 2 + stagger;
+      for (let k = 0; k < count; k++) pts.push({ x: x0 + k * gap, y });
+    });
+  } else {
+    const dirs = [[1, 0], [0, 1], [-1, 1], [-1, 0], [0, -1], [1, -1]];
+    const axial = [[0, 0]];
+    const seen = new Set(['0,0']);
+    let ring = 1;
+    while (axial.length < n) {
+      let q = dirs[4][0] * ring;
+      let r = dirs[4][1] * ring;
+      for (let side = 0; side < 6 && axial.length < n; side++) {
+        for (let step = 0; step < ring && axial.length < n; step++) {
+          const key = q + ',' + r;
+          if (!seen.has(key)) {
+            seen.add(key);
+            axial.push([q, r]);
+          }
+          q += dirs[side][0];
+          r += dirs[side][1];
+        }
+      }
+      ring++;
+    }
+    axial.slice(0, n).forEach(([q, r]) => {
+      pts.push({ x: gap * (q + r / 2), y: gap * r * s3 / 2 });
+    });
+  }
+
+  return pts.map(p => ({ x: p.x + cx, y: p.y + cy }));
+}
+
+function mixedTokenList(model, n) {
+  const counts = allocateTokens(model, n);
+  const order = Array.from({ length: n }, (_, i) => i);
+  shuffleInPlace(order, 20260903);
+  const tokens = new Array(n);
+  let t = 0;
+  model.items.forEach((it, i) => {
+    for (let k = 0; k < counts[i]; k++) {
+      if (t >= n) break;
+      tokens[order[t++]] = it;
+    }
+  });
+  return tokens.filter(Boolean);
+}
+
+function isotopeModelFromFracs(sym, fracs) {
+  const isos = ISOTOPES[sym];
+  return {
+    kind: 'isotope',
+    unit: 'amu',
+    sym,
+    items: isos.map((iso, i) => ({
+      label: `${sym}-${iso.A}`,
+      short: String(iso.A),
+      mass: sym === 'B' ? Number(iso.mass.toFixed(1)) : iso.mass,
+      frac: fracs[i],
+      color: ISO_COLORS[i % ISO_COLORS.length]
+    }))
+  };
+}
+
+function getT3Model() {
+  if (STATE.tier !== 3) return null;
+
+  if (STATE.mode === 'challenge' && STATE.t3Phase === 'tutorial') {
+    const step = STATE.tutorialStep;
+    if (step === 0) return null;
+    if (step <= 2) {
+      const heavy = STATE.tutorialHeavy;
+      const light = TUTORIAL_BAG.n - heavy;
+      return {
+        kind: 'bag',
+        unit: 'g',
+        items: [
+          { label: `${TUTORIAL_BAG.lightMass} g`, short: String(TUTORIAL_BAG.lightMass), mass: TUTORIAL_BAG.lightMass, count: light, frac: light / TUTORIAL_BAG.n, color: ISO_COLORS[0] },
+          { label: `${TUTORIAL_BAG.heavyMass} g`, short: String(TUTORIAL_BAG.heavyMass), mass: TUTORIAL_BAG.heavyMass, count: heavy, frac: heavy / TUTORIAL_BAG.n, color: TOKEN_YELLOW }
+        ]
+      };
+    }
+    if (step === 3) {
+      const weights = STATE.tutorialWeights;
+      const sum = weights.reduce((a, b) => a + b, 0) || 1;
+      return {
+        kind: 'grade',
+        unit: '%',
+        items: TUTORIAL_COURSE.map((it, i) => ({
+          ...it,
+          frac: weights[i] / sum
+        }))
+      };
+    }
+    if (step === 4) {
+      const f35 = STATE.tutorialCl35 / 100;
+      return isotopeModelFromFracs('Cl', [f35, 1 - f35]);
+    }
+    if (step === 5) {
+      const f6 = STATE.tutorialLi6 / 100;
+      return isotopeModelFromFracs(T3_INVERSE_SYM, [f6, 1 - f6]);
+    }
+  }
+
+  const sym = STATE.target && STATE.target.sym;
+  if (!sym || !ISOTOPES[sym]) return null;
+  const isos = ISOTOPES[sym];
+  const sliders = document.querySelectorAll('#t3SimControls .t3-slider');
+  const fracs = isos.map((_, i) => {
+    const pct = sliders[i] ? parseFloat(sliders[i].value) : (100 / isos.length);
+    return (isNaN(pct) ? 0 : pct) / 100;
+  });
+  return isotopeModelFromFracs(sym, fracs);
+}
+
+function t3Average(model) {
+  if (!model) return 0;
+  return model.items.reduce((s, it) => s + it.mass * it.frac, 0);
+}
+
+function t3AvgDecimals(model) {
+  if (model.kind === 'bag') return 2;
+  if (model.kind === 'grade') return 1;
+  if (model.sym === 'B') return 1;
+  return 4;
+}
+
+function t3MassDecimals(model) {
+  if (model.kind === 'bag' || model.kind === 'grade') return 0;
+  if (model.sym === 'B') return 1;
+  return 5;
+}
+
+function escapeAttr(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;');
+}
+
+function numSpan(key, value, color, tip) {
+  const c = color ? ` style="color:${color}"` : '';
+  if (!tip) return `<span class="t3-num" data-key="${key}"${c}>${value}</span>`;
+  return `<span class="t3-num t3-tip" data-key="${key}" data-tip="${escapeAttr(tip)}" tabindex="0" aria-describedby="t3EqTip"${c}>${value}</span>`;
+}
+
+function isotopeMassTip(it) {
+  return `This is the measured mass of one ${it.label} atom — not the mass number ${it.short}. Mass number only counts protons + neutrons as whole numbers. The real mass is a little different because protons and neutrons don’t each weigh exactly 1 amu, and a tiny amount of mass is lost as nuclear binding energy.`;
+}
+
+function isotopeAbundanceTip(it, fracStr, model) {
+  const pct = (it.frac * 100).toFixed(1);
+  const elName = (getElement(model.sym) || {}).name || model.sym;
+  return `${fracStr} is the percent abundance written as a decimal (${pct}% ÷ 100). Percent abundance is the percentage of atoms of this isotope in a naturally occurring sample of ${elName}.`;
+}
+
+function formatT3FormulaHTML(model) {
+  const avg = t3Average(model);
+  if (model.kind === 'bag') {
+    const terms = model.items.map((it, i) =>
+      `<span style="color:${it.color}">${numSpan('c' + i, it.count, it.color)}×${it.mass}</span>`
+    ).join(' + ');
+    return `(${terms}) / ${TUTORIAL_BAG.n} = <span class="t3-formula-avg">${numSpan('avg', avg.toFixed(2) + ' ' + model.unit)}</span>`;
+  }
+  if (model.kind === 'grade') {
+    const terms = model.items.map((it, i) =>
+      `<span style="color:${it.color}">${it.mass} × ${numSpan('w' + i, it.frac.toFixed(2), it.color)}</span>`
+    ).join(' + ');
+    return `${terms} = <span class="t3-formula-avg">${numSpan('avg', avg.toFixed(1) + '%')}</span>`;
+  }
+  const massDec = t3MassDecimals(model);
+  const fracDec = model.sym === 'B' ? 2 : 4;
+  const withTips = model.sym === 'Li' || model.sym === 'Cl';
+  const terms = model.items.map((it, i) => {
+    const massStr = it.mass.toFixed(massDec);
+    const fracStr = it.frac.toFixed(fracDec);
+    const massTip = withTips ? isotopeMassTip(it) : '';
+    const abundTip = withTips ? isotopeAbundanceTip(it, fracStr, model) : '';
+    return `<span style="color:${it.color}">${numSpan('m' + i, massStr, it.color, massTip)} × ${numSpan('a' + i, fracStr, it.color, abundTip)}</span>`;
+  }).join(' + ');
+  return `${terms} = <span class="t3-formula-avg">${numSpan('avg', avg.toFixed(t3AvgDecimals(model)) + ' ' + model.unit)}</span>`;
+}
+
+function equalMixGradeModel() {
+  const n = TUTORIAL_COURSE.length;
+  return {
+    kind: 'grade',
+    unit: '%',
+    items: TUTORIAL_COURSE.map(it => ({ ...it, frac: 1 / n }))
+  };
+}
+
+function formatEqualMixCompareHTML() {
+  const model = equalMixGradeModel();
+  const avg = t3Average(model);
+  const terms = model.items.map(it =>
+    `<span style="color:${it.color}">${it.mass} × 0.25</span>`
+  ).join(' + ');
+  return `${terms} = <span class="t3-formula-avg">${avg.toFixed(1)}%</span>`;
+}
+
+function formulaDescription(model) {
+  if (model.kind === 'bag') {
+    return 'Add up every token’s mass, then divide by how many tokens are in the bag. Tokens that show up more often pull the average toward their mass.';
+  }
+  if (model.kind === 'grade') {
+    return 'Multiply each mark by its weighting (as a decimal), then add. A bigger weighting pulls the final mark toward that category — the same idea as a <strong>weighted average</strong>.';
+  }
+  if (model.sym === 'Li' || model.sym === 'Cl') {
+    return 'Multiply each <strong>isotope</strong>’s mass by its <strong>percent abundance</strong> (as a decimal), then add. That sum is the <strong>average atomic mass</strong> — the number on the periodic table. Hover a mass or a decimal in the equation to see what it means.';
+  }
+  return 'Multiply each <strong>isotope</strong>’s mass by its <strong>percent abundance</strong> (as a decimal), then add. That sum is the <strong>average atomic mass</strong> — the number on the periodic table.';
+}
+
+function bindFormulaTips() {
+  const formulaEl = document.getElementById('t3Formula');
+  if (!formulaEl || formulaEl.dataset.tipBound) return;
+  formulaEl.dataset.tipBound = '1';
+
+  let tip = document.getElementById('t3EqTip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 't3EqTip';
+    tip.className = 't3-eq-tip';
+    tip.setAttribute('role', 'tooltip');
+    tip.hidden = true;
+    document.body.appendChild(tip);
+  }
+
+  let active = null;
+
+  function hideEqTip() {
+    active = null;
+    tip.hidden = true;
+  }
+
+  function positionEqTip(anchor) {
+    const r = anchor.getBoundingClientRect();
+    const pad = 8;
+    const tw = tip.offsetWidth;
+    const th = tip.offsetHeight;
+    let left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(pad, Math.min(left, window.innerWidth - tw - pad));
+    let top = r.top - th - 10;
+    if (top < pad) top = r.bottom + 10;
+    if (top + th > window.innerHeight - pad) top = Math.max(pad, r.top - th - 10);
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+  }
+
+  function showEqTip(el) {
+    if (!el) return;
+    const text = el.getAttribute('data-tip');
+    if (!text) return;
+    active = el;
+    tip.textContent = text;
+    tip.hidden = false;
+    positionEqTip(el);
+  }
+
+  formulaEl.addEventListener('pointerover', (e) => {
+    const el = e.target.closest('.t3-tip');
+    if (!el || !formulaEl.contains(el)) return;
+    showEqTip(el);
+  });
+  formulaEl.addEventListener('pointerout', (e) => {
+    const next = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('.t3-tip') : null;
+    if (next && formulaEl.contains(next)) return;
+    hideEqTip();
+  });
+  formulaEl.addEventListener('focusin', (e) => {
+    const el = e.target.closest('.t3-tip');
+    if (el) showEqTip(el);
+  });
+  formulaEl.addEventListener('focusout', (e) => {
+    if (!formulaEl.contains(e.relatedTarget)) hideEqTip();
+  });
+  window.addEventListener('scroll', () => { if (active) positionEqTip(active); }, { passive: true });
+  window.addEventListener('resize', () => { if (active) positionEqTip(active); });
+}
+
+function pulseChangedTerms() {
+  const nodes = document.querySelectorAll('#t3Formula [data-key], #t3Avg');
+  const next = {};
+  let changed = false;
+  nodes.forEach(el => {
+    const k = el.id === 't3Avg' ? 'avgBox' : el.dataset.key;
+    const v = el.textContent;
+    next[k] = v;
+    if (t3PrevTerms[k] != null && t3PrevTerms[k] !== v) {
+      changed = true;
+      el.classList.remove('t3-flash');
+      void el.offsetWidth;
+      el.classList.add('t3-flash');
+    }
+  });
+  t3PrevTerms = next;
+  if (changed) t3PulseT = animTime || 0;
+}
+
+function drawBagTokens(model, cy, bandH) {
+  const n = TUTORIAL_BAG.n;
+  const counts = allocateTokens(model, n);
+  const tokens = [];
+  model.items.forEach((it, i) => {
+    for (let k = 0; k < counts[i]; k++) tokens.push(it);
+  });
+  if (!tokens.length) return;
+
+  const maxByH = Math.max(18, (bandH || H * 0.36) * 0.46);
+  const maxByW = (W / n) * 0.38;
+  const baseR = Math.min(maxByH, maxByW);
+  const rOf = it => it.mass >= TUTORIAL_BAG.heavyMass ? baseR * 1.22 : baseR;
+  const gap = baseR * 1.22 * 2.12;
+  const totalW = (tokens.length - 1) * gap;
+  const startX = (W - totalW) / 2;
+
+  tokens.forEach((it, i) => {
+    drawFlatToken(startX + i * gap, cy, rOf(it), it.color, it.short);
+  });
+}
+
+function drawTokenMix(model, cy, bandH) {
+  if (model.kind === 'bag') {
+    drawBagTokens(model, cy, bandH);
+    return;
+  }
+
+  const n = ISO_SAMPLE_N;
+  const tokens = mixedTokenList(model, n);
+  if (!tokens.length) return;
+
+  const probe = hexClusterPositions(n, 0, 0, 1);
+  const xs = probe.map(p => p.x), ys = probe.map(p => p.y);
+  const spanW = Math.max(...xs) - Math.min(...xs) || 1;
+  const spanH = Math.max(...ys) - Math.min(...ys) || 1;
+  // Use most of the sample band — the larger n needs the width and height
+  // the old 12-atom clump left unused.
+  const fitH = Math.max(64, (bandH || H * 0.36) * 0.94);
+  const fitW = W * 0.90;
+  // centre-to-centre spacing, in radii. Packed tighter than the 12-atom
+  // layout so ~50 spheres still read as individual atoms with room for
+  // the mass number. One constant drives fit and layout together.
+  const gapK = 2.22;
+  const r = Math.max(8, Math.min(
+    13,
+    fitW / (spanW * gapK + 2.4),
+    fitH / (spanH * gapK + 2.6)
+  ));
+  const pts = hexClusterPositions(tokens.length, 0, 0, r * gapK).map((p, i) => ({
+    x: p.x + Math.sin(i * 12.9898 + 1.3) * r * 0.06,
+    y: p.y + Math.cos(i * 78.233 + 0.7) * r * 0.06
+  }));
+
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  pts.forEach(p => {
+    minX = Math.min(minX, p.x - r);
+    maxX = Math.max(maxX, p.x + r);
+    minY = Math.min(minY, p.y - r);
+    maxY = Math.max(maxY, p.y + r);
+  });
+  const ox = W / 2 - (minX + maxX) / 2;
+  const oy = cy - (minY + maxY) / 2;
+
+  // Isotopes of one element are the same size, so every atom gets the same
+  // radius — colour and the printed mass number are what tell them apart.
+  tokens.forEach((it, i) => {
+    drawAtomSphere(pts[i].x + ox, pts[i].y + oy, r, it.color, it.short);
+  });
+}
+
+function drawGradeMarks(model, cy, bandH) {
+  const n = model.items.length;
+  const maxFrac = Math.max(...model.items.map(it => it.frac), 0.01);
+  const spacing = W / (n + 1);
+  const rMax = Math.min(32, (bandH || H * 0.36) * 0.40);
+  const rMin = rMax * 0.78;
+  model.items.forEach((it, i) => {
+    const x = spacing * (i + 1);
+    const r = rMin + (rMax - rMin) * (it.frac / maxFrac);
+    drawFlatToken(x, cy, r, it.color, String(it.mass));
+    ctx.fillStyle = it.color;
+    ctx.font = canvasFont(600, '0.7rem', FONT_TECH);
+    ctx.textBaseline = 'top';
+    ctx.fillText(it.label, x, cy + r + 6);
+  });
+}
+
+function drawContributionBars(model, padX, y) {
+  const innerW = W - padX * 2;
+  const avg = t3Average(model);
+  const total = avg > 0 ? avg : 1;
+  // equal-mix intro has nothing to pull — skip the action cue there
+  const showPullHint = !(STATE.t3Phase === 'tutorial' && STATE.tutorialStep === 1);
+  if (showPullHint) {
+    ctx.fillStyle = INK_SOFT;
+    ctx.font = canvasFont(500, '0.68rem', FONT_TECH);
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(
+      model.kind === 'grade'
+        ? 'Pull toward each mark  (score × weighting)'
+        : 'Pull toward each mass  (mass × how common it is)',
+      padX, y - 10
+    );
+  }
+
+  let x = padX;
+  const h = 12;
+  model.items.forEach(it => {
+    const contrib = it.mass * it.frac;
+    const w = Math.max((contrib / total) * innerW, 0);
+    if (w <= 0.5) return;
+    ctx.fillStyle = it.color;
+    ctx.globalAlpha = 0.88;
+    ctx.fillRect(x, y, w, h);
+    ctx.globalAlpha = 1;
+    if (w > 52) {
+      ctx.fillStyle = readableOn(it.color);
+      ctx.font = canvasFont(700, '0.78rem', FONT_UI);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(contrib.toFixed(2), x + w / 2, y + h / 2);
+    }
+    x += w;
+  });
+}
+
+function drawNumberLine(model, markerMass, padX, y) {
+  const masses = model.items.map(it => it.mass);
+  let min = Math.min(...masses);
+  let max = Math.max(...masses);
+  if (max - min < 1e-6) { min -= 1; max += 1; }
+  const span = max - min;
+  const rangeMin = min - span * 0.14;
+  const rangeMax = max + span * 0.14;
+  const innerW = W - padX * 2;
+  const xOf = m => padX + ((m - rangeMin) / (rangeMax - rangeMin)) * innerW;
+
+  ctx.strokeStyle = INK_LINE;
+  ctx.lineWidth = 2.1;
+  ctx.beginPath();
+  ctx.moveTo(padX, y);
+  ctx.lineTo(W - padX, y);
+  ctx.stroke();
+
+  model.items.forEach((it, i) => {
+    const x = xOf(it.mass);
+    ctx.strokeStyle = it.color;
+    ctx.lineWidth = 2.1;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 8);
+    ctx.lineTo(x, y + 8);
+    ctx.stroke();
+    ctx.fillStyle = it.color;
+    ctx.font = canvasFont(600, '0.7rem', FONT_TECH);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const labelY = y + 12 + ((model.items.length > 2 && i % 2) ? 14 : 0);
+    ctx.fillText(model.kind === 'grade' ? it.short : it.label, x, labelY);
   });
 
-  // Count labels on nucleus
-  ctx.save();
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.font = "0.55rem 'Press Start 2P'";
+  if (model.targetMass != null) {
+    const tx = xOf(model.targetMass);
+    ctx.save();
+    ctx.strokeStyle = INK;
+    ctx.lineWidth = 2.1;
+    ctx.beginPath();
+    ctx.moveTo(tx, y - 15);
+    ctx.lineTo(tx - 8, y);
+    ctx.lineTo(tx, y + 15);
+    ctx.lineTo(tx + 8, y);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  const mx = xOf(markerMass);
+  ctx.fillStyle = OLIVE_DEEP;
+  ctx.beginPath();
+  ctx.moveTo(mx, y - 18);
+  ctx.lineTo(mx - 8, y - 6);
+  ctx.lineTo(mx + 8, y - 6);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(mx, y, 4.5, 0, Math.PI * 2);
+  ctx.fill();
+  const pulse = prefersReduced ? 1 : 1 + 0.22 * Math.max(0, 1 - (animTime - t3PulseT) / 380);
+  ctx.fillStyle = OLIVE_DEEP;
+  ctx.font = canvasFont(700, `${0.8 * pulse}rem`, FONT_TECH);
   ctx.textAlign = 'center';
-  const totalR = Math.sqrt(t2Packed.length) * 10 + 15;
-  ctx.fillText(`${Z}p⁺  ${N}n⁰`, NUCLEUS.cx, NUCLEUS.cy + totalR + 18);
-  ctx.fillText(`${Z}e⁻`, NUCLEUS.cx, NUCLEUS.cy + totalR + 34);
-  ctx.restore();
+  ctx.textBaseline = 'bottom';
+  const decimals = t3AvgDecimals(model) === 4 ? 3 : t3AvgDecimals(model);
+  ctx.fillText(`${markerMass.toFixed(decimals)} ${model.unit}`, mx, y - 22);
+}
+
+function drawCarbonBridge() {
+  // C-14 is bridge-only (not in ISOTOPES.C / AAM math). Abundance is qualitative.
+  const carbons = [
+    { A: 12, mass: 12.00000, abund: '98.93%' },
+    { A: 13, mass: 13.00336, abund: '1.07%' },
+    { A: 14, mass: 14.00324, abund: 'very small' }
+  ];
+  const Z = 6;
+  const avg = acceptedAvgMass(T3_BRIDGE_SYM);
+  const n = carbons.length;
+  const topPad = 26;
+  const labelH = 52;
+  const avgH = 22;
+  const botPad = 10;
+  const outerR = Math.min(W / (n * 2.35), (H - topPad - labelH - avgH - botPad) * 0.48, 68);
+  const cy = topPad + outerR;
+  const pr = Math.max(2.6, Math.min(4.2, outerR * 0.075));
+  const eR = Math.max(2.4, Math.min(3.6, outerR * 0.065));
+  // Carbon only needs n=1 and n=2 rings (6 e⁻ → 2 + 4)
+  const radii = [outerR * 0.52, outerR];
+  const time = prefersReduced ? 0 : animTime;
+  const labelY = cy + outerR + 10;
+
+  ctx.fillStyle = INK;
+  ctx.font = canvasFont(500, '0.72rem', FONT_TECH);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText('FIG.  —  THREE KINDS OF CARBON', W / 2, 8);
+
+  carbons.forEach((iso, i) => {
+    const cx = W * ((i + 0.5) / n);
+    const N = iso.A - Z;
+    const packed = packParticles(Z, N, cx, cy, pr);
+
+    let reach = 0;
+    packed.forEach(p => {
+      const d = Math.hypot(p.x - cx, p.y - cy) + p.r;
+      if (d > reach) reach = d;
+    });
+    drawSoftCloud(cx, cy, Math.max(outerR * 0.28, reach * 1.28), PARTICLE_HEX.proton, 0.55);
+
+    ctx.save();
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    radii.forEach((r, si) => {
+      ctx.strokeStyle = INK_MID;
+      ctx.lineWidth = 1.6;
+      strokeHandCircle(cx, cy, r, 0.6 + si * 1.3 + i * 0.4);
+    });
+    ctx.restore();
+
+    packed.forEach(p => drawParticleSphere(p.x, p.y, p.r, p.color));
+
+    const fill = shellFill(Z);
+    fill.forEach((count, shell) => {
+      if (!count || !radii[shell]) return;
+      const ringR = radii[shell];
+      const start = -Math.PI / 2 + shell * 0.18 + time * SHELL_SPIN[shell] + i * 0.35;
+      for (let k = 0; k < count; k++) {
+        const angle = start + (k / count) * Math.PI * 2;
+        const wave = Math.sin(angle * 3 + shell * 1.7) * ringR * 0.045
+          + Math.sin(angle * 5 - time / 780) * ringR * 0.022;
+        const rr = ringR + wave;
+        drawParticleSphere(cx + Math.cos(angle) * rr, cy + Math.sin(angle) * rr, eR, PARTICLE_HEX.electron);
+      }
+    });
+
+    const color = ISO_COLORS[i % ISO_COLORS.length];
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = color;
+    ctx.font = canvasFont(700, '0.95rem', FONT_UI);
+    ctx.fillText(`${T3_BRIDGE_SYM}-${iso.A}`, cx, labelY);
+
+    ctx.fillStyle = INK_SOFT;
+    ctx.font = canvasFont(500, '0.72rem', FONT_TECH);
+    ctx.fillText(`${iso.mass.toFixed(5)} amu`, cx, labelY + 18);
+    ctx.fillText(iso.abund, cx, labelY + 34);
+  });
+
+  ctx.fillStyle = OLIVE_DEEP;
+  ctx.font = canvasFont(600, '0.8rem', FONT_TECH);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText(`periodic table ≈ ${avg.toFixed(2)} amu`, W / 2, labelY + labelH);
+}
+
+function drawWeightedAverage() {
+  const model = getT3Model();
+  if (!model) return;
+  const avg = t3Average(model);
+  if (t3MarkerAvg == null || prefersReduced) t3MarkerAvg = avg;
+  else t3MarkerAvg += (avg - t3MarkerAvg) * 0.2;
+
+  const isIso = model.kind !== 'bag' && model.kind !== 'grade';
+  const padX = Math.max(isIso ? 40 : 28, W * (isIso ? 0.08 : 0.06));
+  // Isotope samples need a taller band so the larger atom count stays countable.
+  // Leave enough air under the bars for the number-line marker + tick labels.
+  const barY = isIso ? H * 0.74 : H * 0.60;
+  const sampleTop = isIso ? 26 : 26;
+  const sampleBot = barY - (isIso ? 22 : 32);
+  const sampleCy = (sampleTop + sampleBot) / 2;
+  const bandH = sampleBot - sampleTop;
+
+  ctx.fillStyle = INK;
+  ctx.font = canvasFont(500, '0.72rem', FONT_TECH);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  const title = model.kind === 'bag'
+    ? 'FIG.  —  A BAG OF 10 TOKENS'
+    : model.kind === 'grade'
+      ? 'FIG.  —  A FINAL COURSE MARK'
+      : `FIG.  —  A SAMPLE OF ${ISO_SAMPLE_N} ${model.sym} ATOMS`;
+  ctx.fillText(title, W / 2, 8);
+
+  if (model.kind === 'grade') drawGradeMarks(model, sampleCy, bandH);
+  else drawTokenMix(model, sampleCy, bandH);
+  drawContributionBars(model, padX, barY);
+  drawNumberLine(model, t3MarkerAvg, padX, isIso ? H * 0.90 : H * 0.82);
 }
 
 // ============================================================
@@ -582,130 +2437,493 @@ function drawPrebuiltAtom() {
 function updateHUD() {
   const counts = document.getElementById('hudCounts');
   const right = document.getElementById('hudRight');
-  counts.innerHTML = `<span class="proton-count">p⁺ ${STATE.protons.length}</span><span class="neutron-count">n⁰ ${STATE.neutrons.length}</span><span class="electron-count">e⁻ ${STATE.electrons.length}</span>`;
 
-  if (STATE.protons.length > 0) {
-    const el = getElementByZ(STATE.protons.length);
-    const A = STATE.protons.length + STATE.neutrons.length;
-    if (el) {
-      right.textContent = `${el.name}-${A} (${el.sym})`;
-      right.style.color = 'var(--phosphor)';
-    } else {
-      right.textContent = `Z=${STATE.protons.length}`;
-      right.style.color = 'var(--dim)';
+  if (STATE.tier === 3) {
+    const model = getT3Model();
+    if (!model) {
+      counts.innerHTML = '';
+      right.textContent = '';
+      return;
     }
-  } else {
-    right.textContent = '— drag to build —';
-    right.style.color = 'var(--dim)';
+    const avg = t3Average(model);
+    const decimals = t3AvgDecimals(model);
+    counts.innerHTML = model.items.map(it => {
+      const val = model.kind === 'bag' ? `${it.count}` : `${(it.frac * 100).toFixed(1)}%`;
+      return `<span style="color:${it.color}">${it.label} ${val}</span>`;
+    }).join('') + `<span class="mass-count">avg ${avg.toFixed(decimals)} ${model.unit}</span>`;
+    right.textContent = '';
+    return;
   }
+
+  const p = STATE.protons.length;
+  const n = STATE.neutrons.length;
+  const eCount = STATE.electrons.length;
+  const A = p + n;
+  const cfg = shellConfigText(eCount);
+  const eLabel = cfg ? `e⁻ ${eCount}  (${cfg})` : `e⁻ ${eCount}`;
+  counts.innerHTML = `<span class="proton-count">p⁺ ${p}</span><span class="neutron-count">n⁰ ${n}</span><span class="mass-count">atomic mass ${A}</span><span class="electron-count">${eLabel}</span>`;
+
+  // Don't reveal the element's identity while the student is still building.
+  right.textContent = '';
 }
 
-// ============================================================
-// DRAG AND DROP
-// ============================================================
-function getEventPos(e) {
-  const rect = canvas.getBoundingClientRect();
-  const touch = e.touches ? e.touches[0] : e;
-  return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
-}
-
-function hitTray(pos) {
-  for (const tp of trayPositions) {
-    const dx = pos.x - tp.x, dy = pos.y - tp.y;
-    if (dx * dx + dy * dy < (tp.r + 8) * (tp.r + 8)) return tp;
-  }
-  return null;
-}
-
-function onPointerDown(e) {
+function addParticle(type) {
   if (STATE.tier === 2 && STATE.mode === 'challenge') return;
   if (STATE.tier === 3 && STATE.mode === 'challenge') return;
-  const pos = getEventPos(e);
-  const hit = hitTray(pos);
-  if (hit) {
-    STATE.dragging = { type: hit.type, color: hit.color, label: hit.label, x: pos.x, y: pos.y };
-    e.preventDefault();
+  if (type === 'proton') STATE.protons.push({});
+  else if (type === 'neutron') STATE.neutrons.push({});
+  if (type === 'electron') {
+    if (STATE.electrons.length >= 18) return;
+    STATE.electrons.push({});
   }
-}
-
-function onPointerMove(e) {
-  if (!STATE.dragging) return;
-  const pos = getEventPos(e);
-  STATE.dragging.x = pos.x;
-  STATE.dragging.y = pos.y;
-  e.preventDefault();
-}
-
-function onPointerUp(e) {
-  if (!STATE.dragging) return;
-  const d = STATE.dragging;
-  const dx = d.x - NUCLEUS.cx, dy = d.y - NUCLEUS.cy;
-  const distToCenter = Math.sqrt(dx * dx + dy * dy);
-
-  if (d.type === 'electron') {
-    // Drop anywhere above tray counts as placing electron
-    if (d.y < H - TRAY_H) {
-      STATE.electrons.push({});
-    }
-  } else {
-    // Proton or neutron — drop in nucleus zone
-    if (distToCenter < NUCLEUS.radius * 1.5) {
-      if (d.type === 'proton') STATE.protons.push({});
-      else STATE.neutrons.push({});
-    }
-  }
-
-  STATE.dragging = null;
   updateHUD();
 }
 
-canvas.addEventListener('mousedown', onPointerDown);
-canvas.addEventListener('mousemove', onPointerMove);
-canvas.addEventListener('mouseup', onPointerUp);
-canvas.addEventListener('mouseleave', onPointerUp);
-canvas.addEventListener('touchstart', onPointerDown, { passive: false });
-canvas.addEventListener('touchmove', onPointerMove, { passive: false });
-canvas.addEventListener('touchend', onPointerUp);
+function getEventPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const touch = e.changedTouches ? e.changedTouches[0] : e;
+  return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+}
+
+function removeAt(pos) {
+  if (STATE.tier === 2 && STATE.mode === 'challenge') return;
+  if (STATE.tier === 3 && STATE.mode === 'challenge') return;
+  for (let i = lastElectrons.length - 1; i >= 0; i--) {
+    const e = lastElectrons[i];
+    const dx = pos.x - e.x, dy = pos.y - e.y;
+    if (dx * dx + dy * dy < (e.r + 8) * (e.r + 8)) {
+      STATE.electrons.pop();
+      updateHUD();
+      return;
+    }
+  }
+  for (let i = lastPacked.length - 1; i >= 0; i--) {
+    const p = lastPacked[i];
+    const dx = pos.x - p.x, dy = pos.y - p.y;
+    if (dx * dx + dy * dy < (p.r + 6) * (p.r + 6)) {
+      if (p.type === 'proton') STATE.protons.pop();
+      else STATE.neutrons.pop();
+      updateHUD();
+      return;
+    }
+  }
+}
+
+document.querySelectorAll('.particle-btn').forEach(btn => {
+  btn.addEventListener('click', () => addParticle(btn.dataset.type));
+});
+canvas.addEventListener('click', (e) => removeAt(getEventPos(e)));
 
 // ============================================================
 // CHALLENGE SYSTEM
 // ============================================================
 const TIER1_CHALLENGES = [
-  { sym: 'He', A: 4, hint: 'Helium-4 is the most common helium isotope. It has 2 protons.' },
+  { sym: 'He', A: 4, hint: 'Helium-4 is the most common helium <strong>isotope</strong>. It has 2 protons.' },
   { sym: 'C', A: 13, hint: 'Carbon-13 has one extra neutron compared to Carbon-12.' },
   { sym: 'O', A: 18, hint: 'Oxygen always has 8 protons. How many neutrons make A = 18?' }
 ];
 
 const TIER2_CHALLENGES = [
-  { sym: 'Li', A: 7, hint: 'Count the red particles for Z. Red + blue = A.' },
+    { sym: 'Li', A: 7, hint: 'Count the rust-colored protons for Z. Rust + olive = A.' },
   { sym: 'N', A: 14, hint: 'This element has 7 protons. Which element is that?' },
   { sym: 'Si', A: 28, hint: '14 protons and 14 neutrons. Check the periodic table!' }
 ];
 
 const TIER3_CHALLENGES = [
-  { sym: 'Cl', hint: 'Chlorine has two main isotopes: Cl-35 and Cl-37.' },
-  { sym: 'Mg', hint: 'Magnesium has three isotopes. The lightest is most abundant.' },
-  { sym: 'Ne', hint: 'Neon has three isotopes, with Ne-20 being dominant.' }
+  { sym: 'B', hint: 'Boron has two main <strong>isotopes</strong>: B-10 and B-11. The heavier one is more common. Match the average to one decimal place.' }
 ];
 
+// Mass-spec samples — masses & abundances from UAlberta Audi/IUPAC table
+const MS_SAMPLES = [
+  {
+    id: 'C', known: true, sym: 'C', name: 'Carbon',
+    isos: [
+      { A: 12, mass: 12.000000, abundance: 98.93 },
+      { A: 13, mass: 13.003355, abundance: 1.07 }
+    ]
+  },
+  {
+    id: 'Cl', known: true, sym: 'Cl', name: 'Chlorine',
+    isos: [
+      { A: 35, mass: 34.968853, abundance: 75.78 },
+      { A: 37, mass: 36.965903, abundance: 24.22 }
+    ]
+  },
+  {
+    id: 'Mg', known: true, sym: 'Mg', name: 'Magnesium',
+    isos: [
+      { A: 24, mass: 23.985042, abundance: 78.99 },
+      { A: 25, mass: 24.985837, abundance: 10.00 },
+      { A: 26, mass: 25.982593, abundance: 11.01 }
+    ]
+  },
+  {
+    id: 'U1', known: false, label: 'Unknown A', sym: 'Br', name: 'Bromine',
+    isos: [
+      { A: 79, mass: 78.918338, abundance: 50.69 },
+      { A: 81, mass: 80.916291, abundance: 49.31 }
+    ]
+  },
+  {
+    id: 'U2', known: false, label: 'Unknown B', sym: 'Cu', name: 'Copper',
+    isos: [
+      { A: 63, mass: 62.929601, abundance: 69.17 },
+      { A: 65, mass: 64.927794, abundance: 30.83 }
+    ]
+  }
+];
+
+function msAverage(sample) {
+  return sample.isos.reduce((s, i) => s + i.mass * (i.abundance / 100), 0);
+}
+
+function getMsSample(id) {
+  return MS_SAMPLES.find(s => s.id === id) || MS_SAMPLES[0];
+}
+
+function msReadyToFinish() {
+  const knownOk = MS_SAMPLES.filter(s => s.known).every(s => STATE.msSeen[s.id]);
+  const unkOk = MS_SAMPLES.filter(s => !s.known).every(s => STATE.msSolved[s.id]);
+  return knownOk && unkOk;
+}
+
+function resetMassSpecState() {
+  if (STATE.msRunTimer) {
+    clearTimeout(STATE.msRunTimer);
+    STATE.msRunTimer = null;
+  }
+  STATE.msSampleId = 'C';
+  STATE.msPhase = 'idle';
+  STATE.msSeen = {};
+  STATE.msSolved = {};
+}
+
+function setMassSpecStage() {
+  particleControls.style.display = 'none';
+  t2Panel.style.display = 'none';
+  t3Panel.style.display = 'none';
+  setSimControlsOpen(false);
+  document.getElementById('viewport').style.display = 'none';
+  document.getElementById('msPanel').classList.add('open');
+  checkBtn.style.display = 'none';
+  clearBtn.style.display = 'none';
+  backBtn.style.display = '';
+  nextBtn.style.display = '';
+  nextBtn.textContent = 'See summary →';
+  nextBtn.disabled = !msReadyToFinish();
+  setPrompt(null, 'How Abundance Is Measured',
+    'Pick a sample, then run it through the instrument. The printed spectrum below is what the chart recorder draws.');
+  taskStep.textContent = 'Mass Spec · Instrument';
+  setFigureCaption('FIG. 04  ·  MASS SPECTROMETER');
+  helpText.innerHTML = HELP_TEXTS[4];
+  renderMsPicker();
+  renderMsSpectrum(false);
+  renderTierBar();
+  resize();
+}
+
+function renderMsPicker() {
+  const host = document.getElementById('msSamplePicker');
+  const knowns = MS_SAMPLES.filter(s => s.known);
+  const unknowns = MS_SAMPLES.filter(s => !s.known);
+  const chip = (s) => {
+    const active = STATE.msSampleId === s.id ? ' active' : '';
+    const done = STATE.msSeen[s.id] ? ' done' : '';
+    const unk = s.known ? '' : ' unknown';
+    const title = s.known ? s.name : (s.label || 'Unknown');
+    const tag = s.known ? s.sym : (STATE.msSolved[s.id] ? s.sym : '?');
+    return `<button type="button" class="ms-sample-btn${active}${done}${unk}" data-ms="${s.id}" aria-pressed="${STATE.msSampleId === s.id}">${title}<span class="ms-tag">${tag}</span></button>`;
+  };
+  host.innerHTML = `<div class="ms-kicker">Known samples</div>${knowns.map(chip).join('')}` +
+    `<div class="ms-kicker" style="margin-top:0.55rem;">Unknowns</div>${unknowns.map(chip).join('')}`;
+  host.querySelectorAll('[data-ms]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectMsSample(btn.dataset.ms);
+    });
+  });
+}
+
+function selectMsSample(id) {
+  if (STATE.msPhase === 'running') return;
+  STATE.msSampleId = id;
+  STATE.msPhase = 'idle';
+  const instr = document.getElementById('msInstrument');
+  instr.classList.remove('running');
+  instr.querySelectorAll('.ms-path-guide.lit').forEach(p => p.classList.remove('lit'));
+  const runBtn = document.getElementById('msRunBtn');
+  runBtn.disabled = false;
+  runBtn.textContent = 'Run spectrum →';
+  runBtn.classList.add('submit');
+  document.getElementById('msGuess').value = '';
+  document.getElementById('msGuessFeedback').textContent = '';
+  renderMsPicker();
+  renderMsSpectrum(false);
+  renderTierBar();
+  feedbackEl.textContent = '';
+  feedbackEl.className = 'feedback';
+  nextBtn.disabled = !msReadyToFinish();
+}
+
+function renderMsSpectrum(printed) {
+  const sample = getMsSample(STATE.msSampleId);
+  const spectrum = document.getElementById('msSpectrum');
+  const chart = document.getElementById('msChart');
+  const unk = document.getElementById('msUnknownBox');
+  spectrum.classList.toggle('empty', !printed);
+  spectrum.classList.toggle('printed', !!printed);
+
+  if (!printed) {
+    unk.classList.remove('open');
+    document.getElementById('msAvgValue').textContent = '— amu';
+    document.getElementById('msSampleName').textContent = '—';
+    document.getElementById('msSampleDetail').textContent = '';
+    chart.innerHTML = '';
+    return;
+  }
+
+  // Textbook-style axes: y = relative abundance (%), x = continuous mass
+  // numbers (one unit of padding each side; missing masses stay empty).
+  const maxAb = Math.max(...sample.isos.map(i => i.abundance));
+  const step = maxAb > 50 ? 20 : 5;
+  const top = Math.ceil(maxAb / step) * step;
+  const byA = new Map(sample.isos.map(i => [i.A, i]));
+  const cols = [];
+  const A0 = Math.min(...sample.isos.map(i => i.A)) - 1;
+  const A1 = Math.max(...sample.isos.map(i => i.A)) + 1;
+  for (let A = A0; A <= A1; A++) cols.push({ A, iso: byA.get(A) || null });
+  chart.style.setProperty('--ms-cols', String(cols.length));
+  let grid = '';
+  for (let v = 0; v <= top; v += step) {
+    grid += `<div class="ms-gridline${v === 0 ? ' zero' : ''}" style="bottom:${(v / top) * 100}%"><span>${v}</span></div>`;
+  }
+  const bars = cols.map(c => `<div class="ms-peak">${c.iso
+    ? `<div class="ms-bar" style="height:${(c.iso.abundance / top) * 100}%" title="${c.iso.abundance.toFixed(2)}%"></div>`
+    : ''}</div>`).join('');
+  const xTicks = cols.map(c => `<span class="ms-peak-mass">${c.A}</span>`).join('');
+  const desc = sample.isos.map(i => `mass ${i.A} at ${i.abundance.toFixed(2)}%`).join(', ');
+  chart.innerHTML = `<div class="ms-plot" role="img" aria-label="Spectrum: ${desc}">${grid}<div class="ms-cols">${bars}</div></div>` +
+    `<div class="ms-x-ticks" aria-hidden="true">${xTicks}</div>`;
+
+  const avg = msAverage(sample);
+  const solved = sample.known || !!STATE.msSolved[sample.id];
+  // Unsolved unknown: printing the average would hand over the answer —
+  // the student computes it from the peaks. Readout returns once solved.
+  document.getElementById('msAvgValue').closest('.ms-readout').hidden = !solved;
+  document.getElementById('msAvgValue').textContent = avg.toFixed(4) + ' amu';
+  document.getElementById('msAvgDetail').textContent = sample.isos
+    .map(i => `${i.A} × ${(i.abundance / 100).toFixed(4)}`)
+    .join(' + ') + ` → ${avg.toFixed(4)}`;
+
+  if (sample.known) {
+    document.getElementById('msSampleName').textContent = sample.sym;
+    document.getElementById('msSampleDetail').textContent = `${sample.name} — natural isotopic mix. Exact masses: ${sample.isos.map(i => i.mass.toFixed(5)).join(', ')} u.`;
+    unk.classList.remove('open');
+  } else {
+    document.getElementById('msSampleName').textContent = solved ? sample.sym : sample.label;
+    document.getElementById('msSampleDetail').textContent = solved
+      ? `${sample.name}. Exact masses: ${sample.isos.map(i => i.mass.toFixed(5)).join(', ')} u.`
+      : `Exact masses: ${sample.isos.map(i => i.mass.toFixed(5)).join(', ')} u. Match the average to the periodic table.`;
+    unk.classList.add('open');
+    document.getElementById('msUnknownPrompt').innerHTML = solved
+      ? `This was ${sample.name} (<span class="ms-sym">${sample.sym}</span>).`
+      : 'What element produced this spectrum? Use the average mass and the periodic table. <button type="button" class="inline-pt-btn" data-open-periodic-table>See periodic table</button>';
+  }
+}
+
+function runMassSpec() {
+  if (STATE.msPhase === 'running') return;
+  const sample = getMsSample(STATE.msSampleId);
+  const instr = document.getElementById('msInstrument');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  STATE.msPhase = 'running';
+  feedbackEl.textContent = '';
+  feedbackEl.className = 'feedback';
+  renderMsSpectrum(false);
+
+  // Light up path guides by relative mass; only lit paths get a flying ion
+  const paths = [
+    document.getElementById('msPathLight'),
+    document.getElementById('msPathMid'),
+    document.getElementById('msPathHeavy')
+  ];
+  const ions = [
+    instr.querySelector('.ms-ion.ms-light'),
+    instr.querySelector('.ms-ion.ms-mid'),
+    instr.querySelector('.ms-ion.ms-heavy')
+  ];
+  paths.forEach(p => p && p.classList.remove('lit'));
+  ions.forEach(el => el && el.classList.remove('fly'));
+  const sorted = sample.isos.slice().sort((a, b) => a.mass - b.mass);
+  sorted.forEach((_, i) => {
+    const slot = sorted.length === 1 ? 1 : (i === 0 ? 0 : (i === sorted.length - 1 ? 2 : 1));
+    if (paths[slot]) paths[slot].classList.add('lit');
+    if (ions[slot]) ions[slot].classList.add('fly');
+  });
+
+  instr.classList.remove('running');
+  void instr.offsetWidth;
+  if (!reduced) instr.classList.add('running');
+
+  const runBtn = document.getElementById('msRunBtn');
+  runBtn.disabled = true;
+  runBtn.textContent = 'Running…';
+
+  if (STATE.msRunTimer) clearTimeout(STATE.msRunTimer);
+  const delay = reduced ? 80 : 2100;
+  STATE.msRunTimer = setTimeout(() => {
+    STATE.msPhase = 'printed';
+    STATE.msSeen[sample.id] = true;
+    instr.classList.remove('running');
+    runBtn.disabled = false;
+    runBtn.textContent = 'Run again';
+    runBtn.classList.remove('submit');
+    renderMsSpectrum(true);
+    renderMsPicker();
+    renderTierBar();
+    nextBtn.disabled = !msReadyToFinish();
+    if (!sample.known && !STATE.msSolved[sample.id]) {
+      feedbackEl.innerHTML = 'Spectrum printed. Work out the average from the peaks, then identify the element.';
+      feedbackEl.className = 'feedback';
+    } else if (sample.known) {
+      feedbackEl.innerHTML = `Printed spectrum for <strong>${sample.sym}</strong>. Peak height matches natural abundance.`;
+      feedbackEl.className = 'feedback correct';
+    }
+    STATE.msRunTimer = null;
+  }, delay);
+}
+
+function checkMsGuess() {
+  const sample = getMsSample(STATE.msSampleId);
+  if (sample.known || STATE.msPhase !== 'printed') return;
+  const guess = (document.getElementById('msGuess').value || '').trim();
+  const fb = document.getElementById('msGuessFeedback');
+  if (!guess) {
+    fb.textContent = 'Enter an element symbol to compare.';
+    return;
+  }
+  if (guess.toLowerCase() === sample.sym.toLowerCase()) {
+    STATE.msSolved[sample.id] = true;
+    fb.textContent = `Matches ${sample.name} (${sample.sym}). Average mass ≈ ${msAverage(sample).toFixed(2)} amu.`;
+    renderMsSpectrum(true);
+    renderMsPicker();
+    renderTierBar();
+    nextBtn.disabled = !msReadyToFinish();
+    feedbackEl.innerHTML = `✓ Identified <strong>${sample.sym}</strong> from its spectrum.`;
+    feedbackEl.className = 'feedback correct';
+  } else {
+    fb.textContent = `“${guess}” doesn’t match this spectrum’s average. Try again, or show the answer.`;
+  }
+}
+
+function revealMsAnswer() {
+  const sample = getMsSample(STATE.msSampleId);
+  if (sample.known || STATE.msPhase !== 'printed') return;
+  STATE.msSolved[sample.id] = true;
+  document.getElementById('msGuess').value = sample.sym;
+  document.getElementById('msGuessFeedback').textContent =
+    `Model answer: ${sample.name} (${sample.sym}). Average ≈ ${msAverage(sample).toFixed(2)} amu from the printed peaks.`;
+  renderMsSpectrum(true);
+  renderMsPicker();
+  renderTierBar();
+  nextBtn.disabled = !msReadyToFinish();
+}
+
+function finishMassSpec() {
+  STATE.completed = true;
+  localStorage.setItem('mod01_complete', 'true');
+  try {
+    const visited = JSON.parse(localStorage.getItem('visitedModules') || '{}');
+    visited['01'] = true;
+    localStorage.setItem('visitedModules', JSON.stringify(visited));
+  } catch (e) {}
+  setChallenge();
+}
+
 const HELP_TEXTS = {
-  1: 'Count the particles needed. Protons (red) determine the element. Neutrons (blue) fill the mass number. Electrons (teal) equal protons in a neutral atom.',
-  2: 'Count the red particles to find Z (atomic number). Add red + blue for A (mass number). Look up Z on the periodic table for the element symbol.',
-  3: 'Multiply each isotope\'s mass by its abundance (as a decimal). Add them up to get the weighted average. Real abundances are fixed by nature!'
+  1: 'Click Proton, Neutron, or Electron to add particles. Protons determine the element. Neutrons fill the <strong>mass number</strong>. Electrons fill shells 2-8-8, and a neutral atom has the same number of electrons as protons. Click a particle in the atom to remove it.',
+  2: 'Count the rust-colored protons to find Z (<strong>atomic number</strong>). Add rust + olive for A (<strong>mass number</strong>). Look up Z on the periodic table for the element symbol.',
+  3: 'Multiply each <strong>isotope</strong>’s mass by its <strong>percent abundance</strong> (as a decimal). Add them up to get the <strong>weighted average</strong>. The average always sits closer to whichever isotope is more common. Real abundances are fixed by nature!',
+  4: 'Follow the four steps above the tube. In the magnet, the lightest ions bend the most. Peak height on the printed spectrum tracks how common each mass is.'
 };
+
+const TUTORIAL_HELP = [
+  'Same element, different mass — count the neutrons in each carbon nucleus. Nature does not hold equal amounts of every kind.',
+  'When two groups are equally common, the average sits halfway between their masses. That is the only time a “simple” average matches the midpoint.',
+  'Make 8 of one kind and 2 of the other. The average should sit much closer to the common mass — that is what <strong>weighted average</strong> means.',
+  'Course marks work the same way: if the exam is weighted more, a 70% exam pulls the final mark down even when labs and quizzes are high.',
+  'Same idea as the tokens and the course mark: more of one <strong>isotope</strong> pulls the average toward that mass. Chlorine in nature is mostly Cl-35, so its average is closer to 35 than to 37.',
+  'If you know the <strong>average atomic mass</strong> and the two <strong>isotope</strong> masses, only one mix produces that average. Slide until your average matches the table mass.'
+];
 
 // ============================================================
 // UI ELEMENTS
 // ============================================================
 const promptEl = document.getElementById('prompt');
+const promptLead = document.getElementById('promptLead');
 const promptSub = document.getElementById('promptSub');
+const ptOverlay = document.getElementById('ptOverlay');
+const ptOverlayClose = document.getElementById('ptOverlayClose');
+let lastActiveBeforePtOverlay = null;
+
+function openPeriodicTableOverlay() {
+  lastActiveBeforePtOverlay = document.activeElement;
+  ptOverlay.hidden = false;
+  ptOverlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  ptOverlayClose.focus();
+}
+
+function closePeriodicTableOverlay() {
+  ptOverlay.hidden = true;
+  ptOverlay.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  if (lastActiveBeforePtOverlay && typeof lastActiveBeforePtOverlay.focus === 'function') {
+    lastActiveBeforePtOverlay.focus();
+  }
+}
+
+promptSub.addEventListener('click', (event) => {
+  const trigger = event.target.closest('[data-open-periodic-table]');
+  if (!trigger) return;
+  openPeriodicTableOverlay();
+});
+
+ptOverlay.addEventListener('click', (event) => {
+  if (event.target.closest('[data-close-periodic-table]')) closePeriodicTableOverlay();
+});
+ptOverlayClose.addEventListener('click', closePeriodicTableOverlay);
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && !ptOverlay.hidden) closePeriodicTableOverlay();
+});
+
+// The headline reads "Your task: Build He-4". Explainer screens (the tutorial
+// pages and the completion page) pass lead = null, since they aren't tasks.
+function setPrompt(lead, title, sub) {
+  promptLead.textContent = lead ? lead + ' ' : '';
+  promptLead.style.display = lead ? '' : 'none';
+  promptEl.textContent = title;
+  promptSub.innerHTML = sub;
+  // "Your task:" prompts are things the student must do — mark them as student-q (blue + bold).
+  promptSub.classList.toggle('student-q', !!lead);
+}
+const taskStep = document.getElementById('taskStep');
+const particleControls = document.getElementById('particleControls');
 const feedbackEl = document.getElementById('feedback');
 const checkBtn = document.getElementById('checkBtn');
 const clearBtn = document.getElementById('clearBtn');
 const nextBtn = document.getElementById('nextBtn');
+const backBtn = document.getElementById('backBtn');
 const t2Panel = document.getElementById('t2Panel');
 const t3Panel = document.getElementById('t3Panel');
+const t3SimControls = document.getElementById('t3SimControls');
 const helpText = document.getElementById('helpText');
+
+function setSimControlsOpen(open, opts) {
+  t3SimControls.classList.toggle('open', !!open);
+  t3SimControls.classList.toggle('t3-grid', !!(open && opts && opts.grid));
+  if (!open) t3SimControls.innerHTML = '';
+}
 
 // ============================================================
 // TIER PROGRESS BAR
@@ -713,19 +2931,43 @@ const helpText = document.getElementById('helpText');
 function renderTierBar() {
   const bar = document.getElementById('tierBar');
   let html = '';
-  const tierNames = ['Build', 'Identify', 'Avg Mass'];
-  for (let t = 1; t <= 3; t++) {
+  const tierNames = ['Build', 'Identify', 'Avg Mass', 'Mass Spec'];
+  for (let t = 1; t <= 4; t++) {
     const isActive = STATE.tier === t && !STATE.completed;
-    const isDone = STATE.tierScores[t - 1] >= 3;
+    const playCount = TIER3_CHALLENGES.length;
+    let isDone = false;
+    if (t < 3) isDone = STATE.tierScores[t - 1] >= 3;
+    else if (t === 3) isDone = STATE.completed || STATE.tier === 4 || STATE.tierScores[2] >= playCount;
+    else isDone = STATE.completed || msReadyToFinish();
     html += `<div class="tier-group">`;
     html += `<span class="tier-label ${isActive ? 'active' : ''} ${isDone ? 'done' : ''}">${tierNames[t - 1]}</span>`;
-    for (let c = 0; c < 3; c++) {
-      const complete = c < STATE.tierScores[t - 1];
-      const current = isActive && c === STATE.challengeIndex;
-      html += `<div class="tier-dot ${complete ? 'complete' : ''} ${current ? 'current' : ''}"></div>`;
+    if (t === 3) {
+      // One diamond per Learn page, matching the challenge diamonds.
+      const learnDone = STATE.completed || STATE.tier === 4 || STATE.t3Phase === 'play' || STATE.tierScores[2] >= playCount;
+      for (let s = 0; s < T3_LEARN_STEPS; s++) {
+        const complete = learnDone || (isActive && STATE.t3Phase === 'tutorial' && s < STATE.tutorialStep);
+        const current = isActive && STATE.t3Phase === 'tutorial' && s === STATE.tutorialStep;
+        html += `<div class="tier-dot ${complete ? 'complete' : ''} ${current ? 'current' : ''}" title="Learn ${s + 1}"></div>`;
+      }
+    }
+    if (t <= 3) {
+      const dots = t === 3 ? playCount : 3;
+      for (let c = 0; c < dots; c++) {
+        const complete = c < STATE.tierScores[t - 1];
+        const current = isActive && (t < 3 || STATE.t3Phase === 'play') && c === STATE.challengeIndex;
+        html += `<div class="tier-dot ${complete ? 'complete' : ''} ${current ? 'current' : ''}"></div>`;
+      }
+    } else {
+      const samples = MS_SAMPLES.length;
+      for (let c = 0; c < samples; c++) {
+        const samp = MS_SAMPLES[c];
+        const complete = !!STATE.msSeen[samp.id];
+        const current = isActive && STATE.msSampleId === samp.id;
+        html += `<div class="tier-dot ${complete ? 'complete' : ''} ${current ? 'current' : ''}"></div>`;
+      }
     }
     html += `</div>`;
-    if (t < 3) html += `<div class="tier-sep"></div>`;
+    if (t < 4) html += `<div class="tier-sep"></div>`;
   }
   bar.innerHTML = html;
 }
@@ -737,7 +2979,6 @@ function clearPlaced() {
   STATE.protons = [];
   STATE.neutrons = [];
   STATE.electrons = [];
-  STATE.dragging = null;
   updateHUD();
 }
 
@@ -745,53 +2986,374 @@ function setChallenge() {
   feedbackEl.textContent = '';
   feedbackEl.className = 'feedback';
   nextBtn.style.display = 'none';
+  nextBtn.disabled = false;
+  nextBtn.textContent = 'Next →';
+  backBtn.style.display = 'none';
   t2Panel.style.display = 'none';
   t3Panel.style.display = 'none';
+  t3Panel.classList.remove('t3-bridge');
+  document.getElementById('t3Tutorial').style.display = 'none';
+  const msPanel = document.getElementById('msPanel');
+  if (msPanel) msPanel.classList.remove('open');
+  setSimControlsOpen(false);
   clearPlaced();
+  const summaryPage = document.getElementById('summaryPage');
+  if (summaryPage) summaryPage.style.display = 'none';
+  hideDebrief();
+  unmountSandboxPlay();
+  document.getElementById('viewport').style.display = '';
+  document.getElementById('sandboxArea').style.display = 'none';
 
   if (STATE.completed) {
     showCompletion();
     return;
   }
 
-  helpText.textContent = HELP_TEXTS[STATE.tier];
+  helpText.innerHTML = HELP_TEXTS[STATE.tier] || HELP_TEXTS[1];
   renderTierBar();
+  const tierNames = ['Build', 'Identify', 'Avg Mass', 'Mass Spec'];
+  if (STATE.tier < 4) {
+    taskStep.textContent = `${tierNames[STATE.tier - 1]} · ${STATE.challengeIndex + 1} of 3`;
+  }
 
   if (STATE.tier === 1) {
     const ch = TIER1_CHALLENGES[STATE.challengeIndex];
     STATE.target = { sym: ch.sym, Z: getElement(ch.sym).Z, A: ch.A, hint: ch.hint };
-    promptEl.textContent = `Build ${ch.sym}-${ch.A}`;
-    promptSub.textContent = `Drag protons, neutrons, and electrons to build a neutral ${getElement(ch.sym).name}-${ch.A} atom.`;
+    setPrompt('Your task:', `Build ${ch.sym}-${ch.A}`,
+      `Click protons, neutrons, and electrons to build a neutral ${getElement(ch.sym).name}-${ch.A} atom.`);
+    setFigureCaption(`FIG. 01  ·  BUILD ${ch.sym}-${ch.A}`);
+    particleControls.style.display = '';
     checkBtn.style.display = '';
     clearBtn.style.display = '';
+    resize();
   } else if (STATE.tier === 2) {
     const ch = TIER2_CHALLENGES[STATE.challengeIndex];
     STATE.target = { sym: ch.sym, Z: getElement(ch.sym).Z, A: ch.A, hint: ch.hint };
-    promptEl.textContent = 'Identify this atom';
-    promptSub.textContent = 'Look at the particles and determine the element symbol, Z, and A.';
+    setPrompt('Your task:', 'Identify This Atom',
+      'Look at the particles and enter the element symbol, <strong>atomic number</strong> Z, and <strong>mass number</strong> A.');
+    setFigureCaption('FIG. 02  ·  IDENTIFY THE ISOTOPE');
+    particleControls.style.display = 'none';
     t2Panel.style.display = '';
     document.getElementById('t2Symbol').value = '';
     document.getElementById('t2Z').value = '';
     document.getElementById('t2A').value = '';
     checkBtn.style.display = '';
     clearBtn.style.display = 'none';
+    resize();
   } else if (STATE.tier === 3) {
-    const ch = TIER3_CHALLENGES[STATE.challengeIndex];
-    const el = getElement(ch.sym);
-    STATE.target = { sym: ch.sym, Z: el.Z, hint: ch.hint, accepted: acceptedAvgMass(ch.sym) };
-    promptEl.textContent = `Find the average atomic mass of ${el.name}`;
-    promptSub.textContent = 'Adjust the abundance sliders to match the real isotope distribution.';
-    t3Panel.style.display = '';
-    buildT3Sliders(ch.sym);
+    if (STATE.t3Phase === 'tutorial') {
+      setTutorialStep();
+    } else {
+      setPlayChallenge();
+    }
+  } else if (STATE.tier === 4) {
+    setMassSpecStage();
+  }
+}
+
+function resetTutorialState() {
+  STATE.t3Phase = 'tutorial';
+  STATE.tutorialStep = 0;
+  STATE.tutorialHeavy = 5;
+  STATE.tutorialTriedLopsided = false;
+  STATE.tutorialCl35 = 50;
+  STATE.tutorialLi6 = 50;
+  STATE.tutorialWeights = [25, 25, 25, 25];
+  STATE.t3RevealTarget = false;
+  STATE.t3CheckAttempts = 0;
+  t3MarkerAvg = null;
+  t3PrevTerms = {};
+  t3PulseT = -9999;
+}
+
+function setTutorialStep() {
+  particleControls.style.display = 'none';
+  t3Panel.style.display = '';
+  document.getElementById('t3Tutorial').style.display = '';
+  setSimControlsOpen(false);
+  checkBtn.style.display = 'none';
+  clearBtn.style.display = 'none';
+  nextBtn.style.display = '';
+  nextBtn.textContent = 'Continue →';
+  nextBtn.disabled = false;
+  t3MarkerAvg = null;
+  t3PrevTerms = {};
+  t3PulseT = -9999;
+
+  const hint = document.getElementById('t3TutHint');
+  const step = STATE.tutorialStep;
+  t3Panel.classList.toggle('t3-bridge', step === 0);
+  backBtn.style.display = step === 0 ? 'none' : '';
+  taskStep.textContent = `Avg Mass · Learn ${step + 1} of ${T3_LEARN_STEPS}`;
+  helpText.innerHTML = TUTORIAL_HELP[step];
+  const t3Caps = [
+    'FIG. 03  ·  CARBON ISOTOPES',
+    'FIG. 03  ·  EQUAL MIX',
+    'FIG. 03  ·  WEIGHTED MIX',
+    'FIG. 03  ·  COURSE MARK',
+    'FIG. 03  ·  ISOTOPE SAMPLE',
+    'FIG. 03  ·  FIND THE ABUNDANCE'
+  ];
+  setFigureCaption(t3Caps[step] || 'FIG. 03  ·  WEIGHTED AVERAGE');
+
+  const markHintQ = (el) => {
+    if (!el) return;
+    el.classList.toggle('student-q', /\?/.test(el.textContent || el.innerText || ''));
+  };
+
+  if (step === 0) {
+    STATE.target = { sym: T3_BRIDGE_SYM, Z: getElement(T3_BRIDGE_SYM).Z, accepted: acceptedAvgMass(T3_BRIDGE_SYM), hint: TUTORIAL_HELP[step] };
+    hint.textContent = 'Next, we are going to find out how that average is determined.';
+    setPrompt(null, 'Average Atomic Mass Introduction',
+      'Elements on the periodic table are more than they appear, you may have noticed that their atomic mass doesn’t add up to round numbers, as they would if it were simply # of protons + # of neutrons. <button type="button" class="inline-pt-btn" data-open-periodic-table>See periodic table</button> This next section will help guide you into how we calculate the Average Atomic Mass.');
+  } else if (step === 1) {
+    STATE.tutorialHeavy = 5;
+    STATE.target = { sym: 'Cl', Z: 17, accepted: acceptedAvgMass('Cl'), hint: TUTORIAL_HELP[step] };
+    hint.textContent = 'Notice the marker sits exactly in the middle of 10 g and 12 g.';
+    setPrompt(null, 'A Simple Average',
+      'A bag holds 10 tokens: five weigh 10 g and five weigh 12 g. The average is 11 g — right in the middle — because both kinds are equally common.');
+  } else if (step === 2) {
+    STATE.target = { sym: 'Cl', Z: 17, accepted: acceptedAvgMass('Cl'), hint: TUTORIAL_HELP[step] };
+    buildBagSlider();
+    hint.textContent = STATE.tutorialTriedLopsided
+      ? 'The average followed the majority. Continue when you are ready.'
+      : 'Move the yellow slider until most tokens are one mass. Watch the numbers in the equation jump as the mix changes.';
+    setPrompt(null, 'The Average Follows the Majority',
+      'Change the mix. When most tokens are one mass, the average slides toward that mass. That is a <strong>weighted average</strong>: common values count more.');
+  } else if (step === 3) {
+    STATE.target = { hint: TUTORIAL_HELP[step] };
+    if (!STATE.tutorialWeights) STATE.tutorialWeights = [25, 25, 25, 25];
+    buildCourseSliders();
+    hint.textContent = 'Each category starts at 25%. Raise the exam — labs give up weighting first — and watch the final mark slide toward 70%.';
+    setPrompt(null, 'A Course Mark Is a "Weighted Average"',
+      'For this activity, we are going to pretend a student received their marks back at the end of a term. They got 82% in labs, 74% on tests, 88% on quizzes, and 70% on the exam. At first each category counts equally, but you can test out what a "weighted average" does to the overall when they are worth different amounts towards the final average. Play around with the sliders and seee how they affect one another');
+    // Wrap "Weighted Average" in a hover-tip span after setPrompt renders the title
+    promptEl.innerHTML = 'A Course Mark Is a "<span class="title-tip" data-tip="A weighted average multiplies each value by how important it is (its weight), then adds the results. Values that count more pull the average toward them." tabindex="0">Weighted Average</span>"';
+  } else if (step === 4) {
+    STATE.target = { sym: 'Cl', Z: 17, accepted: acceptedAvgMass('Cl'), hint: TUTORIAL_HELP[step] };
+    if (STATE.tutorialCl35 == null) STATE.tutorialCl35 = 50;
+    buildClMixSlider();
+    hint.innerHTML = 'Same picture as the bag and the course mark — now the dots are chlorine <strong>isotopes</strong> mixed in a sample. Cl-37 makes up the rest.<br><span class="student-q">Can you shift the proportion of Cl-35 to match the average atomic mass on the periodic table?</span>';
+    setPrompt(null, 'Atoms Mix the Same Way',
+      'Chlorine atoms come in two <strong>isotopes</strong>, Cl-35 and Cl-37, all together in a sample. Nature mixes them just like the bag of tokens. <strong>The periodic table mass <button type="button" class="inline-pt-btn" data-open-periodic-table>See periodic table</button> is the weighted average of the natural abundance of the isotopes.</strong>');
+  } else if (step === 5) {
+    const el = getElement(T3_INVERSE_SYM);
+    const accepted = acceptedAvgMass(T3_INVERSE_SYM);
+    STATE.target = { sym: T3_INVERSE_SYM, Z: el.Z, accepted, hint: TUTORIAL_HELP[step] };
+    STATE.tutorialLi6 = 50;
+    buildLiSlider();
     checkBtn.style.display = '';
-    clearBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
+    hint.innerHTML = 'The average sits closer to whichever <strong>isotope</strong> is more common. Lithium’s table mass is nearer 7 than 6 — so which isotope wins?';
+    setPrompt('Your task:', `Find the Percent Abundance of ${el.name}`,
+      `${el.name} has two <strong>isotopes</strong>, Li-6 and Li-7. The overall <strong>average atomic mass</strong> is ${accepted.toFixed(2)} amu. Adjust the mix until your average matches that mass — that mix is the <strong>percent abundance</strong>.`);
+  }
+  markHintQ(hint);
+
+  renderTierBar();
+  resize();
+  updateT3Result();
+}
+
+function setPlayChallenge() {
+  const ch = TIER3_CHALLENGES[STATE.challengeIndex];
+  const el = getElement(ch.sym);
+  STATE.target = { sym: ch.sym, Z: el.Z, hint: ch.hint, accepted: acceptedAvgMass(ch.sym) };
+  STATE.t3RevealTarget = false;
+  STATE.t3CheckAttempts = 0;
+  t3MarkerAvg = null;
+  t3PrevTerms = {};
+  setPrompt('Your task:', `Find the Average Atomic Mass of ${el.name}`,
+    'Find the <strong>average atomic mass</strong> for each <strong>isotope</strong> using algebra. Then check your answer with the sliders below.');
+  taskStep.textContent = `Avg Mass · ${el.name}`;
+  helpText.innerHTML = HELP_TEXTS[3];
+  setFigureCaption(`FIG. 03  ·  AVERAGE MASS OF ${el.sym}`);
+  particleControls.style.display = 'none';
+  t3Panel.style.display = '';
+  document.getElementById('t3Tutorial').style.display = 'none';
+  buildT3Sliders(ch.sym);
+  checkBtn.style.display = '';
+  clearBtn.style.display = 'none';
+  nextBtn.style.display = 'none';
+  nextBtn.textContent = 'Next →';
+  backBtn.style.display = '';
+  renderTierBar();
+  resize();
+}
+
+function buildBagSlider() {
+  t3SimControls.innerHTML = `
+    <div class="t3-row">
+      <span class="t3-isotope-label"><span class="t3-swatch" style="background:${TOKEN_YELLOW};color:${TOKEN_YELLOW}"></span>12 g Tokens</span>
+      <input type="range" class="t3-slider t3-thumb-yellow" id="t3BagSlider" min="0" max="10" step="1" value="${STATE.tutorialHeavy}">
+      <span class="t3-pct t3-thumb-yellow" id="t3BagPct">${STATE.tutorialHeavy} of 10</span>
+    </div>
+  `;
+  setSimControlsOpen(true);
+  t3SimControls.querySelector('input').addEventListener('input', (e) => {
+    STATE.tutorialHeavy = parseInt(e.target.value, 10);
+    document.getElementById('t3BagPct').textContent = `${STATE.tutorialHeavy} of 10`;
+    if (STATE.tutorialHeavy !== 5) {
+      STATE.tutorialTriedLopsided = true;
+      document.getElementById('t3TutHint').textContent = 'The average followed the majority. Continue when you are ready.';
+    }
+    updateT3Result();
+  });
+}
+
+function coursePartner(index) {
+  return 3 - index; // Labs ↔ Exam, Tests ↔ Quizzes
+}
+
+function applyCourseWeight(index, rawValue) {
+  const w = STATE.tutorialWeights.map(v => Math.round(Number(v) || 0));
+  const current = w[index];
+  const target = Math.round(Math.max(0, Math.min(100, Number(rawValue))));
+  const delta = target - current;
+  if (delta === 0) {
+    STATE.tutorialWeights = w;
+    return w;
+  }
+
+  const partner = coursePartner(index);
+  const order = [partner];
+  for (let i = 0; i < 4; i++) {
+    if (i !== index && i !== partner) order.push(i);
+  }
+
+  if (delta > 0) {
+    let need = delta;
+    for (const i of order) {
+      if (need <= 0) break;
+      const take = Math.min(w[i], need);
+      w[i] -= take;
+      need -= take;
+    }
+    w[index] = current + (delta - need);
+  } else {
+    let give = -delta;
+    for (const i of order) {
+      if (give <= 0) break;
+      const add = Math.min(give, 100 - w[i]);
+      w[i] += add;
+      give -= add;
+    }
+    w[index] = current + delta + give;
+  }
+
+  STATE.tutorialWeights = w;
+  return w;
+}
+
+function syncCourseWeightUI() {
+  STATE.tutorialWeights.forEach((wt, i) => {
+    const slider = t3SimControls.querySelector(`.t3-slider[data-idx="${i}"]`);
+    const label = document.getElementById('t3w' + i);
+    if (slider && Number(slider.value) !== wt) slider.value = String(wt);
+    if (label) label.textContent = wt + '%';
+  });
+}
+
+function buildCourseSliders() {
+  t3SimControls.innerHTML = `<div class="t3-cat-grid">${TUTORIAL_COURSE.map((it, i) => `
+    <div class="t3-cat-card" style="--cat:${it.color}">
+      <div class="t3-cat-title"><span class="t3-swatch" style="background:${it.color};color:${it.color}"></span>${it.label}</div>
+      <div class="t3-cat-line">Average score: <strong>${it.mass}%</strong></div>
+      <div class="t3-cat-line">Weighting: <strong class="t3-pct ${T3_THUMB[i] || ''}" id="t3w${i}">${STATE.tutorialWeights[i]}%</strong></div>
+      <input type="range" class="t3-slider ${T3_THUMB[i] || ''}" min="0" max="100" step="1" value="${STATE.tutorialWeights[i]}" data-idx="${i}" aria-label="${it.label} weighting">
+    </div>
+  `).join('')}</div>`;
+  setSimControlsOpen(true);
+  t3SimControls.querySelectorAll('.t3-slider').forEach(s => {
+    s.addEventListener('input', (e) => {
+      const i = parseInt(e.target.dataset.idx, 10);
+      applyCourseWeight(i, parseFloat(e.target.value));
+      syncCourseWeightUI();
+      updateT3Result();
+    });
+  });
+}
+
+function buildClMixSlider() {
+  const rest = (100 - Number(STATE.tutorialCl35)).toFixed(1);
+  t3SimControls.innerHTML = `
+    <div class="t3-row">
+      <span class="t3-isotope-label"><span class="t3-swatch" style="background:${ISO_COLORS[0]};color:${ISO_COLORS[0]}"></span>Cl-35</span>
+      <input type="range" class="t3-slider" id="t3ClSlider" min="0" max="100" step="0.1" value="${STATE.tutorialCl35}">
+      <span class="t3-pct" id="t3ClPct">${Number(STATE.tutorialCl35).toFixed(1)}%</span>
+    </div>
+    <p class="t3-note">Cl-37 is the rest: <span id="t3Cl37Pct">${rest}%</span></p>
+  `;
+  setSimControlsOpen(true);
+  t3SimControls.querySelector('input').addEventListener('input', (e) => {
+    STATE.tutorialCl35 = parseFloat(e.target.value);
+    document.getElementById('t3ClPct').textContent = STATE.tutorialCl35.toFixed(1) + '%';
+    document.getElementById('t3Cl37Pct').textContent = (100 - STATE.tutorialCl35).toFixed(1) + '%';
+    updateT3Result();
+  });
+}
+
+function buildLiSlider() {
+  const rest = (100 - Number(STATE.tutorialLi6)).toFixed(1);
+  t3SimControls.innerHTML = `
+    <div class="t3-row">
+      <span class="t3-isotope-label"><span class="t3-swatch" style="background:${ISO_COLORS[0]};color:${ISO_COLORS[0]}"></span>Li-6</span>
+      <input type="range" class="t3-slider" id="t3LiSlider" min="0" max="100" step="0.1" value="${STATE.tutorialLi6}">
+      <span class="t3-pct" id="t3LiPct">${Number(STATE.tutorialLi6).toFixed(1)}%</span>
+    </div>
+    <p class="t3-note">Li-7 is the rest: <span id="t3Li7Pct">${rest}%</span></p>
+  `;
+  setSimControlsOpen(true);
+  t3SimControls.querySelector('input').addEventListener('input', (e) => {
+    STATE.tutorialLi6 = parseFloat(e.target.value);
+    document.getElementById('t3LiPct').textContent = STATE.tutorialLi6.toFixed(1) + '%';
+    document.getElementById('t3Li7Pct').textContent = (100 - STATE.tutorialLi6).toFixed(1) + '%';
+    updateT3Result();
+  });
+}
+
+function advanceTutorial() {
+  STATE.tutorialStep++;
+  if (STATE.tutorialStep > T3_LEARN_STEPS - 1) {
+    STATE.t3Phase = 'play';
+    STATE.challengeIndex = 0;
+    STATE.t3RevealTarget = false;
+    t3MarkerAvg = null;
+  }
+  setChallenge();
+}
+
+function goBackT3() {
+  if (STATE.mode !== 'challenge' || STATE.tier !== 3) return;
+
+  if (STATE.t3Phase === 'play') {
+    if (STATE.challengeIndex > 0) {
+      STATE.challengeIndex--;
+      STATE.tierScores[2] = STATE.challengeIndex;
+    } else {
+      STATE.t3Phase = 'tutorial';
+      STATE.tutorialStep = T3_LEARN_STEPS - 1;
+      STATE.tierScores[2] = 0;
+    }
+    t3MarkerAvg = null;
+    setChallenge();
+    return;
+  }
+
+  if (STATE.tutorialStep > 0) {
+    STATE.tutorialStep--;
+    t3MarkerAvg = null;
+    setChallenge();
   }
 }
 
 function checkAnswer() {
   if (STATE.tier === 1) checkTier1();
   else if (STATE.tier === 2) checkTier2();
-  else if (STATE.tier === 3) checkTier3();
+  else if (STATE.tier === 3) {
+    if (STATE.t3Phase === 'tutorial' && STATE.tutorialStep === 5) checkTutorialInverse();
+    else checkTier3();
+  }
 }
 
 function checkTier1() {
@@ -825,61 +3387,122 @@ function checkTier2() {
   const aOk = a === t.A;
 
   if (symOk && zOk && aOk) {
-    showCorrect(`Correct! It's ${t.sym}, Z = ${t.Z}, A = ${t.A}.`);
+    showCorrect(`Correct! It's ${t.sym}, Z = ${t.Z} (<strong>atomic number</strong>), A = ${t.A} (<strong>mass number</strong>).`);
   } else {
     let hints = [];
     if (!symOk) hints.push(`Symbol "${sym || '?'}" is not right`);
-    if (!zOk) hints.push(`Z = ${isNaN(z) ? '?' : z} is not right — count the red particles`);
-    if (!aOk) hints.push(`A = ${isNaN(a) ? '?' : a} is not right — add red + blue`);
+    if (!zOk) hints.push(`Z = ${isNaN(z) ? '?' : z} is not right — count the rust-colored protons`);
+    if (!aOk) hints.push(`A = ${isNaN(a) ? '?' : a} is not right — add rust + olive`);
     showIncorrect(hints.join('. ') + '.');
   }
 }
 
+function snapPlaySlidersToNature(sym) {
+  const isos = ISOTOPES[sym];
+  t3SimControls.querySelectorAll('.t3-slider').forEach((s, i) => {
+    if (isos[i]) s.value = String(isos[i].abundance);
+  });
+  updateT3Display(sym);
+}
+
 function checkTier3() {
-  const isos = ISOTOPES[STATE.target.sym];
-  const sliders = document.querySelectorAll('.t3-slider');
+  const sliders = document.querySelectorAll('#t3SimControls .t3-slider');
   let totalPct = 0;
   sliders.forEach(s => totalPct += parseFloat(s.value));
 
-  // Check if abundances sum to ~100
   if (Math.abs(totalPct - 100) > 1) {
     showIncorrect(`Abundances must add to 100%. Currently: ${totalPct.toFixed(1)}%.`);
     return;
   }
 
-  const avg = computeT3Average();
+  const model = getT3Model();
+  const avg = t3Average(model);
   const accepted = STATE.target.accepted;
+  const decimals = t3AvgDecimals(model);
+  const close = Number(avg.toFixed(decimals)) === Number(accepted.toFixed(decimals));
+  const mix = model.items.map(it => Number((it.frac * 100).toFixed(1)));
+
+  STATE.t3CheckAttempts = (STATE.t3CheckAttempts || 0) + 1;
+
+  if (close) {
+    STATE.t3RevealTarget = true;
+    STATE.boronResult = { avg, mix, revealed: false };
+    updateT3Result();
+    showCorrect(`Correct! ${getElement(STATE.target.sym).name}’s <strong>average atomic mass</strong> is ${accepted.toFixed(decimals)} amu. B-11 is more common, so the average sits closer to 11.`);
+    nextBtn.textContent = 'Measure abundances →';
+    return;
+  }
+
+  if (STATE.t3CheckAttempts >= 3) {
+    STATE.t3RevealTarget = true;
+    snapPlaySlidersToNature(STATE.target.sym);
+    const natureModel = getT3Model();
+    const natureAvg = t3Average(natureModel);
+    STATE.boronResult = {
+      avg: natureAvg,
+      mix: natureModel.items.map(it => Number((it.frac * 100).toFixed(1))),
+      revealed: true
+    };
+    updateT3Result();
+    const isos = ISOTOPES[STATE.target.sym];
+    feedbackEl.innerHTML = `Nature’s mix is ${isos[0].abundance}% B-10 and ${isos[1].abundance}% B-11, so the <strong>average atomic mass</strong> is ${accepted.toFixed(decimals)} amu. The heavier <strong>isotope</strong> is more common, so the average sits closer to 11.`;
+    feedbackEl.className = 'feedback correct';
+    checkBtn.style.display = 'none';
+    nextBtn.style.display = '';
+    nextBtn.textContent = 'Measure abundances →';
+    STATE.tierScores[STATE.tier - 1]++;
+    renderTierBar();
+    return;
+  }
+
+  const left = 3 - STATE.t3CheckAttempts;
+  showIncorrect(`Your average is ${avg.toFixed(decimals)} amu. The table mass sits closer to whichever <strong>isotope</strong> is more common. ${left} ${left === 1 ? 'try' : 'tries'} left.`);
+}
+
+function checkTutorialInverse() {
+  const avg = t3Average(getT3Model());
+  const accepted = STATE.target.accepted;
+  const nature = ISOTOPES[T3_INVERSE_SYM][0].abundance;
   if (Math.abs(avg - accepted) < 0.05) {
-    showCorrect(`Correct! The weighted average is ${avg.toFixed(4)} amu (accepted: ${accepted.toFixed(4)} amu).`);
+    showCorrect(`Correct! ${getElement(T3_INVERSE_SYM).name} is about ${nature.toFixed(1)}% Li-6 and ${(100 - nature).toFixed(1)}% Li-7. The average sits close to 7 because Li-7 dominates.`, true);
+    nextBtn.textContent = 'Find boron’s mass →';
+  } else if (avg < accepted) {
+    showIncorrect('Too low. You need more of the heavier <strong>isotope</strong> (Li-7) to pull the average up toward the table mass.');
   } else {
-    showIncorrect(`Your average: ${avg.toFixed(4)} amu. Target: ${accepted.toFixed(4)} amu. Adjust the sliders — which isotope is most abundant?`);
+    showIncorrect('Too high. There is some Li-6, but not half — the average is much closer to 7 than to 6.');
   }
 }
 
-function showCorrect(msg) {
-  feedbackEl.textContent = '✓ ' + msg;
+function showCorrect(msg, skipScore) {
+  feedbackEl.innerHTML = '✓ ' + msg;
   feedbackEl.className = 'feedback correct';
   checkBtn.style.display = 'none';
   nextBtn.style.display = '';
-  STATE.tierScores[STATE.tier - 1]++;
-  renderTierBar();
+  if (!skipScore) {
+    STATE.tierScores[STATE.tier - 1]++;
+    renderTierBar();
+  }
 }
 
 function showIncorrect(msg) {
-  feedbackEl.textContent = '✗ ' + msg;
+  feedbackEl.innerHTML = '✗ ' + msg;
   feedbackEl.className = 'feedback incorrect';
 }
 
 function nextChallenge() {
   STATE.challengeIndex++;
-  if (STATE.challengeIndex >= 3) {
+  const needed = STATE.tier === 3 ? TIER3_CHALLENGES.length : 3;
+  if (STATE.challengeIndex >= needed) {
     STATE.challengeIndex = 0;
     if (STATE.tier < 3) {
       STATE.tier++;
+      if (STATE.tier === 3) resetTutorialState();
+    } else if (STATE.tier === 3) {
+      STATE.tier = 4;
+      resetMassSpecState();
     } else {
       STATE.completed = true;
       localStorage.setItem('mod01_complete', 'true');
-      // Mark visited for hub
       try {
         const visited = JSON.parse(localStorage.getItem('visitedModules') || '{}');
         visited['01'] = true;
@@ -890,71 +3513,401 @@ function nextChallenge() {
   setChallenge();
 }
 
+function buildSummary() {
+  const boron = STATE.boronResult;
+  const bAccepted = acceptedAvgMass('B');
+  const bIsos = ISOTOPES.B;
+  let boronLine;
+  if (boron && !boron.revealed) {
+    boronLine = `You matched nature: <span class="result">${Number(boron.avg).toFixed(1)} amu</span> from ${boron.mix[0]}% B-10 and ${boron.mix[1]}% B-11.`;
+  } else if (boron && boron.revealed) {
+    boronLine = `After 3 checks, nature’s mix is ${bIsos[0].abundance}% B-10 and ${bIsos[1].abundance}% B-11 → <span class="result">${bAccepted.toFixed(1)} amu</span>.`;
+  } else {
+    boronLine = `Nature’s mix is ${bIsos[0].abundance}% B-10 and ${bIsos[1].abundance}% B-11 → <span class="result">${bAccepted.toFixed(1)} amu</span>.`;
+  }
+
+  document.getElementById('summaryGrid').innerHTML = `
+    <div class="summary-card">
+      <div class="summary-kicker">Build</div>
+      <h3>You Built Three Nuclei</h3>
+      <ul>
+        <li><span class="result">He-4</span> — 2 protons, 2 neutrons, 2 electrons</li>
+        <li><span class="result">C-13</span> — 6 protons, 7 neutrons, 6 electrons</li>
+        <li><span class="result">O-18</span> — 8 protons, 10 neutrons, 8 electrons</li>
+      </ul>
+    </div>
+    <div class="summary-card identify">
+      <div class="summary-kicker">Identify</div>
+      <h3>You Named Three <strong>Isotopes</strong></h3>
+      <ul>
+        <li><span class="result">Li-7</span> — Z = 3, A = 7</li>
+        <li><span class="result">N-14</span> — Z = 7, A = 14</li>
+        <li><span class="result">Si-28</span> — Z = 14, A = 28</li>
+      </ul>
+    </div>
+    <div class="summary-card aam">
+      <div class="summary-kicker">Average atomic mass</div>
+      <h3>A <strong>Weighted Average</strong> Follows the Majority</h3>
+      <ul>
+        <li><span class="result">Tokens:</span> an equal mix sits in the middle; more of one mass pulls the average toward it.</li>
+        <li><span class="result">Course mark:</span> a bigger weighting pulls the final mark toward that category.</li>
+        <li><span class="result">Chlorine:</span> mostly Cl-35, so the table mass sits closer to 35 than to 37.</li>
+        <li><span class="result">Lithium:</span> about 7.6% Li-6 and 92.4% Li-7.</li>
+        <li><span class="result">Boron:</span> ${boronLine}</li>
+        <li><span class="result">Mass spectrometer:</span> peak heights measure natural abundance; unknowns identified from the printed average.</li>
+      </ul>
+    </div>
+  `;
+}
+
+// ============================================================
+// DEBRIEF — learning intentions & curricular competencies
+// Wording is verbatim from the course planning document; it is the
+// assessment wording, so it is not paraphrased here.
+// ============================================================
+const DEBRIEF = {
+  intentions: [
+    { text: 'We will work independently to recall some of the main concepts of atomic theory.',
+      target: 'tier:1', revisit: 'Build atoms' },
+    { text: 'We will discuss our current understanding of atomic theory and fill in any current gaps.', note: 'in discussion' },
+    { text: 'We will learn some of the important language used in science to talk about different types of particles.',
+      target: 'tier:1', revisit: 'Build atoms' },
+    { text: 'We will discuss “isotopes” and “relative mass”.',
+      target: 'tier:1', revisit: 'Build atoms' },
+    { text: 'We will draw and discuss the different uses for isotopes.', note: 'on paper' },
+    { text: 'We will cover the details of “isotopes” and understand how our knowledge of isotopes affects the “average atomic mass” of each element.',
+      target: 'tier:3', revisit: 'Avg Mass' },
+    { text: 'We will see how scientific inventions help us understand the world on a deeper level.',
+      target: 'tier:4', revisit: 'Mass Spec' }
+  ],
+  competencies: [
+    { code: 'Q&P', name: 'Questioning and predicting',
+      text: 'I will demonstrate a sustained intellectual curiosity by testing my current knowledge of atomic theory, and filling in any gaps by asking good questions during discussion.' },
+    { code: 'PAI', name: 'Processing and analyzing data and information',
+      text: 'Use knowledge of scientific concepts to draw conclusions that are consistent with evidence.' }
+  ]
+};
+
+function fillIntentionList(ul, items, opts) {
+  if (!ul || ul.childElementCount) return;
+  opts = opts || {};
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.appendChild(document.createTextNode(item.text));
+    if (item.note) {
+      li.className = 'elsewhere';
+      const tag = document.createElement('span');
+      tag.className = 'debrief-tag';
+      tag.textContent = ` — ${item.note}`;
+      li.appendChild(tag);
+    }
+    if (opts.showRevisit && item.target && item.revisit) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'debrief-revisit';
+      btn.dataset.target = item.target;
+      btn.textContent = 'Explore again → ' + item.revisit;
+      li.appendChild(btn);
+    }
+    ul.appendChild(li);
+  });
+}
+
+function fillCompetencyList(ul, items) {
+  if (!ul || ul.childElementCount) return;
+  items.forEach(item => {
+    const li = document.createElement('li');
+    const name = document.createElement('span');
+    name.className = 'cc-name';
+    name.textContent = item.name;
+    li.appendChild(name);
+    li.appendChild(document.createTextNode(item.text));
+    ul.appendChild(li);
+  });
+}
+
+function renderBriefing() {
+  fillIntentionList(document.getElementById('briefingIntentions'), DEBRIEF.intentions);
+  fillCompetencyList(document.getElementById('briefingCompetencies'), DEBRIEF.competencies);
+}
+
+function startModule() {
+  const briefing = document.getElementById('briefing');
+  const stage = document.getElementById('moduleStage');
+  if (briefing) briefing.hidden = true;
+  if (stage) stage.hidden = false;
+  // Canvas was sized while hidden — remeasure now that the stage is visible.
+  if (typeof resize === 'function') resize();
+  if (typeof draw === 'function') draw(0);
+  const firstFocus = document.querySelector('#moduleStage .particle-btn, #moduleStage button, #moduleStage input, #moduleStage select');
+  if (firstFocus) firstFocus.focus();
+}
+
+function renderDebrief() {
+  fillIntentionList(document.getElementById('debriefIntentions'), DEBRIEF.intentions, { showRevisit: true });
+  fillCompetencyList(document.getElementById('debriefCompetencies'), DEBRIEF.competencies);
+}
+
+function enterDebriefStage() {
+  const stage = document.getElementById('moduleStage');
+  const debrief = document.getElementById('debrief');
+  if (!stage || !debrief) return;
+  Array.from(stage.children).forEach(child => {
+    if (child === debrief) return;
+    if (!child.hasAttribute('data-pre-debrief-hidden')) {
+      child.setAttribute('data-pre-debrief-hidden', child.hidden ? '1' : '0');
+    }
+    child.hidden = true;
+  });
+  debrief.hidden = false;
+}
+
+function leaveDebriefStage() {
+  const stage = document.getElementById('moduleStage');
+  const debrief = document.getElementById('debrief');
+  if (!stage) return;
+  Array.from(stage.children).forEach(child => {
+    if (child === debrief) return;
+    if (child.hasAttribute('data-pre-debrief-hidden')) {
+      child.hidden = child.getAttribute('data-pre-debrief-hidden') === '1';
+      child.removeAttribute('data-pre-debrief-hidden');
+    }
+  });
+  if (debrief) debrief.hidden = true;
+}
+
+let debriefRevisitWired = false;
+function ensureBackToDebriefBtn() {
+  let btn = document.getElementById('backToDebriefBtn');
+  if (!btn) {
+    btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn submit';
+    btn.id = 'backToDebriefBtn';
+    btn.textContent = 'What this was for →';
+    btn.style.marginTop = '0.75rem';
+    const host = document.querySelector('#sandboxArea .sandbox-panel') || document.getElementById('summaryPage');
+    if (host) host.appendChild(btn);
+    btn.addEventListener('click', () => revealDebrief());
+  }
+  btn.hidden = false;
+}
+
+function wireDebriefRevisit() {
+  if (debriefRevisitWired) return;
+  debriefRevisitWired = true;
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.debrief-revisit');
+    if (!btn || !btn.dataset.target) return;
+    e.preventDefault();
+    leaveDebriefStage();
+    const tier = Number(String(btn.dataset.target).replace(/^tier:/, '')) || 1;
+    document.getElementById('summaryPage').style.display = '';
+    document.getElementById('sandboxArea').style.display = '';
+    document.getElementById('viewport').style.display = '';
+    mountSandboxPlay();
+    ensureBackToDebriefBtn();
+    const sym = sandboxElement || 'C';
+    if (tier === 1) {
+      document.getElementById('sandboxMode').value = 'build';
+      document.getElementById('msPanel').classList.remove('open');
+      selectSandboxElement(sym);
+    } else if (tier === 3) {
+      document.getElementById('sandboxMode').value = 'avgmass';
+      document.getElementById('msPanel').classList.remove('open');
+      selectSandboxElement(sym);
+    } else if (tier === 4) {
+      document.getElementById('summaryPage').style.display = 'none';
+      STATE.mode = 'sandbox';
+      STATE.tier = 4;
+      setMassSpecStage();
+      nextBtn.style.display = '';
+      nextBtn.disabled = false;
+      nextBtn.textContent = 'What this was for →';
+      nextBtn.dataset.returnDebrief = '1';
+    }
+    window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
+  });
+}
+
+function revealDebrief() {
+  const section = document.getElementById('debrief');
+  if (!section) return;
+  renderDebrief();
+  wireDebriefRevisit();
+  enterDebriefStage();
+  section.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+}
+
+function hideDebrief() {
+  leaveDebriefStage();
+}
+
 function showCompletion() {
-  promptEl.textContent = '';
-  promptSub.textContent = '';
+  setPrompt(null, 'Module Complete',
+    'Here’s everything you did — then try any element in the sandbox.');
+  taskStep.textContent = 'Complete';
+  setFigureCaption('FIG.  ·  MODULE COMPLETE');
   checkBtn.style.display = 'none';
   clearBtn.style.display = 'none';
   nextBtn.style.display = 'none';
+  backBtn.style.display = 'none';
   t2Panel.style.display = 'none';
   t3Panel.style.display = 'none';
-  document.getElementById('completeBanner').style.display = '';
+  document.getElementById('t3Tutorial').style.display = 'none';
+  const msPanel = document.getElementById('msPanel');
+  if (msPanel) msPanel.classList.remove('open');
+  setSimControlsOpen(false);
+  document.getElementById('viewport').style.display = 'none';
+  document.getElementById('summaryPage').style.display = '';
   document.getElementById('sandboxArea').style.display = '';
+  document.getElementById('sandboxPrompt').textContent = 'Pick an element, then build its atom or explore average mass.';
+  particleControls.style.display = 'none';
+  feedbackEl.textContent = '';
+  feedbackEl.className = 'feedback';
+  STATE.mode = 'sandbox';
+  STATE.tier = 1;
+  clearPlaced();
   renderTierBar();
+  buildSummary();
   buildMiniPT();
+  mountSandboxPlay();
+  ensureBackToDebriefBtn();
+  revealDebrief();
 }
 
 // ============================================================
 // TIER 3 — ABUNDANCE SLIDERS
 // ============================================================
 function buildT3Sliders(sym) {
-  const container = document.getElementById('t3Sliders');
   const isos = ISOTOPES[sym];
-  container.innerHTML = '';
+  t3SimControls.innerHTML = '';
 
   const even = 100 / isos.length;
+  const massDecimals = sym === 'B' ? 1 : 5;
   isos.forEach((iso, i) => {
+    const color = ISO_COLORS[i % ISO_COLORS.length];
+    const thumb = T3_THUMB[i] || '';
     const row = document.createElement('div');
     row.className = 't3-row';
     row.innerHTML = `
-      <span class="t3-isotope-label">${sym}-${iso.A}</span>
-      <span class="t3-mass">${iso.mass.toFixed(5)} amu</span>
-      <input type="range" class="t3-slider" min="0" max="100" step="0.1" value="${even.toFixed(1)}" data-idx="${i}">
-      <span class="t3-pct" id="t3pct${i}">${even.toFixed(1)}%</span>
+      <span class="t3-isotope-label"><span class="t3-swatch" style="background:${color};color:${color}"></span>${sym}-${iso.A}</span>
+      <span class="t3-mass">${iso.mass.toFixed(massDecimals)} amu</span>
+      <input type="range" class="t3-slider ${thumb}" min="0" max="100" step="0.1" value="${even.toFixed(1)}" data-idx="${i}">
+      <span class="t3-pct ${thumb}" id="t3pct${i}">${even.toFixed(1)}%</span>
     `;
-    container.appendChild(row);
+    t3SimControls.appendChild(row);
   });
 
-  container.querySelectorAll('.t3-slider').forEach(s => {
-    s.addEventListener('input', () => updateT3Display(sym));
+  setSimControlsOpen(true);
+  t3SimControls.querySelectorAll('.t3-slider').forEach(s => {
+    s.addEventListener('input', (e) => {
+      if (isos.length === 2) {
+        const i = parseInt(e.target.dataset.idx, 10);
+        const v = parseFloat(e.target.value);
+        const other = t3SimControls.querySelector(`.t3-slider[data-idx="${1 - i}"]`);
+        if (other) other.value = (100 - v).toFixed(1);
+      }
+      updateT3Display(sym);
+    });
   });
   updateT3Display(sym);
 }
 
 function computeT3Average() {
-  const sym = STATE.target.sym;
-  const isos = ISOTOPES[sym];
-  const sliders = document.querySelectorAll('.t3-slider');
-  let avg = 0;
-  sliders.forEach((s, i) => {
-    avg += isos[i].mass * (parseFloat(s.value) / 100);
-  });
-  return avg;
+  const model = getT3Model();
+  return t3Average(model);
 }
 
 function updateT3Display(sym) {
-  const sliders = document.querySelectorAll('.t3-slider');
+  const sliders = document.querySelectorAll('#t3SimControls .t3-slider');
   sliders.forEach((s, i) => {
-    document.getElementById(`t3pct${i}`).textContent = parseFloat(s.value).toFixed(1) + '%';
+    const el = document.getElementById(`t3pct${i}`);
+    if (el) el.textContent = parseFloat(s.value).toFixed(1) + '%';
   });
-  const avg = computeT3Average();
-  document.getElementById('t3Avg').textContent = avg.toFixed(4) + ' amu';
-  document.getElementById('t3Target').textContent = `Accepted: ${STATE.target.accepted.toFixed(4)} amu`;
+  updateT3Result();
+}
+
+function updateT3Result() {
+  const model = getT3Model();
+  const formulaEl = document.getElementById('t3Formula');
+  const descEl = document.getElementById('t3FormulaDesc');
+  const avgEl = document.getElementById('t3Avg');
+  const targetEl = document.getElementById('t3Target');
+  const compareEl = document.getElementById('t3EqCompare');
+  const compareDesc = document.getElementById('t3CompareDesc');
+  const compareFormula = document.getElementById('t3CompareFormula');
+  if (!model) {
+    formulaEl.innerHTML = '';
+    if (descEl) descEl.textContent = '';
+    avgEl.textContent = '—';
+    targetEl.textContent = '';
+    if (compareEl) compareEl.hidden = true;
+    return;
+  }
+  const avg = t3Average(model);
+  const decimals = t3AvgDecimals(model);
+  avgEl.textContent = `${avg.toFixed(decimals)} ${model.unit}`;
+  if (descEl) descEl.innerHTML = formulaDescription(model);
+  formulaEl.innerHTML = formatT3FormulaHTML(model);
+  const liveTip = document.getElementById('t3EqTip');
+  if (liveTip && !liveTip.hidden && !formulaEl.querySelector('.t3-tip:hover, .t3-tip:focus-visible')) {
+    liveTip.hidden = true;
+  }
+  pulseChangedTerms();
+
+  if (compareEl && compareDesc && compareFormula) {
+    if (model.kind === 'grade') {
+      const equalAvg = t3Average(equalMixGradeModel());
+      compareEl.hidden = false;
+      compareDesc.textContent =
+        `Same four marks, but locked at 25% each — a simple average of ${equalAvg.toFixed(1)}%. This line never moves. Compare it to your equation above: when you raise a category’s weighting, the final mark slides toward that score and away from this midpoint.`;
+      compareFormula.innerHTML = formatEqualMixCompareHTML();
+    } else {
+      compareEl.hidden = true;
+    }
+  }
+
+  if (model.kind === 'bag') {
+    targetEl.textContent = 'Equal mix → average in the middle. Unequal mix → average follows the majority.';
+  } else if (model.kind === 'grade') {
+    targetEl.textContent = 'Weightings always add to 100%. Extra exam weight comes from labs first; extra test weight comes from quizzes.';
+  } else if (STATE.t3Phase === 'tutorial' && STATE.tutorialStep === 5) {
+    targetEl.innerHTML = `Match ${STATE.target.accepted.toFixed(4)} amu — that mix is the <strong>percent abundance</strong>.`;
+  } else if (STATE.mode === 'sandbox' || STATE.t3RevealTarget) {
+    targetEl.textContent = STATE.target
+      ? `Accepted: ${STATE.target.accepted.toFixed(decimals)} amu`
+      : '';
+  } else if (STATE.t3Phase === 'tutorial') {
+    targetEl.innerHTML = 'Nature’s mix is fixed. Next you’ll find it from the <strong>average atomic mass</strong>.';
+  } else {
+    targetEl.textContent = 'Match nature’s mix — the accepted mass stays hidden until you check.';
+  }
+  updateHUD();
+  if (prefersReduced) draw(0);
 }
 
 // ============================================================
 // SANDBOX — MINI PERIODIC TABLE
 // ============================================================
+const SANDBOX_PLAY_IDS = ['viewport', 'particleControls', 't2Panel', 't3Panel', 'actionButtons', 'feedback'];
+
+function mountSandboxPlay() {
+  const stage = document.getElementById('sandboxStage');
+  const viewport = document.getElementById('viewport');
+  if (!stage || !viewport || stage.contains(viewport)) return;
+  SANDBOX_PLAY_IDS.forEach(id => stage.appendChild(document.getElementById(id)));
+}
+
+function unmountSandboxPlay() {
+  const stage = document.getElementById('sandboxStage');
+  const viewport = document.getElementById('viewport');
+  if (!stage || !viewport || !stage.contains(viewport)) return;
+  const wrap = document.querySelector('.module-wrap');
+  const summary = document.getElementById('summaryPage');
+  SANDBOX_PLAY_IDS.forEach(id => wrap.insertBefore(document.getElementById(id), summary));
+}
+
 function buildMiniPT() {
   const grid = document.getElementById('miniPT');
   grid.innerHTML = '';
@@ -997,19 +3950,25 @@ function selectSandboxElement(sym) {
 }
 
 function startSandboxBuild(sym) {
+  document.getElementById('viewport').style.display = '';
   STATE.mode = 'sandbox';
   STATE.tier = 1; // Use tier 1 rendering
   clearPlaced();
   const el = getElement(sym);
   const mainIso = ISOTOPES[sym][0];
-  promptEl.textContent = `Sandbox: Build ${el.name}`;
-  promptSub.textContent = `Z = ${el.Z}. Try building ${sym}-${mainIso.A} or any isotope!`;
+  setFigureCaption(`FIG.  ·  SANDBOX  ·  ${el.sym}`);
+  document.getElementById('sandboxPrompt').innerHTML = `Build ${el.name} — Z = ${el.Z}. Try ${sym}-${mainIso.A} or any <strong>isotope</strong>.`;
+  particleControls.style.display = '';
   checkBtn.style.display = 'none';
   clearBtn.style.display = '';
   nextBtn.style.display = 'none';
   t2Panel.style.display = 'none';
   t3Panel.style.display = 'none';
+  document.getElementById('t3Tutorial').style.display = 'none';
+  setSimControlsOpen(false);
   feedbackEl.textContent = '';
+  backBtn.style.display = 'none';
+  resize();
 
   const info = document.getElementById('sandboxInfo');
   const isos = ISOTOPES[sym];
@@ -1017,19 +3976,27 @@ function startSandboxBuild(sym) {
 }
 
 function startSandboxAvgMass(sym) {
+  document.getElementById('viewport').style.display = '';
   STATE.mode = 'sandbox';
   STATE.tier = 3;
+  STATE.t3Phase = 'play';
+  STATE.t3RevealTarget = true;
+  t3MarkerAvg = null;
   clearPlaced();
   const el = getElement(sym);
   STATE.target = { sym, Z: el.Z, accepted: acceptedAvgMass(sym) };
-  promptEl.textContent = `Sandbox: ${el.name} Average Mass`;
-  promptSub.textContent = 'Adjust sliders to explore how abundance affects average atomic mass.';
+  setFigureCaption(`FIG.  ·  SANDBOX  ·  ${el.sym} MASS`);
+  document.getElementById('sandboxPrompt').innerHTML = `${el.name}: adjust sliders to see how <strong>percent abundance</strong> changes <strong>average atomic mass</strong>.`;
+  particleControls.style.display = 'none';
   checkBtn.style.display = 'none';
   clearBtn.style.display = 'none';
   nextBtn.style.display = 'none';
+  backBtn.style.display = 'none';
   t2Panel.style.display = 'none';
   t3Panel.style.display = '';
+  document.getElementById('t3Tutorial').style.display = 'none';
   feedbackEl.textContent = '';
+  resize();
   buildT3Sliders(sym);
 
   const info = document.getElementById('sandboxInfo');
@@ -1049,7 +4016,42 @@ clearBtn.addEventListener('click', () => {
   feedbackEl.textContent = '';
   feedbackEl.className = 'feedback';
 });
-nextBtn.addEventListener('click', nextChallenge);
+nextBtn.addEventListener('click', () => {
+  if (nextBtn.dataset.returnDebrief === '1' || (STATE.completed && STATE.tier === 4 && STATE.mode === 'sandbox')) {
+    delete nextBtn.dataset.returnDebrief;
+    revealDebrief();
+    return;
+  }
+  if (STATE.tier === 4 && STATE.mode === 'challenge') {
+    finishMassSpec();
+  } else if (STATE.tier === 3 && STATE.mode === 'challenge' && STATE.t3Phase === 'tutorial') {
+    advanceTutorial();
+  } else {
+    nextChallenge();
+  }
+});
+backBtn.addEventListener('click', () => {
+  if (STATE.tier === 4) {
+    STATE.tier = 3;
+    STATE.t3Phase = 'play';
+    STATE.challengeIndex = 0;
+    STATE.completed = false;
+    document.getElementById('msPanel').classList.remove('open');
+    setChallenge();
+    return;
+  }
+  goBackT3();
+});
+
+document.getElementById('msRunBtn').addEventListener('click', runMassSpec);
+document.getElementById('msCheckBtn').addEventListener('click', checkMsGuess);
+document.getElementById('msRevealBtn').addEventListener('click', revealMsAnswer);
+document.getElementById('msGuess').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') checkMsGuess();
+});
+document.getElementById('msPanel').addEventListener('click', (event) => {
+  if (event.target.closest('[data-open-periodic-table]')) openPeriodicTableOverlay();
+});
 
 // Help system
 const stuckBtn = document.getElementById('stuckBtn');
@@ -1072,15 +4074,123 @@ function loop(t) {
   if (!prefersReduced) requestAnimationFrame(loop);
 }
 
+// DEV-ONLY-SKIP — delete this block before publish
+const DEV_STOP_COUNT = 15;
+
+function currentDevStop() {
+  if (STATE.completed || STATE.mode === 'sandbox') return 14;
+  if (STATE.tier === 1) return STATE.challengeIndex;
+  if (STATE.tier === 2) return 3 + STATE.challengeIndex;
+  if (STATE.tier === 3) {
+    if (STATE.t3Phase === 'tutorial') return 6 + STATE.tutorialStep;
+    return 12;
+  }
+  if (STATE.tier === 4) return 13;
+  return 0;
+}
+
+function applyDevStop(i) {
+  STATE.mode = 'challenge';
+  STATE.completed = false;
+  document.getElementById('summaryPage').style.display = 'none';
+  hideDebrief();
+  unmountSandboxPlay();
+  document.getElementById('viewport').style.display = '';
+  document.getElementById('sandboxArea').style.display = 'none';
+  const msPanel = document.getElementById('msPanel');
+  if (msPanel) msPanel.classList.remove('open');
+
+  if (i <= 2) {
+    STATE.tier = 1;
+    STATE.challengeIndex = i;
+    STATE.tierScores = [i, 0, 0];
+    resetTutorialState();
+    resetMassSpecState();
+    setChallenge();
+    return;
+  }
+  if (i <= 5) {
+    STATE.tier = 2;
+    STATE.challengeIndex = i - 3;
+    STATE.tierScores = [3, i - 3, 0];
+    resetTutorialState();
+    resetMassSpecState();
+    setChallenge();
+    return;
+  }
+  if (i <= 11) {
+    STATE.tier = 3;
+    STATE.challengeIndex = 0;
+    STATE.tierScores = [3, 3, 0];
+    resetTutorialState();
+    resetMassSpecState();
+    STATE.tutorialStep = i - 6;
+    setChallenge();
+    return;
+  }
+  if (i === 12) {
+    STATE.tier = 3;
+    STATE.challengeIndex = 0;
+    STATE.tierScores = [3, 3, 0];
+    resetTutorialState();
+    resetMassSpecState();
+    STATE.t3Phase = 'play';
+    setChallenge();
+    return;
+  }
+  if (i === 13) {
+    STATE.tier = 4;
+    STATE.challengeIndex = 0;
+    STATE.tierScores = [3, 3, 1];
+    resetTutorialState();
+    resetMassSpecState();
+    setChallenge();
+    return;
+  }
+  STATE.tier = 4;
+  STATE.tierScores = [3, 3, 1];
+  STATE.completed = true;
+  showCompletion();
+}
+
+function devNext() {
+  // Leave the briefing gate if still open, then advance stops.
+  const briefing = document.getElementById('briefing');
+  if (briefing && !briefing.hidden) startModule();
+  applyDevStop((currentDevStop() + 1) % DEV_STOP_COUNT);
+}
+document.getElementById('devNext').addEventListener('click', devNext);
+
 // ============================================================
 // INIT
 // ============================================================
+bindFormulaTips();
 setChallenge();
+renderBriefing();
+
+const briefingNext = document.getElementById('briefingNext');
+if (briefingNext) briefingNext.addEventListener('click', startModule);
+
+// Teacher preview — append ?debrief to the URL to see the end-of-module panel
+// without playing the module through. Also skips the briefing gate.
+const _qs = new URLSearchParams(location.search);
+if (_qs.has('debrief') || _qs.has('start')) {
+  startModule();
+  if (_qs.has('debrief')) {
+    STATE.completed = true;
+    showCompletion();
+  }
+}
 
 if (prefersReduced) {
   draw(0);
 } else {
   requestAnimationFrame(loop);
+}
+
+// canvas labels are drawn with webfonts; repaint once they land
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => { if (prefersReduced) draw(0); });
 }
 </script>
 </body>

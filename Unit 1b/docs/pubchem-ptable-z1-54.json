@@ -1,0 +1,326 @@
+{
+  "H": {
+    "z": 1,
+    "radiusPm": 120.0,
+    "en": 2.2,
+    "eaEv": 0.754
+  },
+  "He": {
+    "z": 2,
+    "radiusPm": 140.0,
+    "en": null,
+    "eaEv": null
+  },
+  "Li": {
+    "z": 3,
+    "radiusPm": 182.0,
+    "en": 0.98,
+    "eaEv": 0.618
+  },
+  "Be": {
+    "z": 4,
+    "radiusPm": 153.0,
+    "en": 1.57,
+    "eaEv": null
+  },
+  "B": {
+    "z": 5,
+    "radiusPm": 192.0,
+    "en": 2.04,
+    "eaEv": 0.277
+  },
+  "C": {
+    "z": 6,
+    "radiusPm": 170.0,
+    "en": 2.55,
+    "eaEv": 1.263
+  },
+  "N": {
+    "z": 7,
+    "radiusPm": 155.0,
+    "en": 3.04,
+    "eaEv": null
+  },
+  "O": {
+    "z": 8,
+    "radiusPm": 152.0,
+    "en": 3.44,
+    "eaEv": 1.461
+  },
+  "F": {
+    "z": 9,
+    "radiusPm": 135.0,
+    "en": 3.98,
+    "eaEv": 3.339
+  },
+  "Ne": {
+    "z": 10,
+    "radiusPm": 154.0,
+    "en": null,
+    "eaEv": null
+  },
+  "Na": {
+    "z": 11,
+    "radiusPm": 227.0,
+    "en": 0.93,
+    "eaEv": 0.548
+  },
+  "Mg": {
+    "z": 12,
+    "radiusPm": 173.0,
+    "en": 1.31,
+    "eaEv": null
+  },
+  "Al": {
+    "z": 13,
+    "radiusPm": 184.0,
+    "en": 1.61,
+    "eaEv": 0.441
+  },
+  "Si": {
+    "z": 14,
+    "radiusPm": 210.0,
+    "en": 1.9,
+    "eaEv": 1.385
+  },
+  "P": {
+    "z": 15,
+    "radiusPm": 180.0,
+    "en": 2.19,
+    "eaEv": 0.746
+  },
+  "S": {
+    "z": 16,
+    "radiusPm": 180.0,
+    "en": 2.58,
+    "eaEv": 2.077
+  },
+  "Cl": {
+    "z": 17,
+    "radiusPm": 175.0,
+    "en": 3.16,
+    "eaEv": 3.617
+  },
+  "Ar": {
+    "z": 18,
+    "radiusPm": 188.0,
+    "en": null,
+    "eaEv": null
+  },
+  "K": {
+    "z": 19,
+    "radiusPm": 275.0,
+    "en": 0.82,
+    "eaEv": 0.501
+  },
+  "Ca": {
+    "z": 20,
+    "radiusPm": 231.0,
+    "en": 1.0,
+    "eaEv": null
+  },
+  "Sc": {
+    "z": 21,
+    "radiusPm": 211.0,
+    "en": 1.36,
+    "eaEv": 0.188
+  },
+  "Ti": {
+    "z": 22,
+    "radiusPm": 187.0,
+    "en": 1.54,
+    "eaEv": 0.079
+  },
+  "V": {
+    "z": 23,
+    "radiusPm": 179.0,
+    "en": 1.63,
+    "eaEv": 0.525
+  },
+  "Cr": {
+    "z": 24,
+    "radiusPm": 189.0,
+    "en": 1.66,
+    "eaEv": 0.666
+  },
+  "Mn": {
+    "z": 25,
+    "radiusPm": 197.0,
+    "en": 1.55,
+    "eaEv": null
+  },
+  "Fe": {
+    "z": 26,
+    "radiusPm": 194.0,
+    "en": 1.83,
+    "eaEv": 0.163
+  },
+  "Co": {
+    "z": 27,
+    "radiusPm": 192.0,
+    "en": 1.88,
+    "eaEv": 0.661
+  },
+  "Ni": {
+    "z": 28,
+    "radiusPm": 163.0,
+    "en": 1.91,
+    "eaEv": 1.156
+  },
+  "Cu": {
+    "z": 29,
+    "radiusPm": 140.0,
+    "en": 1.9,
+    "eaEv": 1.228
+  },
+  "Zn": {
+    "z": 30,
+    "radiusPm": 139.0,
+    "en": 1.65,
+    "eaEv": null
+  },
+  "Ga": {
+    "z": 31,
+    "radiusPm": 187.0,
+    "en": 1.81,
+    "eaEv": 0.3
+  },
+  "Ge": {
+    "z": 32,
+    "radiusPm": 211.0,
+    "en": 2.01,
+    "eaEv": 1.35
+  },
+  "As": {
+    "z": 33,
+    "radiusPm": 185.0,
+    "en": 2.18,
+    "eaEv": 0.81
+  },
+  "Se": {
+    "z": 34,
+    "radiusPm": 190.0,
+    "en": 2.55,
+    "eaEv": 2.021
+  },
+  "Br": {
+    "z": 35,
+    "radiusPm": 183.0,
+    "en": 2.96,
+    "eaEv": 3.365
+  },
+  "Kr": {
+    "z": 36,
+    "radiusPm": 202.0,
+    "en": 3.0,
+    "eaEv": null
+  },
+  "Rb": {
+    "z": 37,
+    "radiusPm": 303.0,
+    "en": 0.82,
+    "eaEv": 0.468
+  },
+  "Sr": {
+    "z": 38,
+    "radiusPm": 249.0,
+    "en": 0.95,
+    "eaEv": null
+  },
+  "Y": {
+    "z": 39,
+    "radiusPm": 219.0,
+    "en": 1.22,
+    "eaEv": 0.307
+  },
+  "Zr": {
+    "z": 40,
+    "radiusPm": 186.0,
+    "en": 1.33,
+    "eaEv": 0.426
+  },
+  "Nb": {
+    "z": 41,
+    "radiusPm": 207.0,
+    "en": 1.6,
+    "eaEv": 0.893
+  },
+  "Mo": {
+    "z": 42,
+    "radiusPm": 209.0,
+    "en": 2.16,
+    "eaEv": 0.746
+  },
+  "Tc": {
+    "z": 43,
+    "radiusPm": 209.0,
+    "en": 1.9,
+    "eaEv": 0.55
+  },
+  "Ru": {
+    "z": 44,
+    "radiusPm": 207.0,
+    "en": 2.2,
+    "eaEv": 1.05
+  },
+  "Rh": {
+    "z": 45,
+    "radiusPm": 195.0,
+    "en": 2.28,
+    "eaEv": 1.137
+  },
+  "Pd": {
+    "z": 46,
+    "radiusPm": 202.0,
+    "en": 2.2,
+    "eaEv": 0.557
+  },
+  "Ag": {
+    "z": 47,
+    "radiusPm": 172.0,
+    "en": 1.93,
+    "eaEv": 1.302
+  },
+  "Cd": {
+    "z": 48,
+    "radiusPm": 158.0,
+    "en": 1.69,
+    "eaEv": null
+  },
+  "In": {
+    "z": 49,
+    "radiusPm": 193.0,
+    "en": 1.78,
+    "eaEv": 0.3
+  },
+  "Sn": {
+    "z": 50,
+    "radiusPm": 217.0,
+    "en": 1.96,
+    "eaEv": 1.2
+  },
+  "Sb": {
+    "z": 51,
+    "radiusPm": 206.0,
+    "en": 2.05,
+    "eaEv": 1.07
+  },
+  "Te": {
+    "z": 52,
+    "radiusPm": 206.0,
+    "en": 2.1,
+    "eaEv": 1.971
+  },
+  "I": {
+    "z": 53,
+    "radiusPm": 198.0,
+    "en": 2.66,
+    "eaEv": 3.059
+  },
+  "Xe": {
+    "z": 54,
+    "radiusPm": 216.0,
+    "en": 2.6,
+    "eaEv": null
+  }
+}

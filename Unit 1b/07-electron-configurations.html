@@ -6,327 +6,3608 @@
 <title>07 — Electron Configurations</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/suite.css">
 <style>
-:root{
-  --void:#0a0912;
-  --void-2:#0c0b1c;
-  --panel:#151330;
-  --panel-edge:#2a2660;
-  --grid:#211d47;
-  --phosphor:#3fe0cf;
-  --phosphor-dim:#1c6b66;
-  --ember:#ffb24d;
-  --signal:#b579ff;
-  --ink:#e9e7fb;
-  --dim:#797597;
+/* Module 07 — Act 1: shell-model Ne vs real PES */
+.mono-label,
+.act-meta,.scaffold-note,.discovery-line,.beat-kicker,
+.pes-axis-label,.pes-tick,.pes-num,.pes-sublabel,.atom-caption,
+.axis-note,.dir-tag,.guess-prompt-label,.guess-feedback,.guess-solved-tag,
+.fill-tile,.fill-zoom-btn,.fill-zoom-tag,
+.blocks-cell-z,.blocks-cell-sym,.blocks-legend-item,.blocks-config-hint,
+.blocks-el-meta,.why-strip-label,.blocks-discovery,
+.sh-el-name,.sh-el-sym,.sh-pair-label,.sh-desc-kicker{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{
-  background:var(--void);
-  color:var(--ink);
-  font-family:'IBM Plex Mono',monospace;
-  min-height:100vh;
+.act-meta{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--dim);margin:-0.35rem 0 0.85rem;
 }
-body::before{
-  content:'';
-  position:fixed;
-  inset:0;
-  z-index:9999;
+.discovery-line{display:none !important;}
+.discovery-line.visible{display:none !important;}
+.scaffold-note{
+  font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--faint);margin:0.35rem 0 0.85rem;
+}
+.act-panel[hidden]{display:none !important;}
+.plate-body{padding:1.1rem 1.1rem 1.25rem;}
+
+.opener-grid{
+  display:grid;
+  grid-template-columns:minmax(140px,200px) minmax(0,1fr);
+  gap:1.1rem 1.35rem;
+  align-items:center;
+}
+@media(max-width:720px){
+  .opener-grid{grid-template-columns:1fr; justify-items:center;}
+}
+
+.atom-pane{
+  display:flex;flex-direction:column;align-items:center;gap:0.45rem;
+  opacity:0;transform:translateY(8px);
+  transition:opacity 0.45s ease, transform 0.45s ease;
   pointer-events:none;
-  opacity:0.045;
-  mix-blend-mode:screen;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-.module-wrap{
-  max-width:900px;
-  margin:0 auto;
-  padding:2rem 1.5rem;
+.beat-show-atom .atom-pane{
+  opacity:1;transform:none;pointer-events:auto;
 }
-.back-link{
-  display:inline-block;
-  color:var(--dim);
-  text-decoration:none;
-  font-size:0.85rem;
-  margin-bottom:1.5rem;
-  transition:color 0.2s;
+.atom-caption{
+  font-size:var(--label-sm);font-weight:600;letter-spacing:0;
+  text-transform:none;color:var(--ink);
 }
-.back-link:hover{color:var(--phosphor);}
-.mod-tag{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.55rem;
-  color:var(--dim);
-  text-transform:uppercase;
-  letter-spacing:0.15em;
-  margin-bottom:0.5rem;
+.atom-caption .sub{
+  display:block;margin-top:0.15rem;
+  font-size:var(--label-xs);letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--dim);
 }
-h1{
-  font-family:'Press Start 2P',monospace;
-  font-size:0.9rem;
-  color:var(--phosphor);
-  text-shadow:0 0 12px rgba(63,224,207,0.4),0 0 30px rgba(63,224,207,0.15);
-  margin-bottom:0.75rem;
-  line-height:1.6;
-}
-.framing{
-  font-family:'IBM Plex Mono',monospace;
-  color:var(--dim);
-  font-style:italic;
-  font-size:0.85rem;
-  line-height:1.6;
-  margin-bottom:1rem;
-}
-.viewport{
-  position:relative;
-  background:var(--void-2);
-  border:2px solid var(--panel-edge);
-  border-radius:4px;
-  box-shadow:
-    0 0 0 4px var(--void),
-    0 0 0 6px var(--panel-edge),
-    0 0 30px rgba(63,224,207,0.06);
-  padding:0;
-  margin:1.5rem 0;
-  overflow:hidden;
-}
-#simCanvas{width:100%;display:block;}
-.controls{/* placeholder for simulation controls */}
-.hud{
-  color:var(--dim);
-  font-size:0.75rem;
-  padding:0.75rem 0;
-  min-height:1.5rem;
-}
-[data-gate]{opacity:0;transition:opacity 0.6s;pointer-events:none;}
-[data-gate].discovered{opacity:1;pointer-events:auto;}
 
-#stuckBtn{
-  background:none;
-  border:1px solid var(--signal);
-  color:var(--signal);
-  font-family:'IBM Plex Mono',monospace;
-  font-size:0.8rem;
-  padding:0.5rem 1.2rem;
-  border-radius:4px;
-  cursor:pointer;
-  transition:background 0.2s,color 0.2s;
-  margin-top:1rem;
+.atom-svg{width:min(100%,200px);height:auto;display:block;}
+.atom-svg .shell{
+  fill:none;stroke:var(--ink);stroke-width:1.25;opacity:0.55;
 }
-#stuckBtn:hover{background:rgba(181,121,255,0.1);}
-#stuckBtn:focus-visible{outline:2px solid var(--signal);outline-offset:2px;}
+.atom-svg .neg-core-disk{pointer-events:none;}
+.atom-svg .e-marker,
+.atom-svg .e-valence{
+  fill:var(--electron);stroke:#6a5530;stroke-width:1;
+}
+.atom-svg .nuc-label{
+  font-family:var(--font-mono);font-size:11px;font-weight:600;
+  fill:var(--paper);text-anchor:middle;dominant-baseline:central;
+}
+.atom-svg .nuc-label.is-shielded{opacity:0.4;}
+.atom-svg .shell-count{
+  font-family:var(--font-mono);font-size:9px;font-weight:500;
+  letter-spacing:0.06em;fill:var(--dim);text-anchor:middle;
+}
 
-.help-panel{
+.pes-pane{
+  opacity:0;transform:translateY(8px);
+  transition:opacity 0.45s ease, transform 0.45s ease;
+  pointer-events:none;min-width:0;
+}
+.beat-show-pes .pes-pane{
+  opacity:1;transform:none;pointer-events:auto;
+}
+.pes-svg{width:100%;height:auto;display:block;overflow:visible;}
+
+.pes-axis-label{
+  font-size:11px;font-weight:600;letter-spacing:0.1em;
+  text-transform:uppercase;fill:var(--dim);
+}
+.pes-tick{
+  font-size:10px;font-weight:500;letter-spacing:0.04em;
+  fill:var(--faint);
+}
+.pes-schematic-ticks{opacity:1;transition:opacity 0.35s ease;}
+.beat-show-nums .pes-schematic-ticks{
+  opacity:0;visibility:hidden;pointer-events:none;
+}
+.pes-num{
+  font-size:11px;font-weight:600;letter-spacing:0.02em;
+  fill:var(--ink);opacity:0;
+  transition:opacity 0.4s ease;
+}
+.beat-show-nums .pes-num{opacity:1;}
+.pes-sublabel{
+  font-size:12px;font-weight:600;letter-spacing:0.08em;
+  text-transform:uppercase;fill:var(--signal);opacity:0;
+  transition:opacity 0.4s ease;
+}
+.beat-show-sublabels .pes-sublabel{opacity:1;}
+
+.peak-fill{fill:rgba(92,107,40,0.16);}
+.peak-stroke{fill:none;stroke:var(--phosphor);stroke-width:1.75;}
+.axis-line{stroke:var(--ink);stroke-width:1.25;fill:none;}
+.axis-break{stroke:var(--ink);stroke-width:1.25;fill:none;opacity:0;}
+.beat-show-real .axis-break{opacity:1;}
+
+.peak-group{transform-box:fill-box;transform-origin:center bottom;}
+.peak-united,
+.peak-split{
   opacity:0;
-  max-height:0;
-  overflow:hidden;
-  transition:opacity 0.3s,max-height 0.3s;
-  border:1px solid var(--signal);
-  background:var(--panel);
-  border-radius:4px;
-  padding:0 1.2rem;
-  margin-top:0.75rem;
-  color:var(--dim);
-  font-size:0.85rem;
-  line-height:1.6;
+  pointer-events:none;
+  transition:opacity 0.4s ease;
 }
-.help-panel.open{
+.beat-show-fake .peak-united{opacity:1;pointer-events:auto;}
+.beat-show-real .peak-united{opacity:0;pointer-events:none;}
+.beat-show-real .peak-split{opacity:1;pointer-events:auto;}
+
+/* Split: appear stacked at the united peak, then walk apart */
+.beat-splitting .peak-united.peak-outer{opacity:0;transition:opacity 0.18s ease;}
+.beat-splitting .peak-united.peak-deep{opacity:0;transition:opacity 0.35s ease;}
+.beat-splitting .peak-1s{
   opacity:1;
-  max-height:200px;
-  padding:1rem 1.2rem;
+  animation:pes-1s-in 0.35s ease both;
+}
+.beat-splitting .peak-2s,
+.beat-splitting .peak-2p{opacity:1;}
+.beat-splitting .peak-2s .peak-slide{
+  animation:pes-split-2s 1.05s cubic-bezier(0.22,0.8,0.2,1) both;
+}
+.beat-splitting .peak-2p .peak-slide{
+  animation:pes-split-2p 1.05s cubic-bezier(0.22,0.8,0.2,1) both;
+}
+.beat-splitting .pes-num{opacity:0;}
+@keyframes pes-1s-in{
+  from{opacity:0;}
+  to{opacity:1;}
+}
+/* Final 2s is at x=400; united outer was at x=470 → start +70 */
+@keyframes pes-split-2s{
+  0%{opacity:0;transform:translate(70px,0);}
+  18%{opacity:1;transform:translate(70px,0);}
+  42%{opacity:1;transform:translate(70px,0);}
+  100%{opacity:1;transform:translate(0,0);}
+}
+/* Final 2p is at x=500; united outer was at x=470 → start −30 */
+@keyframes pes-split-2p{
+  0%{opacity:0;transform:translate(-30px,0);}
+  18%{opacity:1;transform:translate(-30px,0);}
+  42%{opacity:1;transform:translate(-30px,0);}
+  100%{opacity:1;transform:translate(0,0);}
+}
+
+.callout-ring{
+  fill:none;stroke:var(--signal);stroke-width:1.5;
+  stroke-dasharray:4 3;opacity:0;
+  transition:opacity 0.35s ease;
+}
+.beat-callout-y .callout-y{opacity:1;}
+.beat-callout-x .callout-x{opacity:1;}
+.beat-callout-dir .callout-dir{opacity:1;}
+.beat-callout-break .callout-break{opacity:1;}
+
+.dir-tag{
+  font-size:10px;font-weight:600;letter-spacing:0.08em;
+  text-transform:uppercase;fill:var(--signal);opacity:0;
+  transition:opacity 0.35s ease;
+}
+.beat-callout-dir .dir-tag{opacity:1;}
+
+.story-panel{
+  margin:0 0 0.95rem;
+  min-height:9rem;
+}
+.story-panel + .opener-grid{margin-top:0.15rem;}
+.config-reveal{
+  display:grid;
+  grid-template-columns:minmax(140px,200px) minmax(0,1fr);
+  gap:1.1rem 1.35rem;
+  align-items:end;
+  margin:0 0 0.55rem;
+  min-height:2.6rem;
+  opacity:0;
+  transform:translateY(6px);
+  pointer-events:none;
+  transition:opacity 0.4s ease, transform 0.4s ease, min-height 0.35s ease;
+}
+.beat-show-config .config-reveal{
+  opacity:1;
+  transform:none;
+  pointer-events:auto;
+}
+.beat-show-config-parts .config-reveal{min-height:8.5rem;}
+.config-reveal .config-spacer{min-height:1px;}
+.config-annotated{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0;
+  width:100%;
+  position:relative;
+}
+.config-annots{
+  display:none;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:0.35rem 0.75rem;
+  width:min(100%,24rem);
+  opacity:0;
+  transition:opacity 0.35s ease;
+}
+.beat-show-config-parts .config-annots{
+  display:grid;
+  opacity:1;
+}
+.config-annot{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:0.12rem;
+}
+.config-annot .annot-label{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--signal);
+  line-height:1.25;
+}
+.config-annot .annot-detail{
+  font-family:var(--font-body);
+  font-size:0.82rem;
+  font-weight:500;
+  color:var(--ink-soft);
+  line-height:1.3;
+  text-wrap:pretty;
+}
+.config-arrows{
+  display:none;
+  width:min(100%,24rem);
+  height:3.1rem;
+  margin:0.1rem 0 0.15rem;
+  overflow:visible;
+}
+.beat-show-config-parts .config-arrows{display:block;}
+.config-arrows .arrow-path{
+  fill:none;
+  stroke:var(--signal);
+  stroke-width:1.6;
+  stroke-linecap:round;
+}
+.config-formula{
+  margin:0;
+  font-family:var(--font-mono);
+  font-size:1.45rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  color:var(--signal);
+  line-height:1.45;
+  text-align:center;
+}
+.config-formula .cfg-term{white-space:nowrap;margin:0 0.2em;}
+.config-formula .cfg-demo{
+  display:inline-block;
+  padding:0.05em 0.12em;
+  margin:0 0.15em;
+}
+.config-formula .cfg-shell,
+.config-formula .cfg-sub,
+.config-formula .cfg-count{
+  transition:background 0.3s ease, box-shadow 0.3s ease;
+}
+.config-formula .cfg-demo .cfg-shell,
+.config-formula .cfg-demo .cfg-sub,
+.config-formula .cfg-demo .cfg-count{
+  display:inline-block;
+  min-width:0.65em;
+  text-align:center;
+}
+.config-formula sup.cfg-count{
+  font-size:0.65em;
+  font-weight:600;
+  letter-spacing:0;
+  vertical-align:super;
+}
+.beat-show-config-parts .cfg-demo .cfg-shell,
+.beat-show-config-parts .cfg-demo .cfg-sub,
+.beat-show-config-parts .cfg-demo .cfg-count{
+  background:rgba(26,106,163,0.14);
+  box-shadow:inset 0 -2px 0 var(--signal);
+}
+@media(max-width:720px){
+  .config-reveal{grid-template-columns:1fr;justify-items:center;}
+  .config-reveal .config-spacer{display:none;}
+  .beat-show-config-parts .config-reveal{min-height:9.5rem;}
+}
+.story-panel p{
+  margin:0;font-size:1.05rem;line-height:1.55;color:var(--ink-soft);
+  max-width:none;text-wrap:pretty;
+}
+.story-panel .beat-kicker{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.35rem;
+}
+.story-panel .beat-kicker::before{
+  content:"";display:inline-block;width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);margin-right:0.55rem;vertical-align:middle;
+}
+.axis-note{
+  display:none;margin-top:0.55rem;
+  font-size:var(--label-sm);font-weight:500;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--signal);line-height:1.45;
+  text-align:center;
+}
+.axis-note.visible{display:block;}
+.story-panel p.axis-note{color:var(--signal);}
+
+/* Act 2 — guess-the-element PES */
+.guess-plate .story-panel{min-height:4.5rem;}
+.guess-pes-host{min-width:0;}
+.guess-pes-host .pes-svg{width:100%;height:auto;display:block;overflow:visible;}
+.guess-pes-host .peak-group{opacity:1;pointer-events:auto;}
+.guess-pes-host .pes-ie{opacity:1;}
+.guess-pes-host .pes-height,
+.guess-pes-host .pes-sublabel{opacity:0;}
+.guess-revealed .guess-pes-host .pes-height,
+.guess-revealed .guess-pes-host .pes-sublabel{opacity:1;}
+.guess-config{
+  display:none;
+  margin:0 0 0.75rem;
+}
+.guess-revealed .guess-config{
+  display:block;
+}
+.guess-config .config-formula{font-size:1.35rem;}
+.guess-controls{
+  margin-top:1rem;
+  padding-top:0.85rem;
+  border-top:1px solid var(--grid);
+}
+.guess-prompt-label{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--dim);margin:0 0 0.45rem;
+}
+.guess-row{
+  display:flex;flex-wrap:wrap;gap:0.45rem;align-items:center;
+}
+.guess-row input{
+  background:transparent;border:1px solid var(--ink);color:var(--ink);
+  font-family:var(--font-body);font-size:1.05rem;font-weight:600;
+  padding:0.5rem 0.6rem;width:4.75rem;border-radius:0;
+  letter-spacing:0.04em;
+}
+.guess-row input:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.guess-row input:disabled{opacity:0.55;}
+.guess-row .btn{margin-top:0;margin-right:0;}
+.guess-feedback{
+  margin:0.55rem 0 0;
+  font-size:var(--label-sm);font-weight:500;letter-spacing:var(--track-tight);
+  text-transform:none;color:var(--ink-soft);line-height:1.45;min-height:1.35rem;
+}
+.guess-feedback.is-match{color:var(--olive-deep);font-weight:600;}
+.guess-feedback.is-miss{color:var(--ember);}
+.guess-solved-tag{
+  display:none;margin-top:0.35rem;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--signal);
+}
+.guess-revealed .guess-solved-tag{display:block;}
+.guess-revealed .guess-controls .guess-row{display:none;}
+.guess-revealed .guess-prompt-label{display:none;}
+
+/* Act 3 — shells, subshells, IE chart (H–Ar) */
+.shells-ie-plate .story-panel{min-height:3.2rem;}
+.shells-ie-table-wrap{
+  margin:0.65rem 0 0;
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.shells-ie-table{
+  width:100%;
+  min-width:32rem;
+  border-collapse:collapse;
+  font-variant-numeric:tabular-nums;
+}
+.shells-ie-table caption{
+  caption-side:top;
+  text-align:left;
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin-bottom:0.55rem;
+}
+.shells-ie-table th,
+.shells-ie-table td{
+  font-family:var(--font-mono);
+  text-align:center;
+  padding:0.38rem 0.35rem;
+  border-bottom:1px solid var(--paper-3);
+}
+.shells-ie-table thead th{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+  border-bottom:1px solid var(--ink);
+  padding-bottom:0.5rem;
+}
+.shells-ie-table thead th.sub-s{color:var(--mustard);text-transform:none;letter-spacing:0.04em;}
+.shells-ie-table thead th.sub-p{color:var(--signal);text-transform:none;letter-spacing:0.04em;}
+.shells-ie-table .el-sym{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0;
+  text-transform:none;
+  color:var(--ink);
+  text-align:left;
+  padding-left:0.15rem;
+  border-bottom:1px solid var(--paper-3);
+}
+.shells-ie-table td.ie-val{
+  font-size:clamp(0.72rem,1.35vw,0.88rem);
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--phosphor);
+}
+.shells-ie-table td.ie-empty{
+  color:var(--faint);
+  font-weight:500;
+}
+.shells-ie-table tbody tr:last-child th,
+.shells-ie-table tbody tr:last-child td{border-bottom:none;}
+.shells-ie-qs{
+  list-style:decimal;
+  margin:1.1rem 0 0;
+  padding:0.85rem 0 0 1.35rem;
+  border-top:1px solid var(--grid);
+}
+.shells-ie-qs li{
+  margin:0 0 0.65rem;
+  padding:0;
+  font-family:var(--font-body);
+  font-size:clamp(0.95rem,1.8vw,1.05rem);
+  line-height:1.45;
+}
+.shells-ie-qs li:last-child{margin-bottom:0;}
+.shells-ie-note{
+  margin:0.75rem 0 0;
+  font-size:var(--label-sm);
+  font-weight:500;
+  letter-spacing:var(--track-tight);
+  color:var(--dim);
+  line-height:1.4;
+}
+
+/* Act 4 — K / Ca / Sc filling order */
+.fill-plate .story-panel{min-height:5.5rem;}
+.fill-tiles{
+  display:flex;flex-wrap:wrap;gap:0.45rem;
+  margin:0 0 0.85rem;
+}
+.fill-tile{
+  appearance:none;background:transparent;cursor:pointer;
+  border:1px solid var(--ink);color:var(--ink);
+  font-size:var(--label-sm);font-weight:600;letter-spacing:0;
+  text-transform:none;padding:0.45rem 0.85rem;border-radius:0;
+  min-width:3.25rem;text-align:center;
+}
+.fill-tile:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.fill-tile[aria-pressed="true"]{
+  background:var(--ink);color:var(--paper);
+}
+.fill-tile:disabled{
+  opacity:0.35;cursor:not-allowed;
+}
+.fill-tile .fill-tile-z{
+  display:block;margin-top:0.1rem;
+  font-size:var(--label-xs);letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--dim);
+}
+.fill-tile[aria-pressed="true"] .fill-tile-z{color:var(--paper-3);}
+.fill-toolbar{
+  display:flex;flex-wrap:wrap;gap:0.55rem;align-items:center;
+  margin:0 0 0.65rem;min-height:2rem;
+}
+.fill-zoom-btn{
+  appearance:none;background:transparent;cursor:pointer;
+  border:1px solid var(--ink);color:var(--ink);
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;
+  text-transform:uppercase;padding:0.4rem 0.7rem;border-radius:0;
+}
+.fill-zoom-btn:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.fill-zoom-btn[aria-pressed="true"]{
+  background:var(--signal);border-color:var(--signal);color:var(--paper);
+}
+.fill-zoom-btn[hidden]{display:none !important;}
+.fill-zoom-tag{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--signal);
+}
+.fill-config{
+  display:none;margin:0 0 0.75rem;
+}
+.fill-config.is-visible{display:block;}
+.fill-config .config-formula{font-size:1.2rem;}
+.fill-pes-host{min-width:0;}
+.fill-pes-host .pes-svg{width:100%;height:auto;display:block;overflow:visible;}
+.fill-pes-host .peak-group{opacity:1;pointer-events:auto;}
+.fill-pes-host .pes-ie{opacity:1;}
+.fill-pes-host .pes-height,
+.fill-pes-host .pes-sublabel{opacity:1;}
+.fill-pes-host .peak-hold .pes-height,
+.fill-pes-host .peak-hold .pes-sublabel{opacity:0;}
+.fill-pes-host .peak-overlap .peak-fill{fill:rgba(26,106,163,0.14);}
+.fill-pes-host .peak-overlap .peak-stroke{stroke:var(--signal);}
+.fill-pes-host .peak-callout{
+  fill:none;stroke:var(--signal);stroke-width:1.35;
+  stroke-dasharray:4 3;opacity:0;
+}
+.fill-pes-host.is-callout .peak-callout{opacity:1;}
+
+/* Subshell letter colours ↔ periodic-table blocks */
+.config-formula .cfg-sub-s{color:var(--mustard);}
+.config-formula .cfg-sub-p{color:var(--signal);}
+.config-formula .cfg-sub-d{color:var(--ember);}
+.config-formula .cfg-sub-f{color:var(--phosphor);}
+
+/* Act 5 — why 3d + full table */
+.blocks-plate .story-panel{min-height:4.2rem;}
+.why-strip{
+  display:none;
+  margin:0.85rem 0 0.35rem;
+  padding:0.75rem 0.65rem 0.85rem;
+  border-top:1px solid var(--ink);
+  border-bottom:1px solid var(--ink);
+}
+.blocks-mode-why .why-strip{display:block;}
+.why-strip-label{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--dim);margin:0 0 0.55rem;
+}
+.why-strip-row{
+  display:grid;
+  grid-template-columns:repeat(18, minmax(0,1fr));
+  gap:2px;
+}
+.why-cell{
+  min-height:2.1rem;border:1px solid var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;
+  letter-spacing:0;text-transform:none;color:var(--ink);
+}
+.why-cell.is-empty{border-color:transparent;background:transparent;}
+.why-cell.block-s{background:rgba(196,163,90,0.22);}
+.why-cell.block-p{background:rgba(26,106,163,0.16);}
+.why-cell.block-d{background:rgba(168,90,50,0.18);}
+.why-cell.block-d.is-focus{
+  background:rgba(168,90,50,0.32);
+  box-shadow:inset 0 0 0 1px var(--ember);
+}
+.blocks-explore{display:none;}
+.blocks-mode-table .blocks-explore{display:block;}
+.blocks-config{
+  margin:0.75rem 0 0.65rem;
+  min-height:4.4rem;
+  padding:0.65rem 0.35rem 0.75rem;
+  border-top:1px solid var(--ink);
+  border-bottom:1px solid var(--ink);
+  text-align:center;
+}
+.blocks-config-hint{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--dim);margin:0 0 0.35rem;
+}
+.blocks-el-meta{
+  font-size:var(--label-sm);font-weight:600;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--olive-deep);margin:0 0 0.35rem;
+  min-height:1.15rem;
+}
+.blocks-el-meta .el-sym{text-transform:none;letter-spacing:0;}
+.blocks-config .config-formula{
+  font-size:clamp(0.78rem, 1.55vw, 1.2rem);
+  color:var(--ink);
+  margin:0;
+}
+.blocks-config.is-empty .config-formula{color:var(--faint);}
+.blocks-ptable-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.blocks-ptable{
+  display:grid;
+  grid-template-columns:repeat(18, minmax(1.55rem, 1fr));
+  gap:2px;
+  min-width:min(100%, 52rem);
+  width:100%;
+}
+.blocks-ptable.f-row{margin-top:0.55rem;}
+.blocks-cell{
+  border:1px solid var(--ink);
+  min-height:2.35rem;
+  padding:0.18rem 0.12rem;
+  background:transparent;
+  cursor:pointer;
+  text-align:center;
+  color:inherit;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0.05rem;
+}
+.blocks-cell:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
+.blocks-cell.block-s{background:rgba(196,163,90,0.22);}
+.blocks-cell.block-p{background:rgba(26,106,163,0.16);}
+.blocks-cell.block-d{background:rgba(168,90,50,0.18);}
+.blocks-cell.block-f{background:rgba(92,107,40,0.18);}
+.blocks-cell.is-active{
+  background:var(--ink);color:var(--paper);
+  border-color:var(--ink);
+}
+.blocks-cell.is-active.block-s,
+.blocks-cell.is-active.block-p,
+.blocks-cell.is-active.block-d,
+.blocks-cell.is-active.block-f{background:var(--ink);}
+.blocks-cell.is-active .blocks-cell-z{color:var(--paper-3);}
+.blocks-cell.is-active .blocks-cell-sym{color:var(--paper);}
+.blocks-cell-z{
+  font-size:0.58rem;font-weight:500;letter-spacing:0.04em;
+  text-transform:uppercase;color:var(--faint);line-height:1;
+}
+.blocks-cell-sym{
+  font-size:clamp(0.68rem, 1.4vw, 0.82rem);font-weight:700;
+  letter-spacing:0;text-transform:none;color:var(--ink);line-height:1.15;
+}
+.blocks-spacer{min-height:2.35rem;}
+.blocks-legend{
+  display:none;
+  flex-wrap:wrap;gap:0.55rem 1.1rem;
+  margin:0.75rem 0 0;
+  padding-top:0.55rem;
+  border-top:1px solid var(--grid);
+}
+.blocks-legend.is-visible{display:flex;}
+.blocks-legend-item{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--ink-soft);
+  display:inline-flex;align-items:center;gap:0.4rem;
+}
+.blocks-legend-swatch{
+  width:0.85rem;height:0.85rem;border:1px solid var(--ink);
+}
+.blocks-legend-swatch.block-s{background:rgba(196,163,90,0.45);}
+.blocks-legend-swatch.block-p{background:rgba(26,106,163,0.35);}
+.blocks-legend-swatch.block-d{background:rgba(168,90,50,0.4);}
+.blocks-legend-swatch.block-f{background:rgba(92,107,40,0.4);}
+.blocks-legend-item .leg-letter{
+  text-transform:none;letter-spacing:0;font-weight:700;
+}
+.blocks-legend-item .leg-letter.s{color:var(--mustard);}
+.blocks-legend-item .leg-letter.p{color:var(--signal);}
+.blocks-legend-item .leg-letter.d{color:var(--ember);}
+.blocks-legend-item .leg-letter.f{color:var(--phosphor);}
+.blocks-discovery{
+  display:none;margin:0.65rem 0 0;
+  font-size:var(--label-sm);font-weight:600;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--signal);line-height:1.45;
+}
+.blocks-discovery.is-visible{display:block;}
+
+/* Act 6 — short-hand electron configurations */
+.shorthand-plate .story-panel{min-height:0;}
+.shorthand-plate .story-panel p:empty{display:none;}
+#moduleStage:has(#act6:not([hidden])) .framing:empty{display:none;margin:0;}
+.sh-write-prompt{
+  margin:0 0 0.85rem;
+  font-family:var(--font-body);
+  font-size:clamp(1rem,2vw,1.12rem);
+  font-weight:700;
+  color:var(--signal);
+  line-height:1.4;
+}
+.sh-el-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(10.5rem,1fr));
+  gap:0.45rem 1rem;
+}
+.sh-el-list li{
+  display:flex;
+  align-items:baseline;
+  gap:0.45rem;
+  padding:0.35rem 0;
+  border-bottom:1px solid var(--grid);
+}
+.sh-el-sym{
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0;
+  text-transform:none;
+  color:var(--ink);
+  min-width:1.6rem;
+}
+.sh-el-name{
+  font-size:var(--label-sm);
+  font-weight:500;
+  letter-spacing:0;
+  text-transform:none;
+  color:var(--ink-soft);
+}
+.sh-check-row{
+  margin:1.1rem 0 0;
+  padding-top:0.85rem;
+  border-top:1px solid var(--grid);
+}
+.sh-answers{
+  display:none;
+  margin:1.1rem 0 0;
+  padding-top:0.95rem;
+  border-top:1px solid var(--ink);
+}
+.shorthand-checked .sh-answers{display:block;}
+.shorthand-checked .sh-check-row{display:none;}
+.sh-answers-kicker{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin:0 0 0.65rem;
+}
+.sh-answer-row{
+  display:grid;
+  grid-template-columns:4.5rem minmax(0,1fr);
+  gap:0.35rem 0.75rem;
+  align-items:baseline;
+  padding:0.4rem 0;
+  border-bottom:1px solid var(--grid);
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity 0.35s ease, transform 0.35s ease;
+}
+.shorthand-checked .sh-answer-row{
+  opacity:1;
+  transform:none;
+}
+.shorthand-checked .sh-answer-row:nth-child(2){transition-delay:0.04s;}
+.shorthand-checked .sh-answer-row:nth-child(3){transition-delay:0.08s;}
+.shorthand-checked .sh-answer-row:nth-child(4){transition-delay:0.12s;}
+.shorthand-checked .sh-answer-row:nth-child(5){transition-delay:0.16s;}
+.shorthand-checked .sh-answer-row:nth-child(6){transition-delay:0.2s;}
+.shorthand-checked .sh-answer-row:nth-child(7){transition-delay:0.24s;}
+.shorthand-checked .sh-answer-row:nth-child(8){transition-delay:0.28s;}
+.shorthand-checked .sh-answer-row:nth-child(9){transition-delay:0.32s;}
+.sh-answer-row .el-label{
+  font-family:var(--font-mono);
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0;
+  text-transform:none;
+  color:var(--ink);
+}
+.sh-answer-row .config-formula{
+  font-size:1.05rem;
+  margin:0;
+  line-height:1.55;
+  text-align:left;
+}
+.sh-answer-row .config-formula .cfg-term:first-child{margin-left:0;}
+.sh-page[hidden]{display:none !important;}
+.sh-drop-question{
+  margin:0 0 1.25rem;
+  font-size:clamp(1.05rem,2.1vw,1.2rem);
+  line-height:1.45;
+}
+.sh-anim{
+  margin:0;
+  padding-top:0.35rem;
+}
+.sh-pairs{
+  display:flex;
+  flex-direction:column;
+  gap:1.6rem;
+  max-width:36rem;
+}
+.sh-pair{
+  display:none;
+}
+.sh-pair.is-visible{display:block;}
+.sh-pair-label{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin:0 0 0.65rem;
+}
+.sh-drop{
+  max-width:36rem;
+}
+.sh-drop-stage{
+  position:relative;
+  padding-top:5.25rem;
+  min-height:1.6rem;
+}
+.sh-drop-falling{
+  position:absolute;
+  left:0;
+  right:0;
+  top:5.25rem;
+  display:grid;
+  grid-template-columns:2.4rem minmax(0,1fr);
+  gap:0.35rem 0.5rem;
+  align-items:baseline;
+  opacity:0;
+  transform:translateY(-5.25rem);
+  pointer-events:none;
+  z-index:2;
+  will-change:transform, opacity;
+}
+.sh-pair.is-ready .sh-drop-falling{
+  opacity:1;
+  transform:translateY(-5.25rem);
+}
+.sh-pair.is-dropping .sh-drop-falling{
+  animation:sh-noble-drop 2.4s cubic-bezier(0.33,0.1,0.25,1) forwards;
+}
+.sh-pair.is-aligned .sh-drop-falling{
+  opacity:1;
+  transform:translateY(0);
+  animation:none;
+}
+.sh-pair.is-merged .sh-drop-falling{
+  opacity:0;
+  transform:translateY(0);
+  animation:none;
+  transition:opacity 0.4s ease;
+  pointer-events:none;
+}
+@keyframes sh-noble-drop{
+  0%{opacity:1;transform:translateY(-5.25rem);}
+  82%{opacity:1;transform:translateY(0.06rem);}
+  91%{opacity:1;transform:translateY(-0.04rem);}
+  100%{opacity:1;transform:translateY(0);}
+}
+.sh-drop-base{
+  display:grid;
+  grid-template-columns:2.4rem minmax(0,1fr);
+  gap:0.35rem 0.5rem;
+  align-items:baseline;
+  position:relative;
+  z-index:1;
+}
+.sh-drop-formulas{
+  min-width:0;
+  line-height:1.5;
+}
+.sh-drop .el-sym{
+  font-family:var(--font-mono);
+  font-size:var(--label-sm);
+  font-weight:600;
+  letter-spacing:0;
+  text-transform:none;
+  color:var(--ink);
+}
+.sh-drop-falling .el-sym{
+  transition:opacity 0.45s ease;
+}
+.sh-pair.is-dropping .sh-drop-falling .el-sym,
+.sh-pair.is-aligned .sh-drop-falling .el-sym{
+  opacity:0;
+}
+.sh-drop .config-formula{
+  font-size:1.12rem;
+  margin:0;
+  line-height:1.5;
+  text-align:left;
+}
+.sh-drop .config-formula .cfg-term:first-child{margin-left:0;}
+.sh-drop-full .cfg-match{
+  display:inline-block;
+  vertical-align:baseline;
+  border-radius:0;
+  transition:background 0.35s ease, box-shadow 0.35s ease, opacity 0.35s ease;
+}
+.sh-pair.is-aligned .sh-drop-full .cfg-match,
+.sh-pair.is-dropping .sh-drop-full .cfg-match{
+  background:rgba(26,106,163,0.14);
+  box-shadow:inset 0 -2px 0 var(--signal);
+}
+.sh-pair.is-aligned .sh-drop-full .cfg-match{
+  opacity:0.22;
+}
+.sh-drop-short{display:none;}
+.sh-pair.is-merged .sh-drop-full{display:none;}
+.sh-pair.is-merged .sh-drop-short{display:inline;}
+.sh-pair.is-merged .sh-drop-stage{
+  padding-top:0;
+  transition:padding-top 0.4s ease;
+}
+.sh-replay-btn{
+  margin-top:0.65rem;
+  display:none;
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  padding:0.35rem 0.55rem;
+  line-height:1.2;
+}
+.sh-pair.is-merged .sh-replay-btn{display:inline-block;}
+.cfg-term.cfg-noble{
+  color:var(--signal);
+  font-weight:700;
+  margin-right:0.15em;
+}
+.sh-desc{
+  display:none;
+  margin:1.35rem 0 0;
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity 0.45s ease, transform 0.45s ease;
+}
+.shorthand-dropping.is-explained .sh-desc{
+  display:block;
+  opacity:1;
+  transform:none;
+}
+.sh-desc-kicker{
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin:0 0 0.4rem;
+}
+.sh-desc-kicker::before{
+  content:"";display:inline-block;width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);margin-right:0.55rem;vertical-align:middle;
+}
+.sh-desc p{
+  margin:0;
+  font-family:var(--font-body);
+  font-size:clamp(0.98rem,1.8vw,1.08rem);
+  line-height:1.5;
+  color:var(--ink-soft);
+}
+.sh-shorthand-list{
+  display:none;
+  margin:1.1rem 0 0;
+  padding-top:0.85rem;
+  border-top:1px solid var(--grid);
+}
+.shorthand-dropping.is-explained .sh-shorthand-list{display:block;}
+.sh-shorthand-list .sh-answer-row{
+  opacity:1;
+  transform:none;
+  transition:none;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .atom-pane,.pes-pane,.pes-num,.pes-sublabel,.callout-ring,.dir-tag,
+  .peak-united,.peak-split,.pes-schematic-ticks,.config-reveal,
+  .sh-answer-row,.sh-desc,.sh-drop-full .cfg-match,.sh-drop-falling,.sh-pair.is-merged .sh-drop{transition:none;}
+  .beat-splitting .peak-2s .peak-slide,
+  .beat-splitting .peak-2p .peak-slide,
+  .beat-splitting .peak-1s{animation:none;}
+  .sh-pair.is-dropping .sh-drop-falling{animation:none;opacity:1;transform:translateY(0);}
+  .sh-pair.is-merged .sh-drop-stage{transition:none;padding-top:0;}
+  .shorthand-checked .sh-answer-row,
+  .shorthand-dropping.is-explained .sh-desc{opacity:1;transform:none;transition-delay:0s;}
 }
 </style>
 </head>
 <body>
 <div class="module-wrap">
-  <a href="index.html" class="back-link">← Unit 1b</a>
-  <div class="mod-tag">Module 07</div>
-  <h1>Electron Configurations</h1>
-  <p class="framing">The peaks told you where the electrons sit. Now fill the subshells.</p>
-
-  <div class="viewport">
-    <canvas id="simCanvas"></canvas>
+  <div class="top-nav">
+    <a href="index.html" class="back-link">← Unit 1b</a>
+    <div class="mod-meta">Module 07 · Electron Configurations</div>
   </div>
 
-  <div class="controls"><!-- simulation controls go here --></div>
-  <div class="hud"><!-- live readout values --></div>
+  <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
+    <div class="briefing-kicker"><span>Before you begin</span></div>
+    <h1 id="briefingTitle">Electron Configurations</h1>
+    <p class="briefing-lead">Read what this module is aiming for. Then open the instrument and work through it.</p>
+    <div class="briefing-columns">
+      <div class="briefing-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="briefing-li" id="briefingIntentions"></ul>
+      </div>
+      <div class="briefing-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="briefing-cc" id="briefingCompetencies"></ul>
+      </div>
+    </div>
+    <div class="briefing-actions">
+      <button type="button" class="btn submit" id="briefingNext">Next → Start simulation</button>
+    </div>
+  </section>
 
-  <button id="stuckBtn">Stuck?</button>
-  <div class="help-panel" id="helpPanel">
-    <p>K's outer peak is shallower than any n=3 subshell of Ar. Which shell is it in?</p>
-    <p style="margin-top:0.5rem;">Match your filled subshells to where the element sits on the periodic table.</p>
+  <div id="moduleStage" hidden>
+    <div class="mod-tag">Module 07</div>
+    <div class="act-meta" id="actMeta">Act 1 of · Neon’s spectrum</div>
+    <h1>Electron Configurations</h1>
+    <p class="framing" id="framing" aria-live="polite">Neon’s shell model sits beside a spectrum. Click through and watch what changes.</p>
+    <p class="discovery-line" id="discoveryLine" aria-live="polite"></p>
+
+    <div class="act-panel" id="act1" data-act="1">
+      <div class="viewport" id="openerPlate" data-fig="FIG. 07  ·  NEON — SHELL MODEL VS PES" data-beat="1">
+        <div class="plate-body">
+          <div class="story-panel" aria-live="polite">
+            <div class="beat-kicker" id="storyKicker">Shell-model spectrum</div>
+            <p id="storyText">From our last module, you may have drawn a PES diagram that looks like this, based on our understanding of the shell model.</p>
+            <p class="axis-note" id="axisNote"></p>
+          </div>
+
+          <div class="config-reveal" id="configReveal" aria-hidden="true">
+            <div class="config-spacer" aria-hidden="true"></div>
+            <div class="config-annotated">
+              <div class="config-annots" aria-hidden="true">
+                <div class="config-annot annot-shell">
+                  <span class="annot-label">Shell</span>
+                  <span class="annot-detail">Big numbers</span>
+                </div>
+                <div class="config-annot annot-sub">
+                  <span class="annot-label">Subshell</span>
+                  <span class="annot-detail">Letters</span>
+                </div>
+                <div class="config-annot annot-count">
+                  <span class="annot-label">Electrons</span>
+                  <span class="annot-detail">Exponent</span>
+                </div>
+              </div>
+              <svg class="config-arrows" viewBox="0 0 360 52" aria-hidden="true">
+                <defs>
+                  <marker id="cfgArrowHead" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+                    <path d="M0,0 L6,3.5 L0,7 Z" fill="var(--signal)"/>
+                  </marker>
+                </defs>
+                <!-- Labels sit in thirds; tips land on 2 · s · ² of the middle term -->
+                <path class="arrow-path" marker-end="url(#cfgArrowHead)"
+                      d="M60,4 C60,28 148,34 168,48"/>
+                <path class="arrow-path" marker-end="url(#cfgArrowHead)"
+                      d="M180,4 C180,22 180,34 180,48"/>
+                <path class="arrow-path" marker-end="url(#cfgArrowHead)"
+                      d="M300,4 C300,28 214,34 194,48"/>
+              </svg>
+              <p class="config-formula" aria-label="Neon electron configuration: 1s2 2s2 2p6">
+                <span class="cfg-term"><span class="cfg-shell">1</span><span class="cfg-sub cfg-sub-s">s</span><sup class="cfg-count">2</sup></span>
+                <span class="cfg-term cfg-demo"><span class="cfg-shell">2</span><span class="cfg-sub cfg-sub-s">s</span><sup class="cfg-count">2</sup></span>
+                <span class="cfg-term"><span class="cfg-shell">2</span><span class="cfg-sub cfg-sub-p">p</span><sup class="cfg-count">6</sup></span>
+              </p>
+            </div>
+          </div>
+
+          <div class="opener-grid">
+            <div class="atom-pane" id="atomPane" aria-hidden="true">
+              <div id="atomHost"></div>
+              <div class="atom-caption">Ne <span class="sub">Shell model</span></div>
+            </div>
+
+            <div class="pes-pane" id="pesPane" aria-hidden="true">
+              <svg class="pes-svg" id="pesSvg" viewBox="0 0 640 300" role="img" aria-label="Photoelectron spectrum of neon">
+                <defs>
+                  <linearGradient id="peakWash" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#5c6b28" stop-opacity="0.28"/>
+                    <stop offset="100%" stop-color="#5c6b28" stop-opacity="0.04"/>
+                  </linearGradient>
+                </defs>
+
+                <!-- Plot frame -->
+                <line class="axis-line" x1="56" y1="36" x2="56" y2="220"/>
+                <line class="axis-line" x1="56" y1="220" x2="600" y2="220"/>
+
+                <!-- Axis break (real spectrum) -->
+                <g class="axis-break" aria-hidden="true">
+                  <line x1="210" y1="214" x2="222" y2="226"/>
+                  <line x1="222" y1="214" x2="234" y2="226"/>
+                </g>
+
+                <!-- Callout rings -->
+                <rect class="callout-ring callout-y" x="2" y="72" width="36" height="125" rx="0"/>
+                <rect class="callout-ring callout-x" x="78" y="224" width="546" height="52" rx="0"/>
+                <rect class="callout-ring callout-dir" x="70" y="252" width="510" height="36" rx="0"/>
+                <circle class="callout-ring callout-break" cx="222" cy="220" r="32"/>
+
+                <!-- Y label -->
+                <text class="pes-axis-label" transform="translate(22 180) rotate(-90)">Peak height</text>
+
+                <!-- X ticks: high left → 0 right (schematic; hide when real IE labels appear) -->
+                <g class="pes-schematic-ticks">
+                  <line class="axis-line" x1="110" y1="220" x2="110" y2="226"/>
+                  <line class="axis-line" x1="600" y1="220" x2="600" y2="226"/>
+                  <text class="pes-tick" x="110" y="242" text-anchor="middle">100</text>
+                  <text class="pes-tick" x="600" y="242" text-anchor="middle">0</text>
+                </g>
+                <text class="pes-axis-label" x="328" y="268" text-anchor="middle">← Binding energy (MJ/mol)</text>
+
+                <!-- Direction tags -->
+                <text class="dir-tag" x="90" y="286">Inside · high IE</text>
+                <text class="dir-tag" x="560" y="286" text-anchor="end">Outside · low IE</text>
+
+                <!-- Fake / united outer peak (height 8) + deep peak (height 2) -->
+                <g class="peak-group peak-united peak-deep" transform="translate(110 220)">
+                  <path class="peak-fill" d="M-18,0 C-10,-6 -3,-88 -0.4,-110 C0,-112 0,-112 0.4,-110 C3,-88 10,-6 18,0 Z" fill="url(#peakWash)"/>
+                  <path class="peak-stroke" d="M-18,0 C-10,-6 -3,-88 -0.4,-110 C0,-112 0,-112 0.4,-110 C3,-88 10,-6 18,0"/>
+                </g>
+                <g class="peak-group peak-united peak-outer" transform="translate(470 220)">
+                  <path class="peak-fill" d="M-32,0 C-16,-18 -4,-175 -0.5,-205 C0,-208 0,-208 0.5,-205 C4,-175 16,-18 32,0 Z" fill="url(#peakWash)"/>
+                  <path class="peak-stroke" d="M-32,0 C-16,-18 -4,-175 -0.5,-205 C0,-208 0,-208 0.5,-205 C4,-175 16,-18 32,0"/>
+                </g>
+
+                <!-- Real split peaks -->
+                <g class="peak-group peak-split peak-1s" transform="translate(110 220)">
+                  <path class="peak-fill" d="M-18,0 C-10,-6 -3,-88 -0.4,-110 C0,-112 0,-112 0.4,-110 C3,-88 10,-6 18,0 Z" fill="url(#peakWash)"/>
+                  <path class="peak-stroke" d="M-18,0 C-10,-6 -3,-88 -0.4,-110 C0,-112 0,-112 0.4,-110 C3,-88 10,-6 18,0"/>
+                  <text class="pes-num" x="0" y="-118" text-anchor="middle">2</text>
+                  <text class="pes-num" x="0" y="18" text-anchor="middle">84.0</text>
+                  <text class="pes-sublabel" x="0" y="-138" text-anchor="middle">1s</text>
+                </g>
+                <g class="peak-group peak-split peak-2s" transform="translate(400 220)">
+                  <g class="peak-slide">
+                    <path class="peak-fill" d="M-18,0 C-10,-6 -3,-88 -0.4,-110 C0,-112 0,-112 0.4,-110 C3,-88 10,-6 18,0 Z" fill="url(#peakWash)"/>
+                    <path class="peak-stroke" d="M-18,0 C-10,-6 -3,-88 -0.4,-110 C0,-112 0,-112 0.4,-110 C3,-88 10,-6 18,0"/>
+                    <text class="pes-num" x="0" y="-118" text-anchor="middle">2</text>
+                    <text class="pes-num" x="0" y="18" text-anchor="middle">4.68</text>
+                    <text class="pes-sublabel" x="0" y="-138" text-anchor="middle">2s</text>
+                  </g>
+                </g>
+                <g class="peak-group peak-split peak-2p" transform="translate(500 220)">
+                  <g class="peak-slide">
+                    <path class="peak-fill" d="M-26,0 C-13,-14 -3.5,-145 -0.5,-165 C0,-168 0,-168 0.5,-165 C3.5,-145 13,-14 26,0 Z" fill="url(#peakWash)"/>
+                    <path class="peak-stroke" d="M-26,0 C-13,-14 -3.5,-145 -0.5,-165 C0,-168 0,-168 0.5,-165 C3.5,-145 13,-14 26,0"/>
+                    <text class="pes-num" x="0" y="-176" text-anchor="middle">6</text>
+                    <text class="pes-num" x="0" y="18" text-anchor="middle">2.08</text>
+                    <text class="pes-sublabel" x="0" y="-196" text-anchor="middle">2p</text>
+                  </g>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act2" data-act="2" hidden>
+      <div class="viewport guess-plate" id="guessPlate" data-fig="FIG. 07  ·  UNKNOWN PES">
+        <div class="plate-body">
+          <div class="story-panel" aria-live="polite">
+            <div class="beat-kicker" id="guessKicker">Unknown spectrum</div>
+            <p id="guessStory">Here is another photoelectron spectrum. Use the peak heights and binding energies to decide which element it is.</p>
+          </div>
+
+          <div class="guess-config" id="guessConfig" aria-hidden="true">
+            <p class="config-formula" id="guessConfigFormula" aria-live="polite"></p>
+          </div>
+
+          <div class="guess-pes-host" id="guessPesHost"></div>
+
+          <div class="guess-controls" id="guessControls">
+            <div class="guess-prompt-label" id="guessPromptLabel">Your guess</div>
+            <div class="guess-row">
+              <input id="guessInput" maxlength="2" placeholder="?" aria-label="Element symbol guess" autocomplete="off" spellcheck="false">
+              <button type="button" class="btn submit" id="guessCheckBtn">Check</button>
+              <button type="button" class="btn" id="guessRevealBtn">Show answer</button>
+            </div>
+            <p class="guess-feedback" id="guessFeedback" aria-live="polite"></p>
+            <div class="guess-solved-tag" id="guessSolvedTag"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act3" data-act="3" hidden>
+      <div class="viewport shells-ie-plate" id="shellsIePlate" data-fig="FIG. 07  ·  SUBSHELL IONIZATION ENERGIES">
+        <div class="plate-body">
+          <div class="story-panel" aria-live="polite">
+            <div class="beat-kicker">Electron shells, subshells, and IE</div>
+            <p>Ionization energies for the first eighteen elements, by subshell. Work the questions on paper.</p>
+          </div>
+
+          <div class="shells-ie-table-wrap">
+            <table class="shells-ie-table" id="shellsIeTable">
+              <caption>Ionization energy (MJ/mol) by subshell · H–Ar</caption>
+              <thead>
+                <tr>
+                  <th scope="col">El</th>
+                  <th scope="col" class="sub-s">1s</th>
+                  <th scope="col" class="sub-s">2s</th>
+                  <th scope="col" class="sub-p">2p</th>
+                  <th scope="col" class="sub-s">3s</th>
+                  <th scope="col" class="sub-p">3p</th>
+                </tr>
+              </thead>
+              <tbody id="shellsIeBody"></tbody>
+            </table>
+          </div>
+
+          <ol class="shells-ie-qs" aria-label="Discussion questions">
+            <li class="student-q">What is the experimental method of obtaining the data for this table?</li>
+            <li class="student-q">Describe how you would use PES data to write an electron configuration.</li>
+            <li class="student-q">Does this table have enough information to write an electron configuration? Why or why not?</li>
+            <li class="student-q">Describe any patterns or trends you see in this data. Use Coulomb’s law to justify these patterns and trends.</li>
+          </ol>
+          <p class="shells-ie-note">Answer on paper — the sim does not check your responses.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act4" data-act="4" hidden>
+      <div class="viewport fill-plate" id="fillPlate" data-fig="FIG. 07  ·  K — MEASURED PES">
+        <div class="plate-body">
+          <div class="story-panel" aria-live="polite">
+            <div class="beat-kicker" id="fillKicker">Potassium</div>
+            <p id="fillStory">Here is the photoelectron spectrum of potassium. Read the peaks the way you did for neon and the unknowns.</p>
+            <p class="axis-note" id="fillAxisNote"></p>
+          </div>
+
+          <div class="fill-tiles" id="fillTiles" role="group" aria-label="Choose element">
+            <button type="button" class="fill-tile" data-el="K" aria-pressed="true" disabled>
+              K<span class="fill-tile-z">Z = 19</span>
+            </button>
+            <button type="button" class="fill-tile" data-el="Ca" aria-pressed="false" disabled>
+              Ca<span class="fill-tile-z">Z = 20</span>
+            </button>
+            <button type="button" class="fill-tile" data-el="Sc" aria-pressed="false" disabled>
+              Sc<span class="fill-tile-z">Z = 21</span>
+            </button>
+          </div>
+
+          <div class="fill-config" id="fillConfig" aria-hidden="true">
+            <p class="config-formula" id="fillConfigFormula" aria-live="polite"></p>
+          </div>
+
+          <div class="fill-toolbar">
+            <button type="button" class="fill-zoom-btn" id="fillZoomBtn" hidden aria-pressed="false">Zoom valence →</button>
+            <span class="fill-zoom-tag" id="fillZoomTag" hidden>Valence region</span>
+          </div>
+
+          <div class="fill-pes-host" id="fillPesHost"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act5" data-act="5" hidden>
+      <div class="viewport blocks-plate blocks-mode-why" id="blocksPlate" data-fig="FIG. 07  ·  PERIOD 4 — WHY 3d">
+        <div class="plate-body">
+          <div class="story-panel" aria-live="polite">
+            <div class="beat-kicker" id="blocksKicker">Why 3d appears</div>
+            <p id="blocksStory">Scandium’s spectrum showed a new place for electrons — 3d. As we’ve seen so far, s holds two, p holds six, and now we see that d holds 10. Now we can see that the periodic table is actually organized in a way that shows this pattern. On the next page, we can see the entire periodic table, and each electron configuration.</p>
+          </div>
+
+          <div class="why-strip" id="whyStrip" aria-hidden="false">
+            <div class="why-strip-label">Period 4 · from K to Kr</div>
+            <div class="why-strip-row" id="whyStripRow"></div>
+          </div>
+
+          <div class="blocks-explore" id="blocksExplore">
+            <div class="blocks-config is-empty" id="blocksConfig">
+              <div class="blocks-config-hint" id="blocksConfigHint">Full electron configuration</div>
+              <div class="blocks-el-meta" id="blocksElMeta"></div>
+              <p class="config-formula" id="blocksConfigFormula" aria-live="polite">Hover or select an element</p>
+            </div>
+
+            <div class="blocks-ptable-wrap">
+              <div class="blocks-ptable" id="blocksMainTable" role="group" aria-label="Periodic table"></div>
+              <div class="blocks-ptable f-row" id="blocksFTable" role="group" aria-label="f-block elements"></div>
+            </div>
+
+            <p class="blocks-discovery" id="blocksDiscovery" aria-live="polite"></p>
+            <div class="blocks-legend" id="blocksLegend" aria-hidden="true">
+              <span class="blocks-legend-item"><span class="blocks-legend-swatch block-s" aria-hidden="true"></span><span class="leg-letter s">s</span>-block</span>
+              <span class="blocks-legend-item"><span class="blocks-legend-swatch block-p" aria-hidden="true"></span><span class="leg-letter p">p</span>-block</span>
+              <span class="blocks-legend-item"><span class="blocks-legend-swatch block-d" aria-hidden="true"></span><span class="leg-letter d">d</span>-block</span>
+              <span class="blocks-legend-item"><span class="blocks-legend-swatch block-f" aria-hidden="true"></span><span class="leg-letter f">f</span>-block</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="act-panel" id="act6" data-act="6" hidden>
+      <div class="viewport shorthand-plate" id="shorthandPlate" data-fig="FIG. 07  ·  SHORT-HAND CONFIGURATIONS">
+        <div class="plate-body">
+          <div class="story-panel" aria-live="polite">
+            <div class="beat-kicker" id="shorthandKicker">Full configurations</div>
+            <p id="shorthandStory">Write these out on paper first. Then check against the model answers.</p>
+          </div>
+
+          <div class="sh-page sh-page-write" id="shPageWrite">
+            <p class="sh-write-prompt" id="shWritePrompt">Write the following FULL electron configurations in your notes</p>
+            <ul class="sh-el-list" id="shElList" aria-label="Elements to write"></ul>
+            <div class="sh-check-row" id="shCheckRow">
+              <button type="button" class="btn submit" id="shCheckBtn">Check answers</button>
+            </div>
+            <div class="sh-answers" id="shAnswers" aria-live="polite">
+              <div class="sh-answers-kicker">Model answers · full configurations</div>
+              <div id="shAnswerRows"></div>
+            </div>
+          </div>
+
+          <div class="sh-page sh-page-drop" id="shPageDrop" hidden>
+            <p class="student-q sh-drop-question" id="shNoticeQ">What do you notice happens when we put helium on top of oxygen? Neon on top of chlorine? Argon on top of bromine?</p>
+            <div class="sh-anim" id="shAnim" aria-live="polite">
+              <div class="sh-pairs" id="shPairs"></div>
+              <div class="sh-desc" id="shDesc">
+                <div class="sh-desc-kicker">Noble-gas short-hand</div>
+                <p>The electrons that match a previous noble gas can be written as that element’s symbol in brackets. What remains is only the new outer electrons — the short-hand configuration.</p>
+              </div>
+              <div class="sh-shorthand-list" id="shShorthandList">
+                <div class="sh-answers-kicker">Same atoms · short-hand</div>
+                <div id="shShorthandRows"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="module-footer" aria-label="Section navigation">
+      <div class="module-footer-back">
+        <button type="button" class="btn" id="backBtn" hidden>← Back</button>
+      </div>
+      <div class="module-footer-help">
+        <button type="button" id="stuckBtn" hidden>Stuck?</button>
+      </div>
+      <div class="module-footer-fwd">
+        <button type="button" class="btn submit" id="continueBtn">Continue →</button>
+      </div>
+    </nav>
+    <div class="help-panel" id="helpPanel">
+      <p id="helpText">Help nudges land with each beat.</p>
+    </div>
+
+    <section class="debrief" id="debrief" hidden aria-labelledby="debriefTitle">
+      <h2 id="debriefTitle">What this was for</h2>
+      <p class="debrief-lead">The intentions behind this module, and the competencies you just practised. Read each competency statement and decide honestly how well it fits you right now.</p>
+      <div class="debrief-block">
+        <div class="debrief-kicker">Learning intentions</div>
+        <ul class="debrief-li" id="debriefIntentions"></ul>
+      </div>
+      <div class="debrief-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="debrief-cc" id="debriefCompetencies"></ul>
+      </div>
+      <div class="debrief-block todo">
+        <div class="debrief-kicker">To do</div>
+        <ul class="debrief-todo">
+          <li>
+            <label>
+              <input type="checkbox" name="todo-notes">
+              <span>In your OneNote, make some notes that summarize each of the last four modules. Pretend you are studying for a test and you need to make quick notes to reference later. Use both the learning intentions and CCs as your guide.</span>
+            </label>
+          </li>
+          <li>
+            <label>
+              <input type="checkbox" name="todo-ap">
+              <span>Go to AP Classroom and complete quiz 07.</span>
+            </label>
+          </li>
+        </ul>
+      </div>
+    </section>
   </div>
 </div>
 
+<script src="assets/suite-chrome.js"></script>
 <script>
-const canvas = document.getElementById('simCanvas');
-const ctx = canvas.getContext('2d');
-let W, H, dpr;
+(function () {
+  'use strict';
 
-function resize(){
-  dpr = window.devicePixelRatio || 1;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  W = rect.width;
-  H = Math.min(W * 0.6, 500);
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.height = H + 'px';
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-window.addEventListener('resize', resize);
-resize();
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const prefersReduced = SuiteChrome.prefersReduced;
 
-const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const DEBRIEF = {
+    intentions: [
+      { text: 'We will learn about shells, subshells, and orbitals.',
+        target: 'act:1', revisit: 'Neon’s spectrum' },
+      { text: 'We will discover how electrons are arranged in specific, quantized places within an atom.',
+        target: 'act:5', revisit: 'Table blocks' },
+      { text: 'We will link concepts from previous chem activities to synthesize our understandings.',
+        target: 'act:6', revisit: 'Short-hand configs' },
+      { text: 'We will use PES to hypothesize the electron configuration of atoms.',
+        target: 'act:2', revisit: 'Unknown spectra' }
+    ],
+    competencies: [
+      { code:'C', name:'Communicating',
+        text:'I can use scientific terminology to explain the structure of an atom in terms of shells, subshells, and orbitals as part of electron configuration.' },
+      { code:'PAI', name:'Processing and analyzing data and information',
+        text:'I can construct and interpret full and short-hand electron configurations of atoms.' }
+    ]
+  };
 
-function glowLine(x1, y1, x2, y2, color, width = 2){
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 12;
-  ctx.strokeStyle = color;
-  ctx.globalAlpha = 0.3;
-  ctx.lineWidth = width + 4;
-  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.lineWidth = width;
-  ctx.stroke();
-  ctx.restore();
-}
+  /* Beat map — Continue advances one beat at a time within Act 1. */
+  const BEATS = [
+    {
+      framing: 'Neon’s shell model sits beside a spectrum. Click through and watch what changes.',
+      kicker: 'Shell-model spectrum',
+      story: 'From our last module, you may have drawn a PES diagram that looks like this, based on our understanding of the shell model.',
+      axisNote: '',
+      help: '',
+      flags: ['atom', 'pes', 'fake']
+    },
+    {
+      framing: 'Read the axes before anything else moves.',
+      kicker: 'Peak height',
+      story: 'The vertical axis is peak height. Taller means more electrons arrived with that same binding energy — so the short peak holds 2, and the tall one holds 8.',
+      axisNote: 'Reminder: Height ∝ number of electrons at that energy',
+      help: 'Which peak matches the inner ring on the shell diagram?',
+      flags: ['atom', 'pes', 'fake', 'calloutY']
+    },
+    {
+      framing: 'Binding energy runs left to right — but not the way a number line usually feels.',
+      kicker: 'Binding energy',
+      story: 'The horizontal axis is binding energy (ionization energy) in MJ/mol: how tightly each electron was held by the atom.',
+      axisNote: 'Left = more tightly held · Right = more loosely held',
+      help: '',
+      flags: ['atom', 'pes', 'fake', 'calloutX']
+    },
+    {
+      framing: 'Think of the axis as a walk from the nucleus outward.',
+      kicker: 'Inside → outside',
+      story: 'The x-axis is drawn “backwards” on purpose: high binding energy on the left (closer to the nucleus), low binding energy on the right (farther out). Reading left → right is moving from inside the atom toward the outside.',
+      axisNote: '← Inside (high IE) · Outside (low IE) →',
+      help: 'If you walk right along the axis, are you heading toward the nucleus or away from it?',
+      flags: ['atom', 'pes', 'fake', 'calloutDir']
+    },
+    {
+      framing: 'The shell model predicted two peaks. The instrument disagreed.',
+      kicker: 'Measured neon',
+      story: 'In reality, when tested, this is what neon looks like.',
+      axisNote: 'Numbers are binding energies (MJ/mol) and peak heights',
+      help: '',
+      flags: ['atom', 'pes', 'real', 'nums', 'split'],
+      split: true
+    },
+    {
+      framing: 'That zigzag on the axis is doing real work — it is not decoration.',
+      kicker: 'Axis break',
+      story: 'A break in the line indicates a large distance between the two sections. It also often indicates a new energy level — a new shell.',
+      axisNote: 'Break ≈ large gap in energy · often a new shell',
+      help: '',
+      flags: ['atom', 'pes', 'real', 'nums', 'calloutBreak']
+    },
+    {
+      framing: 'Two peaks sit close together on the right — same shell, different energies.',
+      kicker: 'Level 2 needs subshells',
+      story: 'Because the two peaks on the right are close in energy, we still label them both as level-2 electrons. But one energy is not enough anymore: that shell splits into subshells — s and p.',
+      axisNote: '',
+      help: '',
+      flags: ['atom', 'pes', 'real', 'nums']
+    },
+    {
+      framing: 'Name the pieces the spectrum just forced into view.',
+      kicker: 'Subshell labels',
+      story: 'The deep peak is 1s. The two level-2 peaks are 2s (slightly deeper) and 2p (shallower, and taller — six electrons).',
+      axisNote: 'Subshells: the n=2 shell holds two different energies.',
+      help: '',
+      flags: ['atom', 'pes', 'real', 'nums', 'sublabels']
+    },
+    {
+      framing: 'Read the configuration straight off the labeled peaks.',
+      kicker: 'Electron configuration',
+      story: 'Peak heights and subshell labels give neon’s ground-state electron configuration.',
+      axisNote: '',
+      help: '',
+      flags: ['atom', 'pes', 'real', 'nums', 'sublabels', 'config']
+    },
+    {
+      framing: 'Each piece of the notation names something you just measured.',
+      kicker: 'Reading the notation',
+      story: 'Here is the new way we are going to start talking about the arrangement of electrons in an atom.',
+      axisNote: '',
+      help: '',
+      flags: ['atom', 'pes', 'real', 'nums', 'sublabels', 'config', 'configParts']
+    }
+  ];
 
-function glowCircle(x, y, r, color){
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 15;
-  ctx.fillStyle = color;
-  ctx.globalAlpha = 0.2;
-  ctx.beginPath(); ctx.arc(x,y,r+4,0,Math.PI*2); ctx.fill();
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
-  ctx.restore();
-}
+  const STATE = {
+    act: 1,
+    beat: 0,
+    splitting: false,
+    guessIndex: 0,
+    guessRevealed: false,
+    fillBeat: 0,
+    fillEl: 'K',
+    fillZoom: false,
+    fillFree: false,
+    fillOuterRevealed: false,
+    blocksBeat: 0,
+    blocksZ: 0,
+    blocksHoverZ: 0,
+    blocksVisited: {},
+    blocksNamed: false,
+    blocksBuilt: false,
+    shorthandPhase: 0, /* 0 write · 1 answers+notice · 2–4 drops · 5 explained */
+    shorthandBuilt: false,
+    shorthandTimers: []
+  };
 
-function drawGrid(spacing = 40, color = 'rgba(33,29,71,0.6)'){
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1;
-  for(let x = 0; x < W; x += spacing){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
-  for(let y = 0; y < H; y += spacing){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
-  ctx.restore();
-}
+  /* Act 2 — unlabeled PES → guess element → labels + config (data §8.6 / §8.7) */
+  const GUESS_PROMPT = 'Your turn: Use the PES data below to identify the element. For an extra challenge, try to write out the electron configuration using the data as well.';
 
-const gates = {};
-function setGate(name, val){
-  gates[name] = val;
-  document.querySelectorAll('[data-gate]').forEach(el => {
-    const required = el.dataset.gate.split(',');
-    const unlocked = required.every(g => gates[g.trim()]);
-    el.classList.toggle('discovered', unlocked);
+  const GUESS_SPECTRA = [
+    {
+      sym: 'Mg',
+      name: 'Magnesium',
+      fig: 'FIG. 07  ·  UNKNOWN PES',
+      kicker: 'Unknown spectrum',
+      story: 'Here is another photoelectron spectrum. Use the peak heights and binding energies to decide which element it is.',
+      help: 'Count electrons from the heights, then match the binding energies to an atom you already know.',
+      configAria: 'Magnesium electron configuration: 1s2 2s2 2p6 3s2',
+      configHtml:
+        '<span class="cfg-term"><span class="cfg-shell">1</span><span class="cfg-sub cfg-sub-s">s</span><sup class="cfg-count">2</sup></span>' +
+        '<span class="cfg-term"><span class="cfg-shell">2</span><span class="cfg-sub cfg-sub-s">s</span><sup class="cfg-count">2</sup></span>' +
+        '<span class="cfg-term"><span class="cfg-shell">2</span><span class="cfg-sub cfg-sub-p">p</span><sup class="cfg-count">6</sup></span>' +
+        '<span class="cfg-term"><span class="cfg-shell">3</span><span class="cfg-sub cfg-sub-s">s</span><sup class="cfg-count">2</sup></span>',
+      breaks: [210, 488],
+      peaks: [
+        { label: '1s', ie: '126', n: 2, x: 100 },
+        { label: '2s', ie: '9.07', n: 2, x: 340 },
+        { label: '2p', ie: '5.31', n: 6, x: 430 },
+        { label: '3s', ie: '0.74', n: 2, x: 545 }
+      ]
+    },
+    {
+      sym: 'Ar',
+      name: 'Argon',
+      fig: 'FIG. 07  ·  UNKNOWN PES',
+      kicker: 'Unknown spectrum',
+      story: 'Another measured spectrum. Peak heights count electrons; binding energies place each subshell. Which atom is this?',
+      help: 'Five peaks — one deep, a pair in the middle, a pair on the right. How many electrons total?',
+      configAria: 'Argon electron configuration: 1s2 2s2 2p6 3s2 3p6',
+      configHtml:
+        '<span class="cfg-term"><span class="cfg-shell">1</span><span class="cfg-sub cfg-sub-s">s</span><sup class="cfg-count">2</sup></span>' +
+        '<span class="cfg-term"><span class="cfg-shell">2</span><span class="cfg-sub cfg-sub-s">s</span><sup class="cfg-count">2</sup></span>' +
+        '<span class="cfg-term"><span class="cfg-shell">2</span><span class="cfg-sub cfg-sub-p">p</span><sup class="cfg-count">6</sup></span>' +
+        '<span class="cfg-term"><span class="cfg-shell">3</span><span class="cfg-sub cfg-sub-s">s</span><sup class="cfg-count">2</sup></span>' +
+        '<span class="cfg-term"><span class="cfg-shell">3</span><span class="cfg-sub cfg-sub-p">p</span><sup class="cfg-count">6</sup></span>',
+      breaks: [200, 400],
+      peaks: [
+        { label: '1s', ie: '309', n: 2, x: 95 },
+        { label: '2s', ie: '31.5', n: 2, x: 275 },
+        { label: '2p', ie: '24.1', n: 6, x: 345 },
+        { label: '3s', ie: '2.82', n: 2, x: 465 },
+        { label: '3p', ie: '1.52', n: 6, x: 545 }
+      ]
+    },
+    {
+      sym: 'Cl',
+      name: 'Chlorine',
+      fig: 'FIG. 07  ·  UNKNOWN PES',
+      kicker: 'Unknown spectrum',
+      story: 'Last unknown for this section. Compare heights carefully on the rightmost peaks before you guess.',
+      help: 'Look at the shallowest peak height — is it full like argon’s, or one electron short?',
+      configAria: 'Chlorine electron configuration: 1s2 2s2 2p6 3s2 3p5',
+      configHtml:
+        '<span class="cfg-term"><span class="cfg-shell">1</span><span class="cfg-sub cfg-sub-s">s</span><sup class="cfg-count">2</sup></span>' +
+        '<span class="cfg-term"><span class="cfg-shell">2</span><span class="cfg-sub cfg-sub-s">s</span><sup class="cfg-count">2</sup></span>' +
+        '<span class="cfg-term"><span class="cfg-shell">2</span><span class="cfg-sub cfg-sub-p">p</span><sup class="cfg-count">6</sup></span>' +
+        '<span class="cfg-term"><span class="cfg-shell">3</span><span class="cfg-sub cfg-sub-s">s</span><sup class="cfg-count">2</sup></span>' +
+        '<span class="cfg-term"><span class="cfg-shell">3</span><span class="cfg-sub cfg-sub-p">p</span><sup class="cfg-count">5</sup></span>',
+      breaks: [200, 400],
+      peaks: [
+        { label: '1s', ie: '273', n: 2, x: 95 },
+        { label: '2s', ie: '26.8', n: 2, x: 275 },
+        { label: '2p', ie: '20.2', n: 6, x: 345 },
+        { label: '3s', ie: '2.44', n: 2, x: 465 },
+        { label: '3p', ie: '1.25', n: 5, x: 545 }
+      ]
+    }
+  ];
+
+  /* Act 3 — H–Ar subshell IE chart (§8.6 / Moog p.60) */
+  const SHELLS_IE_ROWS = [
+    { sym: 'H',  vals: ['1.31', null, null, null, null] },
+    { sym: 'He', vals: ['2.37', null, null, null, null] },
+    { sym: 'Li', vals: ['6.26', '0.52', null, null, null] },
+    { sym: 'Be', vals: ['11.5', '0.90', null, null, null] },
+    { sym: 'B',  vals: ['19.3', '1.36', '0.80', null, null] },
+    { sym: 'C',  vals: ['28.6', '1.72', '1.09', null, null] },
+    { sym: 'N',  vals: ['39.6', '2.45', '1.40', null, null] },
+    { sym: 'O',  vals: ['52.6', '3.04', '1.31', null, null] },
+    { sym: 'F',  vals: ['67.2', '3.88', '1.68', null, null] },
+    { sym: 'Ne', vals: ['84.0', '4.68', '2.08', null, null] },
+    { sym: 'Na', vals: ['104', '6.84', '3.67', '0.50', null] },
+    { sym: 'Mg', vals: ['126', '9.07', '5.31', '0.74', null] },
+    { sym: 'Al', vals: ['151', '12.1', '7.19', '1.09', '0.58'] },
+    { sym: 'Si', vals: ['178', '15.1', '10.3', '1.46', '0.79'] },
+    { sym: 'P',  vals: ['208', '18.7', '13.5', '1.95', '1.06'] },
+    { sym: 'S',  vals: ['239', '22.7', '16.5', '2.05', '1.00'] },
+    { sym: 'Cl', vals: ['273', '26.8', '20.2', '2.44', '1.25'] },
+    { sym: 'Ar', vals: ['309', '31.5', '24.1', '2.82', '1.52'] }
+  ];
+
+  /* Act 4 — K / Ca / Sc (§8.6). Sc 3d/4s nearly overlap (Model 2 style). */
+  function cfgTerm(shell, sub, count) {
+    return '<span class="cfg-term"><span class="cfg-shell">' + shell +
+      '</span><span class="cfg-sub cfg-sub-' + sub + '">' + sub +
+      '</span><sup class="cfg-count">' + count + '</sup></span>';
+  }
+
+  const FILL_SPECTRA = {
+    K: {
+      sym: 'K',
+      name: 'Potassium',
+      z: 19,
+      fig: 'FIG. 07  ·  K — MEASURED PES',
+      configAria: 'Potassium electron configuration: 1s2 2s2 2p6 3s2 3p6 4s1',
+      configHtml: cfgTerm(1,'s',2) + cfgTerm(2,'s',2) + cfgTerm(2,'p',6) +
+        cfgTerm(3,'s',2) + cfgTerm(3,'p',6) + cfgTerm(4,'s',1),
+      breaks: [175, 355, 500],
+      peaks: [
+        { label: '1s', ie: '347', n: 2, x: 100 },
+        { label: '2s', ie: '37.1', n: 2, x: 235 },
+        { label: '2p', ie: '29.1', n: 6, x: 305 },
+        { label: '3s', ie: '3.93', n: 2, x: 410 },
+        { label: '3p', ie: '2.38', n: 6, x: 470 },
+        { label: '4s', ie: '0.42', n: 1, x: 555, outer: true }
+      ],
+      zoomPeaks: [
+        { label: '3s', ie: '3.93', n: 2, x: 160 },
+        { label: '3p', ie: '2.38', n: 6, x: 280 },
+        { label: '4s', ie: '0.42', n: 1, x: 480, outer: true }
+      ],
+      zoomBreaks: [360]
+    },
+    Ca: {
+      sym: 'Ca',
+      name: 'Calcium',
+      z: 20,
+      fig: 'FIG. 07  ·  Ca — MEASURED PES',
+      configAria: 'Calcium electron configuration: 1s2 2s2 2p6 3s2 3p6 4s2',
+      configHtml: cfgTerm(1,'s',2) + cfgTerm(2,'s',2) + cfgTerm(2,'p',6) +
+        cfgTerm(3,'s',2) + cfgTerm(3,'p',6) + cfgTerm(4,'s',2),
+      breaks: [175, 355, 500],
+      peaks: [
+        { label: '1s', ie: '390', n: 2, x: 100 },
+        { label: '2s', ie: '42.7', n: 2, x: 235 },
+        { label: '2p', ie: '34.0', n: 6, x: 305 },
+        { label: '3s', ie: '4.65', n: 2, x: 410 },
+        { label: '3p', ie: '2.90', n: 6, x: 470 },
+        { label: '4s', ie: '0.59', n: 2, x: 555, outer: true }
+      ],
+      zoomPeaks: [
+        { label: '3s', ie: '4.65', n: 2, x: 160 },
+        { label: '3p', ie: '2.90', n: 6, x: 280 },
+        { label: '4s', ie: '0.59', n: 2, x: 480, outer: true }
+      ],
+      zoomBreaks: [360]
+    },
+    Sc: {
+      sym: 'Sc',
+      name: 'Scandium',
+      z: 21,
+      fig: 'FIG. 07  ·  Sc — MEASURED PES',
+      configAria: 'Scandium electron configuration: 1s2 2s2 2p6 3s2 3p6 4s2 3d1',
+      configHtml: cfgTerm(1,'s',2) + cfgTerm(2,'s',2) + cfgTerm(2,'p',6) +
+        cfgTerm(3,'s',2) + cfgTerm(3,'p',6) + cfgTerm(4,'s',2) + cfgTerm(3,'d',1),
+      breaks: [168, 330, 475],
+      peaks: [
+        { label: '1s', ie: '433', n: 2, x: 95 },
+        { label: '2s', ie: '48.5', n: 2, x: 220 },
+        { label: '2p', ie: '39.2', n: 6, x: 285 },
+        { label: '3s', ie: '5.44', n: 2, x: 385 },
+        { label: '3p', ie: '3.24', n: 6, x: 440 },
+        { label: '3d', ie: '0.77', n: 1, x: 528, outer: true, overlap: true },
+        { label: '4s', ie: '0.63', n: 2, x: 546, outer: true, overlap: true }
+      ],
+      /* Model 2–style: 3d slightly left of 4s, bases nearly overlapping */
+      zoomPeaks: [
+        { label: '3p', ie: '3.24', n: 6, x: 175 },
+        { label: '3d', ie: '0.77', n: 1, x: 405, outer: true, overlap: true },
+        { label: '4s', ie: '0.63', n: 2, x: 422, outer: true, overlap: true }
+      ],
+      zoomBreaks: [280],
+      callout: { x: 390, y: 48, w: 70, h: 185 }
+    }
+  };
+
+  const FILL_BEATS = [
+    {
+      el: 'K',
+      framing: 'Past argon, a new shell opens. Start with potassium’s spectrum.',
+      kicker: 'Potassium',
+      story: 'Here is the photoelectron spectrum of potassium. Read the peaks the way you did for neon and the unknowns.',
+      axisNote: '',
+      help: '',
+      showConfig: true,
+      holdOuter: false,
+      zoom: false,
+      callout: false,
+      free: false
+    },
+    {
+      el: 'K',
+      framing: 'One electron sits farther out than anything in argon.',
+      kicker: 'Shell 4 begins',
+      story: 'After the argon-like core, a single peak of height 1 appears on the far right. That electron is in a new shell — 4s.',
+      axisNote: 'Outermost peak · height 1 · 4s',
+      help: 'How does the height of that rightmost peak compare with neon’s 2s?',
+      showConfig: true,
+      holdOuter: false,
+      zoom: false,
+      callout: false,
+      free: false
+    },
+    {
+      el: 'Ca',
+      framing: 'Calcium adds one more proton — and one more electron.',
+      kicker: 'Calcium',
+      story: 'Calcium’s spectrum keeps the same pattern. The outermost peak is still 4s — now height 2. The new electrons are still going into 4s.',
+      axisNote: 'Outermost peak · height 2 · 4s',
+      help: '',
+      showConfig: true,
+      holdOuter: false,
+      zoom: false,
+      callout: false,
+      free: false
+    },
+    {
+      el: 'Sc',
+      framing: 'Scandium looks familiar — until you count the peaks on the right.',
+      kicker: 'Scandium',
+      story: 'Now scandium. The deep peaks match the pattern you already know. On the shallow end, something new has appeared next to the outermost energy.',
+      axisNote: 'Watch the right edge carefully',
+      help: 'Ignore labels for a moment — how many peaks sit near the low-energy end?',
+      showConfig: false,
+      holdOuter: true,
+      zoom: false,
+      callout: false,
+      free: false
+    },
+    {
+      el: 'Sc',
+      framing: 'Zoom the valence region so the new pair is easier to see.',
+      kicker: 'Nearly overlapping',
+      story: 'Two peaks sit almost on top of each other at the shallow end — close enough that their bases nearly overlap.',
+      axisNote: 'Valence zoom · two peaks, almost the same energy',
+      help: '',
+      showConfig: false,
+      holdOuter: true,
+      zoom: true,
+      callout: true,
+      free: false
+    },
+    {
+      el: 'Sc',
+      framing: 'Name what appeared — and what that means for filling order.',
+      kicker: '3d beside 4s',
+      story: 'The slightly deeper peak (higher IE) is 3d; the shallower one is 4s. On the energy axis, 3d sits just before 4s. But potassium and calcium already put their new electrons into 4s — scandium is the first to open 3d. Filling order: 4s before 3d.',
+      axisNote: 'Energy: 3d slightly deeper · Filling: 4s before 3d',
+      help: '',
+      showConfig: true,
+      holdOuter: false,
+      zoom: true,
+      callout: true,
+      free: false
+    },
+    {
+      el: 'Sc',
+      framing: 'Flip among K, Ca, and Sc. Watch what changes at the right edge.',
+      kicker: 'Compare freely',
+      story: 'Use the tiles to switch atoms. Zoom scandium’s valence region whenever you want another look at the 3d–4s pair.',
+      axisNote: '',
+      help: 'What stays the same from K → Ca → Sc? What is new only on Sc?',
+      showConfig: true,
+      holdOuter: false,
+      zoom: false,
+      callout: false,
+      free: true
+    }
+  ];
+
+
+  /* Act 5 — why 3d exists, then full table with block washes + configs */
+  const EL_SYMS = 'H He Li Be B C N O F Ne Na Mg Al Si P S Cl Ar K Ca Sc Ti V Cr Mn Fe Co Ni Cu Zn Ga Ge As Se Br Kr Rb Sr Y Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn Sb Te I Xe Cs Ba La Ce Pr Nd Pm Sm Eu Gd Tb Dy Ho Er Tm Yb Lu Hf Ta W Re Os Ir Pt Au Hg Tl Pb Bi Po At Rn Fr Ra Ac Th Pa U Np Pu Am Cm Bk Cf Es Fm Md No Lr Rf Db Sg Bh Hs Mt Ds Rg Cn Nh Fl Mc Lv Ts Og'.split(' ');
+  const EL_NAMES = 'Hydrogen Helium Lithium Beryllium Boron Carbon Nitrogen Oxygen Fluorine Neon Sodium Magnesium Aluminum Silicon Phosphorus Sulfur Chlorine Argon Potassium Calcium Scandium Titanium Vanadium Chromium Manganese Iron Cobalt Nickel Copper Zinc Gallium Germanium Arsenic Selenium Bromine Krypton Rubidium Strontium Yttrium Zirconium Niobium Molybdenum Technetium Ruthenium Rhodium Palladium Silver Cadmium Indium Tin Antimony Tellurium Iodine Xenon Cesium Barium Lanthanum Cerium Praseodymium Neodymium Promethium Samarium Europium Gadolinium Terbium Dysprosium Holmium Erbium Thulium Ytterbium Lutetium Hafnium Tantalum Tungsten Rhenium Osmium Iridium Platinum Gold Mercury Thallium Lead Bismuth Polonium Astatine Radon Francium Radium Actinium Thorium Protactinium Uranium Neptunium Plutonium Americium Curium Berkelium Californium Einsteinium Fermium Mendelevium Nobelium Lawrencium Rutherfordium Dubnium Seaborgium Bohrium Hassium Meitnerium Darmstadtium Roentgenium Copernicium Nihonium Flerovium Moscovium Livermorium Tennessine Oganesson'.split(' ');
+
+  const AUFBAU = [
+    [1,'s',2],[2,'s',2],[2,'p',6],[3,'s',2],[3,'p',6],
+    [4,'s',2],[3,'d',10],[4,'p',6],[5,'s',2],[4,'d',10],[5,'p',6],
+    [6,'s',2],[4,'f',14],[5,'d',10],[6,'p',6],
+    [7,'s',2],[5,'f',14],[6,'d',10],[7,'p',6]
+  ];
+
+  function aufbauTerms(z) {
+    var rem = z;
+    var terms = [];
+    for (var i = 0; i < AUFBAU.length; i++) {
+      if (rem <= 0) break;
+      var n = AUFBAU[i][0];
+      var sub = AUFBAU[i][1];
+      var cap = AUFBAU[i][2];
+      var take = Math.min(cap, rem);
+      terms.push([n, sub, take]);
+      rem -= take;
+    }
+    return terms;
+  }
+
+  function nobleCore(zNoble) {
+    return aufbauTerms(zNoble);
+  }
+
+  const CONFIG_EXCEPTIONS = {
+    24: nobleCore(18).concat([[4,'s',1],[3,'d',5]]),
+    29: nobleCore(18).concat([[4,'s',1],[3,'d',10]]),
+    41: nobleCore(36).concat([[5,'s',1],[4,'d',4]]),
+    42: nobleCore(36).concat([[5,'s',1],[4,'d',5]]),
+    44: nobleCore(36).concat([[5,'s',1],[4,'d',7]]),
+    45: nobleCore(36).concat([[5,'s',1],[4,'d',8]]),
+    46: nobleCore(36).concat([[4,'d',10]]),
+    47: nobleCore(36).concat([[5,'s',1],[4,'d',10]]),
+    57: nobleCore(54).concat([[6,'s',2],[5,'d',1]]),
+    58: nobleCore(54).concat([[6,'s',2],[4,'f',1],[5,'d',1]]),
+    64: nobleCore(54).concat([[6,'s',2],[4,'f',7],[5,'d',1]]),
+    78: nobleCore(54).concat([[4,'f',14],[5,'d',9],[6,'s',1]]),
+    79: nobleCore(54).concat([[4,'f',14],[5,'d',10],[6,'s',1]]),
+    89: nobleCore(86).concat([[7,'s',2],[6,'d',1]]),
+    90: nobleCore(86).concat([[7,'s',2],[6,'d',2]]),
+    91: nobleCore(86).concat([[7,'s',2],[5,'f',2],[6,'d',1]]),
+    92: nobleCore(86).concat([[7,'s',2],[5,'f',3],[6,'d',1]])
+  };
+
+  function elementBlock(z) {
+    if ((z >= 57 && z <= 70) || (z >= 89 && z <= 102)) return 'f';
+    if (z === 1 || z === 2) return 's';
+    var sSet = {3:1,4:1,11:1,12:1,19:1,20:1,37:1,38:1,55:1,56:1,87:1,88:1};
+    if (sSet[z]) return 's';
+    var pRanges = [[5,10],[13,18],[31,36],[49,54],[81,86],[113,118]];
+    for (var i = 0; i < pRanges.length; i++) {
+      if (z >= pRanges[i][0] && z <= pRanges[i][1]) return 'p';
+    }
+    return 'd';
+  }
+
+  function configTerms(z) {
+    return CONFIG_EXCEPTIONS[z] || aufbauTerms(z);
+  }
+
+  function configHtmlFromTerms(terms) {
+    return terms.map(function (t) {
+      return cfgTerm(t[0], t[1], t[2]);
+    }).join('');
+  }
+
+  function configAriaFromTerms(name, terms) {
+    var body = terms.map(function (t) {
+      return t[0] + t[1] + t[2];
+    }).join(' ');
+    return name + ' electron configuration: ' + body;
+  }
+
+  const NOBLE_GAS_Z = [2, 10, 18, 36, 54, 86];
+  const NOBLE_GAS_SYM = { 2: 'He', 10: 'Ne', 18: 'Ar', 36: 'Kr', 54: 'Xe', 86: 'Rn' };
+
+  function nobleGasBefore(z) {
+    var best = 0;
+    for (var i = 0; i < NOBLE_GAS_Z.length; i++) {
+      if (NOBLE_GAS_Z[i] < z) best = NOBLE_GAS_Z[i];
+    }
+    return best || null;
+  }
+
+  function matchCoreLength(full, core) {
+    var i = 0;
+    while (
+      i < core.length &&
+      i < full.length &&
+      full[i][0] === core[i][0] &&
+      full[i][1] === core[i][1] &&
+      full[i][2] === core[i][2]
+    ) {
+      i++;
+    }
+    return i;
+  }
+
+  function shorthandParts(z) {
+    var full = configTerms(z);
+    var coreZ = nobleGasBefore(z);
+    if (!coreZ) {
+      return { coreSym: null, coreLen: 0, terms: full, full: full };
+    }
+    var core = configTerms(coreZ);
+    var len = matchCoreLength(full, core);
+    return {
+      coreSym: NOBLE_GAS_SYM[coreZ],
+      coreLen: len,
+      terms: full.slice(len),
+      full: full
+    };
+  }
+
+  function shorthandHtml(z) {
+    var parts = shorthandParts(z);
+    var core = parts.coreSym
+      ? '<span class="cfg-term cfg-noble">[' + parts.coreSym + ']</span>'
+      : '';
+    return core + configHtmlFromTerms(parts.terms);
+  }
+
+  function shorthandAria(name, z) {
+    var parts = shorthandParts(z);
+    var body = (parts.coreSym ? '[' + parts.coreSym + '] ' : '') +
+      parts.terms.map(function (t) { return t[0] + t[1] + t[2]; }).join(' ');
+    return name + ' short-hand electron configuration: ' + body;
+  }
+
+  function configHtmlMatched(terms, matchLen) {
+    return terms.map(function (t, i) {
+      var html = cfgTerm(t[0], t[1], t[2]);
+      if (i < matchLen) {
+        return html.replace('class="cfg-term"', 'class="cfg-term cfg-match"');
+      }
+      return html;
+    }).join('');
+  }
+
+  /* Act 6 — write full configs, then discover noble-gas short-hand */
+  const SHORTHAND_ELEMENTS = [
+    { z: 2,  sym: 'He', name: 'Helium' },
+    { z: 8,  sym: 'O',  name: 'Oxygen' },
+    { z: 10, sym: 'Ne', name: 'Neon' },
+    { z: 15, sym: 'P',  name: 'Phosphorus' },
+    { z: 17, sym: 'Cl', name: 'Chlorine' },
+    { z: 18, sym: 'Ar', name: 'Argon' },
+    { z: 25, sym: 'Mn', name: 'Manganese' },
+    { z: 35, sym: 'Br', name: 'Bromine' }
+  ];
+
+  const SHORTHAND_PAIRS = [
+    {
+      coreZ: 2, coreSym: 'He', coreName: 'Helium',
+      elZ: 8, elSym: 'O', elName: 'oxygen',
+      label: 'Helium onto oxygen',
+      continueLabel: 'Drop helium onto oxygen →'
+    },
+    {
+      coreZ: 10, coreSym: 'Ne', coreName: 'Neon',
+      elZ: 17, elSym: 'Cl', elName: 'chlorine',
+      label: 'Neon onto chlorine',
+      continueLabel: 'Drop neon onto chlorine →'
+    },
+    {
+      coreZ: 18, coreSym: 'Ar', coreName: 'Argon',
+      elZ: 35, elSym: 'Br', elName: 'bromine',
+      label: 'Argon onto bromine',
+      continueLabel: 'Drop argon onto bromine →'
+    }
+  ];
+  const SHORTHAND_PAIR_START = 2;
+  const SHORTHAND_EXPLAINED = SHORTHAND_PAIR_START + SHORTHAND_PAIRS.length;
+
+  /* Main table: Lu/Lr in group 3; La–Yb / Ac–No on f rows */
+  const PT_MAIN = [
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
+    [3,4,0,0,0,0,0,0,0,0,0,0,5,6,7,8,9,10],
+    [11,12,0,0,0,0,0,0,0,0,0,0,13,14,15,16,17,18],
+    [19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36],
+    [37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54],
+    [55,56,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86],
+    [87,88,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118]
+  ];
+  const PT_F = [
+    [0,0,57,58,59,60,61,62,63,64,65,66,67,68,69,70,0,0],
+    [0,0,89,90,91,92,93,94,95,96,97,98,99,100,101,102,0,0]
+  ];
+
+  const PERIOD4_STRIP = [19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36];
+
+  const BLOCKS_BEATS = [
+    {
+      mode: 'why',
+      framing: 'Scandium opened 3d. That is why the table suddenly needs a wide middle.',
+      kicker: 'Why 3d appears',
+      story: 'Scandium’s spectrum showed a new place for electrons — 3d. As we’ve seen so far, s holds two, p holds six, and now we see that d holds 10. Now we can see that the periodic table is actually organized in a way that shows this pattern. On the next page, we can see the entire periodic table, and each electron configuration.',
+      help: 'Count the shaded cells between Ca and Ga. How does that number relate to a full 3d subshell?',
+      fig: 'FIG. 07  ·  PERIOD 4 — WHY 3d'
+    },
+    {
+      mode: 'table',
+      framing: 'Hover an element. Watch the full configuration above the table.',
+      kicker: 'Configurations across the table',
+      story: 'Each cell is softly coloured by where its last electron goes. Move across and down — the configuration above tracks with you.',
+      help: 'Pick a mustard cell, then a blue one. What letter just changed in the configuration?',
+      fig: 'FIG. 07  ·  PERIODIC TABLE — CONFIGURATIONS'
+    }
+  ];
+
+  const els = {
+    framing: document.getElementById('framing'),
+    discoveryLine: document.getElementById('discoveryLine'),
+    actMeta: document.getElementById('actMeta'),
+    openerPlate: document.getElementById('openerPlate'),
+    atomPane: document.getElementById('atomPane'),
+    pesPane: document.getElementById('pesPane'),
+    atomHost: document.getElementById('atomHost'),
+    configReveal: document.getElementById('configReveal'),
+    storyKicker: document.getElementById('storyKicker'),
+    storyText: document.getElementById('storyText'),
+    axisNote: document.getElementById('axisNote'),
+    continueBtn: document.getElementById('continueBtn'),
+    backBtn: document.getElementById('backBtn'),
+    stuckBtn: document.getElementById('stuckBtn'),
+    helpText: document.getElementById('helpText'),
+    helpPanel: document.getElementById('helpPanel'),
+    guessPlate: document.getElementById('guessPlate'),
+    guessKicker: document.getElementById('guessKicker'),
+    guessStory: document.getElementById('guessStory'),
+    guessConfig: document.getElementById('guessConfig'),
+    guessConfigFormula: document.getElementById('guessConfigFormula'),
+    guessPesHost: document.getElementById('guessPesHost'),
+    guessInput: document.getElementById('guessInput'),
+    guessCheckBtn: document.getElementById('guessCheckBtn'),
+    guessRevealBtn: document.getElementById('guessRevealBtn'),
+    guessFeedback: document.getElementById('guessFeedback'),
+    guessSolvedTag: document.getElementById('guessSolvedTag'),
+    fillPlate: document.getElementById('fillPlate'),
+    fillKicker: document.getElementById('fillKicker'),
+    fillStory: document.getElementById('fillStory'),
+    fillAxisNote: document.getElementById('fillAxisNote'),
+    fillTiles: document.getElementById('fillTiles'),
+    fillConfig: document.getElementById('fillConfig'),
+    fillConfigFormula: document.getElementById('fillConfigFormula'),
+    fillPesHost: document.getElementById('fillPesHost'),
+    fillZoomBtn: document.getElementById('fillZoomBtn'),
+    fillZoomTag: document.getElementById('fillZoomTag'),
+    blocksPlate: document.getElementById('blocksPlate'),
+    blocksKicker: document.getElementById('blocksKicker'),
+    blocksStory: document.getElementById('blocksStory'),
+    whyStrip: document.getElementById('whyStrip'),
+    whyStripRow: document.getElementById('whyStripRow'),
+    blocksExplore: document.getElementById('blocksExplore'),
+    blocksConfig: document.getElementById('blocksConfig'),
+    blocksConfigHint: document.getElementById('blocksConfigHint'),
+    blocksElMeta: document.getElementById('blocksElMeta'),
+    blocksConfigFormula: document.getElementById('blocksConfigFormula'),
+    blocksMainTable: document.getElementById('blocksMainTable'),
+    blocksFTable: document.getElementById('blocksFTable'),
+    blocksDiscovery: document.getElementById('blocksDiscovery'),
+    blocksLegend: document.getElementById('blocksLegend'),
+    shellsIeBody: document.getElementById('shellsIeBody'),
+    shorthandPlate: document.getElementById('shorthandPlate'),
+    shorthandKicker: document.getElementById('shorthandKicker'),
+    shorthandStory: document.getElementById('shorthandStory'),
+    shPageWrite: document.getElementById('shPageWrite'),
+    shPageDrop: document.getElementById('shPageDrop'),
+    shElList: document.getElementById('shElList'),
+    shCheckBtn: document.getElementById('shCheckBtn'),
+    shAnswerRows: document.getElementById('shAnswerRows'),
+    shPairs: document.getElementById('shPairs'),
+    shShorthandRows: document.getElementById('shShorthandRows')
+  };
+
+  function buildNeAtom() {
+    const canvas = 220;
+    const cx = 110;
+    const cy = 110;
+    const z = 10;
+    const inner = 2;
+    const valence = 8;
+    const rNuc = 22;
+    const rInner = 48;
+    const rOuter = 92;
+    const rCore = rInner + 12;
+
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('class', 'atom-svg');
+    svg.setAttribute('viewBox', '0 0 ' + canvas + ' ' + canvas);
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Neon shell model: 2 inner electrons, 8 valence electrons');
+
+    const defs = document.createElementNS(SVG_NS, 'defs');
+    const nucGrad = document.createElementNS(SVG_NS, 'radialGradient');
+    nucGrad.setAttribute('id', 'nuc-ne07');
+    nucGrad.setAttribute('cx', '32%');
+    nucGrad.setAttribute('cy', '28%');
+    nucGrad.setAttribute('r', '68%');
+    [
+      ['0%', '#e8b48a'],
+      ['45%', '#a85a32'],
+      ['100%', '#5a2c16']
+    ].forEach(function (pair) {
+      const s = document.createElementNS(SVG_NS, 'stop');
+      s.setAttribute('offset', pair[0]);
+      s.setAttribute('stop-color', pair[1]);
+      nucGrad.appendChild(s);
+    });
+    defs.appendChild(nucGrad);
+
+    const coreGrad = document.createElementNS(SVG_NS, 'radialGradient');
+    coreGrad.setAttribute('id', 'core-ne07');
+    coreGrad.setAttribute('cx', '50%');
+    coreGrad.setAttribute('cy', '50%');
+    coreGrad.setAttribute('r', '50%');
+    [
+      [0, 'rgba(184,145,48,0.82)'],
+      [0.28, 'rgba(196,163,90,0.64)'],
+      [0.55, 'rgba(168,130,42,0.42)'],
+      [0.78, 'rgba(196,163,90,0.18)'],
+      [1, 'rgba(196,163,90,0)']
+    ].forEach(function (pair) {
+      const s = document.createElementNS(SVG_NS, 'stop');
+      s.setAttribute('offset', String(pair[0]));
+      s.setAttribute('stop-color', pair[1]);
+      coreGrad.appendChild(s);
+    });
+    defs.appendChild(coreGrad);
+    svg.appendChild(defs);
+
+    function ring(r) {
+      const c = document.createElementNS(SVG_NS, 'circle');
+      c.setAttribute('class', 'shell');
+      c.setAttribute('cx', cx);
+      c.setAttribute('cy', cy);
+      c.setAttribute('r', r);
+      return c;
+    }
+
+    function place(n, r, cls, startAng) {
+      const g = document.createElementNS(SVG_NS, 'g');
+      for (let i = 0; i < n; i++) {
+        const ang = startAng + (i * 2 * Math.PI) / n;
+        const e = document.createElementNS(SVG_NS, 'circle');
+        e.setAttribute('class', cls);
+        e.setAttribute('cx', String(cx + r * Math.cos(ang)));
+        e.setAttribute('cy', String(cy + r * Math.sin(ang)));
+        e.setAttribute('r', 7);
+        g.appendChild(e);
+      }
+      return g;
+    }
+
+    const corePack = document.createElementNS(SVG_NS, 'g');
+    corePack.appendChild(ring(rInner));
+    const coreDisk = document.createElementNS(SVG_NS, 'circle');
+    coreDisk.setAttribute('class', 'neg-core-disk');
+    coreDisk.setAttribute('cx', cx);
+    coreDisk.setAttribute('cy', cy);
+    coreDisk.setAttribute('r', rCore);
+    coreDisk.setAttribute('fill', 'url(#core-ne07)');
+    corePack.appendChild(coreDisk);
+    corePack.appendChild(place(inner, rInner, 'e-marker', -Math.PI / 2));
+    svg.appendChild(corePack);
+
+    svg.appendChild(ring(rOuter));
+    svg.appendChild(place(valence, rOuter, 'e-valence', 0));
+
+    const nuc = document.createElementNS(SVG_NS, 'circle');
+    nuc.setAttribute('cx', cx);
+    nuc.setAttribute('cy', cy);
+    nuc.setAttribute('r', rNuc);
+    nuc.setAttribute('fill', 'url(#nuc-ne07)');
+    svg.appendChild(nuc);
+
+    const nucLabel = document.createElementNS(SVG_NS, 'text');
+    nucLabel.setAttribute('class', 'nuc-label is-shielded');
+    nucLabel.setAttribute('x', cx);
+    nucLabel.setAttribute('y', cy);
+    nucLabel.textContent = '+' + z;
+    svg.appendChild(nucLabel);
+
+    const c1 = document.createElementNS(SVG_NS, 'text');
+    c1.setAttribute('class', 'shell-count');
+    c1.setAttribute('x', cx);
+    c1.setAttribute('y', cy - rInner - 10);
+    c1.textContent = '2';
+    svg.appendChild(c1);
+
+    const c2 = document.createElementNS(SVG_NS, 'text');
+    c2.setAttribute('class', 'shell-count');
+    c2.setAttribute('x', cx);
+    c2.setAttribute('y', cy - rOuter - 10);
+    c2.textContent = '8';
+    svg.appendChild(c2);
+
+    els.atomHost.replaceChildren(svg);
+  }
+
+  function peakHalfWidth(n) {
+    if (n >= 6) return 26;
+    if (n >= 5) return 24;
+    if (n >= 4) return 22;
+    return 18;
+  }
+
+  function peakHeightPx(n) {
+    if (n <= 1) return 58;
+    if (n === 2) return 92;
+    if (n === 5) return 155;
+    if (n >= 6) return 175;
+    return Math.max(100, Math.min(175, 40 + n * 24));
+  }
+
+  function peakPathD(halfW, h) {
+    const tip = h;
+    const mid = tip * 0.85;
+    return 'M-' + halfW + ',0 C-' + (halfW * 0.55) + ',-' + (tip * 0.06) +
+      ' -' + (halfW * 0.18) + ',-' + mid + ' -0.4,-' + tip +
+      ' C0,-' + (tip + 2) + ' 0,-' + (tip + 2) + ' 0.4,-' + tip +
+      ' C' + (halfW * 0.18) + ',-' + mid + ' ' + (halfW * 0.55) + ',-' + (tip * 0.06) +
+      ' ' + halfW + ',0 Z';
+  }
+
+  function peakStrokeD(halfW, h) {
+    return peakPathD(halfW, h).replace(' Z', '');
+  }
+
+  function buildGuessSpectrum(spec) {
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('class', 'pes-svg');
+    svg.setAttribute('viewBox', '0 0 640 300');
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Photoelectron spectrum — unidentified element');
+
+    const defs = document.createElementNS(SVG_NS, 'defs');
+    const grad = document.createElementNS(SVG_NS, 'linearGradient');
+    grad.setAttribute('id', 'guessPeakWash');
+    grad.setAttribute('x1', '0');
+    grad.setAttribute('y1', '0');
+    grad.setAttribute('x2', '0');
+    grad.setAttribute('y2', '1');
+    [
+      ['0%', '#5c6b28', '0.28'],
+      ['100%', '#5c6b28', '0.04']
+    ].forEach(function (row) {
+      const stop = document.createElementNS(SVG_NS, 'stop');
+      stop.setAttribute('offset', row[0]);
+      stop.setAttribute('stop-color', row[1]);
+      stop.setAttribute('stop-opacity', row[2]);
+      grad.appendChild(stop);
+    });
+    defs.appendChild(grad);
+    svg.appendChild(defs);
+
+    function line(x1, y1, x2, y2) {
+      const el = document.createElementNS(SVG_NS, 'line');
+      el.setAttribute('class', 'axis-line');
+      el.setAttribute('x1', x1);
+      el.setAttribute('y1', y1);
+      el.setAttribute('x2', x2);
+      el.setAttribute('y2', y2);
+      return el;
+    }
+
+    svg.appendChild(line(56, 36, 56, 220));
+    svg.appendChild(line(56, 220, 600, 220));
+
+    (spec.breaks || []).forEach(function (bx) {
+      const g = document.createElementNS(SVG_NS, 'g');
+      g.setAttribute('class', 'axis-break');
+      g.style.opacity = '1';
+      const a = document.createElementNS(SVG_NS, 'line');
+      a.setAttribute('x1', bx - 12);
+      a.setAttribute('y1', 214);
+      a.setAttribute('x2', bx);
+      a.setAttribute('y2', 226);
+      const b = document.createElementNS(SVG_NS, 'line');
+      b.setAttribute('x1', bx);
+      b.setAttribute('y1', 214);
+      b.setAttribute('x2', bx + 12);
+      b.setAttribute('y2', 226);
+      g.appendChild(a);
+      g.appendChild(b);
+      svg.appendChild(g);
+    });
+
+    const yLab = document.createElementNS(SVG_NS, 'text');
+    yLab.setAttribute('class', 'pes-axis-label');
+    yLab.setAttribute('transform', 'translate(22 180) rotate(-90)');
+    yLab.textContent = 'Peak height';
+    svg.appendChild(yLab);
+
+    const xLab = document.createElementNS(SVG_NS, 'text');
+    xLab.setAttribute('class', 'pes-axis-label');
+    xLab.setAttribute('x', '328');
+    xLab.setAttribute('y', '268');
+    xLab.setAttribute('text-anchor', 'middle');
+    xLab.textContent = '← Binding energy (MJ/mol)';
+    svg.appendChild(xLab);
+
+    const dirL = document.createElementNS(SVG_NS, 'text');
+    dirL.setAttribute('class', 'dir-tag');
+    dirL.setAttribute('x', '90');
+    dirL.setAttribute('y', '286');
+    dirL.style.opacity = '1';
+    dirL.textContent = 'Inside · high IE';
+    svg.appendChild(dirL);
+
+    const dirR = document.createElementNS(SVG_NS, 'text');
+    dirR.setAttribute('class', 'dir-tag');
+    dirR.setAttribute('x', '560');
+    dirR.setAttribute('y', '286');
+    dirR.setAttribute('text-anchor', 'end');
+    dirR.style.opacity = '1';
+    dirR.textContent = 'Outside · low IE';
+    svg.appendChild(dirR);
+
+    spec.peaks.forEach(function (pk) {
+      const g = document.createElementNS(SVG_NS, 'g');
+      g.setAttribute('class', 'peak-group');
+      g.setAttribute('transform', 'translate(' + pk.x + ' 220)');
+      const halfW = peakHalfWidth(pk.n);
+      const h = peakHeightPx(pk.n);
+
+      const fill = document.createElementNS(SVG_NS, 'path');
+      fill.setAttribute('class', 'peak-fill');
+      fill.setAttribute('d', peakPathD(halfW, h));
+      fill.setAttribute('fill', 'url(#guessPeakWash)');
+      g.appendChild(fill);
+
+      const stroke = document.createElementNS(SVG_NS, 'path');
+      stroke.setAttribute('class', 'peak-stroke');
+      stroke.setAttribute('d', peakStrokeD(halfW, h));
+      g.appendChild(stroke);
+
+      const nLab = document.createElementNS(SVG_NS, 'text');
+      nLab.setAttribute('class', 'pes-num pes-height');
+      nLab.setAttribute('x', '0');
+      nLab.setAttribute('y', String(-(h + 8)));
+      nLab.setAttribute('text-anchor', 'middle');
+      nLab.textContent = String(pk.n);
+      g.appendChild(nLab);
+
+      const ieLab = document.createElementNS(SVG_NS, 'text');
+      ieLab.setAttribute('class', 'pes-num pes-ie');
+      ieLab.setAttribute('x', '0');
+      ieLab.setAttribute('y', '18');
+      ieLab.setAttribute('text-anchor', 'middle');
+      ieLab.textContent = pk.ie;
+      g.appendChild(ieLab);
+
+      const sub = document.createElementNS(SVG_NS, 'text');
+      sub.setAttribute('class', 'pes-sublabel');
+      sub.setAttribute('x', '0');
+      sub.setAttribute('y', String(-(h + 28)));
+      sub.setAttribute('text-anchor', 'middle');
+      sub.textContent = pk.label;
+      g.appendChild(sub);
+
+      svg.appendChild(g);
+    });
+
+    els.guessPesHost.replaceChildren(svg);
+  }
+
+  function currentGuess() {
+    return GUESS_SPECTRA[STATE.guessIndex];
+  }
+
+  function setGuessFooter() {
+    const last = STATE.guessIndex >= GUESS_SPECTRA.length - 1;
+    els.backBtn.hidden = false;
+    if (!STATE.guessRevealed) {
+      els.continueBtn.hidden = true;
+      els.continueBtn.disabled = true;
+      return;
+    }
+    els.continueBtn.hidden = false;
+    els.continueBtn.disabled = false;
+    els.continueBtn.textContent = last ? 'Next section →' : 'Next spectrum →';
+  }
+
+  function buildFillSpectrum(spec, opts) {
+    opts = opts || {};
+    const zoom = !!opts.zoom;
+    const holdOuter = !!opts.holdOuter;
+    const showCallout = !!opts.callout;
+    const peaks = zoom ? (spec.zoomPeaks || spec.peaks) : spec.peaks;
+    const breaks = zoom ? (spec.zoomBreaks || []) : (spec.breaks || []);
+
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('class', 'pes-svg');
+    svg.setAttribute('viewBox', '0 0 640 300');
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Photoelectron spectrum of ' + spec.name);
+
+    const defs = document.createElementNS(SVG_NS, 'defs');
+    const grad = document.createElementNS(SVG_NS, 'linearGradient');
+    grad.setAttribute('id', 'fillPeakWash');
+    grad.setAttribute('x1', '0');
+    grad.setAttribute('y1', '0');
+    grad.setAttribute('x2', '0');
+    grad.setAttribute('y2', '1');
+    [
+      ['0%', '#5c6b28', '0.28'],
+      ['100%', '#5c6b28', '0.04']
+    ].forEach(function (row) {
+      const stop = document.createElementNS(SVG_NS, 'stop');
+      stop.setAttribute('offset', row[0]);
+      stop.setAttribute('stop-color', row[1]);
+      stop.setAttribute('stop-opacity', row[2]);
+      grad.appendChild(stop);
+    });
+    defs.appendChild(grad);
+    svg.appendChild(defs);
+
+    function line(x1, y1, x2, y2) {
+      const el = document.createElementNS(SVG_NS, 'line');
+      el.setAttribute('class', 'axis-line');
+      el.setAttribute('x1', x1);
+      el.setAttribute('y1', y1);
+      el.setAttribute('x2', x2);
+      el.setAttribute('y2', y2);
+      return el;
+    }
+
+    svg.appendChild(line(56, 36, 56, 220));
+    svg.appendChild(line(56, 220, 600, 220));
+
+    breaks.forEach(function (bx) {
+      const g = document.createElementNS(SVG_NS, 'g');
+      g.setAttribute('class', 'axis-break');
+      g.style.opacity = '1';
+      const a = document.createElementNS(SVG_NS, 'line');
+      a.setAttribute('x1', bx - 12);
+      a.setAttribute('y1', 214);
+      a.setAttribute('x2', bx);
+      a.setAttribute('y2', 226);
+      const b = document.createElementNS(SVG_NS, 'line');
+      b.setAttribute('x1', bx);
+      b.setAttribute('y1', 214);
+      b.setAttribute('x2', bx + 12);
+      b.setAttribute('y2', 226);
+      g.appendChild(a);
+      g.appendChild(b);
+      svg.appendChild(g);
+    });
+
+    if (showCallout && spec.callout) {
+      const c = spec.callout;
+      const ring = document.createElementNS(SVG_NS, 'rect');
+      ring.setAttribute('class', 'peak-callout');
+      ring.setAttribute('x', String(zoom ? 360 : c.x));
+      ring.setAttribute('y', String(c.y));
+      ring.setAttribute('width', String(zoom ? 100 : c.w));
+      ring.setAttribute('height', String(c.h));
+      svg.appendChild(ring);
+    }
+
+    const yLab = document.createElementNS(SVG_NS, 'text');
+    yLab.setAttribute('class', 'pes-axis-label');
+    yLab.setAttribute('transform', 'translate(22 180) rotate(-90)');
+    yLab.textContent = 'Peak height';
+    svg.appendChild(yLab);
+
+    const xLab = document.createElementNS(SVG_NS, 'text');
+    xLab.setAttribute('class', 'pes-axis-label');
+    xLab.setAttribute('x', '328');
+    xLab.setAttribute('y', '268');
+    xLab.setAttribute('text-anchor', 'middle');
+    xLab.textContent = zoom
+      ? '← Binding energy (MJ/mol) · valence zoom'
+      : '← Binding energy (MJ/mol)';
+    svg.appendChild(xLab);
+
+    const dirL = document.createElementNS(SVG_NS, 'text');
+    dirL.setAttribute('class', 'dir-tag');
+    dirL.setAttribute('x', '90');
+    dirL.setAttribute('y', '286');
+    dirL.style.opacity = '1';
+    dirL.textContent = 'Inside · high IE';
+    svg.appendChild(dirL);
+
+    const dirR = document.createElementNS(SVG_NS, 'text');
+    dirR.setAttribute('class', 'dir-tag');
+    dirR.setAttribute('x', '560');
+    dirR.setAttribute('y', '286');
+    dirR.setAttribute('text-anchor', 'end');
+    dirR.style.opacity = '1';
+    dirR.textContent = 'Outside · low IE';
+    svg.appendChild(dirR);
+
+    /* Near-coincident peaks (Sc 3d/4s): nudge IE labels apart so they stay legible. */
+    const ieLayout = peaks.map(function () {
+      return { x: 0, anchor: 'middle' };
+    });
+    const IE_MIN_GAP = 42;
+    for (let i = 0; i < peaks.length - 1; i++) {
+      const dx = peaks[i + 1].x - peaks[i].x;
+      if (dx > 0 && dx < IE_MIN_GAP) {
+        const push = (IE_MIN_GAP - dx) / 2 + 4;
+        ieLayout[i].x = -push;
+        ieLayout[i].anchor = 'end';
+        ieLayout[i + 1].x = push;
+        ieLayout[i + 1].anchor = 'start';
+      }
+    }
+
+    peaks.forEach(function (pk, idx) {
+      const g = document.createElementNS(SVG_NS, 'g');
+      const classes = ['peak-group'];
+      if (pk.overlap) classes.push('peak-overlap');
+      if (holdOuter && pk.outer) classes.push('peak-hold');
+      g.setAttribute('class', classes.join(' '));
+      g.setAttribute('transform', 'translate(' + pk.x + ' 220)');
+      const halfW = peakHalfWidth(pk.n);
+      const h = peakHeightPx(pk.n);
+
+      const fill = document.createElementNS(SVG_NS, 'path');
+      fill.setAttribute('class', 'peak-fill');
+      fill.setAttribute('d', peakPathD(halfW, h));
+      fill.setAttribute('fill', 'url(#fillPeakWash)');
+      g.appendChild(fill);
+
+      const stroke = document.createElementNS(SVG_NS, 'path');
+      stroke.setAttribute('class', 'peak-stroke');
+      stroke.setAttribute('d', peakStrokeD(halfW, h));
+      g.appendChild(stroke);
+
+      const nLab = document.createElementNS(SVG_NS, 'text');
+      nLab.setAttribute('class', 'pes-num pes-height');
+      nLab.setAttribute('x', '0');
+      nLab.setAttribute('y', String(-(h + 8)));
+      nLab.setAttribute('text-anchor', 'middle');
+      nLab.textContent = String(pk.n);
+      g.appendChild(nLab);
+
+      const iePos = ieLayout[idx];
+      const ieLab = document.createElementNS(SVG_NS, 'text');
+      ieLab.setAttribute('class', 'pes-num pes-ie');
+      ieLab.setAttribute('x', String(iePos.x));
+      ieLab.setAttribute('y', '18');
+      ieLab.setAttribute('text-anchor', iePos.anchor);
+      ieLab.textContent = pk.ie;
+      g.appendChild(ieLab);
+
+      const sub = document.createElementNS(SVG_NS, 'text');
+      sub.setAttribute('class', 'pes-sublabel');
+      sub.setAttribute('x', '0');
+      sub.setAttribute('y', String(-(h + 28)));
+      sub.setAttribute('text-anchor', 'middle');
+      sub.textContent = pk.label;
+      g.appendChild(sub);
+
+      svg.appendChild(g);
+    });
+
+    els.fillPesHost.replaceChildren(svg);
+    els.fillPesHost.classList.toggle('is-callout', showCallout);
+  }
+
+  function setFillTiles(enabled, activeEl) {
+    const tiles = els.fillTiles.querySelectorAll('.fill-tile');
+    tiles.forEach(function (btn) {
+      const el = btn.getAttribute('data-el');
+      btn.disabled = !enabled;
+      btn.setAttribute('aria-pressed', el === activeEl ? 'true' : 'false');
+    });
+  }
+
+  function setFillZoomChrome(spec, zoom, free) {
+    const canZoom = !!spec.zoomPeaks;
+    if (!canZoom) {
+      els.fillZoomBtn.hidden = true;
+      els.fillZoomTag.hidden = true;
+      return;
+    }
+    if (free) {
+      els.fillZoomBtn.hidden = false;
+      els.fillZoomBtn.setAttribute('aria-pressed', zoom ? 'true' : 'false');
+      els.fillZoomBtn.textContent = zoom ? '← Full spectrum' : 'Zoom valence →';
+      els.fillZoomTag.hidden = !zoom;
+    } else {
+      els.fillZoomBtn.hidden = true;
+      els.fillZoomTag.hidden = !zoom;
+    }
+  }
+
+  function renderFillView(opts) {
+    opts = opts || {};
+    const elKey = opts.el || STATE.fillEl;
+    const spec = FILL_SPECTRA[elKey];
+    if (!spec) return;
+    STATE.fillEl = elKey;
+    const zoom = opts.zoom != null ? !!opts.zoom : STATE.fillZoom;
+    const holdOuter = opts.holdOuter != null ? !!opts.holdOuter : false;
+    const showConfig = opts.showConfig != null ? !!opts.showConfig : true;
+    const callout = !!opts.callout;
+    STATE.fillZoom = zoom;
+
+    els.fillPlate.dataset.fig = zoom
+      ? ('FIG. 07  ·  ' + spec.sym + ' — VALENCE ZOOM')
+      : spec.fig;
+
+    buildFillSpectrum(spec, {
+      zoom: zoom,
+      holdOuter: holdOuter,
+      callout: callout
+    });
+
+    els.fillConfigFormula.innerHTML = spec.configHtml;
+    els.fillConfigFormula.setAttribute('aria-label', spec.configAria);
+    if (showConfig) {
+      els.fillConfig.classList.add('is-visible');
+      els.fillConfig.setAttribute('aria-hidden', 'false');
+    } else {
+      els.fillConfig.classList.remove('is-visible');
+      els.fillConfig.setAttribute('aria-hidden', 'true');
+    }
+
+    setFillTiles(STATE.fillFree, elKey);
+    setFillZoomChrome(spec, zoom, STATE.fillFree);
+  }
+
+  function applyFillBeat(i) {
+    const beat = FILL_BEATS[i];
+    if (!beat) return;
+    STATE.act = 4;
+    STATE.fillBeat = i;
+    STATE.fillFree = !!beat.free;
+    if (!beat.holdOuter) STATE.fillOuterRevealed = true;
+    showActPanels(4);
+
+    els.framing.classList.remove('student-q');
+    els.framing.textContent = beat.framing;
+    els.actMeta.textContent = STATE.fillFree
+      ? 'Act 4 · K · Ca · Sc · free compare'
+      : ('Act 4 · K · Ca · Sc · ' + (i + 1) + ' / ' + FILL_BEATS.length);
+
+    els.fillKicker.textContent = beat.kicker;
+    els.fillStory.textContent = beat.story;
+    if (beat.axisNote) {
+      els.fillAxisNote.textContent = beat.axisNote;
+      els.fillAxisNote.classList.add('visible');
+    } else {
+      els.fillAxisNote.textContent = '';
+      els.fillAxisNote.classList.remove('visible');
+    }
+
+    renderFillView({
+      el: beat.el,
+      zoom: beat.zoom,
+      holdOuter: beat.holdOuter,
+      showConfig: beat.showConfig,
+      callout: beat.callout
+    });
+
+    const help = beat.help || '';
+    els.stuckBtn.hidden = !help;
+    els.helpText.textContent = help || 'Compare the right edge of each spectrum.';
+    els.helpPanel.classList.remove('open');
+    els.discoveryLine.textContent = '';
+    els.discoveryLine.classList.remove('visible');
+
+    els.backBtn.hidden = false;
+    els.continueBtn.hidden = false;
+    els.continueBtn.disabled = false;
+    if (STATE.fillFree) {
+      els.continueBtn.textContent = 'Next section →';
+    } else if (i < FILL_BEATS.length - 1) {
+      els.continueBtn.textContent = 'Continue →';
+    } else {
+      els.continueBtn.textContent = 'Next section →';
+    }
+  }
+
+  function selectFillElement(elKey) {
+    if (!STATE.fillFree) return;
+    if (!FILL_SPECTRA[elKey]) return;
+    renderFillView({
+      el: elKey,
+      zoom: elKey === 'Sc' ? STATE.fillZoom : false,
+      holdOuter: false,
+      showConfig: true,
+      callout: false
+    });
+    els.fillKicker.textContent = FILL_SPECTRA[elKey].name;
+    els.fillStory.textContent = elKey === 'Sc'
+      ? 'Scandium’s extra peak is 3d, sitting just beside 4s. Zoom the valence region to see the overlap more clearly.'
+      : (FILL_SPECTRA[elKey].name + ' places its outermost electrons in 4s.');
+  }
+
+  function buildWhyStrip() {
+    els.whyStripRow.innerHTML = '';
+    PERIOD4_STRIP.forEach(function (z) {
+      var cell = document.createElement('div');
+      var block = elementBlock(z);
+      cell.className = 'why-cell block-' + block;
+      if (block === 'd') cell.classList.add('is-focus');
+      cell.textContent = EL_SYMS[z - 1];
+      els.whyStripRow.appendChild(cell);
+    });
+  }
+
+  function makeBlocksCell(z) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'blocks-cell block-' + elementBlock(z);
+    btn.dataset.z = String(z);
+    btn.setAttribute('aria-pressed', 'false');
+    btn.setAttribute('aria-label', EL_NAMES[z - 1] + ', ' + EL_SYMS[z - 1]);
+    var zEl = document.createElement('span');
+    zEl.className = 'blocks-cell-z';
+    zEl.textContent = String(z);
+    var symEl = document.createElement('span');
+    symEl.className = 'blocks-cell-sym';
+    symEl.textContent = EL_SYMS[z - 1];
+    btn.appendChild(zEl);
+    btn.appendChild(symEl);
+    btn.addEventListener('mouseenter', function () { previewBlocksElement(z); });
+    btn.addEventListener('mouseleave', function () { clearBlocksHover(); });
+    btn.addEventListener('focus', function () { selectBlocksElement(z); });
+    btn.addEventListener('click', function () { selectBlocksElement(z); });
+    return btn;
+  }
+
+  function fillBlocksGrid(host, rows) {
+    host.innerHTML = '';
+    rows.forEach(function (row) {
+      row.forEach(function (z) {
+        if (!z) {
+          var spacer = document.createElement('div');
+          spacer.className = 'blocks-spacer';
+          spacer.setAttribute('aria-hidden', 'true');
+          host.appendChild(spacer);
+          return;
+        }
+        host.appendChild(makeBlocksCell(z));
+      });
+    });
+  }
+
+  function buildBlocksTable() {
+    if (STATE.blocksBuilt) return;
+    buildWhyStrip();
+    fillBlocksGrid(els.blocksMainTable, PT_MAIN);
+    fillBlocksGrid(els.blocksFTable, PT_F);
+    STATE.blocksBuilt = true;
+  }
+
+  function showBlocksConfig(z) {
+    if (!z) {
+      els.blocksConfig.classList.add('is-empty');
+      els.blocksElMeta.textContent = '';
+      els.blocksConfigFormula.textContent = 'Hover or select an element';
+      els.blocksConfigFormula.removeAttribute('aria-label');
+      return;
+    }
+    var terms = configTerms(z);
+    var name = EL_NAMES[z - 1];
+    var sym = EL_SYMS[z - 1];
+    els.blocksConfig.classList.remove('is-empty');
+    els.blocksElMeta.innerHTML = '<span class="el-sym">' + sym + '</span> · Z = ' + z + ' · ' + name;
+    els.blocksConfigFormula.innerHTML = configHtmlFromTerms(terms);
+    els.blocksConfigFormula.setAttribute('aria-label', configAriaFromTerms(name, terms));
+  }
+
+  function markBlocksActive(z) {
+    var nodes = els.blocksPlate.querySelectorAll('.blocks-cell');
+    nodes.forEach(function (btn) {
+      var active = Number(btn.dataset.z) === z;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  }
+
+  function noteBlocksVisit(z) {
+    if (!z) return;
+    var block = elementBlock(z);
+    STATE.blocksVisited[block] = true;
+    var count = Object.keys(STATE.blocksVisited).length;
+    if (!STATE.blocksNamed && count >= 2) {
+      STATE.blocksNamed = true;
+      els.blocksDiscovery.textContent =
+        'Those colour bands are the s, p, d, and f blocks — each named for the subshell being filled.';
+      els.blocksDiscovery.classList.add('is-visible');
+      els.blocksLegend.classList.add('is-visible');
+      els.blocksLegend.setAttribute('aria-hidden', 'false');
+    }
+  }
+
+  function previewBlocksElement(z) {
+    if (BLOCKS_BEATS[STATE.blocksBeat].mode !== 'table') return;
+    STATE.blocksHoverZ = z;
+    showBlocksConfig(z);
+  }
+
+  function clearBlocksHover() {
+    STATE.blocksHoverZ = 0;
+    showBlocksConfig(STATE.blocksZ || 0);
+  }
+
+  function selectBlocksElement(z) {
+    if (BLOCKS_BEATS[STATE.blocksBeat].mode !== 'table') return;
+    STATE.blocksZ = z;
+    STATE.blocksHoverZ = 0;
+    markBlocksActive(z);
+    showBlocksConfig(z);
+    noteBlocksVisit(z);
+  }
+
+  function applyBlocksBeat(i) {
+    var beat = BLOCKS_BEATS[i];
+    if (!beat) return;
+    STATE.act = 5;
+    STATE.blocksBeat = i;
+    buildBlocksTable();
+    showActPanels(5);
+
+    els.blocksPlate.className = 'viewport blocks-plate blocks-mode-' + beat.mode;
+    els.blocksPlate.dataset.fig = beat.fig;
+    els.whyStrip.setAttribute('aria-hidden', beat.mode === 'why' ? 'false' : 'true');
+
+    els.framing.classList.remove('student-q');
+    els.framing.textContent = beat.framing;
+    els.actMeta.textContent = beat.mode === 'why'
+      ? 'Act 5 · Why 3d · 1 / ' + BLOCKS_BEATS.length
+      : 'Act 5 · Table blocks · free explore';
+
+    els.blocksKicker.textContent = beat.kicker;
+    els.blocksStory.textContent = beat.story;
+
+    if (beat.mode === 'table') {
+      if (STATE.blocksZ) {
+        markBlocksActive(STATE.blocksZ);
+        showBlocksConfig(STATE.blocksZ);
+      } else {
+        markBlocksActive(0);
+        showBlocksConfig(0);
+      }
+      if (STATE.blocksNamed) {
+        els.blocksDiscovery.textContent =
+          'Those colour bands are the s, p, d, and f blocks — each named for the subshell being filled.';
+        els.blocksDiscovery.classList.add('is-visible');
+        els.blocksLegend.classList.add('is-visible');
+        els.blocksLegend.setAttribute('aria-hidden', 'false');
+      } else {
+        els.blocksDiscovery.textContent = '';
+        els.blocksDiscovery.classList.remove('is-visible');
+        els.blocksLegend.classList.remove('is-visible');
+        els.blocksLegend.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    var help = beat.help || '';
+    els.stuckBtn.hidden = !help;
+    els.helpText.textContent = help || 'Explore the coloured cells.';
+    els.helpPanel.classList.remove('open');
+    els.discoveryLine.textContent = '';
+    els.discoveryLine.classList.remove('visible');
+
+    els.backBtn.hidden = false;
+    els.continueBtn.hidden = false;
+    els.continueBtn.disabled = false;
+    els.continueBtn.textContent = beat.mode === 'why' ? 'Continue →' : 'Next section →';
+  }
+
+  function clearShorthandTimers() {
+    (STATE.shorthandTimers || []).forEach(function (id) {
+      window.clearTimeout(id);
+    });
+    STATE.shorthandTimers = [];
+  }
+
+  function buildShorthandPairs() {
+    els.shPairs.innerHTML = '';
+    SHORTHAND_PAIRS.forEach(function (pair) {
+      var coreTerms = configTerms(pair.coreZ);
+      var elParts = shorthandParts(pair.elZ);
+      var matchLen = elParts.coreLen;
+      var card = document.createElement('div');
+      card.className = 'sh-pair';
+      card.dataset.pair = pair.elSym;
+      card.innerHTML =
+        '<div class="sh-pair-label">' + pair.label + '</div>' +
+        '<div class="sh-drop">' +
+          '<div class="sh-drop-stage">' +
+            '<div class="sh-drop-falling" aria-hidden="true">' +
+              '<span class="el-sym">' + pair.coreSym + '</span>' +
+              '<div class="sh-drop-formulas">' +
+                '<p class="config-formula">' + configHtmlFromTerms(coreTerms) + '</p>' +
+              '</div>' +
+            '</div>' +
+            '<div class="sh-drop-base">' +
+              '<span class="el-sym">' + pair.elSym + '</span>' +
+              '<div class="sh-drop-formulas">' +
+                '<p class="config-formula sh-drop-full">' +
+                  configHtmlMatched(elParts.full, matchLen) +
+                '</p>' +
+                '<p class="config-formula sh-drop-short">' +
+                  shorthandHtml(pair.elZ) +
+                '</p>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<button type="button" class="btn sh-replay-btn">Replay</button>' +
+        '</div>';
+      els.shPairs.appendChild(card);
+    });
+  }
+
+  function buildShorthandStatic() {
+    if (STATE.shorthandBuilt) {
+      buildShorthandPairs();
+      return;
+    }
+    els.shElList.innerHTML = '';
+    SHORTHAND_ELEMENTS.forEach(function (el) {
+      var li = document.createElement('li');
+      li.innerHTML =
+        '<span class="sh-el-sym">' + el.sym + '</span>' +
+        '<span class="sh-el-name">' + el.name + '</span>';
+      els.shElList.appendChild(li);
+    });
+
+    els.shAnswerRows.innerHTML = '';
+    SHORTHAND_ELEMENTS.forEach(function (el) {
+      var row = document.createElement('div');
+      row.className = 'sh-answer-row';
+      var terms = configTerms(el.z);
+      row.innerHTML =
+        '<span class="el-label">' + el.sym + '</span>' +
+        '<p class="config-formula" aria-label="' + configAriaFromTerms(el.name, terms) + '">' +
+          configHtmlFromTerms(terms) +
+        '</p>';
+      els.shAnswerRows.appendChild(row);
+    });
+
+    els.shShorthandRows.innerHTML = '';
+    SHORTHAND_ELEMENTS.forEach(function (el) {
+      var row = document.createElement('div');
+      row.className = 'sh-answer-row';
+      row.innerHTML =
+        '<span class="el-label">' + el.sym + '</span>' +
+        '<p class="config-formula" aria-label="' + shorthandAria(el.name, el.z) + '">' +
+          shorthandHtml(el.z) +
+        '</p>';
+      els.shShorthandRows.appendChild(row);
+    });
+
+    buildShorthandPairs();
+    STATE.shorthandBuilt = true;
+  }
+
+  function shorthandPairIndex(phase) {
+    return phase - SHORTHAND_PAIR_START;
+  }
+
+  function setShorthandFooter() {
+    els.backBtn.hidden = false;
+    els.continueBtn.hidden = false;
+    els.continueBtn.disabled = false;
+    if (STATE.shorthandPhase < 1) {
+      els.continueBtn.hidden = true;
+      return;
+    }
+    if (STATE.shorthandPhase === 1) {
+      els.continueBtn.textContent = 'Next →';
+      return;
+    }
+    var nextPair = shorthandPairIndex(STATE.shorthandPhase) + 1;
+    if (nextPair < SHORTHAND_PAIRS.length) {
+      els.continueBtn.textContent = SHORTHAND_PAIRS[nextPair].continueLabel;
+      return;
+    }
+    if (STATE.shorthandPhase < SHORTHAND_EXPLAINED) {
+      els.continueBtn.textContent = 'Show short-hand →';
+      return;
+    }
+    els.continueBtn.textContent = 'What this was for →';
+  }
+
+  function syncShorthandPairs(phase, animateActive) {
+    var pairs = Array.prototype.slice.call(els.shPairs.querySelectorAll('.sh-pair'));
+    var activeIdx = shorthandPairIndex(phase);
+    pairs.forEach(function (pair, i) {
+      pair.classList.remove('is-visible', 'is-ready', 'is-dropping', 'is-aligned', 'is-merged');
+      if (phase < SHORTHAND_PAIR_START) return;
+      if (i < activeIdx) {
+        pair.classList.add('is-visible', 'is-merged');
+      } else if (i === activeIdx && phase < SHORTHAND_EXPLAINED) {
+        pair.classList.add('is-visible');
+        if (animateActive) {
+          runPairDrop(pair);
+        } else {
+          pair.classList.add('is-merged');
+        }
+      } else if (phase >= SHORTHAND_EXPLAINED) {
+        pair.classList.add('is-visible', 'is-merged');
+      }
+    });
+  }
+
+  function runPairDrop(pair) {
+    clearShorthandTimers();
+    pair.classList.remove('is-ready', 'is-dropping', 'is-aligned', 'is-merged');
+    if (prefersReduced) {
+      pair.classList.add('is-merged');
+      return;
+    }
+    void pair.offsetWidth;
+    pair.classList.add('is-ready');
+    STATE.shorthandTimers.push(window.setTimeout(function () {
+      pair.classList.remove('is-ready');
+      pair.classList.add('is-dropping');
+    }, 450));
+    STATE.shorthandTimers.push(window.setTimeout(function () {
+      pair.classList.remove('is-dropping');
+      pair.classList.add('is-aligned');
+    }, 450 + 2400));
+    STATE.shorthandTimers.push(window.setTimeout(function () {
+      pair.classList.add('is-merged');
+    }, 450 + 2400 + 700));
+  }
+
+  function replayShorthandPair(pair) {
+    if (!pair) return;
+    runPairDrop(pair);
+  }
+
+  function applyShorthand(phase, opts) {
+    opts = opts || {};
+    clearShorthandTimers();
+    STATE.act = 6;
+    STATE.shorthandPhase = phase == null ? STATE.shorthandPhase : phase;
+    buildShorthandStatic();
+    showActPanels(6);
+
+    var plate = els.shorthandPlate;
+    plate.classList.remove('shorthand-checked', 'shorthand-dropping', 'is-explained');
+
+    var onDropPage = STATE.shorthandPhase >= SHORTHAND_PAIR_START;
+    els.shPageWrite.hidden = onDropPage;
+    els.shPageDrop.hidden = !onDropPage;
+
+    if (STATE.shorthandPhase >= 1 && !onDropPage) {
+      plate.classList.add('shorthand-checked');
+    }
+    if (onDropPage) {
+      plate.classList.add('shorthand-dropping');
+    }
+    if (STATE.shorthandPhase >= SHORTHAND_EXPLAINED) {
+      plate.classList.add('is-explained');
+    }
+
+    var animateActive = !!opts.animate && onDropPage &&
+      STATE.shorthandPhase < SHORTHAND_EXPLAINED;
+    syncShorthandPairs(STATE.shorthandPhase, animateActive);
+
+    els.framing.classList.remove('student-q');
+    if (STATE.shorthandPhase === 0) {
+      els.framing.textContent = 'Write the full configurations on paper first — then check.';
+      els.shorthandKicker.textContent = 'Full configurations';
+      els.shorthandStory.textContent = 'Write these out on paper first. Then check against the model answers.';
+    } else if (STATE.shorthandPhase === 1) {
+      els.framing.textContent = 'Compare what you wrote with the model answers.';
+      els.shorthandKicker.textContent = 'Model answers';
+      els.shorthandStory.textContent = 'When you’re ready, go on — the next page puts a noble gas on top of the next atom.';
+    } else if (STATE.shorthandPhase < SHORTHAND_EXPLAINED) {
+      els.framing.textContent = '';
+      els.shorthandKicker.textContent = 'Noble-gas short-hand';
+      els.shorthandStory.textContent = '';
+    } else {
+      els.framing.textContent = 'Matching electrons collapse into a noble-gas core in brackets.';
+      els.shorthandKicker.textContent = 'Short-hand configurations';
+      els.shorthandStory.textContent = 'The same idea works for every atom on the list.';
+    }
+
+    els.actMeta.textContent = onDropPage && STATE.shorthandPhase < SHORTHAND_EXPLAINED
+      ? ('Act 6 · Short-hand · ' + (shorthandPairIndex(STATE.shorthandPhase) + 1) + ' / ' + SHORTHAND_PAIRS.length)
+      : 'Act 6 · Short-hand configs';
+    els.discoveryLine.textContent = '';
+    els.discoveryLine.classList.remove('visible');
+
+    var help = STATE.shorthandPhase === 0
+      ? 'Write them in order of filling — shell, then subshell letter, then the count.'
+      : (STATE.shorthandPhase === 1
+        ? 'Check your exponents carefully — the model answers are underneath.'
+        : '');
+    els.stuckBtn.hidden = !help;
+    els.helpText.textContent = help || 'Keep exploring the short-hand.';
+    els.helpPanel.classList.remove('open');
+
+    setShorthandFooter();
+  }
+
+  function checkShorthandAnswers() {
+    if (STATE.shorthandPhase >= 1) return;
+    applyShorthand(1);
+    window.setTimeout(function () {
+      if (els.shAnswerRows) {
+        els.shAnswerRows.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'nearest' });
+      }
+    }, 80);
+  }
+
+  function advanceShorthand() {
+    if (STATE.shorthandPhase < 1) return;
+    if (STATE.shorthandPhase >= SHORTHAND_EXPLAINED) {
+      showDebriefStage();
+      return;
+    }
+    var next = STATE.shorthandPhase + 1;
+    applyShorthand(next, { animate: next >= SHORTHAND_PAIR_START && next < SHORTHAND_EXPLAINED });
+    if (next >= SHORTHAND_PAIR_START) {
+      window.setTimeout(function () {
+        if (els.shPageDrop) {
+          els.shPageDrop.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
+        }
+      }, 60);
+    }
+  }
+
+
+  function buildShellsIeTable() {
+    if (!els.shellsIeBody || els.shellsIeBody.childElementCount) return;
+    var frag = document.createDocumentFragment();
+    SHELLS_IE_ROWS.forEach(function (row) {
+      var tr = document.createElement('tr');
+      var th = document.createElement('th');
+      th.scope = 'row';
+      th.className = 'el-sym';
+      th.textContent = row.sym;
+      tr.appendChild(th);
+      row.vals.forEach(function (v) {
+        var td = document.createElement('td');
+        if (v == null) {
+          td.className = 'ie-empty';
+          td.textContent = '—';
+        } else {
+          td.className = 'ie-val';
+          td.textContent = v;
+        }
+        tr.appendChild(td);
+      });
+      frag.appendChild(tr);
+    });
+    els.shellsIeBody.appendChild(frag);
+  }
+
+  function applyShellsIE() {
+    STATE.act = 3;
+    buildShellsIeTable();
+    showActPanels(3);
+
+    els.framing.classList.remove('student-q');
+    els.framing.textContent = 'The ionization energies you have been reading off spectra, gathered for the first eighteen elements.';
+    els.actMeta.textContent = 'Act 3 · Electron shells, subshells, and IE';
+    els.discoveryLine.textContent = '';
+    els.discoveryLine.classList.remove('visible');
+
+    els.stuckBtn.hidden = false;
+    els.helpText.textContent = 'Every peak you measured in Acts 1 and 2 came from the same kind of instrument that filled this table.';
+    els.helpPanel.classList.remove('open');
+
+    els.backBtn.hidden = false;
+    els.continueBtn.hidden = false;
+    els.continueBtn.disabled = false;
+    els.continueBtn.textContent = 'Next section →';
+  }
+
+  function showActPanels(n) {
+    document.querySelectorAll('.act-panel').forEach(function (p) {
+      p.hidden = Number(p.dataset.act) !== n;
+    });
+  }
+
+  function applyGuess(i, opts) {
+    opts = opts || {};
+    const spec = GUESS_SPECTRA[i];
+    if (!spec) return;
+    STATE.guessIndex = i;
+    STATE.guessRevealed = !!opts.revealed;
+    STATE.act = 2;
+    showActPanels(2);
+
+    els.actMeta.textContent = 'Act 2 · Unknown spectra · ' + (i + 1) + ' / ' + GUESS_SPECTRA.length;
+    els.guessPlate.dataset.fig = STATE.guessRevealed
+      ? ('FIG. 07  ·  ' + spec.sym + ' — MEASURED PES')
+      : spec.fig;
+    els.guessKicker.textContent = STATE.guessRevealed ? (spec.sym + ' — measured') : spec.kicker;
+    els.guessStory.textContent = STATE.guessRevealed
+      ? ('Peak labels and the electron configuration for ' + spec.name + ' (' + spec.sym + ').')
+      : spec.story;
+    if (STATE.guessRevealed) {
+      els.framing.classList.remove('student-q');
+      els.framing.textContent = 'That’s ' + spec.name + '. Read the configuration off the labeled peaks.';
+    } else {
+      els.framing.classList.add('student-q');
+      els.framing.textContent = GUESS_PROMPT;
+    }
+
+    buildGuessSpectrum(spec);
+    els.guessConfigFormula.innerHTML = spec.configHtml;
+    els.guessConfigFormula.setAttribute('aria-label', spec.configAria);
+    els.guessConfig.setAttribute('aria-hidden', STATE.guessRevealed ? 'false' : 'true');
+    els.guessSolvedTag.textContent = spec.name + ' · ' + spec.sym;
+
+    if (STATE.guessRevealed) {
+      els.guessPlate.classList.add('guess-revealed');
+      els.guessFeedback.textContent = '';
+      els.guessFeedback.className = 'guess-feedback';
+      els.guessInput.value = spec.sym;
+      els.guessInput.disabled = true;
+    } else {
+      els.guessPlate.classList.remove('guess-revealed');
+      els.guessFeedback.textContent = '';
+      els.guessFeedback.className = 'guess-feedback';
+      els.guessInput.value = '';
+      els.guessInput.disabled = false;
+    }
+
+    const help = STATE.guessRevealed ? '' : (spec.help || '');
+    els.stuckBtn.hidden = !help;
+    els.helpText.textContent = help || 'Keep reading the peaks.';
+    els.helpPanel.classList.remove('open');
+    els.discoveryLine.textContent = '';
+    els.discoveryLine.classList.remove('visible');
+
+    setGuessFooter();
+    if (!STATE.guessRevealed) {
+      window.setTimeout(function () { els.guessInput.focus(); }, 40);
+    }
+  }
+
+  function revealGuess(fromCheck) {
+    const spec = currentGuess();
+    STATE.guessRevealed = true;
+    els.guessPlate.classList.add('guess-revealed');
+    els.guessPlate.dataset.fig = 'FIG. 07  ·  ' + spec.sym + ' — MEASURED PES';
+    els.guessConfig.setAttribute('aria-hidden', 'false');
+    els.guessSolvedTag.textContent = spec.name + ' · ' + spec.sym;
+    els.guessKicker.textContent = spec.sym + ' — measured';
+    els.guessStory.textContent = 'Peak labels and the electron configuration for ' + spec.name + ' (' + spec.sym + ').';
+    els.framing.classList.remove('student-q');
+    els.framing.textContent = 'That’s ' + spec.name + '. Read the configuration off the labeled peaks.';
+    els.guessInput.value = spec.sym;
+    els.guessInput.disabled = true;
+    if (fromCheck) {
+      els.guessFeedback.textContent = 'Matches ' + spec.name + ' (' + spec.sym + ').';
+      els.guessFeedback.className = 'guess-feedback is-match';
+    } else {
+      els.guessFeedback.textContent = 'Model answer: ' + spec.name + ' (' + spec.sym + ').';
+      els.guessFeedback.className = 'guess-feedback';
+    }
+    els.stuckBtn.hidden = true;
+    els.helpPanel.classList.remove('open');
+    setGuessFooter();
+  }
+
+  function checkGuess() {
+    if (STATE.guessRevealed) return;
+    const spec = currentGuess();
+    const guess = (els.guessInput.value || '').trim();
+    if (!guess) {
+      els.guessFeedback.textContent = 'Enter an element symbol to compare.';
+      els.guessFeedback.className = 'guess-feedback';
+      return;
+    }
+    if (guess.toLowerCase() === spec.sym.toLowerCase()) {
+      revealGuess(true);
+      return;
+    }
+    els.guessFeedback.textContent = '“' + guess + '” doesn’t match this spectrum. Try again, or show the answer.';
+    els.guessFeedback.className = 'guess-feedback is-miss';
+  }
+
+  function flagClassList(flags) {
+    const set = new Set(flags || []);
+    const classes = ['viewport'];
+    if (set.has('atom')) classes.push('beat-show-atom');
+    if (set.has('pes')) classes.push('beat-show-pes');
+    if (set.has('fake')) classes.push('beat-show-fake');
+    if (set.has('real')) classes.push('beat-show-real');
+    if (set.has('nums')) classes.push('beat-show-nums');
+    if (set.has('sublabels')) classes.push('beat-show-sublabels');
+    if (set.has('calloutY')) classes.push('beat-callout-y');
+    if (set.has('calloutX')) classes.push('beat-callout-x');
+    if (set.has('calloutDir')) classes.push('beat-callout-dir');
+    if (set.has('calloutBreak')) classes.push('beat-callout-break');
+    if (set.has('config')) classes.push('beat-show-config');
+    if (set.has('configParts')) classes.push('beat-show-config-parts');
+    if (STATE.splitting) classes.push('beat-splitting');
+    return classes.join(' ');
+  }
+
+  function applyBeat(i, opts) {
+    const beat = BEATS[i];
+    if (!beat) return;
+    STATE.beat = i;
+    opts = opts || {};
+
+    els.framing.classList.remove('student-q');
+    els.framing.textContent = beat.framing;
+    els.actMeta.textContent = 'Act 1 · Neon’s spectrum · ' + (i + 1) + ' / ' + BEATS.length;
+
+    if (beat.kicker) {
+      els.storyKicker.hidden = false;
+      els.storyKicker.textContent = beat.kicker;
+    } else {
+      els.storyKicker.hidden = true;
+      els.storyKicker.textContent = '';
+    }
+    els.storyText.textContent = beat.story || '';
+
+    if (beat.axisNote) {
+      els.axisNote.textContent = beat.axisNote;
+      els.axisNote.classList.add('visible');
+    } else {
+      els.axisNote.textContent = '';
+      els.axisNote.classList.remove('visible');
+    }
+
+    els.atomPane.setAttribute('aria-hidden', beat.flags.indexOf('atom') >= 0 ? 'false' : 'true');
+    els.pesPane.setAttribute('aria-hidden', beat.flags.indexOf('pes') >= 0 ? 'false' : 'true');
+    els.configReveal.setAttribute('aria-hidden', beat.flags.indexOf('config') >= 0 ? 'false' : 'true');
+    const annots = els.configReveal.querySelector('.config-annots');
+    if (annots) {
+      annots.setAttribute('aria-hidden', beat.flags.indexOf('configParts') >= 0 ? 'false' : 'true');
+    }
+
+    if (beat.split && !opts.skipSplit && !prefersReduced) {
+      STATE.splitting = true;
+      els.openerPlate.className = flagClassList(beat.flags);
+      els.openerPlate.dataset.beat = String(i + 1);
+      window.setTimeout(function () {
+        STATE.splitting = false;
+        els.openerPlate.className = flagClassList(beat.flags);
+      }, 1100);
+    } else {
+      STATE.splitting = false;
+      els.openerPlate.className = flagClassList(beat.flags);
+      els.openerPlate.dataset.beat = String(i + 1);
+    }
+
+    const help = beat.help || '';
+    els.stuckBtn.hidden = !help;
+    els.helpText.textContent = help || 'Keep clicking Continue — each step adds one idea.';
+    els.helpPanel.classList.remove('open');
+
+    els.backBtn.hidden = false;
+    if (STATE.act === 1 && i === 0) els.backBtn.hidden = true;
+
+    if (STATE.act === 1) {
+      els.continueBtn.hidden = false;
+      if (i < BEATS.length - 1) {
+        els.continueBtn.textContent = 'Continue →';
+        els.continueBtn.disabled = false;
+      } else {
+        els.continueBtn.textContent = 'Next section →';
+        els.continueBtn.disabled = false;
+      }
+    }
+
+    els.discoveryLine.textContent = '';
+    els.discoveryLine.classList.remove('visible');
+  }
+
+  function setAct(n) {
+    STATE.act = n;
+    showActPanels(n);
+    els.helpPanel.classList.remove('open');
+    els.continueBtn.hidden = false;
+
+    if (n === 1) {
+      applyBeat(STATE.beat);
+      return;
+    }
+    if (n === 2) {
+      applyGuess(STATE.guessIndex, { revealed: STATE.guessRevealed });
+      return;
+    }
+    if (n === 3) {
+      applyShellsIE();
+      return;
+    }
+    if (n === 4) {
+      applyFillBeat(STATE.fillBeat);
+      return;
+    }
+    if (n === 5) {
+      applyBlocksBeat(STATE.blocksBeat);
+      return;
+    }
+    applyShorthand(STATE.shorthandPhase);
+  }
+
+  function showDebriefStage() {
+    SuiteChrome.revealDebrief(DEBRIEF, {
+      exclusive: true,
+      onRevisit: function (target) {
+        SuiteChrome.leaveDebriefStage();
+        const t = String(target);
+        if (t === 'act:6') {
+          applyShorthand(SHORTHAND_EXPLAINED);
+        } else if (t === 'act:5') {
+          STATE.blocksBeat = BLOCKS_BEATS.length - 1;
+          applyBlocksBeat(STATE.blocksBeat);
+        } else if (t === 'act:4') {
+          STATE.fillBeat = FILL_BEATS.length - 1;
+          STATE.fillFree = true;
+          STATE.fillOuterRevealed = true;
+          applyFillBeat(STATE.fillBeat);
+        } else if (t === 'act:3') {
+          applyShellsIE();
+        } else if (t === 'act:2') {
+          STATE.guessIndex = 0;
+          STATE.guessRevealed = false;
+          setAct(2);
+        } else {
+          STATE.beat = 0;
+          setAct(1);
+          applyBeat(STATE.beat, { skipSplit: true });
+        }
+        window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
+      }
+    });
+  }
+
+  function startModule() {
+    document.getElementById('briefing').hidden = true;
+    document.getElementById('moduleStage').hidden = false;
+    buildNeAtom();
+    STATE.act = 1;
+    STATE.beat = 0;
+    STATE.guessIndex = 0;
+    STATE.guessRevealed = false;
+    STATE.fillBeat = 0;
+    STATE.fillEl = 'K';
+    STATE.fillZoom = false;
+    STATE.fillFree = false;
+    STATE.fillOuterRevealed = false;
+    STATE.blocksBeat = 0;
+    STATE.blocksZ = 0;
+    STATE.blocksHoverZ = 0;
+    STATE.blocksVisited = {};
+    STATE.blocksNamed = false;
+    STATE.shorthandPhase = 0;
+    clearShorthandTimers();
+    setAct(1);
+    applyBeat(0, { skipSplit: true });
+    window.scrollTo(0, 0);
+  }
+
+  SuiteChrome.renderBriefing(DEBRIEF);
+  SuiteChrome.wireStuckHelp();
+
+  document.getElementById('briefingNext').addEventListener('click', startModule);
+
+  els.backBtn.addEventListener('click', function () {
+    if (STATE.act === 6) {
+      if (STATE.shorthandPhase > 0) {
+        applyShorthand(STATE.shorthandPhase - 1);
+        return;
+      }
+      applyBlocksBeat(BLOCKS_BEATS.length - 1);
+      return;
+    }
+    if (STATE.act === 5) {
+      if (STATE.blocksBeat > 0) {
+        applyBlocksBeat(STATE.blocksBeat - 1);
+        return;
+      }
+      applyFillBeat(FILL_BEATS.length - 1);
+      return;
+    }
+    if (STATE.act === 4) {
+      if (STATE.fillBeat > 0) {
+        applyFillBeat(STATE.fillBeat - 1);
+        return;
+      }
+      applyShellsIE();
+      return;
+    }
+    if (STATE.act === 3) {
+      applyGuess(GUESS_SPECTRA.length - 1, { revealed: true });
+      return;
+    }
+    if (STATE.act === 2) {
+      if (STATE.guessIndex > 0) {
+        applyGuess(STATE.guessIndex - 1, { revealed: true });
+        return;
+      }
+      setAct(1);
+      applyBeat(BEATS.length - 1, { skipSplit: true });
+      return;
+    }
+    if (STATE.beat > 0) applyBeat(STATE.beat - 1, { skipSplit: true });
   });
-}
 
-const stuckBtn = document.getElementById('stuckBtn');
-const helpPanel = document.getElementById('helpPanel');
-if(stuckBtn && helpPanel){
-  stuckBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    helpPanel.classList.toggle('open');
+  els.continueBtn.addEventListener('click', function () {
+    if (STATE.act === 6) {
+      advanceShorthand();
+      return;
+    }
+    if (STATE.act === 5) {
+      if (STATE.blocksBeat < BLOCKS_BEATS.length - 1) {
+        applyBlocksBeat(STATE.blocksBeat + 1);
+        return;
+      }
+      applyShorthand(0);
+      return;
+    }
+    if (STATE.act === 4) {
+      if (STATE.fillFree || STATE.fillBeat >= FILL_BEATS.length - 1) {
+        applyBlocksBeat(0);
+        return;
+      }
+      applyFillBeat(STATE.fillBeat + 1);
+      return;
+    }
+    if (STATE.act === 3) {
+      applyFillBeat(0);
+      return;
+    }
+    if (STATE.act === 2) {
+      if (!STATE.guessRevealed) return;
+      if (STATE.guessIndex < GUESS_SPECTRA.length - 1) {
+        applyGuess(STATE.guessIndex + 1, { revealed: false });
+        return;
+      }
+      applyShellsIE();
+      return;
+    }
+    if (STATE.beat < BEATS.length - 1) {
+      applyBeat(STATE.beat + 1);
+      return;
+    }
+    STATE.guessIndex = 0;
+    STATE.guessRevealed = false;
+    setAct(2);
   });
-  document.addEventListener('click', (e) => {
-    if(!helpPanel.contains(e.target) && e.target !== stuckBtn){
-      helpPanel.classList.remove('open');
+
+  els.guessCheckBtn.addEventListener('click', checkGuess);
+  els.guessRevealBtn.addEventListener('click', function () {
+    if (!STATE.guessRevealed) revealGuess(false);
+  });
+  els.guessInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      checkGuess();
     }
   });
-}
 
-/* ---------- REFERENCE DATA ---------- */
-const DATA = {
-  pes: {
-    H:  {1:[1.31,1]},
-    He: {1:[2.37,2]},
-    Li: {1:[6.26,2], 2:[0.52,1]},
-    Be: {1:[11.5,2], 2:[0.90,2]},
-    B:  {1:[19.3,2], 2:[1.36,2], 3:[0.80,1]},
-    C:  {1:[28.6,2], 2:[1.72,2], 3:[1.09,2]},
-    N:  {1:[39.6,2], 2:[2.45,2], 3:[1.40,3]},
-    O:  {1:[52.6,2], 2:[3.04,2], 3:[1.31,4]},
-    F:  {1:[67.2,2], 2:[3.88,2], 3:[1.68,5]},
-    Ne: {1:[84.0,2], 2:[4.68,2], 3:[2.08,6]},
-    Na: {1:[104,2],  2:[6.84,2], 3:[3.67,6], 4:[0.50,1]},
-    K:  {1:[347,2],  2:[37.1,2], 3:[29.1,6], 4:[3.93,2], 5:[2.38,6], 6:[0.42,1]},
-    Ca: {1:[390,2],  2:[42.7,2], 3:[34.0,6], 4:[4.65,2], 5:[2.90,6], 6:[0.59,2]},
-    Sc: {1:[433,2],  2:[48.5,2], 3:[39.2,6], 4:[5.44,2], 5:[3.24,6], 6:[0.77,1], 7:[0.63,2]}
-  },
-  configs: {
-    H:'1s¹', He:'1s²', Be:'1s²2s²', C:'1s²2s²2p²',
-    Ne:'1s²2s²2p⁶', Mg:'1s²2s²2p⁶3s²'
-  }
-};
-
-/* Discovery gates */
-gates.hasFilledSubshell = false;
-gates.hasFoundFillingOrder = false;
-
-/* === SIMULATION LOGIC — TO BE DESIGNED === */
-
-/* ---------- STANDBY ANIMATION ---------- */
-const subshells = [
-  {label:'1s', slots:1, w:48},
-  {label:'2s', slots:1, w:48},
-  {label:'2p', slots:3, w:120},
-  {label:'3s', slots:1, w:48},
-  {label:'3p', slots:3, w:120},
-  {label:'4s', slots:1, w:48},
-  {label:'3d', slots:5, w:192},
-  {label:'4p', slots:3, w:120}
-];
-
-let t = 0;
-function standbyFrame(){
-  ctx.clearRect(0, 0, W, H);
-  drawGrid();
-
-  const boxH = 50;
-  const gap = 10;
-  const totalW = subshells.reduce((s, sh) => s + sh.w + gap, -gap);
-  let startX = (W - totalW) / 2;
-  const cy = H * 0.45;
-
-  subshells.forEach((sh, i) => {
-    const pulse = 0.25 + 0.15 * Math.sin(t * 0.002 + i * 0.8);
-
-    ctx.save();
-    ctx.strokeStyle = '#2a2660';
-    ctx.globalAlpha = pulse;
-    ctx.lineWidth = 1.5;
-
-    const slotW = sh.w / sh.slots;
-    for(let s = 0; s < sh.slots; s++){
-      const sx = startX + s * slotW;
-      ctx.strokeRect(sx, cy - boxH / 2, slotW - 2, boxH);
-    }
-
-    ctx.globalAlpha = pulse * 0.7;
-    ctx.fillStyle = '#797597';
-    ctx.font = '0.6rem "IBM Plex Mono"';
-    ctx.textAlign = 'center';
-    ctx.fillText(sh.label, startX + sh.w / 2, cy + boxH / 2 + 16);
-
-    ctx.restore();
-    startX += sh.w + gap;
+  els.shCheckBtn.addEventListener('click', checkShorthandAnswers);
+  els.shPairs.addEventListener('click', function (e) {
+    var btn = e.target.closest('.sh-replay-btn');
+    if (!btn) return;
+    var pair = btn.closest('.sh-pair');
+    if (!pair) return;
+    replayShorthandPair(pair);
   });
 
-  if(!prefersReduced){
-    t++;
-    requestAnimationFrame(standbyFrame);
-  }
-}
+  els.fillTiles.addEventListener('click', function (e) {
+    const btn = e.target.closest('.fill-tile');
+    if (!btn || btn.disabled) return;
+    selectFillElement(btn.getAttribute('data-el'));
+  });
 
-if(prefersReduced){
-  t = 0;
-  standbyFrame();
-} else {
-  requestAnimationFrame(standbyFrame);
-}
+  els.fillZoomBtn.addEventListener('click', function () {
+    if (!STATE.fillFree) return;
+    const next = !STATE.fillZoom;
+    renderFillView({
+      el: STATE.fillEl,
+      zoom: next,
+      holdOuter: false,
+      showConfig: true,
+      callout: STATE.fillEl === 'Sc' && next
+    });
+  });
+
+  const qs = new URLSearchParams(location.search);
+  if (qs.has('debrief') || qs.has('start') || qs.has('act')) {
+    startModule();
+    if (qs.has('debrief')) showDebriefStage();
+    else if (qs.get('act') === '6') {
+      applyShorthand(Math.min(SHORTHAND_EXPLAINED, Math.max(0, Number(qs.get('sh')) || 0)), {
+        animate: Number(qs.get('sh')) >= SHORTHAND_PAIR_START && Number(qs.get('sh')) < SHORTHAND_EXPLAINED
+      });
+    } else if (qs.get('act') === '5') {
+      applyBlocksBeat(Math.min(BLOCKS_BEATS.length - 1, Math.max(0, Number(qs.get('blocks')) || 0)));
+    } else if (qs.get('act') === '4') {
+      const fb = Math.min(FILL_BEATS.length - 1, Math.max(0, Number(qs.get('fill')) || 0));
+      applyFillBeat(fb);
+    } else if (qs.get('act') === '3') {
+      applyShellsIE();
+    } else if (qs.get('act') === '2') {
+      const gi = Math.min(GUESS_SPECTRA.length - 1, Math.max(0, Number(qs.get('guess')) || 0));
+      applyGuess(gi, { revealed: qs.has('revealed') });
+    } else if (qs.get('beat')) {
+      const b = Math.min(BEATS.length - 1, Math.max(0, Number(qs.get('beat')) || 0));
+      applyBeat(b, { skipSplit: true });
+    }
+  }
+})();
 </script>
 </body>
 </html>
