@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Graphing Rates — Rate Laws</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/suite.css?v=24">
+<style>
+.y-axis-drop .y-drop-hit{cursor:copy;pointer-events:all;}
+.y-axis-drop .y-drop-label{pointer-events:none;}
+.y-axis-drop.is-over .y-drop-hit{fill:rgba(21,101,192,0.22)!important;stroke:#0d47a1!important;stroke-width:2.25!important;}
+.y-axis-drop.is-over .y-drop-label{fill:#0d47a1;}
+.transform-tray{display:flex;gap:0.45rem;flex-wrap:wrap;margin:0.7rem 0;}
+.plot-host{min-height:280px;}
+.hl-mark{fill:var(--data);stroke:#000;stroke-width:1.2;}
+.checklist{list-style:none;margin:0.6rem 0;}
+.checklist li{padding:0.35rem 0;border-bottom:1px solid var(--grid);}
+.checklist label{display:flex;gap:0.6rem;align-items:flex-start;cursor:pointer;}
+.irl-table td.dim{opacity:0.35;}
+.irl-table tr.active td{background:#d6e8fb;}
+.worked[hidden]{display:none;}
+.slope-work{margin:0.85rem 0 0;padding:0.75rem 0 0;border-top:2px solid var(--ink);}
+.slope-work > p{margin:0 0 0.55rem;}
+.slope-eq{margin:0.35rem 0 0.7rem;padding:0.45rem 0.65rem;border-left:4px solid var(--data);background:var(--paper-2);}
+.slope-steps{margin:0.35rem 0 0.7rem 1.15rem;padding:0;}
+.slope-steps li{margin:0.35rem 0;line-height:1.45;}
+.mono-inline{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+  font-size:0.95em;
+}
+.sheets-summary .order-summary{margin:0.75rem 0;}
+.sheets-summary .order-summary td,
+.sheets-summary .order-summary th{font-size:0.9rem;vertical-align:middle;}
+.sheets-summary .callout{margin:0.7rem 0;}
+.eq-align{
+  display:grid;
+  gap:0.35rem 0;
+  margin:0.35rem 0 0.7rem;
+  padding:0.65rem 0.75rem;
+  border-left:4px solid var(--data);
+  background:var(--paper-2);
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+}
+.eq-row{
+  display:grid;
+  grid-template-columns:minmax(5.5rem,auto) 1.2rem minmax(3.2rem,auto) minmax(1.6rem,auto) 1.2rem minmax(5.5rem,auto);
+  gap:0.35rem 0.55rem;
+  align-items:baseline;
+  justify-content:start;
+  font-size:1.05rem;
+  font-weight:600;
+}
+.eq-op{color:var(--ink);text-align:center;}
+.eq-y{color:#1565c0;}
+.eq-m{color:#6b3fa0;}
+.eq-x{color:#8a5a00;}
+.eq-b{color:#4a4a4a;}
+.eq-legend{margin:0.55rem 0 0;font-family:var(--font-body);font-size:0.95rem;font-weight:400;}
+.eq-legend .eq-m{font-family:var(--font-mono);font-weight:700;}
+.order-tab-row{display:flex;flex-wrap:wrap;gap:0.45rem;margin:0.35rem 0 0.85rem;}
+.order-tab-row .choice{margin:0;}
+.order-summary-card{margin-top:0.85rem;padding-top:0.75rem;border-top:2px solid var(--ink);}
+.order-summary-card > p{margin:0 0 0.65rem;}
+.order-meta{
+  font-family:var(--font-mono);
+  font-size:var(--label-sm);
+  letter-spacing:0.02em;
+  padding:0.5rem 0.65rem;
+  background:var(--paper-2);
+  border-left:4px solid var(--data);
+  margin-bottom:0.85rem !important;
+}
+.order-plots{margin:0.15rem 0 0.35rem;}
+.order-plot-pane .fig-cap{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin:0 0 0.35rem;
+}
+.hl-prompt{margin:0.75rem 0 0.35rem;font-size:1.02rem;}
+.hl-note{margin:0.25rem 0 0.7rem;font-family:var(--font-mono);font-size:var(--label-sm);}
+.hl-miss{
+  margin:0.35rem 0 0.55rem;padding:0.55rem 0.7rem;
+  border-left:4px solid var(--error);background:#fde8e8;
+  font-size:1.02rem;line-height:1.45;
+}
+.hl-teach{margin:0.85rem 0 0.5rem;padding-top:0.75rem;border-top:2px solid var(--ink);}
+.hl-teach[hidden]{display:none!important;}
+.hl-teach.is-revealed{animation:hl-teach-in 0.45s ease-out;}
+@media (prefers-reduced-motion:reduce){
+  .hl-teach.is-revealed{animation:none;}
+}
+@keyframes hl-teach-in{
+  from{opacity:0;transform:translateY(0.35rem);}
+  to{opacity:1;transform:none;}
+}
+.hl-formula{
+  display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;
+  margin:0 0 0.65rem;padding:0.55rem 0.7rem;
+  border-left:4px solid var(--data);background:var(--paper-2);
+  font-family:var(--font-mono);font-size:1.2rem;font-weight:600;
+  font-variant-numeric:tabular-nums;font-feature-settings:"zero" 1;
+}
+.hl-formula .iso-frac{font-size:1.05rem;}
+.hl-why{margin:0 0 0.7rem;font-size:1.05rem;line-height:1.5;}
+#hlHost svg.plot{background:var(--paper);}
+</style>
+</head>
+<body>
+<div class="module-wrap wide">
+  <div class="top-nav">
+    <a href="index.html" class="back-link">← Rate Laws</a>
+    <div class="mod-meta">Part B · Graphing</div>
+  </div>
+
+  <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
+    <div class="briefing-kicker">5.3.A</div>
+    <h1 id="briefingTitle">Straighten the curve</h1>
+    <p class="briefing-lead">Identify the rate law expression of a chemical reaction using data that show how the concentrations of reaction species change over time.</p>
+    <div class="briefing-columns">
+      <div class="briefing-block">
+        <div class="debrief-kicker">Learning objective</div>
+        <ul class="briefing-li" id="briefingIntentions"></ul>
+      </div>
+      <div class="briefing-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="briefing-cc" id="briefingCompetencies"></ul>
+      </div>
+    </div>
+    <div class="briefing-actions">
+      <button type="button" class="btn submit" id="briefingNext">Next → Start</button>
+    </div>
+  </section>
+
+  <div id="moduleStage" hidden>
+    <div class="task-kicker"><span id="stepKicker">A</span></div>
+    <div class="tier-row" id="tierRow"></div>
+    <h2 class="task-title" id="stepTitle"></h2>
+    <p class="framing" id="stepFrame"></p>
+    <div id="stepBody"></div>
+    <div class="help-panel" id="helpPanel"><p id="helpText"></p></div>
+    <div class="module-footer" id="moduleFooter">
+      <div class="module-footer-back"><button type="button" class="btn" id="backBtn">← Back</button></div>
+      <div class="module-footer-help"><button type="button" id="stuckBtn">Stuck?</button></div>
+      <div class="module-footer-fwd"><button type="button" class="btn submit" id="nextBtn">Next →</button></div>
+    </div>
+    <section class="debrief" id="debrief" hidden aria-labelledby="debriefTitle">
+      <h2 id="debriefTitle">What this was for</h2>
+      <p class="debrief-lead">5.3.A — a rate law from how concentrations change over time.</p>
+      <div class="debrief-block">
+        <div class="debrief-kicker">Learning objective</div>
+        <ul class="debrief-li" id="debriefIntentions"></ul>
+      </div>
+      <div class="debrief-block cc">
+        <div class="debrief-kicker">Curricular competencies</div>
+        <ul class="debrief-cc" id="debriefCompetencies"></ul>
+      </div>
+      <div class="briefing-actions">
+        <a class="btn submit" href="index.html" style="text-decoration:none;display:inline-block;">← Hub</a>
+      </div>
+    </section>
+  </div>
+</div>
+<script src="assets/suite-chrome.js?v=2"></script>
+<script src="assets/lock.js?v=1"></script>
+<script src="assets/path-b.js?v=41"></script>
+</body>
+</html>

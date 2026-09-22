@@ -116,7 +116,7 @@ h1,.task-title{
   font-size:1.15rem;
   font-weight:400;
   line-height:1.5;
-  color:var(--ink-soft);
+  color:var(--signal);
   max-width:none;
   text-wrap:pretty;
   margin-bottom:0.85rem;
@@ -272,6 +272,7 @@ h1,.task-title{
   border-bottom:2px solid var(--ink);
   padding:0.85rem 1rem 1rem;
   background:transparent;
+  text-align:center;
 }
 .hypo-plate[hidden]{display:none !important;}
 .hypo-kicker{
@@ -282,6 +283,7 @@ h1,.task-title{
   text-transform:uppercase;
   color:var(--olive-deep);
   margin:0 0 0.55rem;
+  text-align:left;
 }
 .hypo-kicker::before{
   content:'';
@@ -291,7 +293,24 @@ h1,.task-title{
   margin-right:0.55rem;
   vertical-align:middle;
 }
-.hypo-svg{display:block;width:100%;height:auto;max-height:200px;}
+.hypo-svg{display:block;width:min(100%,22rem);height:auto;max-height:200px;margin:0 auto;}
+.levels-reveal{
+  display:none;
+  border-top:1px solid var(--grid);
+  padding:0.75rem 1rem 0.95rem;
+  background:transparent;
+  text-align:center;
+}
+.levels-reveal.visible{display:block;}
+.levels-reveal .hypo-kicker{text-align:left;}
+.levels-reveal.pop-in{
+  animation:levelsPop 0.55s ease both;
+}
+@keyframes levelsPop{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:none;}
+}
+.levels-svg{display:block;width:min(100%,28rem);height:auto;max-height:190px;margin:0 auto;}
 .hypo-panel-label{
   font-family:var(--font-mono);
   font-size:10px;
@@ -400,6 +419,77 @@ h1,.task-title{
   margin:0.55rem 0;
   text-wrap:pretty;
   max-width:none;
+}
+
+/* Act 3 — practice (on paper) */
+.practice-act{
+  display:none;
+  margin:0.15rem 0 0.5rem;
+  padding:0.15rem 0 0.25rem;
+}
+.practice-act.visible{display:block;}
+.practice-act[hidden]{display:none !important;}
+.practice-act .prompt-kicker{
+  font-family:var(--font-mono);
+  font-size:var(--label-xs);
+  font-weight:600;
+  letter-spacing:var(--track-wide);
+  text-transform:uppercase;
+  color:var(--olive-deep);
+  margin:0 0 0.55rem;
+}
+.practice-act .prompt-kicker::before{
+  content:'';
+  display:inline-block;
+  width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);
+  margin-right:0.55rem;
+  vertical-align:middle;
+}
+.practice-list{
+  list-style:none;
+  margin:0.75rem 0 0.85rem;
+  padding:0;
+  counter-reset:prac;
+}
+.practice-list li{
+  position:relative;
+  counter-increment:prac;
+  padding-left:2rem;
+  margin:0.85rem 0;
+  color:var(--signal);
+  font-weight:700;
+  font-size:1.08rem;
+  line-height:1.5;
+  text-wrap:pretty;
+}
+.practice-list li::before{
+  content:counter(prac) ")";
+  position:absolute;
+  left:0;
+  font-family:var(--font-mono);
+  font-size:var(--label-md);
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--signal);
+}
+.practice-list .chem{
+  font-weight:700;
+  text-transform:none;
+  letter-spacing:0;
+}
+.practice-note{
+  font-size:1.05rem;
+  line-height:1.55;
+  color:var(--ink-soft);
+  text-wrap:pretty;
+  margin:0.65rem 0 0;
+  max-width:none;
+}
+.practice-note .chem{
+  font-weight:700;
+  text-transform:none;
+  letter-spacing:0;
 }
 
 /* Act 1 / 2 — apparatus */
@@ -1065,6 +1155,7 @@ input[type="range"]:focus-visible{outline:2px solid var(--olive-deep);outline-of
 }
 @media (prefers-reduced-motion: reduce){
   .photon-packet,.flight-e,.gap-reject,.discovery-line,.eq-reveal,.eq-numbers,.detector-peak{transition:none;}
+  .levels-reveal.pop-in{animation:none;}
 }
 @media print{
   .debrief{break-inside:avoid;border-top-color:#000;}
@@ -1101,16 +1192,16 @@ input[type="range"]:focus-visible{outline:2px solid var(--olive-deep);outline-of
 
   <div id="moduleStage" hidden>
   <div class="mod-tag">Module 06</div>
-  <div class="act-meta" id="actMeta">Act 1 of 2 · Photon &amp; detector</div>
+  <div class="act-meta" id="actMeta">Act 1 of 3 · Photon &amp; detector</div>
   <h1>Photoelectron Spectroscopy</h1>
   <p class="framing" id="framing" aria-live="polite">Let's fire a photon at an atom and see what happens.</p>
   <p class="discovery-line" id="discoveryLine" aria-live="polite"></p>
 
   <div class="viewport" id="viewport" data-fig="FIG. 06  ·  PHOTON &amp; DETECTOR">
-    <!-- Act 2 — hypothetical atom (energy levels + shell), side by side -->
+    <!-- Act 2 — shell model of the hypothetical atom (centered) -->
     <div class="hypo-plate" id="hypoPlate" hidden>
       <div class="hypo-kicker">Hypothetical atom</div>
-      <svg class="hypo-svg" id="hypoSvg" viewBox="0 0 720 180" role="img" aria-label="Hypothetical atom: energy-level diagram and shell model">
+      <svg class="hypo-svg" id="hypoSvg" viewBox="0 0 320 170" role="img" aria-label="Hypothetical atom shell model">
         <defs>
           <radialGradient id="hypoNucGrad" cx="32%" cy="28%" r="68%">
             <stop offset="0%" stop-color="#e8b48a"/>
@@ -1129,7 +1220,6 @@ input[type="range"]:focus-visible{outline:2px solid var(--olive-deep);outline-of
             <stop offset="100%" stop-color="rgba(196,163,90,0)"/>
           </radialGradient>
         </defs>
-        <g id="hypoLevels"></g>
         <g id="hypoShell"></g>
       </svg>
     </div>
@@ -1271,6 +1361,13 @@ input[type="range"]:focus-visible{outline:2px solid var(--olive-deep);outline-of
         </div>
       </div>
       <canvas id="spectrumCanvas" aria-label="Binding-energy spectrum building from detections"></canvas>
+      <!-- Energy-level diagram — revealed after the PES run finishes -->
+      <div class="levels-reveal" id="levelsReveal" hidden aria-live="polite">
+        <div class="hypo-kicker">Energy levels</div>
+        <svg class="levels-svg" id="levelsSvg" viewBox="0 0 420 170" role="img" aria-label="Energy-level diagram for the hypothetical atom">
+          <g id="hypoLevels"></g>
+        </svg>
+      </div>
     </div>
   </div>
 
@@ -1318,10 +1415,21 @@ input[type="range"]:focus-visible{outline:2px solid var(--olive-deep);outline-of
 
   <div class="act2-outro" id="act2Outro" aria-live="polite">
     <div class="outro-kicker">What the readout shows</div>
-    <p>The graph under the instrument is a photoelectron spectrum. The horizontal axis is <strong>binding energy</strong> (ionization energy) in MJ/mol — how tightly each electron was held. The vertical axis is <strong>peak height</strong> — how many electrons arrived at that energy.</p>
+    <p>The graph under the instrument is a <strong>photoelectron spectrum (PES)</strong>. The horizontal axis is <strong>binding energy</strong> (ionization energy) in MJ/mol — how tightly each electron was held. The vertical axis is <strong>peak height</strong> — how many electrons arrived at that energy.</p>
     <p>Electrons from this atom only appear at two places on the axis: <strong>0.85</strong> and <strong>4.25 MJ/mol</strong>. Nothing in between. Those are <strong>quantized energy levels</strong> — discrete allowed energies, the same idea as the levels on an energy-level diagram (and on the Bohr-style diagram you may have drawn on paper), without needing orbits.</p>
     <p>Peak height tracks how many electrons share each level: <strong>3</strong> at the shallower (valence) energy, <strong>2</strong> at the deeper (core) one. Position tells you the energy; height tells you the count.</p>
   </div>
+
+  <section class="practice-act" id="practiceAct" hidden aria-labelledby="practiceTitle">
+    <div class="prompt-kicker" id="practiceTitle">Practice</div>
+    <ol class="practice-list">
+      <li>
+        Based on your understanding of the shell model, predict how many peaks the following atoms would have in their PES diagram. Use the information on the previous page to help you decide:
+        <span class="chem">He</span>, <span class="chem">Li</span>, <span class="chem">N</span>, <span class="chem">Ne</span>.
+      </li>
+    </ol>
+    <p class="practice-note">Draw them in your notes, and pay close attention to <span class="chem">Ne</span> as we will explore it further in the next module.</p>
+  </section>
 
   <div class="eq-reveal" id="eqReveal" aria-live="polite">
     <div class="eq-line">
@@ -1392,13 +1500,7 @@ input[type="range"]:focus-visible{outline:2px solid var(--olive-deep);outline-of
         <li>
           <label>
             <input type="checkbox" name="todo-notes">
-            <span>In your OneNote, make some notes that summarize each of the last four modules. Pretend you are studying for a test and you need to make quick notes to reference later. Use both the learning intentions and CCs as your guide.</span>
-          </label>
-        </li>
-        <li>
-          <label>
-            <input type="checkbox" name="todo-ap">
-            <span>Go to AP Classroom and complete quiz 05–06.</span>
+            <span>In your OneNote, make some notes that summarize modules 04–06. Pretend you are studying for a test and you need to make quick notes to reference later. Use both the learning intentions and CCs as your guide.</span>
           </label>
         </li>
       </ul>
@@ -1433,20 +1535,24 @@ const DATA = {
 
 const FRAMING = {
   1: "Let's fire a photon at an atom and see what happens.",
-  2: 'This is a hypothetical atom. Load a sample, start the source, and watch the readout build.'
+  2: 'This is a hypothetical atom. Load a sample, start the source, and watch the readout build.',
+  3: 'Before you finish — predict a few spectra on paper.'
 };
 const HELP = {
   1: 'Try one shot below the energy that ejects an electron, and one well above. What does the detector report each time?',
   '1b': 'On C, fire once below 1.09 MJ/mol and once well above. Check that IE = E − KE.',
-  2: 'Watch both peak position (binding energy) and peak height as detections accumulate.'
+  2: 'Watch both peak position (binding energy) and peak height as detections accumulate.',
+  3: 'Look back at the hypothetical atom: how many peaks matched how many energy levels? Use that idea for He, Li, N, and Ne.'
 };
 const FIG = {
   1: 'FIG. 06  ·  PHOTON & DETECTOR',
-  2: 'FIG. 06  ·  QUANTIZED LEVELS'
+  2: 'FIG. 06  ·  QUANTIZED LEVELS',
+  3: 'FIG. 06  ·  PRACTICE'
 };
 const ACT_META = {
-  1: 'Act 1 of 2 · Photon & detector',
-  2: 'Act 2 of 2 · Quantized levels'
+  1: 'Act 1 of 3 · Photon & detector',
+  2: 'Act 2 of 3 · Quantized levels',
+  3: 'Act 3 of 3 · Practice'
 };
 
 /** Predetermined spectrum milestones — one electron per photon (5 total). */
@@ -1533,11 +1639,13 @@ const els = {
   hypoPlate: document.getElementById('hypoPlate'),
   hypoLevels: document.getElementById('hypoLevels'),
   hypoShell: document.getElementById('hypoShell'),
+  levelsReveal: document.getElementById('levelsReveal'),
   sampleCloud: document.getElementById('sampleCloud'),
   apparatusActions: document.getElementById('apparatusActions'),
   loadSampleBtn: document.getElementById('loadSampleBtn'),
   startRunBtn: document.getElementById('startRunBtn'),
   act2Outro: document.getElementById('act2Outro'),
+  practiceAct: document.getElementById('practiceAct'),
   chipReady: document.getElementById('chipReady'),
   chipDetecting: document.getElementById('chipDetecting'),
   chipFinished: document.getElementById('chipFinished'),
@@ -2031,65 +2139,12 @@ function drawSpectrum(){
   });
 }
 
-function buildHypoDiagrams(){
-  const levels = DATA.hypo.levels;
+function buildHypoShell(){
   const shellHost = els.hypoShell;
-  const levelHost = els.hypoLevels;
-  if(!shellHost || !levelHost) return;
+  if(!shellHost) return;
   shellHost.replaceChildren();
-  levelHost.replaceChildren();
 
-  // --- Energy-level diagram (left) — CA9 style, negative energies ---
-  const lx = 40, ly0 = 28, ly1 = 150, lw = 280;
-  levelHost.appendChild(svgEl('text', {
-    class: 'hypo-panel-label', x: lx + lw / 2, y: 16, 'text-anchor': 'middle'
-  })).textContent = 'Energy levels';
-
-  // axis (more negative = deeper = down)
-  levelHost.appendChild(svgEl('line', {
-    class: 'hypo-level-tick', x1: lx + 36, y1: ly0, x2: lx + 36, y2: ly1
-  }));
-  const yFor = (ie) => {
-    // map 0.85 → higher on page, 4.25 → lower
-    const t = (ie - 0.85) / (4.25 - 0.85);
-    return ly0 + 28 + t * 78;
-  };
-
-  levels.forEach(lev => {
-    const y = yFor(lev.ie);
-    levelHost.appendChild(svgEl('line', {
-      class: 'hypo-level-line',
-      x1: lx + 48, y1: y, x2: lx + 200, y2: y
-    }));
-    const lab = svgEl('text', {
-      class: 'hypo-level-val', x: lx + 8, y: y + 4
-    });
-    lab.textContent = lev.label;
-    levelHost.appendChild(lab);
-
-    const startX = lx + 70;
-    for(let i = 0; i < lev.count; i++){
-      levelHost.appendChild(svgEl('circle', {
-        class: 'hypo-e',
-        cx: startX + i * 22, cy: y, r: 7
-      }));
-    }
-    const cnt = svgEl('text', {
-      class: 'hypo-level-count', x: lx + 220, y: y + 4
-    });
-    cnt.textContent = lev.count + ' e⁻';
-    levelHost.appendChild(cnt);
-  });
-
-  // zero reference tick
-  const zeroLab = svgEl('text', {
-    class: 'hypo-level-count', x: lx + 44, y: ly0 + 10
-  });
-  zeroLab.textContent = '0';
-  levelHost.appendChild(zeroLab);
-
-  // --- Shell-model atom (right) ---
-  const cx = 540, cy = 95;
+  const cx = 160, cy = 92;
   shellHost.appendChild(svgEl('text', {
     class: 'hypo-panel-label', x: cx, y: 16, 'text-anchor': 'middle'
   })).textContent = 'Shell model';
@@ -2120,6 +2175,84 @@ function buildHypoDiagrams(){
       }));
     }
   });
+}
+
+function buildHypoLevels(){
+  const levels = DATA.hypo.levels;
+  const levelHost = els.hypoLevels;
+  if(!levelHost) return;
+  levelHost.replaceChildren();
+
+  // CA9 style, negative energies — centered under the PES readout
+  const lx = 70, ly0 = 22, ly1 = 148, lw = 280;
+
+  levelHost.appendChild(svgEl('line', {
+    class: 'hypo-level-tick', x1: lx + 36, y1: ly0, x2: lx + 36, y2: ly1
+  }));
+  const yFor = (ie) => {
+    const t = (ie - 0.85) / (4.25 - 0.85);
+    return ly0 + 28 + t * 78;
+  };
+
+  levels.forEach(lev => {
+    const y = yFor(lev.ie);
+    levelHost.appendChild(svgEl('line', {
+      class: 'hypo-level-line',
+      x1: lx + 48, y1: y, x2: lx + 200, y2: y
+    }));
+    const lab = svgEl('text', {
+      class: 'hypo-level-val', x: lx + 8, y: y + 4
+    });
+    lab.textContent = lev.label;
+    levelHost.appendChild(lab);
+
+    const startX = lx + 70;
+    for(let i = 0; i < lev.count; i++){
+      levelHost.appendChild(svgEl('circle', {
+        class: 'hypo-e',
+        cx: startX + i * 22, cy: y, r: 7
+      }));
+    }
+    const cnt = svgEl('text', {
+      class: 'hypo-level-count', x: lx + 220, y: y + 4
+    });
+    cnt.textContent = lev.count + ' e⁻';
+    levelHost.appendChild(cnt);
+  });
+
+  const zeroLab = svgEl('text', {
+    class: 'hypo-level-count', x: lx + 44, y: ly0 + 10
+  });
+  zeroLab.textContent = '0';
+  levelHost.appendChild(zeroLab);
+}
+
+function buildHypoDiagrams(){
+  buildHypoShell();
+  buildHypoLevels();
+}
+
+function setLevelsReveal(show, opts){
+  const el = els.levelsReveal;
+  if(!el) return;
+  opts = opts || {};
+  el.classList.remove('pop-in');
+  if(!show){
+    el.hidden = true;
+    el.classList.remove('visible');
+    return;
+  }
+  buildHypoLevels();
+  el.hidden = false;
+  el.classList.add('visible');
+  if(opts.animate && !prefersReduced){
+    // reflow so the animation restarts when re-shown
+    void el.offsetWidth;
+    el.classList.add('pop-in');
+  }
+  if(opts.scroll && !prefersReduced){
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 }
 
 function buildSampleCloud(){
@@ -2323,6 +2456,7 @@ async function startAct2Run(){
   STATE.act2Phase = 'done';
   STATE.firing = false;
   setAct2Chrome();
+  setLevelsReveal(true, { animate: true, scroll: true });
   if(els.act2Outro){
     els.act2Outro.classList.add('visible');
     if(!prefersReduced){
@@ -2339,6 +2473,7 @@ function resetAct2(){
   STATE.lastPulseIE = null;
   STATE.partDone = false;
   if(els.act2Outro) els.act2Outro.classList.remove('visible');
+  setLevelsReveal(false);
   els.partEnd.classList.remove('visible');
   els.discoveryLine.classList.remove('visible');
   els.discoveryLine.textContent = '';
@@ -2350,7 +2485,8 @@ function resetAct2(){
   updateContinue();
 }
 
-function setupAct2(){
+function setupAct2(opts){
+  opts = opts || {};
   buildHypoDiagrams();
   els.hypoPlate.hidden = false;
   els.hud.hidden = false;
@@ -2365,7 +2501,21 @@ function setupAct2(){
   els.hudPeakItem.hidden = false;
   els.eqReveal.classList.remove('visible');
   if(els.eqNumbers) els.eqNumbers.classList.remove('visible');
-  resetAct2();
+
+  if(opts.preserve && STATE.act2Phase === 'done'){
+    showAct2Chamber('sample');
+    setAct2Chrome();
+    setLevelsReveal(true, { animate: false });
+    if(els.act2Outro) els.act2Outro.classList.add('visible');
+    drawSpectrum();
+  } else if(opts.preserve && STATE.act2Milestone > 0){
+    showAct2Chamber(STATE.act2Phase === 'intro' ? 'empty' : 'sample');
+    setAct2Chrome();
+    setLevelsReveal(false);
+    drawSpectrum();
+  } else {
+    resetAct2();
+  }
   requestAnimationFrame(() => { resizeSpectrum(); });
 }
 
@@ -2377,15 +2527,18 @@ function updateContinue(){
     btn.disabled = !ready;
     btn.hidden = !ready;
     btn.textContent = 'Move to next section →';
-  } else if(STATE.partDone){
+  } else if(STATE.act === 3){
     btn.hidden = false;
     btn.disabled = false;
     btn.textContent = 'What this was for →';
-  } else {
-    const ready = STATE.act2Phase === 'done';
-    btn.disabled = !ready;
+  } else if(STATE.act === 2 && STATE.act2Phase === 'done'){
     btn.hidden = false;
-    btn.textContent = 'Finish this part →';
+    btn.disabled = false;
+    btn.textContent = 'Move to practice →';
+  } else {
+    btn.disabled = true;
+    btn.hidden = false;
+    btn.textContent = 'Move to practice →';
   }
   els.backBtn.hidden = STATE.act === 1;
 }
@@ -2397,8 +2550,19 @@ function setAct(n){
   els.helpText.textContent = n === 1
     ? (STATE.namedIE ? HELP['1b'] : HELP[1])
     : HELP[n];
-  els.viewport.setAttribute('data-fig', FIG[n]);
+  if(n === 3){
+    els.viewport.hidden = true;
+  } else {
+    els.viewport.hidden = false;
+    els.viewport.setAttribute('data-fig', FIG[n]);
+  }
   els.partEnd.classList.remove('visible');
+
+  if(els.practiceAct){
+    const showPractice = n === 3;
+    els.practiceAct.hidden = !showPractice;
+    els.practiceAct.classList.toggle('visible', showPractice);
+  }
 
   if(n === 1 && STATE.namedIE){
     els.discoveryLine.textContent = 'IE = E_photon − KE. The instrument measures KE and infers binding energy.';
@@ -2422,6 +2586,11 @@ function setAct(n){
   if(els.hypoPlate) els.hypoPlate.hidden = n !== 2;
   if(els.act2Outro){
     els.act2Outro.classList.toggle('visible', n === 2 && STATE.act2Phase === 'done');
+  }
+  if(n === 2 && STATE.act2Phase === 'done'){
+    setLevelsReveal(true, { animate: false });
+  } else {
+    setLevelsReveal(false);
   }
   els.controlsFire.hidden = n !== 1;
   if(els.energyRail) els.energyRail.hidden = n !== 1;
@@ -2481,7 +2650,16 @@ function setAct(n){
   }
 
   if(n === 2){
-    setupAct2();
+    setupAct2({
+      preserve: STATE.act2Phase === 'done' || STATE.act2Milestone > 0
+    });
+  }
+
+  if(n === 3){
+    els.hud.hidden = true;
+    els.eqReveal.classList.remove('visible');
+    if(els.eqNumbers) els.eqNumbers.classList.remove('visible');
+    if(els.apparatusActions) els.apparatusActions.hidden = true;
   }
 
   updateContinue();
@@ -2494,7 +2672,7 @@ const DEBRIEF = {
     { text: 'We will develop an understanding of the relationship between ionization energy, energy of a photon, and kinetic energy, using the equation IE = E_photon − KE.',
       target: 'act:1', revisit: 'Photon & detector' },
     { text: 'We will analyze graphs to understand how the electrons in an atom are organized.',
-      target: 'act:2', revisit: 'Quantized levels' },
+      target: 'act:3', revisit: 'Practice' },
     { text: 'We will begin to see how electrons are organized in an atom based on “quantized energy levels”.',
       target: 'act:2', revisit: 'Quantized levels' }
   ],
@@ -2626,16 +2804,13 @@ function wireDebriefRevisit() {
     leaveDebriefStage();
     const n = Number(String(btn.dataset.target).replace(/^act:/, '')) || 1;
     if(n >= 1) STATE.namedIE = true;
-    if(n === 2){
+    if(n >= 2){
       STATE.act2Phase = 'done';
+      STATE.act2Milestone = 5;
+      STATE.peakHeights = { 0.85: 3, 4.25: 2 };
       STATE.partDone = true;
     }
-    setAct(Math.min(2, Math.max(1, n)));
-    if(els.continueBtn && STATE.partDone){
-      els.continueBtn.hidden = false;
-      els.continueBtn.disabled = false;
-      els.continueBtn.textContent = 'What this was for →';
-    }
+    setAct(Math.min(3, Math.max(1, n)));
     scrollToPageTop();
   });
 }
@@ -2670,7 +2845,10 @@ els.continueBtn.addEventListener('click', () => {
     scrollToPageTop();
   } else if(STATE.act === 2 && STATE.act2Phase === 'done'){
     STATE.partDone = true;
-    updateContinue();
+    setAct(3);
+    scrollToPageTop();
+  } else if(STATE.act === 3){
+    STATE.partDone = true;
     revealDebrief();
   } else if(STATE.partDone){
     revealDebrief();
@@ -2678,7 +2856,10 @@ els.continueBtn.addEventListener('click', () => {
 });
 
 els.backBtn.addEventListener('click', () => {
-  if(STATE.act === 2){
+  if(STATE.act === 3){
+    setAct(2);
+    scrollToPageTop();
+  } else if(STATE.act === 2){
     setAct(1);
     scrollToPageTop();
   }
@@ -2711,7 +2892,7 @@ const _qs = new URLSearchParams(location.search);
 if(_qs.has('start') || _qs.has('debrief') || _qs.has('act')) {
   startModule();
   const a = parseInt(_qs.get('act'), 10);
-  if(a === 2){
+  if(a === 2 || a === 3){
     STATE.hasSeenKE = true;
     STATE.namedIE = true;
     STATE.promptsShown = true;
@@ -2719,7 +2900,13 @@ if(_qs.has('start') || _qs.has('debrief') || _qs.has('act')) {
     STATE.lastE = 5.0;
     STATE.lastKE = Math.round((STATE.lastE - DATA.atoms.C.IE) * 100) / 100;
     STATE.atomKey = 'C';
-    setAct(2);
+    if(a === 3){
+      STATE.act2Phase = 'done';
+      STATE.act2Milestone = 5;
+      STATE.peakHeights = { 0.85: 3, 4.25: 2 };
+      STATE.partDone = true;
+    }
+    setAct(a);
   }
   if(_qs.has('debrief')) revealDebrief();
 }

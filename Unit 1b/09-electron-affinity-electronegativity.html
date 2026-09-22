@@ -981,8 +981,8 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
 .en-scene[hidden]{display:none !important;}
 .en-pair-host{
   position:relative;
-  width:min(100%,420px);
-  height:220px;
+  width:min(100%,440px);
+  height:240px;
   margin:0 auto;
 }
 .en-pair-host .en-atom{
@@ -1006,138 +1006,85 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
 }
 .en-pair-host.is-apart .en-atom-a{left:22%;}
 .en-pair-host.is-apart .en-atom-b{left:78%;}
-.en-pair-host.is-overlap .en-atom-a{left:36%;}
-.en-pair-host.is-overlap .en-atom-b{left:64%;}
-/* During pull, weaker atom drifts in; winner receives. */
-.en-pair-host.is-pull.is-pull-a .en-atom-a{left:34%;}
-.en-pair-host.is-pull.is-pull-a .en-atom-b{left:56%;}
-.en-pair-host.is-pull.is-pull-b .en-atom-a{left:44%;}
-.en-pair-host.is-pull.is-pull-b .en-atom-b{left:66%;}
-.en-pair-host.is-pull.is-pull-even .en-atom-a{left:36%;}
-.en-pair-host.is-pull.is-pull-even .en-atom-b{left:64%;}
+.en-pair-host.is-overlap .en-atom-a,
+.en-pair-host.is-pull .en-atom-a{left:36%;}
+.en-pair-host.is-overlap .en-atom-b,
+.en-pair-host.is-pull .en-atom-b{left:64%;}
 .en-pair-host.is-simple .en-atom{
   opacity:0;
   pointer-events:none;
 }
-.en-pair-host .en-atom .atom-svg{
-  transition:transform 1.15s cubic-bezier(0.2,0.75,0.2,1);
-  transform-origin:50% 55%;
+/* Winner's valence ring quietly marks the pull — no whole-atom squeeze. */
+.en-pair-host .en-atom .shell-valence{
+  transition:stroke 0.8s ease, opacity 0.8s ease, stroke-width 0.8s ease;
 }
-.en-pair-host .en-atom .shell,
-.en-pair-host .en-atom .shell-valence,
-.en-pair-host .en-atom .valence-group{
-  transition:
-    transform 1.15s cubic-bezier(0.2,0.75,0.2,1),
-    stroke 0.7s ease,
-    opacity 0.7s ease,
-    stroke-width 0.7s ease;
-  transform-box:fill-box;
-  transform-origin:center;
-}
-/* Weaker atom: rings elongate / morph toward the stronger pull. */
-.en-pair-host.is-pull.is-pull-a .en-atom-b .atom-svg{
-  transform:translateX(-22px) scaleX(1.28) skewX(10deg);
-}
-.en-pair-host.is-pull.is-pull-a .en-atom-b .shell-valence{
-  transform:scaleX(1.55) translateX(-6px);
-  stroke:var(--ember);
-  stroke-width:2;
-  opacity:0.95;
-}
-.en-pair-host.is-pull.is-pull-a .en-atom-b .valence-group{
-  transform:scaleX(1.4) translateX(-10px);
-}
-.en-pair-host.is-pull.is-pull-a .en-atom-b .shell:not(.shell-valence){
-  transform:scaleX(1.18) translateX(-4px);
-  opacity:0.4;
-}
-.en-pair-host.is-pull.is-pull-b .en-atom-a .atom-svg{
-  transform:translateX(22px) scaleX(1.28) skewX(-10deg);
-}
-.en-pair-host.is-pull.is-pull-b .en-atom-a .shell-valence{
-  transform:scaleX(1.55) translateX(6px);
-  stroke:var(--ember);
-  stroke-width:2;
-  opacity:0.95;
-}
-.en-pair-host.is-pull.is-pull-b .en-atom-a .valence-group{
-  transform:scaleX(1.4) translateX(10px);
-}
-.en-pair-host.is-pull.is-pull-b .en-atom-a .shell:not(.shell-valence){
-  transform:scaleX(1.18) translateX(4px);
-  opacity:0.4;
-}
-/* Stronger atom: valence tightens and takes the density. */
 .en-pair-host.is-pull.is-pull-a .en-atom-a .shell-valence,
 .en-pair-host.is-pull.is-pull-b .en-atom-b .shell-valence{
   stroke:var(--ember);
-  stroke-width:2.25;
-  opacity:1;
-  transform:scale(1.08);
+  stroke-width:2;
+  opacity:0.95;
 }
-.en-pair-host.is-pull.is-pull-a .en-atom-a .atom-svg{
-  transform:scale(1.04);
-}
-.en-pair-host.is-pull.is-pull-b .en-atom-b .atom-svg{
-  transform:scale(1.04);
+.en-pair-host.is-pull.is-pull-a .en-atom-b .shell-valence,
+.en-pair-host.is-pull.is-pull-b .en-atom-a .shell-valence{
+  opacity:0.35;
 }
 .en-density{
   position:absolute;
   top:52%;
   left:50%;
-  width:118px;
-  height:70px;
+  width:128px;
+  height:76px;
   transform:translate(-50%,-50%);
   border-radius:50%;
   background:
     radial-gradient(ellipse at 50% 50%,
-      rgba(196,163,90,0.58) 0%,
-      rgba(196,163,90,0.30) 42%,
-      rgba(196,163,90,0.08) 68%,
+      rgba(196,163,90,0.62) 0%,
+      rgba(196,163,90,0.34) 40%,
+      rgba(196,163,90,0.12) 64%,
       rgba(196,163,90,0) 78%);
   opacity:0;
   pointer-events:none;
   z-index:1;
   transition:
     opacity 0.4s ease,
-    transform 1.15s cubic-bezier(0.2,0.75,0.2,1),
-    width 1.15s cubic-bezier(0.2,0.75,0.2,1),
-    height 1.15s cubic-bezier(0.2,0.75,0.2,1),
-    filter 1.15s ease;
-  filter:blur(0.2px);
+    transform 1.2s cubic-bezier(0.22,0.8,0.25,1),
+    width 1.2s cubic-bezier(0.22,0.8,0.25,1),
+    height 1.2s cubic-bezier(0.22,0.8,0.25,1),
+    filter 1.2s ease;
+  filter:blur(1px);
 }
 .en-pair-host.is-overlap .en-density,
 .en-pair-host.is-pull .en-density{opacity:1;}
 .en-pair-host.is-simple .en-density{opacity:0;}
 .en-pair-host.is-pull.is-pull-a .en-density{
-  width:168px;
-  height:58px;
-  transform:translate(-82%,-50%) scale(1.05,0.92);
-  filter:blur(0.6px);
+  width:190px;
+  height:70px;
+  transform:translate(-78%,-50%);
+  filter:blur(1.4px);
   background:
-    radial-gradient(ellipse at 22% 50%,
-      rgba(196,163,90,0.82) 0%,
-      rgba(168,90,50,0.28) 28%,
-      rgba(196,163,90,0.35) 48%,
-      rgba(196,163,90,0.08) 72%,
-      rgba(196,163,90,0) 82%);
+    radial-gradient(ellipse at 24% 50%,
+      rgba(196,163,90,0.88) 0%,
+      rgba(168,90,50,0.32) 26%,
+      rgba(196,163,90,0.42) 48%,
+      rgba(196,163,90,0.12) 70%,
+      rgba(196,163,90,0) 84%);
 }
 .en-pair-host.is-pull.is-pull-b .en-density{
-  width:168px;
-  height:58px;
-  transform:translate(-18%,-50%) scale(1.05,0.92);
-  filter:blur(0.6px);
+  width:190px;
+  height:70px;
+  transform:translate(-22%,-50%);
+  filter:blur(1.4px);
   background:
-    radial-gradient(ellipse at 78% 50%,
-      rgba(196,163,90,0.82) 0%,
-      rgba(168,90,50,0.28) 28%,
-      rgba(196,163,90,0.35) 48%,
-      rgba(196,163,90,0.08) 72%,
-      rgba(196,163,90,0) 82%);
+    radial-gradient(ellipse at 76% 50%,
+      rgba(196,163,90,0.88) 0%,
+      rgba(168,90,50,0.32) 26%,
+      rgba(196,163,90,0.42) 48%,
+      rgba(196,163,90,0.12) 70%,
+      rgba(196,163,90,0) 84%);
 }
 .en-pair-host.is-pull.is-pull-even .en-density{
-  width:130px;
-  height:66px;
+  width:140px;
+  height:74px;
   transform:translate(-50%,-50%);
 }
 .en-shared{
@@ -1182,9 +1129,12 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
   pointer-events:auto;
 }
 .en-simple-svg{
-  width:min(100%,380px);
+  width:min(100%,420px);
   height:auto;
   display:block;
+}
+.en-simple-svg .share-cloud{
+  pointer-events:none;
 }
 .en-simple-svg .sphere-a,
 .en-simple-svg .sphere-b{
@@ -1195,6 +1145,7 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
   stroke:var(--ink);
   stroke-width:1.5;
   fill:none;
+  opacity:0.55;
 }
 .en-simple-svg .pull-arrow{
   fill:none;
@@ -1214,8 +1165,11 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
   font-family:var(--font-mono);
   font-size:14px;
   font-weight:600;
-  fill:var(--ink);
+  fill:var(--paper);
   text-anchor:middle;
+  paint-order:stroke fill;
+  stroke:rgba(22,20,14,0.35);
+  stroke-width:2.5;
 }
 .en-compare{
   display:grid;
@@ -1270,10 +1224,7 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
 }
 @media (prefers-reduced-motion:reduce){
   .en-pair-host .en-atom,
-  .en-pair-host .en-atom .atom-svg,
-  .en-pair-host .en-atom .shell,
   .en-pair-host .en-atom .shell-valence,
-  .en-pair-host .en-atom .valence-group,
   .en-shared,
   .en-density,
   .en-simple{transition:none;}
@@ -1539,13 +1490,19 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
           <li>
             <label>
               <input type="checkbox" name="todo-notes">
-              <span>In your OneNote, make some notes that summarize each of the last four modules. Pretend you are studying for a test and you need to make quick notes to reference later. Use both the learning intentions and CCs as your guide.</span>
+              <span>In your OneNote, make some notes that summarize this module (periodic trends, affinity, and electronegativity). Pretend you are studying for a test and you need to make quick notes to reference later. Use both the learning intentions and CCs as your guide.</span>
             </label>
           </li>
           <li>
             <label>
               <input type="checkbox" name="todo-ap">
               <span>Go to AP Classroom and complete quiz 09.</span>
+            </label>
+          </li>
+          <li>
+            <label>
+              <input type="checkbox" name="todo-schoology">
+              <span>Go to Schoology and complete quiz 4.</span>
             </label>
           </li>
         </ul>
@@ -1727,7 +1684,7 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
     },
     act4: {
       pick: 'Choose two atoms that can share a pair. Higher core charge and smaller radius usually win the tug.',
-      share: 'Bring the shells together — watch the weaker rings stretch toward the stronger pull.',
+      share: 'Bring the shells together — watch the electron density drift toward the stronger pull.',
       done: 'δ− sits on the stronger pull. Try another pair — same group, different size is a good contrast.'
     }
   };
@@ -3125,11 +3082,11 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
     els.enSimple.replaceChildren();
     const svg = document.createElementNS(SVG_NS, 'svg');
     svg.setAttribute('class', 'en-simple-svg');
-    svg.setAttribute('viewBox', '0 0 380 160');
+    svg.setAttribute('viewBox', '0 0 420 200');
     svg.setAttribute('role', 'img');
     const aria = winner === 'tie'
       ? a.sym + ' and ' + b.sym + ' share the pair evenly'
-      : (winner === 'a' ? a.sym : b.sym) + ' pulls the shared pair; δ− on the stronger side';
+      : (winner === 'a' ? a.sym : b.sym) + ' pulls the shared density; larger cloud on the δ− side';
     svg.setAttribute('aria-label', aria);
 
     const defs = document.createElementNS(SVG_NS, 'defs');
@@ -3153,6 +3110,29 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
     sphereGrad('enSphA', winner === 'a');
     sphereGrad('enSphB', winner === 'b');
 
+    function cloudGrad(id, cx, cy, rx, strength) {
+      const g = document.createElementNS(SVG_NS, 'radialGradient');
+      g.setAttribute('id', id);
+      g.setAttribute('gradientUnits', 'userSpaceOnUse');
+      g.setAttribute('cx', String(cx));
+      g.setAttribute('cy', String(cy));
+      g.setAttribute('r', String(rx));
+      const s0 = strength == null ? 0.72 : strength;
+      [
+        [0, 'rgba(168,90,50,' + (s0 * 0.55).toFixed(2) + ')'],
+        [0.22, 'rgba(196,163,90,' + s0.toFixed(2) + ')'],
+        [0.48, 'rgba(196,163,90,' + (s0 * 0.48).toFixed(2) + ')'],
+        [0.78, 'rgba(196,163,90,' + (s0 * 0.12).toFixed(2) + ')'],
+        [1, 'rgba(196,163,90,0)']
+      ].forEach(function (pair) {
+        const s = document.createElementNS(SVG_NS, 'stop');
+        s.setAttribute('offset', (pair[0] * 100) + '%');
+        s.setAttribute('stop-color', pair[1]);
+        g.appendChild(s);
+      });
+      defs.appendChild(g);
+    }
+
     const marker = document.createElementNS(SVG_NS, 'marker');
     marker.setAttribute('id', 'enArrowHead');
     marker.setAttribute('markerWidth', '8');
@@ -3167,17 +3147,97 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
     defs.appendChild(marker);
     svg.appendChild(defs);
 
-    const rA = 28 + Math.min(22, a.radiusPm / 12);
-    const rB = 28 + Math.min(22, b.radiusPm / 12);
-    const cxA = 110;
-    const cxB = 270;
-    const cy = 78;
+    /* Relative sizes within the pair — larger radiusPm → larger sphere. */
+    const maxPm = Math.max(a.radiusPm, b.radiusPm, 1);
+    const minPm = Math.min(a.radiusPm, b.radiusPm);
+    const span = Math.max(maxPm - minPm, 1);
+    function sphereR(pm) {
+      const t = (pm - minPm) / span;
+      /* Keep a visible size gap even when radii are close. */
+      const base = 0.35 + 0.65 * (pm / maxPm);
+      const contrast = 0.55 + 0.45 * t;
+      return 22 + 30 * ((base + contrast) / 2);
+    }
+    const rA = sphereR(a.radiusPm);
+    const rB = sphereR(b.radiusPm);
+    const gap = 18;
+    const mid = 210;
+    const cxA = mid - gap / 2 - rA;
+    const cxB = mid + gap / 2 + rB;
+    const cy = 100;
+
+    const cxNeg = winner === 'a' ? cxA : winner === 'b' ? cxB : mid;
+    const cxPos = winner === 'a' ? cxB : winner === 'b' ? cxA : mid;
+    const rNeg = winner === 'a' ? rA : winner === 'b' ? rB : Math.max(rA, rB);
+    const rPos = winner === 'a' ? rB : winner === 'b' ? rA : Math.max(rA, rB);
+
+    /* Electron density behind the spheres — fat on δ−, narrow on δ+. */
+    const cloudLayer = document.createElementNS(SVG_NS, 'g');
+    cloudLayer.setAttribute('class', 'share-cloud');
+
+    if (winner === 'tie') {
+      cloudGrad('enCloudMain', mid, cy, 110, 0.55);
+      const even = document.createElementNS(SVG_NS, 'ellipse');
+      even.setAttribute('cx', String(mid));
+      even.setAttribute('cy', String(cy));
+      even.setAttribute('rx', '108');
+      even.setAttribute('ry', '40');
+      even.setAttribute('fill', 'url(#enCloudMain)');
+      cloudLayer.appendChild(even);
+    } else {
+      const fatCx = cxNeg;
+      const thinCx = cxPos;
+      const fatRx = rNeg + 62;
+      const fatRy = rNeg + 48;
+      const thinRx = Math.max(14, rPos * 0.45 + 6);
+      const thinRy = Math.max(10, rPos * 0.32 + 4);
+      const bridgeCx = (cxNeg * 0.72 + cxPos * 0.28);
+      const bridgeRx = Math.abs(cxPos - cxNeg) * 0.38 + 28;
+
+      cloudGrad('enCloudFat', fatCx, cy, fatRx, 0.92);
+      cloudGrad('enCloudCore', fatCx, cy, rNeg + 22, 1.0);
+      cloudGrad('enCloudThin', thinCx, cy, thinRx * 1.5, 0.28);
+      cloudGrad('enCloudBridge', bridgeCx, cy, bridgeRx, 0.42);
+
+      const fat = document.createElementNS(SVG_NS, 'ellipse');
+      fat.setAttribute('cx', String(fatCx));
+      fat.setAttribute('cy', String(cy));
+      fat.setAttribute('rx', String(fatRx));
+      fat.setAttribute('ry', String(fatRy));
+      fat.setAttribute('fill', 'url(#enCloudFat)');
+      cloudLayer.appendChild(fat);
+
+      const core = document.createElementNS(SVG_NS, 'ellipse');
+      core.setAttribute('cx', String(fatCx));
+      core.setAttribute('cy', String(cy));
+      core.setAttribute('rx', String(rNeg + 28));
+      core.setAttribute('ry', String(rNeg + 22));
+      core.setAttribute('fill', 'url(#enCloudCore)');
+      cloudLayer.appendChild(core);
+
+      const bridge = document.createElementNS(SVG_NS, 'ellipse');
+      bridge.setAttribute('cx', String(bridgeCx));
+      bridge.setAttribute('cy', String(cy));
+      bridge.setAttribute('rx', String(bridgeRx));
+      bridge.setAttribute('ry', String(Math.max(16, fatRy * 0.38)));
+      bridge.setAttribute('fill', 'url(#enCloudBridge)');
+      cloudLayer.appendChild(bridge);
+
+      const thin = document.createElementNS(SVG_NS, 'ellipse');
+      thin.setAttribute('cx', String(thinCx));
+      thin.setAttribute('cy', String(cy));
+      thin.setAttribute('rx', String(thinRx));
+      thin.setAttribute('ry', String(thinRy));
+      thin.setAttribute('fill', 'url(#enCloudThin)');
+      cloudLayer.appendChild(thin);
+    }
+    svg.appendChild(cloudLayer);
 
     const bond = document.createElementNS(SVG_NS, 'line');
     bond.setAttribute('class', 'bond');
-    bond.setAttribute('x1', String(cxA + rA - 4));
+    bond.setAttribute('x1', String(cxA + rA - 2));
     bond.setAttribute('y1', String(cy));
-    bond.setAttribute('x2', String(cxB - rB + 4));
+    bond.setAttribute('x2', String(cxB - rB + 2));
     bond.setAttribute('y2', String(cy));
     svg.appendChild(bond);
 
@@ -3209,21 +3269,19 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
     label(cxB, cy + 5, b.sym, 'sym-lab');
 
     if (winner === 'tie') {
-      label(190, 28, 'equal share', 'delta');
+      label(mid, 28, 'equal share', 'delta');
     } else {
-      const negX = winner === 'a' ? cxA : cxB;
-      const posX = winner === 'a' ? cxB : cxA;
-      label(negX, cy - rA - 14, 'δ−', 'delta');
-      label(posX, cy - rB - 14, 'δ+', 'delta is-pos');
+      label(cxNeg, cy - rNeg - 16, 'δ−', 'delta');
+      label(cxPos, cy - rPos - 16, 'δ+', 'delta is-pos');
 
       const arrow = document.createElementNS(SVG_NS, 'line');
       arrow.setAttribute('class', 'pull-arrow');
-      const fromX = winner === 'a' ? cxB - rB - 8 : cxA + rA + 8;
-      const toX = winner === 'a' ? cxA + rA + 10 : cxB - rB - 10;
+      const fromX = cxPos + (cxNeg < cxPos ? -rPos - 6 : rPos + 6);
+      const toX = cxNeg + (cxNeg < cxPos ? rNeg + 8 : -rNeg - 8);
       arrow.setAttribute('x1', String(fromX));
-      arrow.setAttribute('y1', String(cy + 36));
+      arrow.setAttribute('y1', String(cy + Math.max(rNeg, rPos) + 18));
       arrow.setAttribute('x2', String(toX));
-      arrow.setAttribute('y2', String(cy + 36));
+      arrow.setAttribute('y2', String(cy + Math.max(rNeg, rPos) + 18));
       arrow.setAttribute('marker-end', 'url(#enArrowHead)');
       svg.appendChild(arrow);
     }
@@ -3381,7 +3439,7 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
     updateContinue();
 
     enAnimTimer = setTimeout(function () {
-      /* 2) Density + weaker rings morph toward the stronger pull; hold the beat. */
+      /* 2) Electron density drifts toward the stronger pull; hold the beat. */
       STATE.enPhase = 'pull';
       setEnPhaseClass('pull', winner);
       els.enPhaseLab.textContent = winner === 'tie'

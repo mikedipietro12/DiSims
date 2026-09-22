@@ -133,12 +133,15 @@ body::before{
 /* "Your task:" sits on the same line as the task itself, one step back in weight */
 .task-lead{color:var(--faint);}
 .task-sub{
-  font-size:1.15rem;
+  font-size:1.3rem;
   font-weight:400;
   line-height:1.5;
   color:var(--ink-soft);
   max-width:none;
   text-wrap:pretty;
+}
+.task-sub > p{
+  margin:0.75em 0 0;
 }
 
 .viewport{
@@ -288,7 +291,7 @@ body::before{
 .t3-cat-card .t3-slider{width:100%;min-width:0;margin-top:0.28rem;}
 .t3-cat-card .t3-pct{min-width:0;text-align:left;font-size:inherit;}
 .t3-result{margin:0.55rem 0;padding:0.7rem 0;background:transparent;border:none;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);border-radius:0;}
-.t3-result .label{font-size:var(--label-xs);font-weight:600;letter-spacing:0.13em;text-transform:uppercase;color:var(--dim);margin-bottom:0.28rem;}
+.t3-result .label{font-size:var(--label-xs);font-weight:600;letter-spacing:0.04em;text-transform:none;color:var(--dim);margin-bottom:0.28rem;}
 .t3-result .value{font-family:var(--font-display);font-size:1.55rem;letter-spacing:-0.015em;color:var(--olive-deep);font-weight:400;display:inline-block;}
 .t3-result .target{font-size:0.9rem;color:var(--dim);margin-top:0.25rem;}
 .t3-eq-block{margin:0.55rem 0 0.15rem;}
@@ -337,6 +340,12 @@ body::before{
 .t3-tut-hint{font-size:1rem;line-height:1.5;color:var(--dim);margin:0.35rem 0 0.5rem;min-height:1.3em;text-wrap:pretty;}
 .t3-tut-hint.student-q,
 .student-q{color:var(--signal);font-weight:700;}
+.t3-tut-hint .student-q{
+  display:block;
+  margin-top:0.45em;
+  font-size:1.12em;
+  line-height:1.45;
+}
 /* Bridge page before the weighted-average tutorial — no equation yet */
 #t3Panel.t3-bridge .t3-eq-block,
 #t3Panel.t3-bridge .t3-result{display:none;}
@@ -348,7 +357,7 @@ body::before{
 .module-wrap.t3-compact .task-card{padding:0.7rem 0 0.7rem;margin-bottom:0.55rem;}
 .module-wrap.t3-compact .task-kicker{margin-bottom:0.35rem;}
 .module-wrap.t3-compact .task-title{font-size:clamp(1.5rem,3.4vw,2rem);margin-bottom:0.3rem;}
-.module-wrap.t3-compact .task-sub{font-size:1rem;}
+.module-wrap.t3-compact .task-sub{font-size:1.22rem;}
 .module-wrap.t3-compact .tier-bar{margin-bottom:0.5rem;}
 .module-wrap.t3-compact .viewport{margin:0.1rem 0 0.5rem;}
 .module-wrap.t3-compact .hud{display:none;}
@@ -791,6 +800,27 @@ body::before{
 .debrief-cc li::before{content:'\25B8';position:absolute;left:0;color:var(--signal);}
 .briefing-cc .cc-name,
 .debrief-cc .cc-name{display:block;font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--signal);margin-bottom:0.15rem;}
+.debrief-block.todo{border-left-color:var(--ember);}
+.debrief-block.todo .debrief-kicker{color:var(--ember);}
+.debrief-todo{list-style:none;margin:0;padding:0;}
+.debrief-todo li{position:static;padding-left:0;margin:0.65rem 0;}
+.debrief-todo label{
+  display:flex;align-items:flex-start;gap:0.7rem;
+  cursor:pointer;font-size:1rem;line-height:1.5;color:var(--ink-soft);
+  text-wrap:pretty;
+}
+.debrief-todo input[type="checkbox"]{
+  appearance:none;-webkit-appearance:none;
+  flex:0 0 auto;width:1.05rem;height:1.05rem;margin:0.2rem 0 0;
+  border:1.5px solid var(--ink);border-radius:0;background:var(--paper);
+  cursor:pointer;
+}
+.debrief-todo input[type="checkbox"]:checked{
+  background:var(--olive-deep);border-color:var(--olive-deep);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.5 L4.5 9 L10 3' fill='none' stroke='%23e6e1cf' stroke-width='1.8'/%3E%3C/svg%3E");
+  background-size:0.75rem 0.75rem;background-position:center;background-repeat:no-repeat;
+}
+.debrief-todo input[type="checkbox"]:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
 @media(max-width:760px){
   .briefing-columns{grid-template-columns:1fr;gap:1.35rem;}
 }
@@ -853,7 +883,7 @@ body::before{
       <span class="step" id="taskStep">Build · 1 of 3</span>
     </div>
     <h1 class="task-title"><span class="task-lead" id="promptLead">Your task: </span><span id="prompt">Build He-4</span></h1>
-    <p class="task-sub" id="promptSub">Click protons, neutrons, and electrons to build a neutral Helium-4 atom.</p>
+    <div class="task-sub" id="promptSub">Click protons, neutrons, and electrons to build a neutral Helium-4 atom.</div>
   </div>
 
   <div class="tier-bar" id="tierBar"></div>
@@ -912,7 +942,7 @@ body::before{
       <div class="t3-formula" id="t3CompareFormula"></div>
     </div>
     <div class="t3-result">
-      <div class="label">Your Weighted Average</div>
+      <div class="label">The average:</div>
       <div class="value" id="t3Avg">— amu</div>
       <div class="target" id="t3Target"></div>
     </div>
@@ -1098,6 +1128,23 @@ body::before{
     <div class="debrief-block cc">
       <div class="debrief-kicker">Curricular competencies</div>
       <ul class="debrief-cc" id="debriefCompetencies"></ul>
+    </div>
+    <div class="debrief-block todo">
+      <div class="debrief-kicker">To do</div>
+      <ul class="debrief-todo">
+        <li>
+          <label>
+            <input type="checkbox" name="todo-notes">
+            <span>In your OneNote, make some notes that summarize this module. Pretend you are studying for a test and you need to make quick notes to reference later. Use both the learning intentions and CCs as your guide.</span>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox" name="todo-ap">
+            <span>Go to AP Classroom and complete quiz 01.</span>
+          </label>
+        </li>
+      </ul>
     </div>
   </section>
 
@@ -2690,6 +2737,18 @@ function renderMsSpectrum(printed) {
   const cols = [];
   const A0 = Math.min(...sample.isos.map(i => i.A)) - 1;
   const A1 = Math.max(...sample.isos.map(i => i.A)) + 1;
+  // Match the instrument path key: light → mustard, mid → signal, heavy → ember.
+  const MS_BAR_COLORS = ['var(--mustard)', 'var(--signal)', 'var(--ember)'];
+  const presentAs = [...sample.isos].map(i => i.A).sort((a, b) => a - b);
+  const barColorFor = (A) => {
+    const idx = presentAs.indexOf(A);
+    if (idx < 0) return 'var(--phosphor)';
+    if (presentAs.length === 1) return MS_BAR_COLORS[0];
+    if (presentAs.length === 2) return idx === 0 ? MS_BAR_COLORS[0] : MS_BAR_COLORS[2];
+    if (idx === 0) return MS_BAR_COLORS[0];
+    if (idx === presentAs.length - 1) return MS_BAR_COLORS[2];
+    return MS_BAR_COLORS[1];
+  };
   for (let A = A0; A <= A1; A++) cols.push({ A, iso: byA.get(A) || null });
   chart.style.setProperty('--ms-cols', String(cols.length));
   let grid = '';
@@ -2697,7 +2756,7 @@ function renderMsSpectrum(printed) {
     grid += `<div class="ms-gridline${v === 0 ? ' zero' : ''}" style="bottom:${(v / top) * 100}%"><span>${v}</span></div>`;
   }
   const bars = cols.map(c => `<div class="ms-peak">${c.iso
-    ? `<div class="ms-bar" style="height:${(c.iso.abundance / top) * 100}%" title="${c.iso.abundance.toFixed(2)}%"></div>`
+    ? `<div class="ms-bar" style="height:${(c.iso.abundance / top) * 100}%;background:${barColorFor(c.A)}" title="${c.iso.abundance.toFixed(2)}%"></div>`
     : ''}</div>`).join('');
   const xTicks = cols.map(c => `<span class="ms-peak-mass">${c.A}</span>`).join('');
   const desc = sample.isos.map(i => `mass ${i.A} at ${i.abundance.toFixed(2)}%`).join(', ');
@@ -3081,6 +3140,7 @@ function setTutorialStep() {
   t3PulseT = -9999;
 
   const hint = document.getElementById('t3TutHint');
+  hint.hidden = false;
   const step = STATE.tutorialStep;
   t3Panel.classList.toggle('t3-bridge', step === 0);
   backBtn.style.display = step === 0 ? 'none' : '';
@@ -3098,14 +3158,17 @@ function setTutorialStep() {
 
   const markHintQ = (el) => {
     if (!el) return;
-    el.classList.toggle('student-q', /\?/.test(el.textContent || el.innerText || ''));
+    // Keep blue only on nested .student-q spans when the question is already wrapped.
+    const hasNestedQ = !!el.querySelector('.student-q');
+    el.classList.toggle('student-q', !hasNestedQ && /\?/.test(el.textContent || el.innerText || ''));
   };
 
   if (step === 0) {
     STATE.target = { sym: T3_BRIDGE_SYM, Z: getElement(T3_BRIDGE_SYM).Z, accepted: acceptedAvgMass(T3_BRIDGE_SYM), hint: TUTORIAL_HELP[step] };
-    hint.textContent = 'Next, we are going to find out how that average is determined.';
+    hint.textContent = '';
+    hint.hidden = true;
     setPrompt(null, 'Average Atomic Mass Introduction',
-      'Elements on the periodic table are more than they appear, you may have noticed that their atomic mass doesn’t add up to round numbers, as they would if it were simply # of protons + # of neutrons. <button type="button" class="inline-pt-btn" data-open-periodic-table>See periodic table</button> This next section will help guide you into how we calculate the Average Atomic Mass.');
+      'Elements on the periodic table are more than they appear, you may have noticed that their atomic mass doesn’t add up to round numbers, as they would if it were simply # of protons + # of neutrons. <button type="button" class="inline-pt-btn" data-open-periodic-table>See periodic table</button><p>This next section will guide you through the process of calculating <strong>Average Atomic Mass</strong>.</p>');
   } else if (step === 1) {
     STATE.tutorialHeavy = 5;
     STATE.target = { sym: 'Cl', Z: 17, accepted: acceptedAvgMass('Cl'), hint: TUTORIAL_HELP[step] };

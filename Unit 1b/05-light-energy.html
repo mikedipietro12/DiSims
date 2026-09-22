@@ -380,6 +380,7 @@ input[type="range"]:focus-visible{
 .hud-item.energy .v{color:var(--photon);}
 .hud-item.atom .v{text-transform:none;letter-spacing:0.04em;}
 .hud-item[hidden]{display:none;}
+.hud[hidden]{display:none !important;}
 
 /* Live energy equation — variables scale with value (module 02 pattern) */
 .energy-eq{
@@ -530,6 +531,7 @@ input[type="range"]:focus-visible{
   display:none;
 }
 .eq-reveal.visible{display:block;}
+.eq-reveal[hidden]{display:none !important;}
 
 /* Act 1 live wave equation — below HUD; λ and f scale with sliders */
 .wave-eq{
@@ -974,6 +976,25 @@ input[type="range"]:focus-visible{
   .module-footer-help{grid-area:help;}
   .module-footer-fwd{grid-area:fwd;}
 }
+.ion-plate-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.45rem;
+  align-items:center;
+  position:absolute;
+  left:0.85rem;
+  bottom:0.85rem;
+  z-index:3;
+  max-width:calc(100% - 5rem);
+  padding:0.35rem 0.4rem;
+  background:rgba(230,225,207,0.92);
+}
+.ion-plate-actions[hidden]{display:none !important;}
+.ion-plate-actions .btn{
+  margin:0;
+  padding:0.45rem 0.85rem;
+  font-size:var(--label-sm);
+}
 .ion-aftermath{
   display:flex;
   flex-wrap:wrap;
@@ -1239,6 +1260,10 @@ input[type="range"]:focus-visible{
       <span class="aside-kicker">About these orbs</span>
       This simulation shows the packets of energy as orbs. The orbs shrink and grow based on their energy. This is meant to be a visualization — in reality we can’t see any of this!
     </aside>
+    <div class="ion-plate-actions" id="ionPlateActions" hidden>
+      <button type="button" class="btn" id="ionResetBtn">Reset</button>
+      <button type="button" class="btn" id="ionNextAtomBtn">Try another atom</button>
+    </div>
   </div>
 
   <div class="controls" id="controls">
@@ -1304,8 +1329,6 @@ input[type="range"]:focus-visible{
     <div class="module-footer-fwd">
       <button type="button" class="btn submit" id="continueBtn" disabled>Continue →</button>
       <div class="ion-aftermath" id="ionAftermath" hidden>
-        <button type="button" class="btn" id="ionResetBtn">Reset</button>
-        <button type="button" class="btn" id="ionNextAtomBtn">Try another atom</button>
         <button type="button" class="btn submit" id="ionFinishBtn">Finish</button>
       </div>
     </div>
@@ -1650,6 +1673,7 @@ const els = {
   continueBtn: document.getElementById('continueBtn'),
   backBtn: document.getElementById('backBtn'),
   ionAftermath: document.getElementById('ionAftermath'),
+  ionPlateActions: document.getElementById('ionPlateActions'),
   ionResetBtn: document.getElementById('ionResetBtn'),
   ionNextAtomBtn: document.getElementById('ionNextAtomBtn'),
   ionFinishBtn: document.getElementById('ionFinishBtn'),
@@ -1825,8 +1849,9 @@ function updateAtomHud(){
 }
 
 function updateIonAftermath(){
-  if(!els.ionAftermath) return;
-  els.ionAftermath.hidden = !(STATE.act === 3 && STATE.ejected);
+  const show = STATE.act === 3 && STATE.ejected;
+  if(els.ionAftermath) els.ionAftermath.hidden = !show;
+  if(els.ionPlateActions) els.ionPlateActions.hidden = !show;
 }
 
 function resetIonBench(){
@@ -2778,8 +2803,9 @@ function setAct(n){
     updateAtomHud();
     setLambda(500, null);
     updateIonization();
-  } else if(els.ionAftermath){
-    els.ionAftermath.hidden = true;
+  } else {
+    if(els.ionAftermath) els.ionAftermath.hidden = true;
+    if(els.ionPlateActions) els.ionPlateActions.hidden = true;
   }
 
   updateReadouts();

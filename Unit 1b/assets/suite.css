@@ -117,7 +117,7 @@ h1,.task-title{
   font-size:1.15rem;
   font-weight:400;
   line-height:1.5;
-  color:var(--ink-soft);
+  color:var(--signal);
   max-width:none;
   text-wrap:pretty;
   margin-bottom:0.85rem;

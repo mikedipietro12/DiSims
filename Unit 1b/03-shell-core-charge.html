@@ -271,6 +271,27 @@ h1,.task-title{
 .debrief-cc li::before{content:'\25B8';position:absolute;left:0;color:var(--signal);}
 .briefing-cc .cc-name,
 .debrief-cc .cc-name{display:block;font-family:var(--font-mono);font-size:var(--label-xs);font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--signal);margin-bottom:0.15rem;}
+.debrief-block.todo{border-left-color:var(--ember);}
+.debrief-block.todo .debrief-kicker{color:var(--ember);}
+.debrief-todo{list-style:none;margin:0;padding:0;}
+.debrief-todo li{position:static;padding-left:0;margin:0.65rem 0;}
+.debrief-todo label{
+  display:flex;align-items:flex-start;gap:0.7rem;
+  cursor:pointer;font-size:1rem;line-height:1.5;color:var(--ink-soft);
+  text-wrap:pretty;
+}
+.debrief-todo input[type="checkbox"]{
+  appearance:none;-webkit-appearance:none;
+  flex:0 0 auto;width:1.05rem;height:1.05rem;margin:0.2rem 0 0;
+  border:1.5px solid var(--ink);border-radius:0;background:var(--paper);
+  cursor:pointer;
+}
+.debrief-todo input[type="checkbox"]:checked{
+  background:var(--olive-deep);border-color:var(--olive-deep);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.5 L4.5 9 L10 3' fill='none' stroke='%23e6e1cf' stroke-width='1.8'/%3E%3C/svg%3E");
+  background-size:0.75rem 0.75rem;background-position:center;background-repeat:no-repeat;
+}
+.debrief-todo input[type="checkbox"]:focus-visible{outline:2px solid var(--olive-deep);outline-offset:2px;}
 
 /* === Act 1 plate === */
 .act[hidden]{display:none;}
@@ -598,8 +619,8 @@ h1,.task-title{
   font-family:var(--font-mono);
   font-size:var(--label-xs);
   font-weight:600;
-  letter-spacing:0.14em;
-  text-transform:uppercase;
+  letter-spacing:var(--track-tight);
+  text-transform:none;
   color:var(--dim);
   margin-bottom:0.5rem;
 }
@@ -657,6 +678,15 @@ h1,.task-title{
   margin-top:0.35rem;
   display:flex;
   justify-content:flex-end;
+  opacity:1;
+  transition:opacity 0.45s ease;
+}
+.reveal-advance.is-fading{
+  opacity:0;
+  pointer-events:none;
+}
+.reveal-advance[hidden]{
+  display:none !important;
 }
 .reveal-advance .btn{margin:0;}
 .shield-tag{
@@ -1417,7 +1447,7 @@ h1,.task-title{
     <h1>Shell Model &amp; Core Charge</h1>
     <p class="framing" id="framing" aria-live="polite">
       As we saw at the end of the last simulation, there were two proposed configurations of lithium. Here, we will see how we know which one is correct by adding electrons and seeing how that changes the V value, which is the potential energy required to remove an electron, which we will now consider as IE.<br><br>
-      Add electrons to see how “q” changes as inner shell electrons are considered.
+      <span class="student-q">Add electrons to see how “q” changes as inner shell electrons are considered.</span>
     </p>
   </header>
 
@@ -1636,6 +1666,23 @@ h1,.task-title{
     <div class="debrief-block cc">
       <div class="debrief-kicker">Curricular competencies</div>
       <ul class="debrief-cc" id="debriefCompetencies"></ul>
+    </div>
+    <div class="debrief-block todo">
+      <div class="debrief-kicker">To do</div>
+      <ul class="debrief-todo">
+        <li>
+          <label>
+            <input type="checkbox" name="todo-notes">
+            <span>In your OneNote, make some notes that summarize modules 02 and 03. Pretend you are studying for a test and you need to make quick notes to reference later. Use both the learning intentions and CCs as your guide.</span>
+          </label>
+        </li>
+        <li>
+          <label>
+            <input type="checkbox" name="todo-schoology">
+            <span>Go to Schoology and complete quiz 1.</span>
+          </label>
+        </li>
+      </ul>
     </div>
   </section>
   </div><!-- /#moduleStage -->
@@ -2098,7 +2145,7 @@ const FINALE_OUTER = 72;
 function buildIEStripTable(opts = {}) {
   const atoms = opts.atoms || PERIOD2_ROW;
   const focusSym = opts.focusSym || '';
-  const caption = opts.caption || 'First ionization energy (MJ/mol)';
+  const caption = opts.caption || 'Experimental data of First Ionization Energies';
   const cols = atoms.length;
 
   const table = document.createElement('table');
@@ -2293,7 +2340,31 @@ function syncReveal() {
     mountIEStrip(document.getElementById('revealIEHost'), { focusSym: 'Li' });
   }
 
-  advance.hidden = !(stage >= 1 && stage < 5);
+  const shouldShowAdvance = stage >= 1 && stage < 5;
+  if (shouldShowAdvance) {
+    advance.hidden = false;
+    advance.classList.remove('is-fading');
+  } else if (stage >= 5) {
+    // Fade the in-plate Next away so the footer Next is the clear path forward.
+    // (display:flex on .reveal-advance otherwise overrides [hidden].)
+    if (advance.hidden) {
+      advance.classList.remove('is-fading');
+    } else if (prefersReduced) {
+      advance.hidden = true;
+      advance.classList.remove('is-fading');
+    } else if (!advance.classList.contains('is-fading')) {
+      advance.classList.add('is-fading');
+      window.setTimeout(() => {
+        if (STATE.revealStage >= 5) {
+          advance.hidden = true;
+          advance.classList.remove('is-fading');
+        }
+      }, 450);
+    }
+  } else {
+    advance.hidden = true;
+    advance.classList.remove('is-fading');
+  }
 
   if (stage >= 5) {
     kicker.textContent = 'The outer electron feels +1';
@@ -3364,7 +3435,7 @@ async function returnToLiFromPeriod() {
   framing.hidden = false;
   framing.innerHTML =
     'As we saw at the end of the last simulation, there were two proposed configurations of lithium. Here, we will see how we know which one is correct by adding electrons and seeing how that changes the V value, which is the potential energy required to remove an electron, which we will now consider as IE.<br><br>' +
-    'Add electrons to see how “q” changes as inner shell electrons are considered.';
+    '<span class="student-q">Add electrons to see how “q” changes as inner shell electrons are considered.</span>';
 
   STATE.act = 'li';
   STATE.periodPage = 0;
