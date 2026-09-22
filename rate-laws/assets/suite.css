@@ -263,7 +263,8 @@ svg.plot.plot-paper{
 
 /* Hub */
 .hub-header{margin-bottom:2.2rem;}
-.hub-header .subtitle{font-size:1.15rem;line-height:1.5;color:var(--ink-soft);max-width:56ch;text-wrap:pretty;}
+.hub-header .subtitle{font-size:1.15rem;line-height:1.5;color:var(--ink-soft);max-width:56ch;text-wrap:pretty;margin:0 0 0.35rem;}
+.hub-header .subtitle:last-of-type{margin-bottom:0;}
 .path{list-style:none;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);}
 .path li + li{border-top:1px solid var(--ink);}
 .path a,.path .locked-card{
