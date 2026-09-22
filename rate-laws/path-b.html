@@ -27,6 +27,17 @@
 .slope-eq{margin:0.35rem 0 0.7rem;padding:0.45rem 0.65rem;border-left:4px solid var(--data);background:var(--paper-2);}
 .slope-steps{margin:0.35rem 0 0.7rem 1.15rem;padding:0;}
 .slope-steps li{margin:0.35rem 0;line-height:1.45;}
+#slopeNote{
+  display:flex;flex-wrap:wrap;align-items:center;gap:0.35rem 0.45rem;
+  font-family:var(--font-mono);font-size:0.98rem;
+  font-variant-numeric:tabular-nums;font-feature-settings:"zero" 1;
+  line-height:1.35;margin:0.75rem 0 0.35rem;
+}
+#slopeNote .slope-calc{
+  display:inline-flex;flex-wrap:wrap;align-items:center;gap:0.35rem 0.4rem;
+}
+#slopeNote .iso-frac{font-size:0.95rem;}
+#slopeNote .eq-op{font-weight:600;}
 .mono-inline{
   font-family:var(--font-mono);
   font-variant-numeric:tabular-nums;
@@ -68,6 +79,11 @@
 .order-tab-row .choice{margin:0;}
 .order-summary-card{margin-top:0.85rem;padding-top:0.75rem;border-top:2px solid var(--ink);}
 .order-summary-card > p{margin:0 0 0.65rem;}
+.trait-list{
+  margin:0 0 0.85rem;padding:0 0 0 1.15rem;
+  list-style:disc;
+}
+.trait-list li{margin:0.28rem 0;line-height:1.45;}
 .order-meta{
   font-family:var(--font-mono);
   font-size:var(--label-sm);
@@ -114,6 +130,7 @@
 .hl-formula .iso-frac{font-size:1.05rem;}
 .hl-why{margin:0 0 0.7rem;font-size:1.05rem;line-height:1.5;}
 #hlHost svg.plot{background:var(--paper);}
+#irlHost svg.plot{background:var(--paper);}
 </style>
 </head>
 <body>
@@ -173,6 +190,6 @@
 </div>
 <script src="assets/suite-chrome.js?v=2"></script>
 <script src="assets/lock.js?v=1"></script>
-<script src="assets/path-b.js?v=41"></script>
+<script src="assets/path-b.js?v=50"></script>
 </body>
 </html>

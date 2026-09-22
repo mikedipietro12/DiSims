@@ -98,6 +98,9 @@
     var pad = (yMax - yMin) * 0.08;
     yMin -= pad;
     yMax += pad;
+    /* Raw [A] and 1/[A] are non-negative. Pin the floor at 0 so the x-axis
+       sits on the zero tick instead of floating in padded empty space. */
+    if (transform !== 'ln' && yMin < 0) yMin = 0;
     return {
       W: W,
       H: H,
@@ -392,7 +395,9 @@
     els.title.textContent = 'Zero-order vs first-order, same start';
     els.frame.className = 'framing';
     els.frame.innerHTML =
-      '<span class="frame-line">These two graphs start with the same amount of reactant and start at the same time. Watch carefully how the shape of their curve changes. The order of a reaction can be inferred from the shape of the concentration vs. time graph.</span>' +
+      '<span class="frame-line">These two graphs start with the same amount of reactant and start at the same time. Watch carefully how the shape of their curve changes.</span>' +
+      '<strong class="frame-line">The order of a reaction can be inferred from the shape of the concentration vs. time graph.</strong>' +
+      '<span class="frame-line">This module is going to walk us through how we can determine the order of a reaction from “integrated rate laws” and graphing.</span>' +
       '<strong class="frame-line student-q">What do you think leads to the difference in shape?</strong>';
     els.body.innerHTML =
       '<div class="two-col">' +
@@ -491,7 +496,8 @@
     els.frame.className = 'framing';
     els.frame.innerHTML =
       '<span class="frame-line">Raw [A] vs t is curved for first and second order, so looking at the curve is only a hint, not a clean test.</span>' +
-      '<span class="frame-line">We can change what we plot on the y-axis (a logarithm, or a reciprocal) and ask which version becomes a straight line. The transform that straightens the data names the order.</span>';
+      '<span class="frame-line">We can change what we plot on the y-axis (a logarithm, or a reciprocal) and ask which version becomes a straight line.</span>' +
+      '<strong class="frame-line">The transform that straightens the data names the order.</strong>';
     els.body.innerHTML =
       '<div class="viewport graph-paper" data-fig="FIG. C  ·  SAME RUN, RAW"><div class="viewport-body">' +
       svgPlot(series(1), 'raw', { graphPaper: true }) +
@@ -503,7 +509,6 @@
     els.title.textContent = 'Drag a transform onto the y-axis';
     els.frame.className = 'framing';
     els.frame.innerHTML =
-      '<span class="frame-line">This is the first-order run you just watched — same points, not a fresh plot.</span>' +
       '<strong class="frame-line student-q">Drag ln or 1/ onto the y-axis (or tap a chip). One transform will straighten the curve; the other will stay bent or bend the other way.</strong>';
     paintLin();
   }
@@ -556,7 +561,8 @@
     els.body.innerHTML =
       '<div class="viewport graph-paper" data-fig="FIG. E  ·  ln[A] VS t  ·  SLOPE −k" data-fig-case="preserve">' +
       '<div class="viewport-body" id="slopeHost">' + svgPlot(pts, 'ln', { graphPaper: true, dots: true }) +
-      '<p id="slopeNote">Click two blue points on the line. Slope is rise over run: (y₂ − y₁)/(t₂ − t₁).</p>' +
+      '<p id="slopeNote">Click two blue points on the line. Slope is rise over run: ' +
+      stackedFrac('y<sub>2</sub> − y<sub>1</sub>', 't<sub>2</sub> − t<sub>1</sub>') + '.</p>' +
       '<div id="slopeWork" class="slope-work" hidden></div>' +
       '</div></div>';
     state.slopePts = [];
@@ -613,9 +619,16 @@
       });
 
       $('slopeNote').innerHTML =
-        'Rise over run: <span class="mono-inline">slope = Δ ln[A] / Δt = (' + yb.toFixed(3) + ' − ' +
-        ya.toFixed(3) + ') / (' + p2.t.toFixed(1) + ' − ' + p1.t.toFixed(1) + ') = ' +
-        dLn.toFixed(3) + ' / ' + dT.toFixed(1) + ' = <strong>' + slope.toFixed(3) + ' s⁻¹</strong></span>';
+        'Rise over run: <span class="slope-calc">slope = ' +
+        stackedFrac('Δ ln[A]', 'Δt') +
+        ' <span class="eq-op">=</span> ' +
+        stackedFrac(
+          '(' + yb.toFixed(3) + ' − ' + ya.toFixed(3) + ')',
+          '(' + p2.t.toFixed(1) + ' − ' + p1.t.toFixed(1) + ')'
+        ) +
+        ' <span class="eq-op">=</span> ' +
+        stackedFrac(dLn.toFixed(3), dT.toFixed(1)) +
+        ' <span class="eq-op">=</span> <strong>' + slope.toFixed(3) + ' s⁻¹</strong></span>';
 
       var work = $('slopeWork');
       work.hidden = false;
@@ -650,7 +663,8 @@
           clearSlopeViz();
           $('slopeWork').hidden = true;
           $('slopeWork').innerHTML = '';
-          $('slopeNote').textContent = 'Click two blue points on the line. Slope is rise over run: (y₂ − y₁)/(t₂ − t₁).';
+          $('slopeNote').innerHTML = 'Click two blue points on the line. Slope is rise over run: ' +
+            stackedFrac('y<sub>2</sub> − y<sub>1</sub>', 't<sub>2</sub> − t<sub>1</sub>') + '.';
         }
         state.slopePts.push(i);
         c.setAttribute('r', '7');
@@ -683,7 +697,12 @@
         body:
           '<p>Zero order means the rate does <strong>not</strong> depend on how much reactant is left. As [A] falls, the rate stays the same — a constant decline.</p>' +
           '<p>On a raw <span class="mono-inline">[A] vs t</span> graph that shows up as a straight line already. No transform needed. The slope of that line is <span class="mono-inline">−k</span>.</p>' +
-          '<p><strong>Key traits:</strong> constant rate; straight [A] vs t; common when a catalyst or surface is saturated so the “working” amount does not change with concentration.</p>' +
+          '<p><strong>Key traits</strong></p>' +
+          '<ul class="trait-list">' +
+          '<li>Constant rate — does not change as [A] falls</li>' +
+          '<li>Straight <span class="mono-inline">[A] vs t</span> already (no transform needed)</li>' +
+          '<li>Common when a catalyst or surface is saturated, so the “working” amount does not change with concentration</li>' +
+          '</ul>' +
           '<p><strong>In real life:</strong> many enzyme-catalyzed reactions at high substrate concentration, and some surface-catalyzed decompositions (for example ammonia on a metal surface when the surface is fully covered).</p>'
       },
       {
@@ -698,7 +717,13 @@
         body:
           '<p>First order means the rate is proportional to the concentration of the reactant. As [A] drops, collisions become rarer and the rate slows — that is why raw [A] vs t curves downward.</p>' +
           '<p>When we graph <span class="mono-inline">ln[A] vs t</span>, that curve becomes a straight line (the integrated form). The slope of that line stays constant: <span class="mono-inline">m = −k</span>. So once the plot is linear, reading the slope gives you k.</p>' +
-          '<p><strong>Key traits:</strong> rate slows as [A] falls; raw curve bends; ln[A] vs t is linear; half-life is constant (same fraction gone in equal time intervals).</p>' +
+          '<p><strong>Key traits</strong></p>' +
+          '<ul class="trait-list">' +
+          '<li>Rate slows as [A] falls</li>' +
+          '<li>Raw curve bends</li>' +
+          '<li><span class="mono-inline">ln[A] vs t</span> is linear</li>' +
+          '<li>Half-life is constant (same fraction gone in equal time intervals)</li>' +
+          '</ul>' +
           '<p><strong>In real life:</strong> radioactive decay, many drug-elimination processes in the body, and the hydrolysis of some esters under excess water.</p>'
       },
       {
@@ -713,7 +738,13 @@
         body:
           '<p>Second order (in one reactant) means the rate depends on [A]<sup>2</sup>. As concentration falls, the rate slows even more sharply than first order — raw [A] vs t bends hard.</p>' +
           '<p>The transform that straightens it is <span class="mono-inline">1/[A] vs t</span>. That plot is a straight line with a <em>positive</em> slope: <span class="mono-inline">m = +k</span>. The reaction is still consuming A; the linearized y-axis just climbs as 1/[A] grows.</p>' +
-          '<p><strong>Key traits:</strong> strong concentration dependence; raw curve bends more than first order; 1/[A] vs t is linear; half-life gets longer as [A] drops.</p>' +
+          '<p><strong>Key traits</strong></p>' +
+          '<ul class="trait-list">' +
+          '<li>Strong concentration dependence</li>' +
+          '<li>Raw curve bends more than first order</li>' +
+          '<li><span class="mono-inline">1/[A] vs t</span> is linear</li>' +
+          '<li>Half-life gets longer as [A] drops</li>' +
+          '</ul>' +
           '<p><strong>In real life:</strong> some dimerization reactions, and classic gas-phase examples such as the decomposition of nitrogen dioxide (2 NO<sub>2</sub> → 2 NO + O<sub>2</sub>), which is second order in NO<sub>2</sub>.</p>'
       }
     ];
@@ -724,20 +755,21 @@
     }).join('');
 
     var pts = series(cur.o);
+    var plotOpts = { axisTicks: true, tickGrid: true, noDrawAnim: true };
     var plots;
     if (cur.o === 0) {
-      plots = svgPlot(pts, 'raw', { graphPaper: true, noDrawAnim: true });
+      plots = svgPlot(pts, 'raw', plotOpts);
     } else {
       var linCap = cur.transform === 'ln' ? 'ln[A] VS t' : '1/[A] VS t';
       plots =
         '<div class="two-col order-plots">' +
         '<div class="order-plot-pane">' +
         '<div class="fig-cap">RAW  ·  [A] VS t</div>' +
-        svgPlot(pts, 'raw', { graphPaper: true, noDrawAnim: true }) +
+        svgPlot(pts, 'raw', plotOpts) +
         '</div>' +
         '<div class="order-plot-pane">' +
         '<div class="fig-cap">INTEGRATED  ·  ' + linCap + '</div>' +
-        svgPlot(pts, cur.transform, { graphPaper: true, noDrawAnim: true }) +
+        svgPlot(pts, cur.transform, plotOpts) +
         '</div></div>';
     }
 
@@ -749,7 +781,7 @@
 
     els.body.innerHTML =
       '<div class="order-tab-row">' + tabs + '</div>' +
-      '<div class="viewport graph-paper" data-fig="' + figTitle + '" data-fig-case="preserve">' +
+      '<div class="viewport" data-fig="' + figTitle + '" data-fig-case="preserve">' +
       '<div class="viewport-body" id="irlHost">' +
       plots +
       '<div class="order-summary-card">' +
@@ -823,7 +855,7 @@
     var cards = SHEETS.map(function (s) {
       return '<div class="viewport" data-fig="' + s.title + '"><div class="viewport-body">' +
         '<button type="button" class="btn" data-dl="' + s.id + '">Download CSV</button>' +
-        '<p>Find the straight plot, then write the rate law. Order 2 is k[A]², not 2k[A]. k stays a symbol.</p>' +
+        '<p>Find the straight plot, then write the rate law.</p>' +
         '<input class="rate-input" style="width:12rem" data-law="' + s.id + '" placeholder="rate = …" aria-label="Rate law for ' + s.title + '">' +
         '<button type="button" class="btn submit" data-check="' + s.id + '">Check</button>' +
         '<p class="guess-feedback" id="fb-' + s.id + '"></p></div></div>';
@@ -935,7 +967,7 @@
         frame: '<span class="frame-line">Half-life is the time for concentration to fall to half of whatever you just had — not always half of the original start.</span><strong class="frame-line student-q">The curve is crowded with small points. Click them in order to mark each half-life — start at [A]<sub>0</sub>, then find half of that, then half again. Wrong points stay unmarked; watch whether the time gaps shrink, stay the same, or grow.</strong>',
         formulaHtml: 't<sub>½</sub> = ' + stackedFrac('[A]<sub>0</sub>', '2k'),
         why: 'Zero-order rate does not depend on [A] — the reaction burns at a constant pace. Clearing half of a smaller pile at that same pace takes less time, so successive half-lives get shorter as concentration falls.',
-        apNote: 'AP does not test zero-order half-life. It is contrast so first-order’s constancy has something to stand against.'
+        apNote: ''
       },
       {
         order: 1,
@@ -943,7 +975,7 @@
         frame: '<span class="frame-line">Same hunt, first-order this time: find the points where half of the previous mark remains.</span><span class="frame-line">First-order half-life is the one AP tests: it is constant, and t<sub>½</sub> = 0.693/k. Radioactive decay is the usual illustration.</span>',
         formulaHtml: 't<sub>½</sub> = ' + stackedFrac('0.693', 'k'),
         why: 'First-order rate is proportional to [A]. When concentration halves, the reaction slows by the same factor — so the time to lose another half stays the same no matter how much is left.',
-        apNote: 'This is the tested relationship. Radioactive decay is first-order for the same reason: constant t<sub>½</sub>.'
+        apNote: 'Radioactive decay is first-order for the same reason: constant t<sub>½</sub>.'
       },
       {
         order: 2,
@@ -951,7 +983,7 @@
         frame: '<span class="frame-line">Last contrast: second order. Find successive half-marks among the points and watch the spacing.</span><span class="frame-line">AP will not ask you to compute a second-order half-life. The point is to make first-order’s constancy look like a fact, not a slogan.</span>',
         formulaHtml: 't<sub>½</sub> = ' + stackedFrac('1', 'k[A]<sub>0</sub>'),
         why: 'Second-order rate depends on [A]<sup>2</sup>. Halving concentration cuts the rate to one-fourth, so the reaction is much slower at low [A] and each successive half-life takes longer.',
-        apNote: 'Enrichment only — not an AP calculation.'
+        apNote: ''
       }
     ];
     if (state.hl.order == null) state.hl.order = 0;
@@ -990,7 +1022,7 @@
       '<div class="hl-teach" id="hlTeach" hidden>' +
       '<p class="hl-formula">' + r.formulaHtml + '</p>' +
       '<p class="hl-why">' + r.why + '</p>' +
-      '<p class="callout">' + r.apNote + '</p>' +
+      (r.apNote ? '<p class="callout">' + r.apNote + '</p>' : '') +
       '</div>' +
       '<button type="button" class="btn ghost" id="hlReset">Reset marks</button>' +
       '</div></div>';
