@@ -27,7 +27,7 @@
     hook: 'Commit a prediction first. The measured result only appears after you choose.',
     molecular: 'Watch collision count as density changes. More particles in the same volume means more collisions.',
     ratelaw: 'Click a row. The matching piece of the law lights up — that is where the value sits in the equation.',
-    warmup: 'Write the rate ratio as (concentration ratio) raised to the order. The data are clean powers: if concentration doubles and the rate quadruples, the order is 2, because 2² = 4.',
+    warmup: 'Click two experiment rows. The arrows show how [A] and the rate scaled. Write the rate ratio as (concentration ratio) raised to the order — if concentration doubles and the rate quadruples, the order is 2, because 2² = 4.',
     isolation: 'Click two rows. You want exactly one concentration different and every other column identical. If two concentrations change, the rate shift could come from either reactant — you isolated nothing, so pick again.',
     predict: 'Rearrange one measured trial to get k, then plug the new concentrations into the rate law. The prediction is the point of having a law — guess the rate, then reveal.',
     kunits: 'Drag a concentration unit from the numerator onto a matching unit in the denominator to cancel. The leftover M stays below the bar on purpose; that denominator is what becomes M⁻¹. Units come from the sum of the exponents, not from one reactant.',
@@ -43,6 +43,7 @@
     hookRevealed: false,
     warmupOrder: null,
     warmupRevealed: false,
+    warmupSelected: [],
     isoSelected: [],
     isoOrders: {},
     predictVal: null,
@@ -226,9 +227,11 @@
     var held = highlight.held;
     var cRatio = bot.conc[r.key] / top.conc[r.key];
     var rateRatio = bot.rate / top.rate;
-    var cancel = held.length === 1
-      ? held[0].label + ' did not change between those two experiments, so it cancels from the ratio.'
-      : held.map(function (h) { return h.label; }).join(' and ') + ' did not change, so those concentrations cancel.';
+    var cancel = held.length === 0
+      ? 'Only one reactant is in the table, so the whole concentration change belongs to ' + r.label + '.'
+      : held.length === 1
+        ? held[0].label + ' did not change between those two experiments, so it cancels from the ratio.'
+        : held.map(function (h) { return h.label; }).join(' and ') + ' did not change, so those concentrations cancel.';
     var n0 = top.exp, n1 = bot.exp;
     var known = found[r.key] != null;
     var all = ds.reactants.every(function (x) { return found[x.key] != null; });
@@ -398,12 +401,23 @@
       }).join('') +
       '</div>' +
       '<p class="guess-feedback" id="hookFb"></p>' +
+      '</div>' +
+      '<div id="hookReveal" class="hook-reveal" hidden>' +
+      '<div class="guess-prompt-label">Measured initial rates</div>' +
+      '<table class="lab-table hook-data">' +
+      '<thead><tr><th>Trial</th><th>[A] (M)</th><th>Initial rate (M·s⁻¹)</th></tr></thead>' +
+      '<tbody>' +
+      '<tr><td>1</td><td>0.10</td><td>0.020</td></tr>' +
+      '<tr><td>2</td><td>0.20</td><td>0.080</td></tr>' +
+      '</tbody></table>' +
+      '<p class="callout ok">[A] doubled (0.10 → 0.20 M). The initial rate went from 0.020 to 0.080 M·s⁻¹ — it <strong>quadrupled</strong>. Doubling concentration did not simply double the rate.</p>' +
       '</div></div></div>';
     els.body.innerHTML = body;
     if (state.hookRevealed) {
       var plate0 = $('guessPlate');
       if (plate0) plate0.dataset.fig = 'FIG. 01  ·  MEASURED';
       paintHookFeedback();
+      showHookReveal(true);
     }
     var tip = els.body.querySelector('.term-tip');
     if (tip) {
@@ -503,22 +517,45 @@
     frame();
   }
 
+  function showHookReveal(instant) {
+    var reveal = $('hookReveal');
+    if (!reveal) return;
+    reveal.hidden = false;
+    if (instant || prefersReduced) {
+      reveal.classList.add('is-revealed');
+      return;
+    }
+    reveal.classList.remove('is-revealed');
+    void reveal.offsetWidth;
+    reveal.classList.add('is-revealed');
+  }
+
   function paintHookFeedback() {
     var fb = $('hookFb');
     if (!fb || !state.hookChoice) return;
-    var match = state.hookChoice === 'Quadruples';
+    var choice = state.hookChoice;
+    var match = choice === 'Quadruples';
     fb.className = 'guess-feedback hook-fb ' + (match ? 'is-match' : 'is-miss');
-    if (match) {
-      fb.textContent = 'That matches the measured result.';
-      return;
-    }
-    fb.innerHTML = 'You guessed “' + state.hookChoice + '.” The measured result is different.' +
-      '<span class="fb-note">Your logic makes sense, but the chemistry DATA says otherwise.</span>';
+    var msgs = {
+      'Stays the same': 'Interesting guess! But our understanding of collision theory would say otherwise. Check the data below to see what really happens.',
+      Doubles: 'Good guess. But the data shows otherwise…',
+      Triples: 'Interesting guess mathematically, but decent guess directionally. Let’s see what the data says.',
+      Quadruples: 'Your guess matches the data, lucky guess?'
+    };
+    fb.textContent = msgs[choice] || '';
+
+    Array.prototype.forEach.call(document.querySelectorAll('#hookChoices .choice'), function (b) {
+      b.classList.remove('correct', 'wrong');
+      if (!state.hookRevealed) return;
+      if (b.dataset.c === 'Quadruples') b.classList.add('correct');
+      if (b.dataset.c === choice && !match) b.classList.add('wrong');
+    });
   }
 
   function revealHook() {
     state.hookRevealed = true;
     paintHookFeedback();
+    showHookReveal(false);
     var plate = $('guessPlate');
     if (plate) plate.dataset.fig = 'FIG. 01  ·  MEASURED';
   }
@@ -528,7 +565,7 @@
     els.kicker.textContent = 'Step 02 · 5.2.A.1';
     els.title.textContent = 'Why concentration changes the rate';
     els.frame.className = 'framing';
-    els.frame.innerHTML = '<span class="frame-line">Recall: rate is determined from how much reactant is present.</span><span class="frame-line">More particles in the same volume → more collisions → faster rate.</span>';
+    els.frame.innerHTML = '<span class="frame-line">The assumption is more particles in the same volume → more collisions → faster rate.</span>';
     els.body.innerHTML =
       '<div class="viewport" data-fig="FIG. 02  ·  PARTICLE DENSITY">' +
       '<div class="viewport-body">' +
@@ -708,7 +745,10 @@
     els.kicker.textContent = 'Step 03 · 5.2.A.2';
     els.title.textContent = 'The differential rate law';
     els.frame.className = 'framing';
-    els.frame.innerHTML = '<span class="frame-line">Rate is proportional to each concentration raised to a power.</span><strong class="frame-line">The powers are the orders — those are what this path finds.</strong>';
+    els.frame.innerHTML =
+      '<span class="frame-line">A differential rate law is an equation that says how the initial rate depends on the concentrations of the reactants — each concentration raised to a power called its order, times a constant k.</span>' +
+      '<span class="frame-line">Chemists need it because a balanced equation does not tell you that dependence; you have to measure it. Once you have the rate law, you can predict how fast a new run will go at concentrations nobody has tried yet, and you can compare conditions without redoing every experiment.</span>' +
+      '<strong class="frame-line">This part of the sim is about finding those orders from data.</strong>';
     var defs = [
       { k: 'rate', sym: 'rate', name: 'Initial rate', text: 'How fast the reaction proceeds at t ≈ 0. Measured for each trial. Units M·s⁻¹.' },
       { k: 'k', sym: 'k', name: 'Rate constant', text: 'The proportionality constant. Each reaction has one; it lets chemists predict rates at any combination of concentrations. How to determine its value comes later.' },
@@ -768,42 +808,126 @@
   }
 
   /* ── Warm-up ──────────────────────────────────────── */
+  function warmupDeriveHTML(ds, highlight, selected) {
+    var rows = pairOrder(selected);
+    var top = ds.trials[rows[0]];
+    var bot = ds.trials[rows[1]];
+    var r = highlight.changed[0];
+    var letter = 'n';
+    var cRatio = bot.conc[r.key] / top.conc[r.key];
+    var rateRatio = bot.rate / top.rate;
+    var n0 = top.exp, n1 = bot.exp;
+    return '<div class="iso-derive">' +
+      '<p class="iso-verbal">When ' + r.label + ' is ' + scalePhrase(cRatio, false) + ', the rate ' +
+      scalePhrase(rateRatio, true) + '. The arrows on the table show that scale factor.</p>' +
+      '<div class="iso-math">' +
+      '<p class="law iso-ratio-line">' + stackedFrac('rate<sub>' + n1 + '</sub>', 'rate<sub>' + n0 + '</sub>') +
+      ' <span class="iso-eq">=</span> (' + stackedFrac(r.label + '<sub>' + n1 + '</sub>', r.label + '<sub>' + n0 + '</sub>') +
+      ')<sup class="iso-focus">' + letter + '</sup></p>' +
+      '<p class="law iso-ratio-nums">' + stackedFrac(htmlRate(bot.rate), htmlRate(top.rate)) +
+      ' <span class="iso-eq">=</span> (' + stackedFrac(String(bot.conc[r.key]), String(top.conc[r.key])) +
+      ')<sup class="iso-focus">' + letter + '</sup></p>' +
+      '<p class="law iso-ratio-times">' + fmtTimes(rateRatio) + ' <span class="iso-eq">=</span> (' +
+      fmtTimes(cRatio) + ')<sup class="iso-focus">' + letter + '</sup></p>' +
+      '</div>' +
+      '<p>The order with respect to ' + r.label + ' is the exponent that makes those two factors equal.</p>' +
+      '</div>';
+  }
+
   function renderWarmup() {
     var ds = RateData.DATASETS.warmup2;
+    if (!state.warmupSelected) state.warmupSelected = [];
+    var selected = state.warmupSelected;
     els.kicker.textContent = 'Step 04 · 5.2.A.3';
-    els.title.textContent = 'One reactant, clean powers';
+    els.title.textContent = 'The relationship between initial concentration, and initial rate';
     els.frame.className = 'framing';
     els.frame.innerHTML =
-      '<strong class="frame-line student-q">Compare two experiments. What happened to the rate when [A] changed, and which exponent turns that concentration ratio into the rate ratio?</strong>';
+      '<span class="frame-line">For a single reactant the rule is rate ratio = (concentration ratio)<sup>order</sup>. The numbers here are clean powers, so you can see the exponent without logarithms.</span>' +
+      '<strong class="frame-line student-q">Click two experiment rows. Arrows will show how [A] and the rate scaled — then choose the order that turns the concentration ratio into the rate ratio.</strong>';
+
+    var highlight = null;
+    var msg = '<p class="table-note">Click two experiment rows to compare them.</p>';
+    if (selected.length === 2) {
+      highlight = RateData.isolationDiff(ds, selected[0], selected[1]);
+      if (highlight.clean) {
+        msg = warmupDeriveHTML(ds, highlight, selected) +
+          '<div class="guess-controls"><div class="guess-prompt-label">Order in A</div>' +
+          '<div class="choice-row" id="wuChoices">' +
+          [1, 2, 3].map(function (n) {
+            var pressed = state.warmupOrder === n ? 'true' : 'false';
+            return '<button type="button" class="choice" data-n="' + n + '" aria-pressed="' + pressed + '">' + n + '</button>';
+          }).join('') +
+          '</div><p class="guess-feedback" id="wuFb"></p></div>';
+      }
+    }
+
     els.body.innerHTML =
-      '<div class="viewport" data-fig="FIG. 04  ·  SINGLE-REACTANT TABLE">' +
+      '<div class="viewport iso-open" data-fig="FIG. 04  ·  SINGLE-REACTANT TABLE">' +
       '<div class="viewport-body">' +
-      '<p>For a single reactant the rule is rate ratio = (concentration ratio)<sup>order</sup>. The numbers here are clean powers, so you can see the exponent without logarithms. That ratio-to-exponent move is the tool every later table will use.</p>' +
-      tableHTML(ds, { selected: [] }) +
-      '<p class="table-note">Rule: rate ratio = (concentration ratio)<sup>order</sup></p>' +
-      '<div class="guess-controls"><div class="guess-prompt-label">Order in A</div>' +
-      '<div class="choice-row" id="wuChoices">' +
-      [1, 2, 3].map(function (n) { return '<button type="button" class="choice" data-n="' + n + '">' + n + '</button>'; }).join('') +
-      '</div><p class="guess-feedback" id="wuFb"></p></div></div></div>';
+      isoTableBlock(ds, { selected: selected, highlight: highlight }) +
+      msg +
+      '</div></div>';
+
+    mountIsoVisual(els.body.querySelector('.iso-table-wrap'), ds, highlight, selected);
+
+    Array.prototype.forEach.call(els.body.querySelectorAll('tr.clickable'), function (tr) {
+      tr.addEventListener('click', function () {
+        var i = Number(tr.dataset.i);
+        var ix = selected.indexOf(i);
+        if (ix !== -1) selected.splice(ix, 1);
+        else {
+          if (selected.length === 2) selected.length = 0;
+          selected.push(i);
+        }
+        state.warmupSelected = selected;
+        renderWarmup();
+      });
+    });
+
     Array.prototype.forEach.call(document.querySelectorAll('#wuChoices .choice'), function (btn) {
       btn.addEventListener('click', function () {
         state.warmupOrder = Number(btn.dataset.n);
-        Array.prototype.forEach.call(document.querySelectorAll('#wuChoices .choice'), function (b) {
-          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
-        });
-        var fb = $('wuFb');
-        if (state.warmupOrder === 2) {
-          state.warmupRevealed = true;
-          fb.className = 'guess-feedback teach-fb is-match';
-          fb.innerHTML = 'Concentration doubled and the rate quadrupled. 2² = 4, so the order in A is 2. Experiments 2 and 3 are the same doubling again; 1 vs 3 is [A] ×4 and rate ×16, because 4² = 16. Same exponent either way.' +
-            '<span class="fb-note">That is the tool you will use on every table after this.</span>';
-        } else {
-          fb.className = 'guess-feedback teach-fb is-miss';
-          fb.innerHTML = 'The rate went ×4 when [A] went ×2, not ×' + state.warmupOrder + '.' +
-            '<span class="fb-note">Which power of 2 equals 4? That power is the order.</span>';
-        }
+        paintWarmupOrder();
       });
     });
+    if (state.warmupOrder != null && selected.length === 2) paintWarmupOrder();
+  }
+
+  function paintWarmupOrder() {
+    var n = state.warmupOrder;
+    if (n == null) return;
+    var ds = RateData.DATASETS.warmup2;
+    var selected = state.warmupSelected || [];
+    var cRatio = 2;
+    var rateRatio = 4;
+    if (selected.length === 2) {
+      var rows = pairOrder(selected);
+      var top = ds.trials[rows[0]];
+      var bot = ds.trials[rows[1]];
+      cRatio = bot.conc.A / top.conc.A;
+      rateRatio = bot.rate / top.rate;
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('#wuChoices .choice'), function (b) {
+      var on = Number(b.dataset.n) === n;
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.classList.remove('correct', 'wrong');
+      if (on) b.classList.add(n === 2 ? 'correct' : 'wrong');
+    });
+    var fb = $('wuFb');
+    if (!fb) return;
+    if (n === 2) {
+      state.warmupRevealed = true;
+      fb.className = 'guess-feedback teach-fb is-match';
+      fb.innerHTML = 'When [A] went ' + fmtTimes(cRatio) + ', the rate went ' + fmtTimes(rateRatio) +
+        '. (' + fmtTimes(cRatio) + ')<sup>2</sup> = ' + fmtTimes(rateRatio) + ', so the order in A is 2. Try another pair — 1 vs 2, 2 vs 3, or 1 vs 3 all give the same exponent.' +
+        '<span class="fb-note">That is the tool you will use on every table after this.</span>';
+    } else {
+      fb.className = 'guess-feedback teach-fb is-miss';
+      fb.innerHTML = 'The rate went ' + fmtTimes(rateRatio) + ' when [A] went ' + fmtTimes(cRatio) +
+        ', not ×' + n + '.' +
+        '<span class="fb-note">Which power of ' + fmtTimes(cRatio).replace(/^×/, '') +
+        ' equals ' + fmtTimes(rateRatio).replace(/^×/, '') + '? That power is the order.</span>';
+    }
   }
 
   /* ── Isolation ────────────────────────────────────── */
@@ -1146,7 +1270,7 @@
     var st = isolationState('gate');
     var n = RateData.totalOrder(ds);
     var units = ['s⁻¹', 'M⁻¹s⁻¹', 'M⁻²s⁻¹'];
-    els.kicker.textContent = 'Completion gate';
+    els.kicker.textContent = '';
     els.title.textContent = 'Prove it once';
     els.frame.className = 'framing';
     els.frame.innerHTML =
@@ -1254,7 +1378,7 @@
       summary: renderSummary,
       gate: renderGate
     })[id]();
-    els.kicker.parentElement.hidden = false;
+    els.kicker.parentElement.hidden = id === 'gate';
   }
 
   function init() {

@@ -85,13 +85,22 @@
 }
 .trait-list li{margin:0.28rem 0;line-height:1.45;}
 .order-meta{
+  display:flex;flex-wrap:wrap;align-items:center;gap:0.35rem 0.55rem;
   font-family:var(--font-mono);
   font-size:var(--label-sm);
   letter-spacing:0.02em;
-  padding:0.5rem 0.65rem;
+  padding:0.55rem 0.65rem;
   background:var(--paper-2);
   border-left:4px solid var(--data);
   margin-bottom:0.85rem !important;
+  font-variant-numeric:tabular-nums;font-feature-settings:"zero" 1;
+}
+.order-meta .iso-frac{font-size:0.92em;}
+.order-meta .mono-inline{
+  display:inline-flex;flex-wrap:wrap;align-items:center;gap:0.25rem;
+}
+.order-plot-pane .fig-cap .iso-frac{
+  display:inline-flex;vertical-align:middle;font-size:0.95em;
 }
 .order-plots{margin:0.15rem 0 0.35rem;}
 .order-plot-pane .fig-cap{
@@ -190,6 +199,6 @@
 </div>
 <script src="assets/suite-chrome.js?v=2"></script>
 <script src="assets/lock.js?v=1"></script>
-<script src="assets/path-b.js?v=50"></script>
+<script src="assets/path-b.js?v=56"></script>
 </body>
 </html>

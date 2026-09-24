@@ -463,6 +463,19 @@ svg.plot.plot-paper{
   line-height:1.45;
 }
 .hook-fb .fb-note,.teach-fb .fb-note{display:block;margin-top:0.35rem;font-weight:500;}
+.hook-reveal{
+  margin-top:1rem;padding-top:0.85rem;border-top:1px solid var(--ink);
+}
+.hook-reveal[hidden]{display:none!important;}
+.hook-reveal.is-revealed{animation:hook-reveal-in 0.45s ease-out;}
+@media (prefers-reduced-motion:reduce){
+  .hook-reveal.is-revealed{animation:none;}
+}
+@keyframes hook-reveal-in{
+  from{opacity:0;transform:translateY(0.35rem);}
+  to{opacity:1;transform:none;}
+}
+.hook-data{margin:0.55rem 0 0.7rem;max-width:28rem;}
 .choice-row{display:flex;flex-wrap:wrap;gap:0.45rem;}
 .choice{
   border:1px solid var(--ink);background:transparent;color:var(--ink);

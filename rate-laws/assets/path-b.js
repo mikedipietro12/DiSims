@@ -380,7 +380,8 @@
     els.frame.className = 'framing';
     els.frame.innerHTML =
       '<span class="frame-line">In Part A, each trial was a single initial rate. Here we watch one run as concentration falls with time.</span>' +
-      '<span class="frame-line">The rate at any moment is how steep [A] vs t is — Δ[A]/Δt, or the slope of a tangent. The shape of that curve is how we will infer the order.</span>';
+      '<span class="frame-line">The rate at any moment is how steep [A] vs t is — Δ[A]/Δt, or the slope of a tangent.</span>' +
+      '<strong class="frame-line">The shape of that curve is how we will infer the order.</strong>';
     var pts = series(1, 30);
     els.body.innerHTML =
       '<div class="viewport graph-paper" data-fig="FIG. A  ·  [A] VS t">' +
@@ -732,17 +733,17 @@
         transform: 'inv',
         fig: 'FIG. F  ·  SECOND-ORDER  ·  1/[A] VS t',
         rate: 'rate = k[A]<sup>2</sup>',
-        integrated: '1/[A]<sub>t</sub> = (+k)t + 1/[A]<sub>0</sub>',
-        axes: '1/[A] vs t',
+        integrated: stackedFrac('1', '[A]<sub>t</sub>') + ' = (+k)t + ' + stackedFrac('1', '[A]<sub>0</sub>'),
+        axes: stackedFrac('1', '[A]') + ' vs t',
         slope: 'm = +k',
         body:
           '<p>Second order (in one reactant) means the rate depends on [A]<sup>2</sup>. As concentration falls, the rate slows even more sharply than first order — raw [A] vs t bends hard.</p>' +
-          '<p>The transform that straightens it is <span class="mono-inline">1/[A] vs t</span>. That plot is a straight line with a <em>positive</em> slope: <span class="mono-inline">m = +k</span>. The reaction is still consuming A; the linearized y-axis just climbs as 1/[A] grows.</p>' +
+          '<p>The transform that straightens it is <span class="mono-inline">' + stackedFrac('1', '[A]') + ' vs t</span>. That plot is a straight line with a <em>positive</em> slope: <span class="mono-inline">m = +k</span>. The reaction is still consuming A; the linearized y-axis just climbs as ' + stackedFrac('1', '[A]') + ' grows.</p>' +
           '<p><strong>Key traits</strong></p>' +
           '<ul class="trait-list">' +
           '<li>Strong concentration dependence</li>' +
           '<li>Raw curve bends more than first order</li>' +
-          '<li><span class="mono-inline">1/[A] vs t</span> is linear</li>' +
+          '<li><span class="mono-inline">' + stackedFrac('1', '[A]') + ' vs t</span> is linear</li>' +
           '<li>Half-life gets longer as [A] drops</li>' +
           '</ul>' +
           '<p><strong>In real life:</strong> some dimerization reactions, and classic gas-phase examples such as the decomposition of nitrogen dioxide (2 NO<sub>2</sub> → 2 NO + O<sub>2</sub>), which is second order in NO<sub>2</sub>.</p>'
@@ -760,7 +761,9 @@
     if (cur.o === 0) {
       plots = svgPlot(pts, 'raw', plotOpts);
     } else {
-      var linCap = cur.transform === 'ln' ? 'ln[A] VS t' : '1/[A] VS t';
+      var linCap = cur.transform === 'ln'
+        ? 'ln[A] VS t'
+        : (stackedFrac('1', '[A]') + ' VS t');
       plots =
         '<div class="two-col order-plots">' +
         '<div class="order-plot-pane">' +
@@ -815,9 +818,9 @@
   }
 
   var SHEETS = [
-    { id: 'z', name: 'A_M', order: 0, title: 'Run Z — unknown order', law: 'rate = k', file: 'run-Z-zero-order.csv' },
-    { id: 'br', name: 'Br2_M', order: 1, title: 'Br₂ + HCOOH → products', law: 'rate = k[Br₂]', file: 'run-Br2-HCOOH-first-order.csv' },
-    { id: 's', name: 'A_M', order: 2, title: 'Run S — unknown order', law: 'rate = k[A]²', file: 'run-S-second-order.csv' }
+    { id: 'z', name: 'A_M', order: 0, title: 'Run Z — unknown order', law: 'rate = k', file: 'Run z.csv' },
+    { id: 'br', name: 'Br2_M', order: 1, title: 'Br₂ + HCOOH → products', law: 'rate = k[Br₂]', file: 'Br2 + HCOOH.csv' },
+    { id: 's', name: 'A_M', order: 2, title: 'Run S — unknown order', law: 'rate = k[A]²', file: 'Run S.csv' }
   ];
 
   function downloadCSV(text, filename) {
@@ -1172,11 +1175,10 @@
 
   function renderSummary() {
     els.kicker.textContent = 'Summary · 5.3.A';
-    els.title.textContent = 'k is a value now';
+    els.title.textContent = 'Final Section Review';
     els.frame.className = 'framing';
     els.frame.innerHTML =
-      '<span class="frame-line">Order comes from which graph straightens. k is now a value you can read from that slope — the same k whose units you found from overall order in Part A.</span>' +
-      '<span class="frame-line">First-order half-life is constant; radioactive decay is the usual picture of that fact.</span>';
+      '<span class="frame-line">Order comes from which graph straightens. k is now a value you can read from that slope — the same k whose units you found from overall order in Part A.</span>';
     els.body.innerHTML =
       '<div class="two-col">' +
       '<div class="viewport" data-fig="5.2.A  ·  INITIAL RATES"><div class="viewport-body">' +
@@ -1186,21 +1188,22 @@
       '<p>One trial over time. Transform [A] to ln[A] or 1/[A] until the plot is straight; that names the order. The slope of that line is ±k. First-order t<sub>½</sub> = 0.693/k.</p>' +
       '</div></div>' +
       '</div>' +
-      '<p class="callout ok">Only first-order half-life is tested. Radioactive decay is first-order — constant t<sub>½</sub>, same math as the curve you just timed. Zero- and second-order spacing were contrast, not exam items.</p>' +
-      '<button type="button" class="btn submit" id="finishB">What this was for →</button>';
-    $('finishB').addEventListener('click', function () {
-      SuiteChrome.revealDebrief(DEBRIEF, {
-        exclusive: true,
-        onRevisit: function (target) {
-          SuiteChrome.leaveDebriefStage();
-          var map = { lin: 3, slope: 4, halflife: 7, side: 1, decay: 7, '5.3.A.1': 1, '5.3.A.2': 3, '5.3.A.3': 3, '5.3.A.4': 4, '5.3.A.5': 7, '5.3.A.6': 7 };
-          if (target === 'decay' || target === '5.3.A.6') state.hl.order = 1;
-          state.step = map[target] != null ? map[target] : 0;
-          showStep();
-        }
-      });
-      els.footer.hidden = true;
+      '<p class="callout ok">Only first-order half-life is tested. Radioactive decay is first-order — constant t<sub>½</sub>, same math as the curve you just timed. Zero- and second-order spacing were contrast, not exam items.</p>';
+  }
+
+  function finishPartB() {
+    SuiteChrome.revealDebrief(DEBRIEF, {
+      exclusive: true,
+      onRevisit: function (target) {
+        SuiteChrome.leaveDebriefStage();
+        els.footer.hidden = false;
+        var map = { lin: 3, slope: 4, halflife: 7, side: 1, decay: 7, '5.3.A.1': 1, '5.3.A.2': 3, '5.3.A.3': 3, '5.3.A.4': 4, '5.3.A.5': 7, '5.3.A.6': 7 };
+        if (target === 'decay' || target === '5.3.A.6') state.hl.order = 1;
+        state.step = map[target] != null ? map[target] : 0;
+        showStep();
+      }
     });
+    els.footer.hidden = true;
   }
 
   function showStep() {
@@ -1209,7 +1212,8 @@
     els.helpText.textContent = HELP[id] || '';
     els.helpPanel.classList.remove('open');
     els.stuckBtn.hidden = !HELP[id];
-    els.nextBtn.hidden = id === 'summary';
+    els.nextBtn.hidden = false;
+    els.nextBtn.textContent = id === 'summary' ? 'What this was for →' : 'Next →';
     paintTiers();
     ({
       review: renderReview,
@@ -1254,6 +1258,10 @@
       showStep();
     });
     els.nextBtn.addEventListener('click', function () {
+      if (STEPS[state.step] === 'summary') {
+        finishPartB();
+        return;
+      }
       if (state.step < STEPS.length - 1) {
         state.step++;
         showStep();

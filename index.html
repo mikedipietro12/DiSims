@@ -3,71 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DiPietro Science Sims</title>
-  <meta name="description" content="DiPietro Science Sims: interactive browser-based science demos." />
-  <link rel="stylesheet" href="./assets/home.css?v=3" />
+  <title>Atomic Simulations</title>
+  <meta name="description" content="Atomic Simulations by M DiPietro — interactive browser-based science demos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./assets/home.css?v=4" />
 </head>
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <a class="brand" href="./index.html"><span class="live-dot"></span>DIPIETRO.SCI</a>
-      <span class="stat">COLLECTION <b>SCIENCE SIMS</b></span>
-      <span class="stat">RUNTIME <b>BROWSER</b></span>
-      <span class="spacer"></span>
-      <span class="stat">DEPLOY <b>STATIC HOSTING</b></span>
-    </div>
+  <div class="hub">
+    <header class="hub-header">
+      <div class="unit-tag"><span>Collection</span></div>
+      <h1>Atomic Simulations</h1>
+      <p class="subtitle">By: M DiPietro</p>
+    </header>
 
-    <div class="hero">
-      <h1>DiPietro Science Sims</h1>
-      <p>Choose a course, then open a simulation.</p>
-    </div>
-
-    <div class="grid">
-      <a class="card card-course" href="./ap-chemistry-12/">
-        <div class="panel-head">
-          <span class="title">COURSE</span>
-          <span class="meta">5 SIMS</span>
-        </div>
-        <div class="panel-body">
-          <div class="sim-name">AP Chemistry 12</div>
-          <div class="sim-desc">Rate laws, collision theory, Maxwell–Boltzmann, equilibrium, and titration.</div>
-          <div class="actions">
-            <span class="btn">Open</span>
-            <span class="tag cyan">grade 12</span>
+    <ol class="path">
+      <li>
+        <a href="./ap-chemistry-12/">
+          <div class="mod-head">
+            <span class="mod-num">Grade 12</span>
+            <span class="mod-go" aria-hidden="true">Open →</span>
           </div>
-        </div>
-      </a>
-
-      <a class="card card-course" href="./chemistry-11h/">
-        <div class="panel-head">
-          <span class="title">COURSE</span>
-          <span class="meta">1 SUITE</span>
-        </div>
-        <div class="panel-body">
-          <div class="sim-name">Chemistry 11H</div>
-          <div class="sim-desc">Atomic structure suite — build the atom from measured evidence.</div>
-          <div class="actions">
-            <span class="btn">Open</span>
-            <span class="tag magenta">grade 11</span>
+          <span class="mod-title">AP Chemistry 12</span>
+          <span class="mod-teaser">Rate laws, collision theory, Maxwell–Boltzmann, equilibrium, and titration.</span>
+        </a>
+      </li>
+      <li>
+        <a href="./chemistry-11h/">
+          <div class="mod-head">
+            <span class="mod-num">Grade 11</span>
+            <span class="mod-go" aria-hidden="true">Open →</span>
           </div>
-        </div>
-      </a>
-
-      <a class="card card-course" href="./other/">
-        <div class="panel-head">
-          <span class="title">COURSE</span>
-          <span class="meta">1 SIM</span>
-        </div>
-        <div class="panel-body">
-          <div class="sim-name">Other</div>
-          <div class="sim-desc">Earth science and extras that don’t sit in a chemistry course.</div>
-          <div class="actions">
-            <span class="btn">Open</span>
-            <span class="tag amber">misc</span>
+          <span class="mod-title">Chemistry 11H</span>
+          <span class="mod-teaser">Atomic structure suite — build the atom from measured evidence.</span>
+        </a>
+      </li>
+      <li>
+        <a href="./other/">
+          <div class="mod-head">
+            <span class="mod-num">Extras</span>
+            <span class="mod-go" aria-hidden="true">Open →</span>
           </div>
-        </div>
-      </a>
-    </div>
+          <span class="mod-title">Other</span>
+          <span class="mod-teaser">Earth science and extras that don’t sit in a chemistry course.</span>
+        </a>
+      </li>
+    </ol>
   </div>
 </body>
 </html>
