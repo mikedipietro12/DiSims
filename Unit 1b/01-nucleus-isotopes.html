@@ -63,7 +63,7 @@ body{
 }
 /* every mono micro-label shares one recipe */
 .mono-label,
-.back-link,.mod-meta,.dev-skip,.task-kicker,.hud,.tier-label,
+.back-link,.mod-meta,.task-kicker,.hud,.tier-label,
 .particle-btn .sym,.btn,.t2-field label,.t3-pct,.t3-result .label,
 .t3-eq-kicker,.summary-kicker,.debrief-kicker,.briefing-kicker,.sandbox-mode-toggle label,#stuckBtn,.ms-kicker,.ms-sample-btn,.ms-run-btn,.ms-readout .label,.ms-axis-label,.ms-peak-mass,.ms-source-cite,
 .pt-cell .z,.viewport::before{
@@ -86,14 +86,6 @@ body::before{
 .back-link{font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color 0.2s;}
 .back-link:hover{color:var(--olive-deep);}
 .mod-meta{font-size:var(--label-xs);font-weight:600;color:var(--ink);letter-spacing:var(--track-wide);text-transform:uppercase;}
-/* DEV-ONLY-SKIP — delete this rule before publish */
-.dev-skip{
-  font-size:0.68rem;font-weight:500;letter-spacing:var(--track-tight);text-transform:uppercase;
-  background:transparent;border:1px dashed var(--ember);
-  color:var(--ember);padding:0.25rem 0.55rem;border-radius:0;cursor:pointer;
-}
-.dev-skip:hover{background:rgba(168,90,50,0.1);}
-.dev-nav{display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;}
 
 .task-card{
   background:transparent;
@@ -851,10 +843,6 @@ body::before{
   <div class="top-nav">
     <a href="index.html" class="back-link">← Unit 1b</a>
     <div class="mod-meta">Module 01 · Nucleus &amp; Isotopes</div>
-    <!-- DEV-ONLY-SKIP — delete this nav before publish -->
-    <div class="dev-nav">
-      <button type="button" class="dev-skip" id="devNext">DEV next</button>
-    </div>
   </div>
 
   <!-- Briefing — read intentions & competencies before the sim -->
@@ -4136,93 +4124,6 @@ function loop(t) {
   draw(t);
   if (!prefersReduced) requestAnimationFrame(loop);
 }
-
-// DEV-ONLY-SKIP — delete this block before publish
-const DEV_STOP_COUNT = 15;
-
-function currentDevStop() {
-  if (STATE.completed || STATE.mode === 'sandbox') return 14;
-  if (STATE.tier === 1) return STATE.challengeIndex;
-  if (STATE.tier === 2) return 3 + STATE.challengeIndex;
-  if (STATE.tier === 3) {
-    if (STATE.t3Phase === 'tutorial') return 6 + STATE.tutorialStep;
-    return 12;
-  }
-  if (STATE.tier === 4) return 13;
-  return 0;
-}
-
-function applyDevStop(i) {
-  STATE.mode = 'challenge';
-  STATE.completed = false;
-  document.getElementById('summaryPage').style.display = 'none';
-  hideDebrief();
-  unmountSandboxPlay();
-  document.getElementById('viewport').style.display = '';
-  document.getElementById('sandboxArea').style.display = 'none';
-  const msPanel = document.getElementById('msPanel');
-  if (msPanel) msPanel.classList.remove('open');
-
-  if (i <= 2) {
-    STATE.tier = 1;
-    STATE.challengeIndex = i;
-    STATE.tierScores = [i, 0, 0];
-    resetTutorialState();
-    resetMassSpecState();
-    setChallenge();
-    return;
-  }
-  if (i <= 5) {
-    STATE.tier = 2;
-    STATE.challengeIndex = i - 3;
-    STATE.tierScores = [3, i - 3, 0];
-    resetTutorialState();
-    resetMassSpecState();
-    setChallenge();
-    return;
-  }
-  if (i <= 11) {
-    STATE.tier = 3;
-    STATE.challengeIndex = 0;
-    STATE.tierScores = [3, 3, 0];
-    resetTutorialState();
-    resetMassSpecState();
-    STATE.tutorialStep = i - 6;
-    setChallenge();
-    return;
-  }
-  if (i === 12) {
-    STATE.tier = 3;
-    STATE.challengeIndex = 0;
-    STATE.tierScores = [3, 3, 0];
-    resetTutorialState();
-    resetMassSpecState();
-    STATE.t3Phase = 'play';
-    setChallenge();
-    return;
-  }
-  if (i === 13) {
-    STATE.tier = 4;
-    STATE.challengeIndex = 0;
-    STATE.tierScores = [3, 3, 1];
-    resetTutorialState();
-    resetMassSpecState();
-    setChallenge();
-    return;
-  }
-  STATE.tier = 4;
-  STATE.tierScores = [3, 3, 1];
-  STATE.completed = true;
-  showCompletion();
-}
-
-function devNext() {
-  // Leave the briefing gate if still open, then advance stops.
-  const briefing = document.getElementById('briefing');
-  if (briefing && !briefing.hidden) startModule();
-  applyDevStop((currentDevStop() + 1) % DEV_STOP_COUNT);
-}
-document.getElementById('devNext').addEventListener('click', devNext);
 
 // ============================================================
 // INIT

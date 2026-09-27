@@ -61,7 +61,7 @@ body{
   text-rendering:optimizeLegibility;
 }
 .mono-label,
-.back-link,.mod-meta,.dev-skip,.task-kicker,.debrief-kicker,.briefing-kicker,.btn,.mod-tag,.eq,
+.back-link,.mod-meta,.task-kicker,.debrief-kicker,.briefing-kicker,.btn,.mod-tag,.eq,
 .ie-meter-label,.ie-meter-val,.ie-meter-tick-label,.ion-hint{
   font-family:var(--font-mono);
   font-variant-numeric:tabular-nums;
@@ -81,13 +81,6 @@ body::before{
 .top-nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.1rem;flex-wrap:wrap;border-bottom:1px solid var(--ink);padding-bottom:0.7rem;}
 .back-link{font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color 0.2s;}
 .back-link:hover{color:var(--olive-deep);}
-/* DEV-ONLY-SKIP — delete this rule before publish */
-.dev-skip{
-  font-size:0.68rem;font-weight:500;letter-spacing:var(--track-tight);text-transform:uppercase;
-  background:transparent;border:1px dashed var(--ember);
-  color:var(--ember);padding:0.25rem 0.55rem;border-radius:0;cursor:pointer;
-}
-.dev-skip:hover{background:rgba(168,90,50,0.1);}
 .mod-meta{font-size:var(--label-xs);font-weight:600;color:var(--ink);letter-spacing:var(--track-wide);text-transform:uppercase;}
 
 .task-kicker,.mod-tag{
@@ -903,7 +896,7 @@ h1,.task-title{
 <div class="module-wrap">
   <div class="top-nav">
     <a href="index.html" class="back-link">← Unit 1b</a>
-    <button type="button" class="dev-skip" id="devSkipPart2">DEV skip → Part 2</button>
+    <div class="mod-meta">Module 02 · Coulomb &amp; Ionization</div>
   </div>
 
   <!-- Briefing — read intentions & competencies before the sim -->
@@ -4012,15 +4005,6 @@ setGate('moduleComplete', false);
 renderBriefing();
 const briefingNext = document.getElementById('briefingNext');
 if (briefingNext) briefingNext.addEventListener('click', startModule);
-
-const devSkipPart2 = document.getElementById('devSkipPart2');
-if (devSkipPart2) {
-  devSkipPart2.addEventListener('click', () => {
-    CHALLENGE.phase = 'done';
-    startModule({ skipIntro: true });
-    goToPart2();
-  });
-}
 
 const _qs = new URLSearchParams(location.search);
 if (_qs.has('debrief') || _qs.has('start') || _qs.has('part2') || _qs.has('compare')) {
