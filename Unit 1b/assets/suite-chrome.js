@@ -8,6 +8,34 @@
   var prefersReduced = global.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var revisitHandler = null;
   var revisitWired = false;
+  var COMPLETE_KEY = 'unit1b_complete';
+
+  function readComplete() {
+    var map = {};
+    try { map = JSON.parse(global.localStorage.getItem(COMPLETE_KEY)) || {}; } catch (e) {}
+    try {
+      if (global.localStorage.getItem('mod01_complete') === 'true' && !map['01']) {
+        map['01'] = true;
+        global.localStorage.setItem(COMPLETE_KEY, JSON.stringify(map));
+      }
+    } catch (e) {}
+    return map;
+  }
+
+  function markComplete(moduleId) {
+    if (!moduleId) return;
+    var map = readComplete();
+    map[String(moduleId)] = true;
+    try { global.localStorage.setItem(COMPLETE_KEY, JSON.stringify(map)); } catch (e) {}
+    try {
+      global.dispatchEvent(new CustomEvent('unit1b-complete', { detail: { id: String(moduleId) } }));
+    } catch (e) {}
+  }
+
+  function isComplete(moduleId) {
+    if (!moduleId) return false;
+    return !!readComplete()[String(moduleId)];
+  }
 
   function fillIntentionList(ul, items, opts) {
     if (!ul || ul.childElementCount) return;
@@ -128,6 +156,7 @@
     renderDebrief(debrief);
     if (opts.onRevisit) revisitHandler = opts.onRevisit;
     wireRevisitClicks();
+    if (opts.moduleId) markComplete(opts.moduleId);
     if (opts.exclusive !== false) enterDebriefStage();
     else section.hidden = false;
     section.scrollIntoView({
@@ -160,6 +189,8 @@
     revealDebrief: revealDebrief,
     enterDebriefStage: enterDebriefStage,
     leaveDebriefStage: leaveDebriefStage,
-    wireStuckHelp: wireStuckHelp
+    wireStuckHelp: wireStuckHelp,
+    markComplete: markComplete,
+    isComplete: isComplete
   };
 })(typeof window !== 'undefined' ? window : this);

@@ -1352,6 +1352,7 @@ input[type="range"]:focus-visible{
   </div><!-- /#moduleStage -->
 </div>
 
+<script src="assets/suite-chrome.js"></script>
 <script>
 const canvas = document.getElementById('simCanvas');
 const ctx = canvas.getContext('2d');
@@ -3019,6 +3020,8 @@ function revealDebrief() {
   if(!section) return;
   renderDebrief();
   wireDebriefRevisit();
+  if (window.SuiteChrome && SuiteChrome.markComplete) SuiteChrome.markComplete('05');
+  else if (window.Unit1bSkip && Unit1bSkip.markComplete) Unit1bSkip.markComplete('05');
   enterDebriefStage();
   section.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
 }
@@ -3041,5 +3044,6 @@ if(_qs.has('debrief') || _qs.has('start')) {
   }
 }
 </script>
+<script src="demo/demo-skip.js"></script>
 </body>
 </html>

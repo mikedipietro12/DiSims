@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Taste directions - Intermolecular Forces (design review, not for students)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;600&family=Geist:wght@400;500;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:system-ui,sans-serif;background:#1b1d22;color:#e9ebef;}
+    .review-head{max-width:1100px;margin:0 auto;padding:1.6rem 1.4rem 1rem;}
+    .review-head h1{font-size:1.2rem;font-weight:700;margin-bottom:0.35rem;}
+    .review-head p{font-size:0.92rem;color:#a9afba;max-width:70ch;line-height:1.5;}
+    .jump{display:flex;gap:0.5rem;margin-top:0.8rem;flex-wrap:wrap;}
+    .jump a{color:#e9ebef;font-size:0.85rem;padding:0.3rem 0.7rem;border:1px solid #444a55;border-radius:6px;text-decoration:none;}
+    .dir{position:relative;padding:2.4rem 0 2.6rem;}
+    .dir .wrap{max-width:1100px;margin:0 auto;padding:0 1.4rem;}
+    .dir-tag{position:absolute;top:0.7rem;right:1rem;font:600 0.72rem system-ui;letter-spacing:0.08em;text-transform:uppercase;opacity:0.7;}
+    .lead{margin-bottom:1.1rem;}
+    .controls{display:flex;flex-wrap:wrap;gap:0.6rem;align-items:flex-end;margin-bottom:0.9rem;}
+    .field{display:flex;flex-direction:column;gap:0.3rem;}
+    .field label{font-size:0.75rem;}
+    .stage canvas{display:block;width:100%;height:min(52vh,430px);touch-action:none;cursor:grab;}
+    .under{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.8rem;margin-top:0.75rem;align-items:center;}
+    .swatches{display:flex;gap:0.35rem;align-items:center;}
+    .swatches i{display:inline-block;width:18px;height:18px;border-radius:50%;}
+    .notes{margin-top:0.9rem;font-size:0.85rem;line-height:1.5;max-width:80ch;}
+
+    /* ---------- 1 · Toy Box ---------- */
+    .toy{background:radial-gradient(1200px 500px at 50% -10%, #ffffff, #eef1f6 60%, #e6eaf1);color:#1d2433;font-family:'Space Grotesk',sans-serif;}
+    .toy .kicker{font:700 0.78rem 'Space Mono',monospace;letter-spacing:0.06em;color:#5b6474;}
+    .toy h2{font-size:clamp(2.2rem,5vw,3.4rem);font-weight:700;letter-spacing:-0.03em;line-height:1;margin:0.2rem 0 0.5rem;}
+    .toy .lede{font-size:1.05rem;color:#3d4658;max-width:56ch;}
+    .toy .field label{font:700 0.72rem 'Space Mono',monospace;color:#5b6474;}
+    .toy select{font:500 0.95rem 'Space Grotesk';padding:0.6rem 0.8rem;border-radius:12px;border:2px solid #1d2433;background:#fff;color:#1d2433;box-shadow:0 3px 0 #1d2433;}
+    .toy button{font:700 0.92rem 'Space Grotesk';padding:0.62rem 1rem;border-radius:12px;border:2px solid #1d2433;background:#fff;color:#1d2433;box-shadow:0 3px 0 #1d2433;cursor:pointer;transition:transform .08s, box-shadow .08s;}
+    .toy button:active{transform:translateY(3px);box-shadow:0 0 0 #1d2433;}
+    .toy button.primary{background:#ffd23f;}
+    .toy .stage{border-radius:22px;background:#fff;box-shadow:inset 0 2px 0 rgba(255,255,255,0.9),0 1px 0 rgba(29,36,51,0.08),0 18px 40px -18px rgba(29,36,51,0.35);border:2px solid #1d2433;overflow:hidden;}
+    .toy .gauge{font:700 0.85rem 'Space Mono',monospace;background:#1d2433;color:#ffd23f;border-radius:10px;padding:0.45rem 0.8rem;}
+    .toy .status{font:700 0.8rem 'Space Mono',monospace;color:#3d4658;}
+
+    /* ---------- 2 · Arcade ---------- */
+    .arcade{background:radial-gradient(900px 420px at 50% 120%, rgba(198,255,61,0.10), transparent 60%),radial-gradient(1000px 500px at 50% -20%, #22164a, #0b0820 60%);color:#efeaff;font-family:'Chakra Petch',sans-serif;}
+    .arcade .kicker{font:600 0.78rem 'JetBrains Mono',monospace;letter-spacing:0.18em;text-transform:uppercase;color:#c6ff3d;}
+    .arcade h2{font-size:clamp(2.4rem,5.4vw,3.8rem);font-weight:700;text-transform:uppercase;letter-spacing:0.02em;line-height:0.95;margin:0.25rem 0 0.5rem;}
+    .arcade .lede{font-size:1.05rem;color:#bfb6e6;max-width:56ch;font-weight:500;}
+    .arcade .field label{font:600 0.7rem 'JetBrains Mono',monospace;letter-spacing:0.14em;text-transform:uppercase;color:#9c90d6;}
+    .arcade select{font:600 0.95rem 'Chakra Petch';padding:0.6rem 0.9rem;background:#160f36;color:#efeaff;border:1px solid #5b47c9;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);}
+    .arcade button{font:700 0.9rem 'Chakra Petch';letter-spacing:0.08em;text-transform:uppercase;padding:0.65rem 1.1rem;background:#1d1446;color:#efeaff;border:none;cursor:pointer;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);}
+    .arcade button:hover{background:#2a1d66;}
+    .arcade button.primary{background:#c6ff3d;color:#0b0820;}
+    .arcade .stage{position:relative;clip-path:polygon(22px 0,100% 0,100% calc(100% - 22px),calc(100% - 22px) 100%,0 100%,0 22px);background:#0b0820;box-shadow:0 0 0 1px #5b47c9;}
+    .arcade .stage::after{content:'';position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(198,255,61,0.35), inset 0 0 60px rgba(91,71,201,0.35);}
+    .arcade .gauge{font:600 0.85rem 'JetBrains Mono',monospace;color:#c6ff3d;border:1px solid #c6ff3d;padding:0.4rem 0.8rem;letter-spacing:0.06em;}
+    .arcade .status{font:600 0.78rem 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;color:#bfb6e6;}
+
+    /* ---------- 3 · Keynote ---------- */
+    .keynote{background:#000;color:#f5f5f7;font-family:'Geist',sans-serif;}
+    .keynote .kicker{font:500 0.8rem 'Geist Mono',monospace;color:#86868b;}
+    .keynote h2{font-size:clamp(2.8rem,7vw,5.2rem);font-weight:800;letter-spacing:-0.045em;line-height:0.95;margin:0.3rem 0 0.6rem;background:linear-gradient(180deg,#ffffff 30%,#8a8f98);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .keynote .lede{font-size:1.2rem;color:#a1a1a6;max-width:46ch;font-weight:500;letter-spacing:-0.01em;}
+    .keynote .field label{font:500 0.72rem 'Geist Mono',monospace;color:#86868b;}
+    .keynote select{font:500 0.95rem 'Geist';padding:0.55rem 0.9rem;border-radius:999px;background:rgba(255,255,255,0.08);color:#f5f5f7;border:1px solid rgba(255,255,255,0.14);backdrop-filter:blur(12px);}
+    .keynote button{font:500 0.92rem 'Geist';padding:0.55rem 1.1rem;border-radius:999px;background:rgba(255,255,255,0.08);color:#f5f5f7;border:1px solid rgba(255,255,255,0.14);cursor:pointer;}
+    .keynote button:hover{background:rgba(255,255,255,0.14);}
+    .keynote button.primary{background:#f5f5f7;color:#000;border-color:#f5f5f7;}
+    .keynote .stage{border-radius:28px;overflow:hidden;background:#000;}
+    .keynote .gauge{font:500 0.85rem 'Geist Mono',monospace;color:#f5f5f7;}
+    .keynote .gauge b{color:#86868b;font-weight:400;margin-right:0.4rem;}
+    .keynote .status{font:500 0.82rem 'Geist Mono',monospace;color:#86868b;}
+
+    button:focus-visible,select:focus-visible{outline:3px solid #4b8bff;outline-offset:3px;}
+  </style>
+</head>
+<body>
+  <header class="review-head">
+    <h1>IMF taste directions: design review page (not student-facing)</h1>
+    <p>Three contrasting identities, each running the real Sandbox engine. Poke them; the auto demo stops when you interact. Same physics in all three; only the look changes. All three use model-kit (CPK) atom colours and the textbook electrostatic-map convention for partial charges: <strong>red = δ−, blue = δ+</strong>.</p>
+    <nav class="jump" aria-label="Directions">
+      <a href="#toy">1 · Toy Box</a>
+      <a href="#arcade">2 · Arcade</a>
+      <a href="#keynote">3 · Keynote</a>
+    </nav>
+  </header>
+
+  <section class="dir toy" id="toy" data-dir="toy" aria-label="Direction 1: Toy Box">
+    <span class="dir-tag">Direction 1 · Toy Box</span>
+    <div class="wrap">
+      <div class="lead">
+        <div class="kicker">ROOM 2 / SANDBOX</div>
+        <h2>Bring them close.</h2>
+        <p class="lede">Pick two molecules and see what their electron clouds do. No names here; just watch.</p>
+      </div>
+      <div class="controls"></div>
+      <div class="stage"><canvas aria-label="Sandbox stage, Toy Box style"></canvas></div>
+      <div class="under">
+        <span class="gauge">T 373.2 K · P 1.00 atm</span>
+        <span class="status" aria-live="polite"></span>
+        <span class="swatches" aria-hidden="true"><i style="background:#ffd23f"></i><i style="background:#1d2433"></i><i style="background:#e5484d"></i><i style="background:#3e63dd"></i><i style="background:#fff;border:1px solid #1d2433"></i></span>
+      </div>
+      <p class="notes"><strong>Feel:</strong> squishy toys on a bright tray. <strong>Why it might work:</strong> molecules look like a model kit students have held; contact shadows make "touching" obvious; keycap buttons invite poking. <strong>Risk:</strong> the light field washes out glow, so clouds must carry colour rather than light.</p>
+    </div>
+  </section>
+
+  <section class="dir arcade" id="arcade" data-dir="arcade" aria-label="Direction 2: Arcade">
+    <span class="dir-tag">Direction 2 · Arcade</span>
+    <div class="wrap">
+      <div class="lead">
+        <div class="kicker">Room 02 // Sandbox</div>
+        <h2>Bring them close</h2>
+        <p class="lede">Pick two molecules. Watch the clouds. No force names; you call it.</p>
+      </div>
+      <div class="controls"></div>
+      <div class="stage"><canvas aria-label="Sandbox stage, Arcade style"></canvas></div>
+      <div class="under">
+        <span class="gauge">TEMP 373.2 K // PRES 1.00 atm</span>
+        <span class="status" aria-live="polite"></span>
+        <span class="swatches" aria-hidden="true"><i style="background:#c6ff3d"></i><i style="background:#5b47c9"></i><i style="background:#ff3d6e"></i><i style="background:#3db8ff"></i><i style="background:#0b0820;border:1px solid #5b47c9"></i></span>
+      </div>
+      <p class="notes"><strong>Feel:</strong> a puzzle game: glossy collectible atoms, neon clouds, chamfered controls. <strong>Why it might work:</strong> highest energy; glow makes clouds and bridges pop; Heat gauges would look like a HUD. <strong>Risk:</strong> can tip into gimmick; needs restraint in copy-heavy Guide pages.</p>
+    </div>
+  </section>
+
+  <section class="dir keynote" id="keynote" data-dir="keynote" aria-label="Direction 3: Keynote">
+    <span class="dir-tag">Direction 3 · Keynote</span>
+    <div class="wrap">
+      <div class="lead">
+        <div class="kicker">Room 2 - Sandbox</div>
+        <h2>Bring them close.</h2>
+        <p class="lede">Two molecules. One stage. See what the electrons do.</p>
+      </div>
+      <div class="controls"></div>
+      <div class="stage"><canvas aria-label="Sandbox stage, Keynote style"></canvas></div>
+      <div class="under">
+        <span class="gauge"><b>Temperature</b>373.2 K &nbsp;&nbsp; <b>Pressure</b>1.00 atm</span>
+        <span class="status" aria-live="polite"></span>
+        <span class="swatches" aria-hidden="true"><i style="background:#f5f5f7"></i><i style="background:#86868b"></i><i style="background:#ff5a4e"></i><i style="background:#4b8bff"></i><i style="background:#000;border:1px solid #444"></i></span>
+      </div>
+      <p class="notes"><strong>Feel:</strong> an Apple product reveal: spotlight on black, huge tight type, chrome that almost vanishes. <strong>Why it might work:</strong> most "stage is the hero"; molecules look precious. <strong>Risk:</strong> the least playful of the three; long Guide copy on black needs care.</p>
+    </div>
+  </section>
+
+  <script src="assets/molecules.js?v=1"></script>
+  <script src="assets/pairs.js?v=2"></script>
+  <script src="assets/imf-engine.js?v=18"></script>
+  <script>
+(function () {
+  function dotGrid(ctx, w, h, base, dot, step) {
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = dot;
+    for (var x = step / 2; x < w; x += step) {
+      for (var y = step / 2; y < h; y += step) {
+        ctx.fillRect(x, y, 1.4, 1.4);
+      }
+    }
+  }
+
+  var THEMES = {
+    toy: {
+      paintBg: function (ctx, w, h) {
+        dotGrid(ctx, w, h, '#ffffff', 'rgba(29,36,51,0.10)', 22);
+        var g = ctx.createRadialGradient(w * 0.5, h * 0.35, 10, w * 0.5, h * 0.5, Math.max(w, h) * 0.7);
+        g.addColorStop(0, 'rgba(255,255,255,0.0)');
+        g.addColorStop(1, 'rgba(214,222,235,0.55)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+      },
+      text: '#1d2433',
+      halo: 'rgba(255,255,255,0.96)',
+      font: '"Space Grotesk", sans-serif',
+      formulaFont: '700 12px "Space Mono", monospace',
+      pos: '#3e63dd', posRgb: '62,99,221',
+      neg: '#e5484d', negRgb: '229,72,77',
+      neutralRgb: '150,160,200',
+      el: {
+        H: ['#ffffff', '#cdd4df'], C: ['#646d7e', '#2b313c'], O: ['#ff7468', '#c62f2a'],
+        N: ['#6b95ff', '#2747b8'], F: ['#a6ec78', '#4f9e2a'], Cl: ['#7ddb78', '#2f8f3a'],
+        Br: ['#cf6249', '#7a2416'], Ne: ['#8ae8f3', '#2b9fb3'], Na: ['#bd9aff', '#6a3fd1'],
+      },
+      rim: 'rgba(40,48,66,0.55)',
+      behindAlpha: 0.9,
+      gloss: 0.18,
+      cloudBlend: 'source-over',
+      cloudAlpha: 1.7,
+      lobeAlpha: 1.1,
+      shadow: { rgb: '29,36,51', alpha: 0.2, dy: 9 },
+      pullRgb: '29,36,51',
+      pullGlowRgb: '255,255,255',
+      pushRgb: '214,118,0',
+      ionText: '#ffffff',
+    },
+    arcade: {
+      paintBg: function (ctx, w, h) {
+        var g = ctx.createRadialGradient(w * 0.5, h * 0.5, 10, w * 0.5, h * 0.5, Math.max(w, h) * 0.7);
+        g.addColorStop(0, '#1a1140');
+        g.addColorStop(1, '#07051a');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = 'rgba(155,135,255,0.16)';
+        for (var x = 12; x < w; x += 24) for (var y = 12; y < h; y += 24) ctx.fillRect(x, y, 1.5, 1.5);
+        var hz = ctx.createLinearGradient(0, h * 0.75, 0, h);
+        hz.addColorStop(0, 'rgba(198,255,61,0)');
+        hz.addColorStop(1, 'rgba(198,255,61,0.10)');
+        ctx.fillStyle = hz;
+        ctx.fillRect(0, h * 0.75, w, h * 0.25);
+      },
+      text: '#efeaff',
+      halo: 'rgba(11,8,32,0.95)',
+      font: '"Chakra Petch", sans-serif',
+      formulaFont: '600 12px "JetBrains Mono", monospace',
+      pos: '#3db8ff', posRgb: '61,184,255',
+      neg: '#ff3d6e', negRgb: '255,61,110',
+      neutralRgb: '150,120,255',
+      el: {
+        H: ['#ffffff', '#b7c0d8'], C: ['#7a83a3', '#23263a'], O: ['#ff5577', '#b0123f'],
+        N: ['#4da3ff', '#1745c7'], F: ['#b6ff5c', '#4c9c10'], Cl: ['#9dff6a', '#2f9a1e'],
+        Br: ['#ff8a3d', '#a33a05'], Ne: ['#5cf2ff', '#0b8ea6'], Na: ['#c58bff', '#6a1fd6'],
+      },
+      rim: 'rgba(5,3,15,0.95)',
+      gloss: 0.75,
+      cloudBlend: 'lighter',
+      cloudAlpha: 1.25,
+      pullRgb: '255,255,255',
+      pullGlowRgb: '198,255,61',
+      pushRgb: '255,190,61',
+      ionText: '#ffffff',
+    },
+    keynote: {
+      paintBg: function (ctx, w, h) {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, w, h);
+        var spot = ctx.createRadialGradient(w * 0.5, -h * 0.15, 10, w * 0.5, h * 0.35, h * 1.05);
+        spot.addColorStop(0, 'rgba(255,255,255,0.20)');
+        spot.addColorStop(0.45, 'rgba(255,255,255,0.05)');
+        spot.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = spot;
+        ctx.fillRect(0, 0, w, h);
+        var floor = ctx.createRadialGradient(w * 0.5, h * 1.25, 10, w * 0.5, h * 1.25, h * 0.75);
+        floor.addColorStop(0, 'rgba(255,255,255,0.10)');
+        floor.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = floor;
+        ctx.fillRect(0, 0, w, h);
+      },
+      text: 'rgba(245,245,247,0.9)',
+      halo: 'rgba(0,0,0,0.92)',
+      font: '"Geist", sans-serif',
+      formulaFont: '500 12px "Geist Mono", monospace',
+      pos: '#4b8bff', posRgb: '75,139,255',
+      neg: '#ff5a4e', negRgb: '255,90,78',
+      neutralRgb: '160,170,210',
+      el: {
+        H: ['#ffffff', '#a9b0bd'], C: ['#858b97', '#1d2027'], O: ['#ff6a5c', '#a11f17'],
+        N: ['#6a9bff', '#1f3fa8'], F: ['#a6f07a', '#3f8a1c'], Cl: ['#8fe07a', '#2c7a2a'],
+        Br: ['#d0654a', '#6e2213'], Ne: ['#8ee8ff', '#1f86a3'], Na: ['#c09bff', '#5b2fc0'],
+      },
+      rim: 'rgba(0,0,0,0.98)',
+      gloss: 0.35,
+      cloudBlend: 'lighter',
+      cloudAlpha: 1.0,
+      pullRgb: '255,255,255',
+      pullGlowRgb: '255,255,255',
+      pushRgb: '255,184,77',
+      ionText: '#ffffff',
+    },
+  };
+
+  var STATUS_TEXT = {
+    apart: 'Far apart',
+    drifting: 'Close, barely interacting',
+    pulling: 'Pulling together',
+    pushing: 'Pushing apart',
+    touching: 'Touching, held together',
+  };
+
+  function el(tag, attrs, text) {
+    var n = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+    if (text) n.textContent = text;
+    return n;
+  }
+
+  window.__dirs = {};
+
+  document.querySelectorAll('.dir').forEach(function (sec) {
+    var key = sec.getAttribute('data-dir');
+    var controls = sec.querySelector('.controls');
+    var statusEl = sec.querySelector('.status');
+    var selA = el('select', { id: key + 'A' });
+    var selB = el('select', { id: key + 'B' });
+    ImfMolecules.LIST.forEach(function (m) {
+      selA.appendChild(el('option', { value: m.id }, m.formula + ' - ' + m.name));
+      selB.appendChild(el('option', { value: m.id }, m.formula + ' - ' + m.name));
+    });
+    selA.value = 'h2o';
+    selB.value = 'h2o';
+    [['Molecule A', selA], ['Molecule B', selB]].forEach(function (p) {
+      var f = el('div', { class: 'field' });
+      f.appendChild(el('label', { for: p[1].id }, p[0]));
+      f.appendChild(p[1]);
+      controls.appendChild(f);
+    });
+    var bTo = el('button', { type: 'button', class: 'primary' }, 'Bring together');
+    var bSep = el('button', { type: 'button' }, 'Separate');
+    var bTA = el('button', { type: 'button', 'aria-label': 'Turn molecule A' }, 'Turn A ↻');
+    var bTB = el('button', { type: 'button', 'aria-label': 'Turn molecule B' }, 'Turn B ↻');
+    [bTo, bSep, bTA, bTB].forEach(function (b) { controls.appendChild(b); });
+
+    var stage = ImfEngine.create({
+      canvas: sec.querySelector('canvas'),
+      theme: THEMES[key],
+      onStatus: function (s) { statusEl.textContent = STATUS_TEXT[s] || ''; },
+    });
+    stage.setPair('h2o', 'h2o');
+    stage.start();
+    window.__dirs[key] = stage;
+
+    var auto = true;
+    var phase = 0;
+    var timer = setInterval(function () {
+      if (!auto) return;
+      phase = (phase + 1) % 2;
+      if (phase === 1) stage.bringTogether();
+      else stage.separate();
+    }, 4200);
+    function manual() {
+      auto = false;
+      clearInterval(timer);
+    }
+    sec.querySelector('canvas').addEventListener('mousedown', manual);
+    sec.querySelector('canvas').addEventListener('touchstart', manual, { passive: true });
+
+    function apply() {
+      manual();
+      stage.setPair(selA.value, selB.value);
+    }
+    selA.addEventListener('change', apply);
+    selB.addEventListener('change', apply);
+    bTo.addEventListener('click', function () { manual(); stage.bringTogether(); });
+    bSep.addEventListener('click', function () { manual(); stage.separate(); });
+    bTA.addEventListener('click', function () { manual(); stage.rotate('a', Math.PI / 2); });
+    bTB.addEventListener('click', function () { manual(); stage.rotate('b', Math.PI / 2); });
+  });
+})();
+  </script>
+</body>
+</html>

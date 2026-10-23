@@ -303,6 +303,7 @@
     STATE.moduleComplete = true;
     SuiteChrome.revealDebrief(DEBRIEF, {
       exclusive: true,
+      moduleId: '10',
       onRevisit: function (target) {
         SuiteChrome.leaveDebriefStage();
         const n = Number(String(target).replace(/^act:/, '')) || 1;
@@ -338,7 +339,40 @@
       setAct(Math.min(2, Math.max(1, Number(qs.get('act')) || 1)));
     }
   }
+
+  window.Unit1bDemo = {
+    parts: [
+      { id: 'briefing', label: 'Briefing' },
+      { id: 'act1', label: 'Instruments' },
+      { id: 'act2', label: 'What survived' },
+      { id: 'debrief', label: 'Debrief' }
+    ],
+    current: function () {
+      var briefing = document.getElementById('briefing');
+      var debrief = document.getElementById('debrief');
+      if (briefing && !briefing.hidden) return 'briefing';
+      if (debrief && !debrief.hidden) return 'debrief';
+      return 'act' + STATE.act;
+    },
+    go: function (id) {
+      var briefing = document.getElementById('briefing');
+      var stage = document.getElementById('moduleStage');
+      if (id === 'briefing') {
+        SuiteChrome.leaveDebriefStage();
+        if (stage) stage.hidden = true;
+        if (briefing) briefing.hidden = false;
+        window.scrollTo(0, 0);
+        return;
+      }
+      if (briefing && !briefing.hidden) startModule();
+      else SuiteChrome.leaveDebriefStage();
+      if (id === 'debrief') { showDebriefStage(); window.scrollTo(0, 0); return; }
+      setAct(id === 'act2' ? 2 : 1);
+      window.scrollTo(0, 0);
+    }
+  };
 })();
 </script>
+<script src="demo/demo-skip.js"></script>
 </body>
 </html>

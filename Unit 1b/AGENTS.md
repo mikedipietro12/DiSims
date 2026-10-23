@@ -1265,6 +1265,12 @@ do not clone the whole file. For tokens and chrome on new work, use `assets/`.
   siblings when linked).
 - Progress/visited state (hub only) may use `localStorage`; never required for a
   module to function, and never a score.
+- After a student finishes a module, `localStorage` key `unit1b_complete` may
+  remember that in this browser so stages are jumpable. That is navigation, not
+  a score. Hub still shows visited/not-visited only. First-time load must not
+  show the skip bar or the debrief. Teacher presenter skip remains `?demo=1`
+  (kicker **Demo skip**); the student bar (kicker **Stages**) is the same
+  inverted-plate strip and only appears after completion (`demo/demo-skip.js`).
 
 ---
 
@@ -1389,6 +1395,10 @@ second.
   student can reach it, read it, and go back to poking (Explore again).
 - **Reachable again.** Once revealed it stays available for the rest of the
   session, so a student can get back to it. It does not persist as a score.
+  Completion itself may persist in `unit1b_complete` so a later open in this
+  browser shows the **Stages** skip bar (same look as the teacher demo bar).
+  First-time load still must not show the debrief or the bar. Teacher `?demo=1`
+  remains presenter-only.
 - **Printable.** Plain semantic markup, no canvas, sensible print colours — the
   student should be able to screenshot or print it straight onto their
   worksheet.

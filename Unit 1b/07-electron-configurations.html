@@ -3409,6 +3409,7 @@
   function showDebriefStage() {
     SuiteChrome.revealDebrief(DEBRIEF, {
       exclusive: true,
+      moduleId: '07',
       onRevisit: function (target) {
         SuiteChrome.leaveDebriefStage();
         const t = String(target);
@@ -3613,7 +3614,63 @@
       applyBeat(b, { skipSplit: true });
     }
   }
+
+  window.Unit1bDemo = {
+    parts: [
+      { id: 'briefing', label: 'Briefing' },
+      { id: 'act1', label: 'Ne spectrum' },
+      { id: 'act2', label: 'Unknowns' },
+      { id: 'act3', label: 'Shells' },
+      { id: 'act4', label: 'Fill' },
+      { id: 'act5', label: 'Blocks' },
+      { id: 'act6', label: 'Short-hand' },
+      { id: 'debrief', label: 'Debrief' }
+    ],
+    current: function () {
+      var briefing = document.getElementById('briefing');
+      var debrief = document.getElementById('debrief');
+      if (briefing && !briefing.hidden) return 'briefing';
+      if (debrief && !debrief.hidden) return 'debrief';
+      return 'act' + STATE.act;
+    },
+    go: function (id) {
+      var briefing = document.getElementById('briefing');
+      var stage = document.getElementById('moduleStage');
+      if (id === 'briefing') {
+        SuiteChrome.leaveDebriefStage();
+        if (stage) stage.hidden = true;
+        if (briefing) briefing.hidden = false;
+        window.scrollTo(0, 0);
+        return;
+      }
+      if (briefing && !briefing.hidden) startModule();
+      else SuiteChrome.leaveDebriefStage();
+      if (id === 'debrief') { showDebriefStage(); window.scrollTo(0, 0); return; }
+      if (id === 'act1') {
+        STATE.beat = 0;
+        setAct(1);
+        applyBeat(0, { skipSplit: true });
+      } else if (id === 'act2') {
+        STATE.guessIndex = 0;
+        STATE.guessRevealed = false;
+        setAct(2);
+      } else if (id === 'act3') {
+        applyShellsIE();
+      } else if (id === 'act4') {
+        STATE.fillBeat = 0;
+        STATE.fillFree = true;
+        applyFillBeat(0);
+      } else if (id === 'act5') {
+        STATE.blocksBeat = 0;
+        applyBlocksBeat(0);
+      } else if (id === 'act6') {
+        applyShorthand(0);
+      }
+      window.scrollTo(0, 0);
+    }
+  };
 })();
 </script>
+<script src="demo/demo-skip.js"></script>
 </body>
 </html>

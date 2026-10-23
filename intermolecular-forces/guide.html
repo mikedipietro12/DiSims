@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide · Intermolecular Forces</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/suite.css?v=7">
+</head>
+<body>
+  <div class="module-wrap guide-wrap">
+    <div class="top-nav">
+      <a href="index.html" class="back-link">← IMF hub</a>
+      <div class="mod-meta">Room 1 · Guide</div>
+    </div>
+
+    <nav class="room-switch" aria-label="IMF rooms">
+      <a href="index.html" data-room="hub">Hub</a>
+      <a href="guide.html" data-room="guide">Guide</a>
+      <a href="sandbox.html" data-room="sandbox">Sandbox</a>
+      <a href="heat.html" data-room="heat">Heat</a>
+    </nav>
+
+    <header class="guide-hero">
+      <div class="stub-kicker">Room 1 · Names on</div>
+      <h1>Guide</h1>
+      <p>You already know bonds <em>inside</em> a molecule. Intermolecular forces are attractions <em>between</em> molecules. They are weaker than chemical bonds, but they decide who sticks, melts, and boils.</p>
+      <p class="guide-hero-note">Scroll to build the picture layer by layer. Red means δ+ / positive · yellow means δ− / negative.</p>
+    </header>
+
+    <nav class="guide-toc" aria-label="Guide beats">
+      <a href="#beat-molecule">Molecule</a>
+      <a href="#beat-bond">Bond</a>
+      <a href="#beat-cloud">Cloud</a>
+      <a href="#beat-en">EN</a>
+      <a href="#beat-polarity">Polarity</a>
+      <a href="#beat-between">Between</a>
+      <a href="#beat-ldf">London</a>
+      <a href="#beat-dipole-induced">Dipole-induced</a>
+      <a href="#beat-ion-induced">Ion-induced</a>
+      <a href="#beat-dipole">Dipole-dipole</a>
+      <a href="#beat-ion-dipole">Ion-dipole</a>
+      <a href="#beat-hbond">H-bond</a>
+      <a href="#beat-next">Next</a>
+    </nav>
+
+    <div class="guide-layout">
+      <div class="guide-rail">
+        <article class="guide-beat" id="beat-molecule" data-solo="hcl" data-zoom="1" data-clouds="false" data-bonds="false" data-shared="false" data-en="false" data-deltas="false" data-lobes="false" data-labels="false" data-controls="false">
+          <p class="beat-kicker">Intro · 1 of 5</p>
+          <h2>One molecule</h2>
+          <p>Start with a single hydrogen chloride molecule. The white ball is hydrogen; the green ball is chlorine. These are the atoms: the nuclei and their tightly held core electrons, drawn as a model-kit toy.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-bond" data-solo="hcl" data-zoom="1.25" data-clouds="false" data-bonds="true" data-shared="true" data-en="false" data-deltas="false" data-lobes="false" data-labels="false" data-controls="false">
+          <p class="beat-kicker">Intro · 2 of 5</p>
+          <h2>The bond inside</h2>
+          <p>Atoms in a molecule share electrons in a <em>covalent bond</em>. That bond is an <strong>intramolecular</strong> force: it holds the molecule together from the inside. It is much stronger than anything you will see between molecules later.</p>
+          <ul class="beat-drivers">
+            <li><strong>Watch:</strong> we zoom into the bond. The two dots are a shared electron pair.</li>
+            <li><strong>Key word:</strong> <em>intra</em> = inside the molecule.</li>
+          </ul>
+        </article>
+
+        <article class="guide-beat" id="beat-cloud" data-solo="hcl" data-zoom="1" data-clouds="true" data-cloud-mode="neutral" data-cloud-pad="24" data-bonds="false" data-shared="false" data-en="false" data-deltas="false" data-lobes="false" data-labels="false" data-controls="false">
+          <p class="beat-kicker">Intro · 3 of 5</p>
+          <h2>Electron clouds</h2>
+          <p>Valence electrons are not stuck on one atom. They form a soft cloud around the nuclei. On this tray the cloud is the fuzzy halo. For now it is even and neutral; we have not yet said who pulls harder.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-en" data-solo="hcl" data-zoom="1" data-clouds="true" data-cloud-mode="polar" data-cloud-pad="24" data-bonds="false" data-shared="false" data-en="true" data-deltas="false" data-lobes="false" data-labels="false" data-controls="false">
+          <p class="beat-kicker">Intro · 4 of 5</p>
+          <h2>Electronegativity</h2>
+          <p>Electronegativity (EN) is how strongly an atom pulls bonding electrons toward itself. Chlorine’s EN is higher than hydrogen’s, so the shared cloud is tugged toward Cl. That uneven pull shows up as colour: yellow near Cl, red near H.</p>
+          <ul class="beat-drivers">
+            <li><strong>Watch:</strong> the cloud shifts colour, EN labels on each atom, and the arrow toward the stronger pull.</li>
+            <li><strong>Numbers:</strong> H ≈ 2.1 · Cl ≈ 3.0 (Pauling scale).</li>
+          </ul>
+        </article>
+
+        <article class="guide-beat" id="beat-polarity" data-solo="hcl" data-zoom="1" data-clouds="true" data-cloud-mode="polar" data-cloud-pad="24" data-bonds="false" data-shared="false" data-en="false" data-deltas="true" data-lobes="false" data-labels="false" data-controls="false">
+          <p class="beat-kicker">Intro · 5 of 5</p>
+          <h2>Polarity</h2>
+          <p>Uneven sharing leaves a permanent imbalance: the H end is slightly electron-poor (δ+), the Cl end slightly electron-rich (δ−). That is a <em>permanent dipole</em>: the molecule is polar.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-between" data-a="hcl" data-b="hcl" data-auto="false" data-labels="false" data-deltas="true" data-clouds="true" data-cloud-mode="polar" data-bonds="false" data-en="false" data-lobes="true" data-controls="true">
+          <p class="beat-kicker">Bridge</p>
+          <h2>Between molecules</h2>
+          <p>Bonds and polarity live <em>inside</em> each molecule. Intermolecular forces act when two particles get close: attractions (and sometimes pushes) <em>between</em> them. Weaker than covalent bonds, but they decide who sticks, melts, and boils.</p>
+          <p>Bring the two HCl molecules together when you are ready. Temporary polarity from London dispersion will <em>pulse</em> later. Permanent polarity stays fixed like this.</p>
+          <ul class="beat-drivers">
+            <li><strong>Try:</strong> Bring together, then Turn A / Turn B to feel orientation.</li>
+            <li><strong>Remember:</strong> bonds hold atoms inside; IMFs act between molecules.</li>
+          </ul>
+        </article>
+
+        <article class="guide-beat" id="beat-ldf" data-a="ch4" data-b="ch4" data-auto="true" data-labels="true" data-deltas="true" data-alt-a="br2" data-alt-b="br2" data-alt-label="Try Br₂ · Br₂ (stronger LDF)">
+          <p class="beat-kicker">Force 1 · London dispersion</p>
+          <h2>London dispersion</h2>
+          <p>Electrons are always moving. For a moment, one side of a molecule can be slightly richer in electrons than the other: a temporary dipole. That flicker can nudge a neighbour into a matching temporary dipole, and the two pull gently together.</p>
+          <p>Every molecule has London dispersion. It gets stronger when the electron cloud is bigger or more polarizable, and when molecules have more contact area.</p>
+          <ul class="beat-drivers">
+            <li><strong>Stronger when:</strong> larger / more polarizable clouds, more surface contact (e.g. Br₂ or octane vs CH₄).</li>
+            <li><strong>Weaker when:</strong> tiny clouds and little contact (Ne, CH₄).</li>
+            <li><strong>Watch for:</strong> pulsing temporary δ±, not fixed polarity colour.</li>
+          </ul>
+          <p class="beat-aside">For molecules of <em>similar size</em>, permanent dipole-dipole is usually stronger than LDF. Big nonpolar molecules can still stick hard via LDF alone.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-dipole-induced" data-a="hcl" data-b="ne" data-auto="true" data-labels="true" data-deltas="true">
+          <p class="beat-kicker">Force 2 · Dipole-induced dipole</p>
+          <h2>Dipole-induced dipole</h2>
+          <p>A polar molecule already has a permanent δ+ / δ−. Bring it near a nonpolar neighbour and that fixed dipole can <em>induce</em> a temporary dipole in the neighbour’s cloud. It is always attractive, usually soft.</p>
+          <p>You still see some LDF-style pulse on the nonpolar partner; the polar molecule’s permanent charges stay fixed.</p>
+          <ul class="beat-drivers">
+            <li><strong>Needs:</strong> one polar + one nonpolar (or weakly polarizable) partner.</li>
+            <li><strong>Stronger when:</strong> larger permanent dipole, more polarizable nonpolar partner.</li>
+          </ul>
+        </article>
+
+        <article class="guide-beat" id="beat-ion-induced" data-a="na" data-b="ch4" data-auto="true" data-labels="true" data-deltas="true">
+          <p class="beat-kicker">Force 3 · Ion-induced dipole</p>
+          <h2>Ion-induced dipole</h2>
+          <p>An ion’s full charge is much stronger than a partial δ. Near a nonpolar molecule it pulls electron density toward itself, inducing a temporary dipole. The cloud leans, and the pair attracts.</p>
+          <p>Same “distort the neighbour” idea as dipole-induced, but the ion is the more forceful inducer. Na⁺ still shows a real “+”, not a δ.</p>
+          <ul class="beat-drivers">
+            <li><strong>Needs:</strong> ion + nonpolar molecule.</li>
+            <li><strong>Stronger when:</strong> higher ion charge density, more polarizable nonpolar cloud.</li>
+          </ul>
+        </article>
+
+        <article class="guide-beat" id="beat-dipole" data-a="hcl" data-b="hcl" data-auto="true" data-labels="true" data-deltas="true">
+          <p class="beat-kicker">Force 4 · Dipole-dipole</p>
+          <h2>Dipole-dipole</h2>
+          <p>Two polar molecules can line up so δ+ faces δ−. Opposite partial charges pull; like charges push. Orientation matters. Turn a molecule and the pull can weaken or flip to a push.</p>
+          <p>Use <strong>Turn A</strong> / <strong>Turn B</strong> after they meet to feel how alignment changes the interaction.</p>
+          <ul class="beat-drivers">
+            <li><strong>Needs:</strong> two polar molecules (no H-bond donors/acceptors required).</li>
+            <li><strong>Stronger when:</strong> larger permanent dipoles, favourable orientation.</li>
+            <li><strong>Caveat:</strong> compared at similar molecular size, big LDF can still compete.</li>
+          </ul>
+        </article>
+
+        <article class="guide-beat" id="beat-ion-dipole" data-a="na" data-b="h2o" data-auto="true" data-labels="true" data-deltas="true">
+          <p class="beat-kicker">Force 5 · Ion-dipole</p>
+          <h2>Ion-dipole</h2>
+          <p>An ion next to a polar molecule is usually a strong attraction. Water’s δ− oxygen end orients toward Na⁺; the molecule turns to present the favourable face.</p>
+          <p>This is typically stronger than ordinary dipole-dipole: full charge meets a permanent dipole.</p>
+          <ul class="beat-drivers">
+            <li><strong>Needs:</strong> ion + polar molecule.</li>
+            <li><strong>Stronger when:</strong> higher ion charge, larger molecular dipole, closer approach.</li>
+          </ul>
+        </article>
+
+        <article class="guide-beat" id="beat-hbond" data-a="h2o" data-b="h2o" data-auto="true" data-labels="true" data-deltas="true">
+          <p class="beat-kicker">Force 6 · Hydrogen bonding</p>
+          <h2>Hydrogen bonding</h2>
+          <p>A special, strong case of attraction: a hydrogen bonded to N, O, or F (the donor) docks onto the lone-pair electrons of N, O, or F on a neighbour (the acceptor). The H is attracted to those valence electrons, drawn here as yellow lobes with electron-pair dots.</p>
+          <p>Favourable geometry is roughly linear: donor-H···acceptor. Small molecules like water usually settle into one primary H-bond at a time on this tray.</p>
+          <ul class="beat-drivers">
+            <li><strong>Needs:</strong> H bonded to N/O/F, plus an N/O/F acceptor with a lone pair.</li>
+            <li><strong>Stronger when:</strong> more H-bond sites (e.g. glucose), good alignment, highly electronegative acceptor.</li>
+            <li><strong>Watch for:</strong> yellow lone-pair lobes. That is where the δ+ H docks.</li>
+          </ul>
+        </article>
+
+        <article class="guide-beat guide-beat-end" id="beat-next" data-a="h2o" data-b="h2o" data-auto="false" data-labels="true" data-deltas="true">
+          <p class="beat-kicker">Before you leave</p>
+          <h2>Names in your pocket</h2>
+          <p>Typical strength order for similar-sized cases:</p>
+          <p class="strength-order">ion-dipole → hydrogen bonding → ion-induced → dipole-dipole → dipole-induced → London dispersion</p>
+          <p>Next, open the <a href="sandbox.html">Sandbox</a> and try pairs without force labels. Notice what happens. Class discussion will unpack it. Then <a href="heat.html">Heat</a> a sample and watch melting, boiling, and vapor pressure respond to how strongly molecules hold each other.</p>
+        </article>
+      </div>
+
+      <aside class="guide-stage-panel" aria-label="Interactive demo">
+        <div class="guide-stage-head">
+          <p class="force-badge" id="forceBadge" aria-live="polite">Between molecules</p>
+          <p class="pair-formulas" id="pairFormulas">HCl · HCl</p>
+        </div>
+        <div class="stage-wrap guide-stage-wrap">
+          <canvas id="guideStage" width="640" height="360" role="img" aria-label="Demo stage for the current Guide beat. Drag molecules or use the buttons."></canvas>
+        </div>
+        <div id="guideControls">
+          <div class="btn-row guide-stage-controls">
+            <button type="button" class="btn primary" id="btnTogether">Bring together</button>
+            <button type="button" class="btn" id="btnSeparate">Separate</button>
+            <button type="button" class="btn" id="btnTurnA" aria-label="Turn molecule A a quarter turn">Turn A ↻</button>
+            <button type="button" class="btn" id="btnTurnB" aria-label="Turn molecule B a quarter turn">Turn B ↻</button>
+          </div>
+          <div class="btn-row" id="altPairRow" hidden>
+            <button type="button" class="btn" id="btnAltPair">Compare pair</button>
+          </div>
+          <p class="hud-quiet"><span id="guideStatus" aria-live="polite"></span></p>
+        </div>
+      </aside>
+    </div>
+
+    <p class="colophon">Suggested next · <a href="sandbox.html">Sandbox</a></p>
+  </div>
+
+  <script src="assets/molecules.js?v=1"></script>
+  <script src="assets/pairs.js?v=4"></script>
+  <script src="assets/imf-engine.js?v=52"></script>
+  <script src="assets/suite-chrome.js?v=1"></script>
+  <script>
+(function () {
+  var STATUS_TEXT = {
+    apart: 'Far apart',
+    drifting: 'Close, barely interacting',
+    pulling: 'Pulling together',
+    pushing: 'Pushing apart',
+    touching: 'Touching, held together',
+  };
+
+  var beats = Array.prototype.slice.call(document.querySelectorAll('.guide-beat'));
+  var badge = document.getElementById('forceBadge');
+  var formulas = document.getElementById('pairFormulas');
+  var statusEl = document.getElementById('guideStatus');
+  var altRow = document.getElementById('altPairRow');
+  var btnAlt = document.getElementById('btnAltPair');
+  var controls = document.getElementById('guideControls');
+  var canvas = document.getElementById('guideStage');
+  var panel = document.querySelector('.guide-stage-panel');
+
+  var stage = ImfEngine.create({
+    canvas: canvas,
+    showForceLabels: false,
+    showDeltas: true,
+    showClouds: true,
+    showBonds: false,
+    showEN: false,
+    onStatus: function (s) {
+      statusEl.textContent = STATUS_TEXT[s] || '';
+    },
+  });
+  stage.start();
+
+  var activeId = null;
+  var usingAlt = false;
+  var activeBeat = null;
+
+  function formulaOf(id) {
+    var m = ImfMolecules.get(id);
+    return m ? m.formula : id;
+  }
+
+  function formulaPair(a, b) {
+    return formulaOf(a) + '  ·  ' + formulaOf(b);
+  }
+
+  function beatTitle(el) {
+    var h = el.querySelector('h2');
+    return h ? h.textContent : 'Guide';
+  }
+
+  function flag(el, name, fallbackTrue) {
+    var v = el.dataset[name];
+    if (v === undefined) return fallbackTrue;
+    return v !== 'false';
+  }
+
+  function applyBeat(el, opts) {
+    if (!el) return;
+    opts = opts || {};
+    activeBeat = el;
+    activeId = el.id;
+    usingAlt = !!opts.alt;
+
+    var showLabels = flag(el, 'labels', true);
+    var showDeltas = flag(el, 'deltas', true);
+    var showClouds = flag(el, 'clouds', true);
+    var showBonds = flag(el, 'bonds', false);
+    var showEN = flag(el, 'en', false);
+    var showLobes = flag(el, 'lobes', true);
+    var showShared = flag(el, 'shared', false);
+    var showControls = flag(el, 'controls', true);
+    var cloudMode = el.dataset.cloudMode || 'polar';
+    var zoom = el.dataset.zoom != null ? +el.dataset.zoom : el.dataset.solo ? 1.2 : 1;
+    var cloudPad = el.dataset.cloudPad != null ? +el.dataset.cloudPad : 16;
+    var auto = el.dataset.auto === 'true' && !opts.skipAuto;
+
+    if (controls) controls.hidden = !showControls;
+    if (panel) panel.classList.toggle('is-intro', !showControls);
+    // Let intro canvas height apply before measuring scale.
+    if (stage.resize) stage.resize();
+
+    stage.setView({
+      showForceLabels: showLabels,
+      showDeltas: showDeltas,
+      showClouds: showClouds,
+      showBonds: showBonds,
+      showEN: showEN,
+      showLobes: showLobes,
+      showSharedElectrons: showShared,
+      cloudMode: cloudMode,
+      zoom: zoom,
+      cloudPad: cloudPad,
+    });
+
+    if (el.dataset.solo) {
+      stage.setSolo(el.dataset.solo);
+      formulas.textContent = formulaOf(el.dataset.solo);
+      badge.textContent = beatTitle(el);
+      statusEl.textContent = '';
+    } else {
+      var a = usingAlt && el.dataset.altA ? el.dataset.altA : el.dataset.a;
+      var b = usingAlt && el.dataset.altB ? el.dataset.altB : el.dataset.b;
+      stage.setPair(a, b);
+      formulas.textContent = formulaPair(a, b);
+
+      var outcome = stage.getOutcome();
+      if (showLabels && outcome && outcome.label) {
+        badge.textContent = outcome.label;
+      } else {
+        badge.textContent = beatTitle(el);
+      }
+
+      if (auto) {
+        stage.bringTogether();
+      } else {
+        stage.separate();
+      }
+    }
+
+    beats.forEach(function (bEl) {
+      bEl.classList.toggle('is-active', bEl === el);
+    });
+
+    if (el.dataset.altA && el.dataset.altB && showControls) {
+      altRow.hidden = false;
+      btnAlt.textContent = usingAlt
+        ? 'Back to CH₄ · CH₄'
+        : (el.dataset.altLabel || 'Compare pair');
+    } else {
+      altRow.hidden = true;
+    }
+  }
+
+  var pinUntil = 0;
+
+  function pickBeatFromScroll() {
+    if (Date.now() < pinUntil) return;
+    var mid = window.innerHeight * 0.38;
+    var best = null;
+    var bestDist = Infinity;
+    beats.forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.bottom < 80 || r.top > window.innerHeight - 80) return;
+      var cy = (r.top + r.bottom) / 2;
+      var dist = Math.abs(cy - mid);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = el;
+      }
+    });
+    if (best && best.id !== activeId) applyBeat(best);
+  }
+
+  var scrollTick = 0;
+  window.addEventListener(
+    'scroll',
+    function () {
+      if (scrollTick) return;
+      scrollTick = requestAnimationFrame(function () {
+        scrollTick = 0;
+        pickBeatFromScroll();
+      });
+    },
+    { passive: true }
+  );
+
+  function goToBeat(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    pinUntil = Date.now() + 700;
+    applyBeat(el);
+  }
+
+  document.querySelectorAll('.guide-toc a[href^="#"]').forEach(function (link) {
+    link.addEventListener('click', function () {
+      var id = (link.getAttribute('href') || '').slice(1);
+      goToBeat(id);
+    });
+  });
+
+  window.addEventListener('hashchange', function () {
+    var id = (location.hash || '').slice(1);
+    if (id) goToBeat(id);
+  });
+
+  document.getElementById('btnTogether').addEventListener('click', function () {
+    stage.bringTogether();
+  });
+  document.getElementById('btnSeparate').addEventListener('click', function () {
+    stage.separate();
+  });
+  document.getElementById('btnTurnA').addEventListener('click', function () {
+    stage.rotate('a', Math.PI / 2);
+  });
+  document.getElementById('btnTurnB').addEventListener('click', function () {
+    stage.rotate('b', Math.PI / 2);
+  });
+  btnAlt.addEventListener('click', function () {
+    if (!activeBeat) return;
+    applyBeat(activeBeat, { alt: !usingAlt, skipAuto: false });
+  });
+
+  // Seed first beat (or hash target)
+  var startId = (location.hash || '').slice(1);
+  var startEl = startId ? document.getElementById(startId) : null;
+  applyBeat(startEl || beats[0], { skipAuto: true });
+})();
+  </script>
+</body>
+</html>

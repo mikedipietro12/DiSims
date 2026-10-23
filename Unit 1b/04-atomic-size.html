@@ -982,6 +982,7 @@ body.is-e-dragging .atom-svg .e-grabbable{cursor:grabbing;}
   </div><!-- /#moduleStage -->
 </div>
 
+<script src="assets/suite-chrome.js"></script>
 <script>
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -2548,6 +2549,8 @@ function revealDebrief() {
   if (!section) return;
   renderDebrief();
   wireDebriefRevisit();
+  if (window.SuiteChrome && SuiteChrome.markComplete) SuiteChrome.markComplete('04');
+  else if (window.Unit1bSkip && Unit1bSkip.markComplete) Unit1bSkip.markComplete('04');
   enterDebriefStage();
   section.scrollIntoView({ behavior: prefersReduced ? 'auto' : 'smooth', block: 'start' });
 }
@@ -2596,5 +2599,6 @@ if (_qs.has('debrief') || _qs.has('start') || _qs.has('ions') || _qs.has('summar
   }
 }
 </script>
+<script src="demo/demo-skip.js"></script>
 </body>
 </html>

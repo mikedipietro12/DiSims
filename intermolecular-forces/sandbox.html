@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sandbox - Intermolecular Forces</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/suite.css?v=5">
+</head>
+<body>
+  <div class="module-wrap">
+    <div class="top-nav">
+      <a href="index.html" class="back-link">← IMF hub</a>
+      <div class="mod-meta">Room 2 · Sandbox</div>
+    </div>
+
+    <nav class="room-switch" aria-label="IMF rooms">
+      <a href="index.html" data-room="hub">Hub</a>
+      <a href="guide.html" data-room="guide">Guide</a>
+      <a href="sandbox.html" data-room="sandbox">Sandbox</a>
+      <a href="heat.html" data-room="heat">Heat</a>
+    </nav>
+
+    <div class="sandbox-layout">
+      <div class="sandbox-lead">
+        <div class="stub-kicker">Room 2</div>
+        <h1 id="sandboxTitle">Sandbox</h1>
+        <p>Pick two molecules and bring them close. Watch the shaped electron clouds - force names stay off on purpose.</p>
+      </div>
+
+      <div class="controls-row">
+        <div class="field">
+          <label for="molA">Molecule A</label>
+          <select id="molA"></select>
+        </div>
+        <div class="field">
+          <label for="molB">Molecule B</label>
+          <select id="molB"></select>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn primary" id="btnTogether">Bring together</button>
+          <button type="button" class="btn" id="btnSeparate">Separate</button>
+          <button type="button" class="btn" id="btnTurnA" aria-label="Turn molecule A a quarter turn">Turn A ↻</button>
+          <button type="button" class="btn" id="btnTurnB" aria-label="Turn molecule B a quarter turn">Turn B ↻</button>
+        </div>
+      </div>
+
+      <div class="stage-wrap">
+        <canvas id="stage" width="640" height="360" role="img" aria-label="Two molecules on a flat stage. Drag them, or use Bring together, Separate and Turn."></canvas>
+      </div>
+      <p class="hud-quiet"><span id="hud">Drag a molecule · Or use Bring together / Separate</span> · <span id="status" aria-live="polite"></span></p>
+    </div>
+
+    <p class="colophon">Suggested next · Heat</p>
+  </div>
+  <script src="assets/molecules.js?v=1"></script>
+  <script src="assets/pairs.js?v=3"></script>
+  <script src="assets/imf-engine.js?v=34"></script>
+  <script src="assets/suite-chrome.js?v=1"></script>
+  <script>
+(function () {
+  var selA = document.getElementById('molA');
+  var selB = document.getElementById('molB');
+  var canvas = document.getElementById('stage');
+  var hud = document.getElementById('hud');
+
+  ImfMolecules.LIST.forEach(function (m) {
+    var o1 = document.createElement('option');
+    o1.value = m.id;
+    o1.textContent = m.formula + ' - ' + m.name;
+    selA.appendChild(o1);
+    var o2 = o1.cloneNode(true);
+    selB.appendChild(o2);
+  });
+  selA.value = 'h2o';
+  selB.value = 'h2o';
+
+  var statusEl = document.getElementById('status');
+  var STATUS_TEXT = {
+    apart: 'Far apart',
+    drifting: 'Close, barely interacting',
+    pulling: 'Pulling together',
+    pushing: 'Pushing apart',
+    touching: 'Touching, held together',
+  };
+
+  var stage = ImfEngine.create({
+    canvas: canvas,
+    showDeltas: false,
+    onStatus: function (s) {
+      statusEl.textContent = STATUS_TEXT[s] || '';
+    },
+  });
+  stage.setShowForceLabels(false);
+  stage.setPair(selA.value, selB.value);
+  stage.start();
+  window.__imfStage = stage;
+
+  function applyPair() {
+    stage.setPair(selA.value, selB.value);
+    var fa = ImfMolecules.get(selA.value).formula;
+    var fb = ImfMolecules.get(selB.value).formula;
+    hud.textContent = fa + '  ·  ' + fb;
+  }
+
+  selA.addEventListener('change', applyPair);
+  selB.addEventListener('change', applyPair);
+  document.getElementById('btnTogether').addEventListener('click', function () {
+    stage.bringTogether();
+  });
+  document.getElementById('btnSeparate').addEventListener('click', function () {
+    stage.separate();
+  });
+  document.getElementById('btnTurnA').addEventListener('click', function () {
+    stage.rotate('a', Math.PI / 2);
+  });
+  document.getElementById('btnTurnB').addEventListener('click', function () {
+    stage.rotate('b', Math.PI / 2);
+  });
+
+  applyPair();
+})();
+  </script>
+</body>
+</html>

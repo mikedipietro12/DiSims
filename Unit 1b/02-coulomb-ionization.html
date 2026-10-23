@@ -1106,6 +1106,7 @@ h1,.task-title{
   </div><!-- /#moduleStage -->
 </div>
 
+<script src="assets/suite-chrome.js"></script>
 <script>
 // === CANVAS ENGINE ===
 const canvas = document.getElementById('simCanvas');
@@ -3971,6 +3972,8 @@ function revealDebrief() {
   if (!section) return;
   renderDebrief();
   wireDebriefRevisit();
+  if (window.SuiteChrome && SuiteChrome.markComplete) SuiteChrome.markComplete('02');
+  else if (window.Unit1bSkip && Unit1bSkip.markComplete) Unit1bSkip.markComplete('02');
   enterDebriefStage();
   section.scrollIntoView({
     behavior: prefersReduced ? 'auto' : 'smooth',
@@ -4037,5 +4040,6 @@ if (_qs.has('debrief') || _qs.has('start') || _qs.has('part2') || _qs.has('compa
   resize();
 }
 </script>
+<script src="demo/demo-skip.js"></script>
 </body>
 </html>

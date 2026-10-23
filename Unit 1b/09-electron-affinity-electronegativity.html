@@ -3635,6 +3635,7 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
     STATE.moduleComplete = true;
     SuiteChrome.revealDebrief(DEBRIEF, {
       exclusive: true,
+      moduleId: '09',
       onRevisit: function (target) {
         SuiteChrome.leaveDebriefStage();
         STATE.free = true;
@@ -3725,7 +3726,60 @@ body.is-e-dragging .bucket-e{cursor:grabbing;}
   els.enSlotB.addEventListener('click', function () { setEnActiveSlot('b'); });
   els.enShareBtn.addEventListener('click', runEnShareSequence);
   els.enResetBtn.addEventListener('click', resetEnPair);
+
+  window.Unit1bDemo = {
+    parts: [
+      { id: 'briefing', label: 'Briefing' },
+      { id: 'act1', label: 'Affinity' },
+      { id: 'act2', label: 'Fluorine' },
+      { id: 'act3', label: 'Cases' },
+      { id: 'act4', label: 'Shared pair' },
+      { id: 'debrief', label: 'Debrief' }
+    ],
+    current: function () {
+      var briefing = document.getElementById('briefing');
+      var debrief = document.getElementById('debrief');
+      if (briefing && !briefing.hidden) return 'briefing';
+      if (debrief && !debrief.hidden) return 'debrief';
+      return 'act' + STATE.act;
+    },
+    go: function (id) {
+      var briefing = document.getElementById('briefing');
+      var stage = document.getElementById('moduleStage');
+      if (id === 'briefing') {
+        SuiteChrome.leaveDebriefStage();
+        if (stage) stage.hidden = true;
+        if (briefing) briefing.hidden = false;
+        window.scrollTo(0, 0);
+        return;
+      }
+      if (briefing && !briefing.hidden) startModule();
+      else SuiteChrome.leaveDebriefStage();
+      STATE.free = true;
+      STATE.captured = true;
+      if (id === 'debrief') { showDebriefStage(); window.scrollTo(0, 0); return; }
+      var n = Number(String(id).replace(/^act/, '')) || 1;
+      if (n === 1) {
+        STATE.eaStep = 0;
+        setAct(1);
+        setEaStep(0);
+      } else if (n === 2) {
+        STATE.fPhase = 'gain';
+        setAct(2);
+      } else if (n === 3) {
+        STATE.casesStep = 0;
+        STATE.casesRevealed = false;
+        setAct(3);
+      } else {
+        STATE.enPhase = 'pick';
+        STATE.enNamed = false;
+        setAct(4);
+      }
+      window.scrollTo(0, 0);
+    }
+  };
 })();
 </script>
+<script src="demo/demo-skip.js"></script>
 </body>
 </html>
