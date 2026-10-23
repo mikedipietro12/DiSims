@@ -1810,16 +1810,26 @@ function buildAtomSVG(opts) {
   const rOuter = Math.min(canvas * 0.46, (opts.outerBase || 88) * scale);
   const rInnerBase = Math.min(52, canvas * 0.19);
   const radii = [];
-  if (nShells === 1) {
-    radii.push(rOuter);
+  const useLadder = Array.isArray(opts.shells) && opts.shells.length > 0;
+  if (useLadder) {
+    /* Shared n-ladder for column atoms. Hydrogen sits on n=1 — the same
+       radius as Li/Na's inner shell — then each extra shell steps out so
+       Li is bigger and Na is biggest. nMax is the deepest n in the scene
+       (3 down a column, 5 in the finale) so every atom shares radii. */
+    const nMax = Math.max(2, opts.nMax || nShells);
+    const rCap = Math.min(canvas * 0.46, opts.outerBase || 88);
+    const step = (rCap - rInnerBase) / (nMax - 1);
+    for (let i = 0; i < nShells; i++) {
+      radii.push(rInnerBase + step * i);
+    }
+  } else if (nShells === 1) {
+    radii.push(rInnerBase);
   } else if (nShells === 2) {
     radii.push(rInnerBase, rOuter);
   } else {
-    // 3+ shells: nest from near-nucleus out to valence
     for (let i = 0; i < nShells; i++) {
       const t = i / (nShells - 1);
-      const rMin = rInnerBase * 0.72;
-      radii.push(rMin + (rOuter - rMin) * t);
+      radii.push(rInnerBase + (rOuter - rInnerBase) * t);
     }
   }
   const rCore = (radii[Math.max(0, nShells - 2)] || rInnerBase) + 12;
@@ -2887,7 +2897,6 @@ function makeGroupCard(atom, opts = {}) {
   card.appendChild(host);
 
   const size = opts.pair ? GROUP_PAIR_SIZE : GROUP_SIZE;
-  const scale = opts.scale != null ? opts.scale : (1 + (atom.n - 1) * 0.08);
   replaceAtom(host, {
     uid: opts.uid || `g-${atom.sym}`,
     z: atom.z,
@@ -2897,7 +2906,7 @@ function makeGroupCard(atom, opts = {}) {
     size,
     canvas: GROUP_CANVAS,
     outerBase: GROUP_OUTER,
-    scale,
+    nMax: opts.nMax || 3,
     interactiveNuc: false,
     sym: atom.sym,
     coreFaded: !!opts.coreFaded,
@@ -3034,13 +3043,11 @@ async function renderAlkaliFadePair(faded) {
   const h = makeGroupCard(ALKALI_COL[0], {
     uid: 'pair-h',
     pair: true,
-    scale: 0.92,
     showCoreChargeOnNuc: faded
   });
   const na = makeGroupCard(ALKALI_COL[2], {
     uid: 'pair-na',
     pair: true,
-    scale: 1.22,
     coreFaded: faded,
     showCoreChargeOnNuc: faded
   });
@@ -3097,13 +3104,11 @@ async function renderHalogenFadePair(faded) {
   const f = makeGroupCard(HALOGEN_COL[0], {
     uid: 'pair-f',
     pair: true,
-    scale: 0.95,
     showCoreChargeOnNuc: faded
   });
   const cl = makeGroupCard(HALOGEN_COL[1], {
     uid: 'pair-cl',
     pair: true,
-    scale: 1.2,
     coreFaded: faded,
     showCoreChargeOnNuc: faded
   });
@@ -3132,7 +3137,6 @@ function makeFinaleCard(atom, opts = {}) {
   host.className = 'compare-atom-host';
   card.appendChild(host);
 
-  const scale = opts.scale != null ? opts.scale : (0.92 + (atom.n - 2) * 0.06);
   replaceAtom(host, {
     uid: opts.uid || `fin-${atom.sym}`,
     z: atom.z,
@@ -3142,7 +3146,7 @@ function makeFinaleCard(atom, opts = {}) {
     size: FINALE_SIZE,
     canvas: FINALE_CANVAS,
     outerBase: FINALE_OUTER,
-    scale,
+    nMax: opts.nMax || 5,
     interactiveNuc: false,
     sym: atom.sym,
     label: `${atom.sym} shell diagram, core charge +${core}`
@@ -3176,10 +3180,11 @@ function buildFinaleColumn(label, atoms, uidPrefix) {
   const stack = document.createElement('div');
   stack.className = 'group-finale-stack';
   stack.setAttribute('role', 'list');
+  const nMax = Math.max(...atoms.map(a => a.n));
   const cards = atoms.map((atom, i) => {
     const card = makeFinaleCard(atom, {
       uid: `${uidPrefix}-${i}`,
-      scale: 0.88 + (atom.n - 2) * 0.07
+      nMax
     });
     stack.appendChild(card);
     return card;
