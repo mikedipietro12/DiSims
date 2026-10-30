@@ -58,8 +58,30 @@
       },
       notes: 'Weak LDF baseline - pulse only.',
     },
+    ar: {
+      id: 'ar',
+      heat: { mp: 83.8, bp: 87.3, hfus: 1.18, hvap: 6.43 },
+      formula: 'Ar',
+      name: 'Argon',
+      polarity: 'nonpolar',
+      vsepr: 'atom',
+      hBondDonor: false,
+      hBondAcceptor: false,
+      ion: false,
+      charge: 0,
+      dipole: 0,
+      ldfTier: 'weak',
+      polarizabilityScore: null,
+      bulk: false,
+      layout: {
+        simplified: { kind: 'mono', atoms: [{ el: 'Ar', r: 1 }] },
+        heatRich: { kind: 'mono', atoms: [{ el: 'Ar', r: 1 }] },
+      },
+      notes: 'Small atom, large polarizable cloud - easy to induce.',
+    },
     ch4: {
       id: 'ch4',
+      heat: { mp: 90.7, bp: 111.7, hfus: 0.94, hvap: 8.19 },
       formula: 'CH₄',
       name: 'Methane',
       polarity: 'nonpolar',
@@ -98,6 +120,7 @@
     },
     br2: {
       id: 'br2',
+      heat: { mp: 265.9, bp: 332.0, hfus: 10.57, hvap: 29.96 },
       formula: 'Br₂',
       name: 'Bromine',
       polarity: 'nonpolar',
@@ -130,6 +153,7 @@
     },
     hcl: {
       id: 'hcl',
+      heat: { mp: 159.0, bp: 188.1, hfus: 1.99, hvap: 16.15 },
       formula: 'HCl',
       name: 'Hydrogen chloride',
       polarity: 'polar',
@@ -200,6 +224,7 @@
     },
     h2o: {
       id: 'h2o',
+      heat: { mp: 273.15, bp: 373.15, hfus: 6.01, hvap: 40.65 },
       formula: 'H₂O',
       name: 'Water',
       polarity: 'polar',
@@ -416,6 +441,7 @@
     },
     octane: {
       id: 'octane',
+      heat: { mp: 216.4, bp: 398.8, hfus: 20.7, hvap: 34.41 },
       formula: 'C₈H₁₈',
       name: 'Octane',
       polarity: 'nonpolar',
@@ -474,6 +500,13 @@
     },
   };
 
+  /**
+   * Heat room roster: real melting / boiling points (K) and molar heats of fusion /
+   * vaporization (kJ/mol), so the curve and vapour pressure come from data, not tuning.
+   * Glucose (decomposes) and ions are left out on purpose.
+   */
+  var HEAT_ROSTER = ['ar', 'ch4', 'br2', 'h2o', 'octane'];
+
   var LIST = Object.keys(BY_ID).map(function (k) {
     return BY_ID[k];
   });
@@ -504,6 +537,7 @@
     LDF_ORDER: LDF_ORDER,
     BY_ID: BY_ID,
     LIST: LIST,
+    HEAT_ROSTER: HEAT_ROSTER,
     get: get,
     layoutFor: layoutFor,
     ldfRank: ldfRank,

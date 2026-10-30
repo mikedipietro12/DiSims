@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sandbox · Intro to Equilibrium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
+  <link rel="stylesheet" href="assets/eq-intro.css?v=3">
+</head>
+<body>
+  <div class="module-wrap heat-wrap eq-wrap">
+    <div class="top-nav">
+      <a href="index.html" class="back-link">← Intro to Equilibrium</a>
+      <div class="mod-meta">Room 2 · Sandbox</div>
+    </div>
+
+    <nav class="room-switch" aria-label="Intro to Equilibrium rooms">
+      <a href="index.html" data-room="hub">Hub</a>
+      <a href="guide.html" data-room="guide">Guide</a>
+      <a href="sandbox.html" data-room="sandbox">Sandbox</a>
+    </nav>
+
+    <div class="sandbox-layout">
+      <div class="sandbox-lead">
+        <h1>Sandbox</h1>
+        <p>A sealed vessel. The reaction inside can run both ways. Pick a starting mix and a temperature, then watch.</p>
+      </div>
+
+      <div class="controls-row eq-controls">
+        <div class="field">
+          <label for="rxn-select">Reaction</label>
+          <select id="rxn-select"></select>
+        </div>
+        <div class="field eq-range">
+          <label for="sl-t">Temperature · <output id="tOut" for="sl-t">298 K</output></label>
+          <input type="range" id="sl-t" min="200" max="700" step="1" value="298">
+          <div class="eq-range-ends" aria-hidden="true"><span>200 K</span><span>700 K</span></div>
+        </div>
+        <div class="field">
+          <span class="field-label" id="mixLbl">Start with</span>
+          <div class="seg" role="group" aria-labelledby="mixLbl" id="mixSeg">
+            <button type="button" class="btn" data-mix="reactants" aria-pressed="true">Reactants</button>
+            <button type="button" class="btn" data-mix="half" aria-pressed="false">Half and half</button>
+            <button type="button" class="btn" data-mix="products" aria-pressed="false">Products</button>
+          </div>
+        </div>
+        <div class="field" id="customFields" hidden>
+          <span class="field-label" id="signLbl">Your signs</span>
+          <div class="btn-row">
+            <div class="seg seg-dh" role="group" aria-label="Sign of ΔH" id="dhSeg">
+              <button type="button" class="btn sign" data-sign="+" aria-pressed="true" aria-label="ΔH positive">ΔH +</button>
+              <button type="button" class="btn sign" data-sign="−" aria-pressed="false" aria-label="ΔH negative">ΔH −</button>
+            </div>
+            <div class="seg seg-ds" role="group" aria-label="Sign of ΔS" id="dsSeg">
+              <button type="button" class="btn sign" data-sign="+" aria-pressed="true" aria-label="ΔS positive">ΔS +</button>
+              <button type="button" class="btn sign" data-sign="−" aria-pressed="false" aria-label="ΔS negative">ΔS −</button>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn" id="btn-pause">❚❚ Pause</button>
+          <button type="button" class="btn" id="btn-reset">Start over</button>
+        </div>
+      </div>
+
+      <div class="eq-gauges" aria-label="Gauges">
+        <section class="gauge mini" aria-labelledby="gTempLabel">
+          <h2 class="gauge-label" id="gTempLabel">Temperature</h2>
+          <div class="mini-body">
+            <div class="gauge-read"><span id="gT">298</span><small> K</small></div>
+            <div class="gauge-sub"><span id="gTc">25</span> °C</div>
+          </div>
+          <div class="thermo" aria-hidden="true"><div class="thermo-fill" id="thermoFill"></div></div>
+        </section>
+        <section class="gauge mini" aria-labelledby="gRxnLabel">
+          <h2 class="gauge-label" id="gRxnLabel">Reaction</h2>
+          <div class="rxn-read" id="rxnRead">N₂O₄ ⇌ 2NO₂</div>
+        </section>
+        <section class="gauge mini" aria-labelledby="gCountLabel">
+          <h2 class="gauge-label" id="gCountLabel">Molecules shown</h2>
+          <div class="count-list" id="countList"></div>
+        </section>
+      </div>
+
+      <div class="eq-main">
+        <div class="stage-wrap heat-stage">
+          <canvas id="sim" role="img" aria-label="A sealed vessel of particles reacting in both directions."></canvas>
+        </div>
+        <div class="eq-side">
+          <section class="heat-curve" aria-labelledby="concLabel">
+            <div class="curve-head">
+              <h2 class="gauge-label" id="concLabel">Amount over time</h2>
+              <div class="legend" id="concLegend" aria-hidden="true"></div>
+            </div>
+            <div class="chart-box"><canvas id="chartConc" role="img" aria-label="Line graph of how many of each molecule are in the vessel over time."></canvas></div>
+          </section>
+          <section class="heat-curve" aria-labelledby="rateLabel">
+            <div class="curve-head">
+              <h2 class="gauge-label" id="rateLabel">Rates over time</h2>
+            </div>
+            <div class="chart-box"><canvas id="chartRate" role="img" aria-label="Line graph of the forward and reverse reaction rates over time."></canvas></div>
+          </section>
+          <section class="heat-curve" aria-labelledby="gibbsLabel">
+            <div class="curve-head">
+              <h2 class="gauge-label" id="gibbsLabel">Energy bars</h2>
+            </div>
+            <div class="chart-box"><canvas id="chartGibbs" role="img" aria-label="Bars for ΔH, minus T ΔS and ΔG."></canvas></div>
+          </section>
+        </div>
+      </div>
+      <p class="sr-only" id="live" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <script src="../intermolecular-forces/assets/suite-chrome.js"></script>
+  <script src="assets/reactions.js?v=1"></script>
+  <script src="assets/vessel-engine.js?v=2"></script>
+  <script src="assets/eq-charts.js?v=3"></script>
+  <script>
+  (function () {
+    'use strict';
+    var R = window.EqReactions;
+    var $ = function (id) { return document.getElementById(id); };
+
+    var sel = $('rxn-select'), slT = $('sl-t');
+    R.REACTIONS.forEach(function (r) {
+      var o = document.createElement('option');
+      o.value = r.id; o.textContent = r.label;
+      sel.appendChild(o);
+    });
+
+    var engine = EqVessel.create({ canvas: $('sim'), reaction: sel.value, T: +slT.value, mix: 'reactants' });
+    var conc = EqCharts.concentration($('chartConc'), engine);
+    var rate = EqCharts.rates($('chartRate'), engine);
+    var gibbs = EqCharts.gibbs($('chartGibbs'), engine);
+    var signs = { dH: '+', dS: '+' };
+
+    function buildLegend() {
+      var rxn = engine.reaction(), nR = Object.keys(rxn.reactants).length;
+      var sps = Object.keys(rxn.reactants).concat(Object.keys(rxn.products));
+      $('concLegend').innerHTML = sps.map(function (sp, i) {
+        var s = R.SPECIES[sp];
+        return '<span class="leg-item" style="color:' + s.color + '"><span class="leg-swatch' + (i >= nR ? ' dash' : '') +
+          '"></span><span style="color:var(--ink-soft)">' + s.label + '</span></span>';
+      }).join('');
+      $('rxnRead').textContent = rxn.label;
+      $('customFields').hidden = !rxn.custom;
+      $('countList').innerHTML = sps.map(function (sp) {
+        return '<div class="count-row"><span style="color:' + R.SPECIES[sp].color + '">' + R.SPECIES[sp].label +
+          '</span><span class="val" id="cnt-' + sp + '">0</span></div>';
+      }).join('');
+    }
+
+    function showT() {
+      var T = +slT.value;
+      $('tOut').textContent = T + ' K';
+      $('gT').textContent = T;
+      $('gTc').textContent = Math.round(T - 273);
+      $('thermoFill').style.width = ((T - R.T_RANGE.min) / (R.T_RANGE.max - R.T_RANGE.min) * 100).toFixed(1) + '%';
+    }
+
+    var lastLive = '', lastLiveAt = 0, lastAria = 0;
+    function update() {
+      var st = engine.getState();
+      Object.keys(st.counts).forEach(function (sp) {
+        var el = $('cnt-' + sp);
+        if (el) el.textContent = Math.round(st.counts[sp]);
+      });
+      conc.draw(); rate.draw(); gibbs.draw();
+      var now = performance.now();
+      if (now - lastAria > 1000) {
+        lastAria = now;
+        $('chartGibbs').setAttribute('aria-label', 'Energy bars. ' + EqCharts.gibbsText(st));
+      }
+      var msg = engine.summary();
+      if (msg !== lastLive && now - lastLiveAt > 2500) { lastLive = msg; lastLiveAt = now; $('live').textContent = msg; }
+    }
+    engine.onUpdate(update);
+
+    function pressed(group, btn) {
+      group.querySelectorAll('.btn').forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
+    }
+
+    sel.addEventListener('change', function () {
+      engine.setReaction(sel.value);
+      if (engine.reaction().custom) engine.setSigns(signs.dH, signs.dS);
+      buildLegend(); update();
+    });
+    slT.addEventListener('input', function () { engine.setT(+slT.value); showT(); if (!engine.isRunning()) update(); });
+    $('mixSeg').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-mix]'); if (!b) return;
+      pressed($('mixSeg'), b); engine.setMix(b.dataset.mix); update();
+    });
+    [['dhSeg', 'dH'], ['dsSeg', 'dS']].forEach(function (g) {
+      $(g[0]).addEventListener('click', function (e) {
+        var b = e.target.closest('[data-sign]'); if (!b) return;
+        pressed($(g[0]), b); signs[g[1]] = b.dataset.sign;
+        engine.setSigns(signs.dH, signs.dS); update();
+      });
+    });
+    $('btn-pause').addEventListener('click', function () {
+      if (engine.isRunning()) { engine.pause(); this.textContent = '▶ Play'; }
+      else { engine.play(); this.textContent = '❚❚ Pause'; }
+    });
+    $('btn-reset').addEventListener('click', function () { engine.reset(); update(); });
+    window.addEventListener('resize', update);
+
+    // Dev hook for headless checks (remove before ship: design-state DD-4)
+    window.__eqSandbox = { engine: engine, update: update };
+
+    buildLegend(); showT(); update();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Taste Directions · Intro to Equilibrium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
+  <style>
+/* Dev-only comparison page (not linked from the hub). Three token directions for
+   ΔH / −TΔS / ΔG bars, forward/reverse rate lines and A/B particles. */
+.dirs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:1.2rem;}
+.dir{background:var(--tray);border:2px solid var(--line-strong);border-radius:var(--radius-lg);box-shadow:var(--key-drop);padding:1.1rem 1.1rem 1.3rem;}
+.dir h2{font-size:1.3rem;letter-spacing:-0.02em;margin-bottom:0.2rem;}
+.dir .why{font-size:0.88rem;color:var(--dim);margin-bottom:0.8rem;min-height:3.9em;}
+.lbl{font-family:var(--font-mono);font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--dim);margin:0.9rem 0 0.35rem;}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;}
+.panel{background:var(--field);border-radius:var(--radius);padding:0.4rem 0.4rem 0.2rem;}
+.panel svg{display:block;width:100%;height:auto;}
+.cap{font-family:var(--font-mono);font-size:0.68rem;color:var(--dim);text-align:center;padding:0.15rem 0 0.25rem;}
+.swatches{display:flex;flex-wrap:wrap;gap:0.4rem 0.8rem;font-family:var(--font-mono);font-size:0.72rem;font-weight:700;color:var(--ink-soft);}
+.sw{display:inline-flex;align-items:center;gap:0.35rem;}
+.sw i{width:0.95rem;height:0.95rem;border-radius:50%;display:inline-block;border:1.5px solid rgba(29,36,51,0.35);}
+@media (max-width:980px){.dirs{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <div class="module-wrap">
+    <div class="top-nav">
+      <a href="index.html" class="back-link">← Intro to Equilibrium</a>
+      <div class="mod-meta">Taste pass · dev only</div>
+    </div>
+    <h1 style="font-size:2.2rem;letter-spacing:-0.03em;">Three directions</h1>
+    <p style="color:var(--dim);max-width:60rem;">Same data in each: N₂O₄ ⇌ 2NO₂ (ΔH +, ΔS +) at a cold and a hot temperature, the rates meeting, and the custom A ⇌ B particles beside the existing NO₂ and NH₃ colours. Red and yellow stay reserved for charge.</p>
+    <div class="dirs" id="dirs"></div>
+  </div>
+<script>
+(function () {
+  const INK = '#1d2433', DIM = '#5b6474', LINE = 'rgba(29,36,51,0.18)';
+  const DIRS = [
+    {
+      name: 'A · Ember and Tide',
+      why: 'Temperature metaphor. ΔH is ember orange (heat), −TΔS is tide teal (spreading out). ΔG is the verdict in ink.',
+      dH: { fill: '#e07a2e' }, dS: { fill: '#14918f' }, dG: { fill: INK },
+      fwd: { stroke: INK, dash: '' }, rev: { stroke: '#14918f', dash: '6 4' },
+      A: '#e07a2e', B: '#14918f'
+    },
+    {
+      name: 'B · Ink and Pattern',
+      why: 'Colour-free first. Solid ink for ΔH, hatched ink for −TΔS, indigo outline for ΔG. Meaning comes from texture.',
+      dH: { fill: INK }, dS: { fill: 'url(#hatch-B)' }, dG: { fill: '#ffffff', stroke: '#4152d9' },
+      fwd: { stroke: INK, dash: '' }, rev: { stroke: INK, dash: '6 4' },
+      A: '#ffffff', B: INK
+    },
+    {
+      name: 'C · Ember and Tide, verdict in colour',
+      why: 'Like A, but the ΔG bar takes the side it favours: indigo when products win, slate when reactants win.',
+      dH: { fill: '#e07a2e' }, dS: { fill: '#14918f' }, dG: { fill: '#4152d9', fillPos: '#8a93a6' },
+      fwd: { stroke: '#4152d9', dash: '' }, rev: { stroke: '#8a93a6', dash: '6 4' },
+      A: '#8a93a6', B: '#4152d9'
+    }
+  ];
+
+  // N2O4 -> 2NO2: dH +57 kJ, dS +176 J/K. Values only set bar lengths; no numbers shown.
+  const dH = 57, dS = 0.176;
+  const temps = [{ T: 250, cap: 'Cold' }, { T: 450, cap: 'Hot' }];
+
+  function hatch(id, color) {
+    return `<pattern id="${id}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#fff"/><line x1="0" y1="0" x2="0" y2="6" stroke="${color}" stroke-width="3"/></pattern>`;
+  }
+
+  function bars(d, T, id) {
+    const W = 200, H = 150, zero = 82, s = 0.9;
+    const tS = -T * dS, g = dH + tS;
+    const cols = [
+      { key: 'ΔH', from: 0, to: dH, st: d.dH },
+      { key: '−TΔS', from: dH, to: dH + tS, st: d.dS },
+      { key: 'ΔG', from: 0, to: g, st: d.dG }
+    ];
+    let out = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gibbs bars at ${T} K"><defs>${hatch('hatch-B', INK)}</defs>`;
+    out += `<line x1="8" x2="${W - 8}" y1="${zero}" y2="${zero}" stroke="${INK}" stroke-width="1.5"/>`;
+    cols.forEach((c, i) => {
+      const x = 22 + i * 60, w = 40;
+      const y1 = zero - c.to * s, y0 = zero - c.from * s;
+      const top = Math.min(y0, y1), h = Math.max(2, Math.abs(y1 - y0));
+      let fill = c.st.fill;
+      if (c.key === 'ΔG' && c.st.fillPos && c.to > 0) fill = c.st.fillPos;
+      const stroke = c.st.stroke || INK;
+      out += `<rect x="${x}" y="${top}" width="${w}" height="${h}" rx="5" fill="${fill}" stroke="${stroke}" stroke-width="${c.st.stroke ? 3 : 1.5}"/>`;
+      if (i === 0) out += `<line x1="${x + w}" x2="${x + 60}" y1="${y1}" y2="${y1}" stroke="${DIM}" stroke-dasharray="2 3"/>`;
+      const sign = c.to - c.from >= 0 ? '+' : '−';
+      const gy = c.to - c.from >= 0 ? top - 5 : top + h + 13;
+      out += `<text x="${x + w / 2}" y="${gy}" text-anchor="middle" font-family="Space Mono, monospace" font-weight="700" font-size="13" fill="${INK}">${sign}</text>`;
+      out += `<text x="${x + w / 2}" y="${H - 4}" text-anchor="middle" font-family="Space Mono, monospace" font-weight="700" font-size="11" fill="${DIM}">${c.key}</text>`;
+    });
+    return out + '</svg>';
+  }
+
+  function rates(d) {
+    const W = 420, H = 130, x0 = 30, x1 = W - 10, y0 = 112, y1 = 12;
+    let f = '', r = '';
+    for (let i = 0; i <= 60; i++) {
+      const t = i / 60, x = x0 + (x1 - x0) * t;
+      const eq = 0.42, k = 6;
+      const fv = eq + (0.95 - eq) * Math.exp(-k * t), rv = eq * (1 - Math.exp(-k * t));
+      f += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + (y0 - (y0 - y1) * fv).toFixed(1);
+      r += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + (y0 - (y0 - y1) * rv).toFixed(1);
+    }
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Forward and reverse rate meeting">
+      <line x1="${x0}" x2="${x0}" y1="${y1}" y2="${y0}" stroke="${LINE}" stroke-width="2"/>
+      <line x1="${x0}" x2="${x1}" y1="${y0}" y2="${y0}" stroke="${LINE}" stroke-width="2"/>
+      <path d="${f}" fill="none" stroke="${d.fwd.stroke}" stroke-width="3.5" stroke-dasharray="${d.fwd.dash}" stroke-linecap="round"/>
+      <path d="${r}" fill="none" stroke="${d.rev.stroke}" stroke-width="3.5" stroke-dasharray="${d.rev.dash}" stroke-linecap="round"/>
+      <text x="${x1 - 4}" y="${y0 - (y0 - y1) * 0.42 - 8}" text-anchor="end" font-family="Space Mono, monospace" font-size="11" font-weight="700" fill="${DIM}">forward = reverse</text>
+      <text x="${x0 + 8}" y="${y1 + 10}" font-family="Space Mono, monospace" font-size="11" font-weight="700" fill="${d.fwd.stroke}">→ forward</text>
+      <text x="${x0 + 8}" y="${y0 - 6}" font-family="Space Mono, monospace" font-size="11" font-weight="700" fill="${d.rev.stroke}">← reverse</text>
+    </svg>`;
+  }
+
+  const host = document.getElementById('dirs');
+  DIRS.forEach(d => {
+    const el = document.createElement('section');
+    el.className = 'dir';
+    el.innerHTML = `<h2>${d.name}</h2><p class="why">${d.why}</p>
+      <div class="lbl">Gibbs bars · N₂O₄ ⇌ 2NO₂</div>
+      <div class="pair">${temps.map(t => `<div class="panel">${bars(d, t.T, d.name)}<div class="cap">${t.cap}</div></div>`).join('')}</div>
+      <div class="lbl">Rates meet</div>
+      <div class="panel">${rates(d)}</div>
+      <div class="lbl">Particles</div>
+      <div class="swatches">
+        <span class="sw"><i style="background:${d.A}"></i>A</span>
+        <span class="sw"><i style="background:${d.B}"></i>B</span>
+        <span class="sw"><i style="background:#9a5b2e"></i>NO₂</span>
+        <span class="sw"><i style="background:#24835a"></i>NH₃</span>
+        <span class="sw"><i style="background:#4152d9"></i>N₂</span>
+      </div>`;
+    host.appendChild(el);
+  });
+})();
+</script>
+</body>
+</html>

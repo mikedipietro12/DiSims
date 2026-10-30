@@ -69,6 +69,8 @@ _Inclusive-personas not yet run - primary user captured in brief._
 | 2026-10-16 | design-builder | Engine default theme = Toy Box (`DEFAULT_THEME`, `opts.theme`, `setTheme`); suite.css rewritten to Toy Box tokens; fonts Space Grotesk + Space Mono on all rooms | Identity applied suite-wide |
 | 2026-10-16 | design-builder | Guide Tasks 4–5: scroll beats + sticky stage; force labels on (except intro); δ signs on; CH₄↔Br₂ LDF compare; ion–induced Na⁺·CH₄ override | Name once in Guide; Apple-style pacing |
 | 2026-10-16 | design-builder | pairs.js teaching overrides for `ch4\|na` and `na\|ne` → Ion–induced dipole | Guide beat 3 canonical demos |
+| 2026-10-29 | user + builder | Heat solo (Task 7): sealed particle jar, pressure gauge = vapour pressure in the jar, heat/cool hot-plate slider (fixed power, so melting/boiling plateaus show), curated roster Ar · CH₄ · HCl · Br₂ · H₂O · octane | Real mp/bp/ΔHfus/ΔHvap in molecules.js `heat`; one heat capacity for all; Clausius–Clapeyron vapour; jar sized so liquid is gone at bp (1 atm). Particles picture the state, not MD |
+| 2026-10-29 | user + builder | Water lone pairs as tetrahedral "rabbit ears" with depth (90° ± 40°: left one into the page, smaller and behind O; right one out of the page, larger) instead of both up the bisector; lone-pair molecules get a lobed cloud (soft union of atom + lone-pair lobes) instead of the teardrop | Reads as a tetrahedron. Measured: H₂O·H₂O still docks in 8/8 poses (O–O ≈ 62, H ≈ 23° off the lone-pair axis, was 18°); every H₂O pairing still settles touching |
 
 ## Open Questions
 - [x] Part 1 Guide beat list per force type

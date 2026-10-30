@@ -38,9 +38,9 @@
   var HB_DOCKED = 40;       // primary donor H ↔ acceptor site distance that counts as (nearly) docked
   var HB_SWITCH = 0.6;      // the primary H-bond only moves when another is clearly stronger (no flicker)
 
-  var POL = { H: 0.3, C: 0.7, N: 0.7, O: 0.6, F: 0.5, Cl: 1.2, Br: 1.6, Ne: 0.6, Na: 0.3 };
+  var POL = { H: 0.3, C: 0.7, N: 0.7, O: 0.6, F: 0.5, Cl: 1.2, Br: 1.6, Ne: 0.6, Ar: 1.1, Na: 0.3 };
   // Pauling electronegativity - Guide intro labels only
-  var EN = { H: 2.1, C: 2.5, N: 3.0, O: 3.5, F: 4.0, Cl: 3.0, Br: 2.8, Ne: null, Na: 0.9 };
+  var EN = { H: 2.1, C: 2.5, N: 3.0, O: 3.5, F: 4.0, Cl: 3.0, Br: 2.8, Ne: null, Ar: null, Na: 0.9 };
 
   // Toy Box atoms: model-kit hues (O red, N blue, C dark, H white), pushed to a softer "vinyl" palette
   var EL = {
@@ -52,6 +52,7 @@
     Cl: ['#bce673', '#69a42b'],
     Br: ['#d98463', '#8a3b22'],
     Ne: ['#86dff0', '#2d9cb6'],
+    Ar: ['#e6a8f0', '#a04fb8'],
     Na: ['#c9a8ff', '#7a52e0'],
   };
 
@@ -125,7 +126,8 @@
     return (d * Math.PI) / 180;
   }
 
-  function lp(cx, cy, angDeg, site, lobe, q, behind) {
+  // depth: -1 into the page (drawn behind the atoms, smaller), +1 out of it (larger), 0 in plane
+  function lp(cx, cy, angDeg, site, lobe, q, depth) {
     var t = deg(angDeg);
     return {
       x: cx + Math.cos(t) * site,
@@ -136,7 +138,8 @@
       q: q,
       cx: cx,
       cy: cy,
-      behind: !!behind,
+      behind: depth < 0,
+      depth: depth || 0,
     };
   }
 
@@ -150,6 +153,9 @@
     var G = {};
 
     G.ne = { atoms: [{ el: 'Ne', x: 0, y: 0, r: 14 }] };
+
+    // small nucleus + core, big soft valence cloud: cloud scales the pad, shell keeps partners at its edge
+    G.ar = { atoms: [{ el: 'Ar', x: 0, y: 0, r: 9 }], cloud: 2.2, shell: 9 };
 
     G.na = {
       atoms: [{ el: 'Na', x: 0, y: 0, r: 12, q: 1 }],
@@ -211,9 +217,10 @@
         { el: 'H', x: -13.4, y: 7.5, r: 10, q: 0.42 },
         { el: 'H', x: 13.4, y: 7.5, r: 10, q: 0.42 },
       ],
-      // H–O–H lies in the screen plane, so the two tetrahedral lone pairs project
-      // up the bisector - one toward the viewer, one behind
-      lps: [lp(0, -3, -112, 17, 18, -0.42, true), lp(0, -3, -68, 17, 18, -0.42)],
+      // Tetrahedral "rabbit ears" with depth: H–O–H lies in the page, one lone pair leans into the
+      // page (left: shorter, smaller, behind O) and one comes out of it (right: longer, larger).
+      // The docking sites stay the same distance out so both accept H-bonds alike.
+      lps: [lp(0, -3, -132, 17, 18.5, -0.42, -1), lp(0, -3, -50, 17, 20, -0.42, 1)],
       labels: [
         { x: 0, y: -3, t: 'δ−', out: [0, -1] },
         { x: -13.4, y: 7.5, t: 'δ+', out: [-0.8, 0.6] },
@@ -346,7 +353,8 @@
         if (s.hb === 'acc') accGroups[s.grp] = 1;
       });
       g.multiHB = Object.keys(accGroups).length > 1;
-      g.R = R;
+      g.shell = g.shell || 0;
+      g.R = R + g.shell;
       g.inertia = Math.max(1, I / 100);
       g.mass = 1 + 0.15 * g.atoms.length;
       g.alpha = g.atoms.reduce(function (s, a) {
@@ -405,6 +413,7 @@
       pullX: 0,
       pullY: 0,
       tdip: { x: 0, y: 0, amp: 0 },
+      ldfNear: 0,
       field: { x: 0, y: 0 },
       // smoothed step (see SMOOTH) and per-frame neighbour bookkeeping from computeForces
       vx: 0,
@@ -470,13 +479,81 @@
     return { x: ex, y: ey };
   }
 
+  /* ---------- lobed clouds (molecules with lone pairs) ---------- */
+
+  // Two lone pairs on one atom fan out to the tetrahedral angle in the cloud, so water reads as
+  // four lobes (two H, two lone pairs) rather than a teardrop. The docking sites stay put.
+  var LP_FAN = deg(54.75);
+  var LOBE_K = 0.45;        // log-sum-exp sharpness: higher = crisper creases between lobes
+
+  /** Cloud lobes in model units: a round lobe per atom and a fatter one per lone pair. */
+  function cloudLobes(g, pad) {
+    // the atom carrying the lone pairs stays a small core so the lobes around it stand out
+    var hosts = {};
+    g.lps.forEach(function (l) {
+      hosts[l.cx + ',' + l.cy] = true;
+    });
+    var lobes = g.atoms.map(function (a) {
+      return { x: a.x, y: a.y, r: a.r + pad * (hosts[a.x + ',' + a.y] ? 0.15 : 0.45) };
+    });
+    var groups = {};
+    g.lps.forEach(function (l) {
+      var k = l.cx + ',' + l.cy;
+      (groups[k] = groups[k] || []).push(l);
+    });
+    Object.keys(groups).forEach(function (k) {
+      var ls = groups[k];
+      var angs = ls.map(function (l) {
+        return l.ang;
+      });
+      if (ls.length === 2) {
+        var d = Math.atan2(Math.sin(angs[1] - angs[0]), Math.cos(angs[1] - angs[0]));
+        if (Math.abs(d) < deg(70)) {
+          var m = angs[0] + d / 2;
+          var sgn = d < 0 ? -1 : 1;
+          angs = [m - sgn * LP_FAN, m + sgn * LP_FAN];
+        }
+      }
+      ls.forEach(function (l, i) {
+        var reach = len(l.lx - l.cx, l.ly - l.cy) + pad * 0.35;
+        var persp = 1 + 0.07 * l.depth;
+        lobes.push({ x: l.cx + Math.cos(angs[i]) * reach, y: l.cy + Math.sin(angs[i]) * reach, r: (10 + pad * 0.5) * persp });
+      });
+    });
+    return lobes;
+  }
+
+  /**
+   * Smooth union of round lobes as a radius from (ox, oy) in each of n directions, the i-th at
+   * angle 2πi/n from the axis (ux, uy). Log-sum-exp keeps the creases between lobes soft.
+   */
+  function lobedRadii(lobes, ox, oy, ux, uy, n, out) {
+    for (var i = 0; i < n; i++) {
+      var t = (i / n) * Math.PI * 2;
+      var dx = ux * Math.cos(t) - uy * Math.sin(t);
+      var dy = ux * Math.sin(t) + uy * Math.cos(t);
+      var sum = 0;
+      for (var j = 0; j < lobes.length; j++) {
+        var px = lobes[j].x - ox;
+        var py = lobes[j].y - oy;
+        var along = px * dx + py * dy;
+        var perp = Math.abs(px * dy - py * dx);
+        var r = lobes[j].r;
+        var reach = perp < r ? along + Math.sqrt(r * r - perp * perp) : along - (perp - r) * 1.5;
+        sum += Math.exp(LOBE_K * reach);
+      }
+      out[i] = Math.max(0, Math.log(sum) / LOBE_K);
+    }
+    return out;
+  }
+
   function minGap(A, B) {
     var aa = worldAtoms(A);
     var bb = worldAtoms(B);
     var best = Infinity;
     for (var i = 0; i < aa.length; i++) {
       for (var j = 0; j < bb.length; j++) {
-        var g = len(bb[j].x - aa[i].x, bb[j].y - aa[i].y) - aa[i].r - bb[j].r;
+        var g = len(bb[j].x - aa[i].x, bb[j].y - aa[i].y) - aa[i].r - bb[j].r - A.g.shell - B.g.shell;
         if (g < best) best = g;
       }
     }
@@ -1039,7 +1116,7 @@
           var ax = bb[q].x - aa[p].x;
           var ay = bb[q].y - aa[p].y;
           var d = len(ax, ay) || 0.0001;
-          var gap = d - aa[p].r - bb[q].r - lobeReach(aa[p], bb[q], B) - lobeReach(bb[q], aa[p], A);
+          var gap = d - aa[p].r - bb[q].r - A.g.shell - B.g.shell - lobeReach(aa[p], bb[q], B) - lobeReach(bb[q], aa[p], A);
           if (gap < gapMin) gapMin = gap;
           var nx = ax / d;
           var ny = ay / d;
@@ -1091,11 +1168,20 @@
         var td = body.tdip;
         if (body.g.polar) {
           td.amp = 0;
+          body.ldfNear = 1;
           return;
         }
+        // alone, a nonpolar cloud sits small, round and grey; it only starts sloshing near a partner
+        var near = clamp(1 - (body.nearGap - 6 - spacing) / 60, 0, 1);
         var t = clock;
-        var wa = body.seed + t * 0.7 + Math.sin(t * 1.7 + body.seed) * 1.3;
-        var wAmp = reduced ? 0 : 0.35 + 0.4 * Math.pow(Math.sin(t * 2.1 + body.seed * 3), 2);
+        // ease toward the target so the cloud glides rather than jitters
+        var dtc = clamp(t - (td.t != null ? td.t : t), 0, 0.1);
+        td.t = t;
+        var ease = reduced ? 1 : 1 - Math.exp(-dtc / 0.45);
+        body.ldfNear += (near - body.ldfNear) * (reduced ? 1 : 1 - Math.exp(-dtc / 0.6));
+        near = body.ldfNear;
+        var wa = body.seed + t * 0.3 + Math.sin(t * 0.7 + body.seed) * 0.8;
+        var wAmp = reduced ? 0 : near * (0.35 + 0.4 * Math.pow(Math.sin(t * 0.9 + body.seed * 3), 2));
         var vx = Math.cos(wa) * wAmp;
         var vy = Math.sin(wa) * wAmp;
 
@@ -1111,7 +1197,7 @@
           ux /= ud;
           uy /= ud;
           var corr = clamp(1 - (body.nearGap - 6 - spacing) / 40, 0, 1);
-          var s = reduced ? 1 : Math.sin(t * 2.4);
+          var s = reduced ? 1 : Math.sin(t * 1.2);
           vx = vx * (1 - corr) + ux * s * corr;
           vy = vy * (1 - corr) + uy * s * corr;
         }
@@ -1124,10 +1210,12 @@
           vx = vx * (1 - c) + (ex / em) * c;
           vy = vy * (1 - c) + (ey / em) * c;
         }
-        var m = len(vx, vy);
+        td.sx = (td.sx || 0) + (vx - (td.sx || 0)) * ease;
+        td.sy = (td.sy || 0) + (vy - (td.sy || 0)) * ease;
+        var m = len(td.sx, td.sy);
         td.amp = clamp(m, 0, 1);
-        td.x = m ? vx / m : 0;
-        td.y = m ? vy / m : 0;
+        td.x = m ? td.sx / m : 0;
+        td.y = m ? td.sy / m : 0;
       });
     }
 
@@ -1188,16 +1276,20 @@
       });
       // keep a cluster on the tray: ease the group's centre back toward the middle, and each
       // molecule softly toward the midline so chains lie along the wide tray, not off its edges
-      if (bodies.length > 2 && !drag) {
+      // Only molecules actually in contact count: one pulled off on its own stays where it was put
+      var cluster = bodies.filter(function (body) {
+        return body.nearGap < LDF_RANGE;
+      });
+      if (bodies.length > 2 && cluster.length > 1 && !drag) {
         var gx = 0;
         var gy = 0;
-        bodies.forEach(function (body) {
+        cluster.forEach(function (body) {
           gx += body.x;
           gy += body.y;
         });
-        var kx = (W / 2 - gx / bodies.length) * 0.02 * f;
-        var ky = (H / 2 - gy / bodies.length) * 0.02 * f;
-        bodies.forEach(function (body) {
+        var kx = (W / 2 - gx / cluster.length) * 0.02 * f;
+        var ky = (H / 2 - gy / cluster.length) * 0.02 * f;
+        cluster.forEach(function (body) {
           body.x += kx;
           body.y += ky + (H / 2 - body.y) * 0.004 * f;
           walls(body);
@@ -1760,6 +1852,13 @@
       return Math.sin(t) * (r0 + (1 - r0) * Math.sin(t / 2));
     }
 
+    // Nonpolar clouds stay tucked in until a partner comes close
+    function padFor(body) {
+      var pad = cloudPad * (body.g.cloud || 1);
+      if (body.g.polar || body.mol.ion) return pad;
+      return pad * (0.55 + 0.45 * body.ldfNear);
+    }
+
     // Electron-rich atom: the yellow (δ−) end of the cloud
     function cloudRich(body, w) {
       if (body.mol.ion) return false;
@@ -1843,7 +1942,75 @@
      * rounded tip past the electron-poor end, so the cloud visibly favours the more
      * electronegative side. Sized so every atom stays inside.
      */
+    var LOBE_N = 64;
+    var lobeBuf = new Float64Array(LOBE_N);
+
+    /**
+     * Molecules with lone pairs: the cloud is a soft union of lobes around each atom and lone pair
+     * (water: two H below, two lone pairs fanned above, so a tetrahedral four-lobe outline), with
+     * the same δ−→δ+ colour run, wobble and nested layers as the teardrop.
+     */
+    function drawLobedCloud(body, f, alpha) {
+      var pad = padFor(body);
+      var lobes = cloudLobes(body.g, pad).map(function (l) {
+        var w = toWorld(body, l);
+        w.r = l.r;
+        return w;
+      });
+      var ux = f.ux;
+      var uy = f.uy;
+      var rad = lobedRadii(lobes, f.x, f.y, ux, uy, LOBE_N, lobeBuf);
+      var tau = reduced ? 0 : clock + body.seed * 5;
+      var breathe = 1 + 0.04 * Math.sin(tau * 1.4);
+      var back = 0;
+      var tip = 0;
+      for (var i = 0; i < LOBE_N; i++) {
+        var t = (i / LOBE_N) * Math.PI * 2;
+        var bulb = (1 - Math.cos(t)) / 2;
+        // Squish mostly on the electron-rich side, like the teardrop
+        var wob = 1 + (0.4 + 0.6 * bulb) * (0.05 * Math.sin(2 * t + tau * 1.7) + 0.035 * Math.sin(3 * t - tau * 2.3));
+        rad[i] *= wob * breathe;
+        tip = Math.max(tip, rad[i] * Math.cos(t));
+        back = Math.max(back, -rad[i] * Math.cos(t));
+      }
+      var cx = f.x + body.pullX * 0.6;
+      var cy = f.y + body.pullY * 0.6;
+      var tint = fade.polar * f.skew;
+      var neg = mixRgb(T.neutralRgb, T.negRgb, tint);
+      var pos = mixRgb(T.neutralRgb, T.posRgb, tint);
+      var lg = ctx.createLinearGradient(cx - ux * back, cy - uy * back, cx + ux * tip, cy + uy * tip);
+      lg.addColorStop(0, 'rgba(' + neg + ',1)');
+      lg.addColorStop(0.45, 'rgba(' + neg + ',1)');
+      lg.addColorStop(0.72, 'rgba(' + pos + ',1)');
+      lg.addColorStop(1, 'rgba(' + pos + ',1)');
+
+      ctx.save();
+      ctx.globalCompositeOperation = T.cloudBlend;
+      ctx.fillStyle = lg;
+      ctx.globalAlpha = alpha * 0.05 * T.cloudAlpha;
+      for (var li = 0; li < 14; li++) {
+        var sc = 1 - li * 0.05;
+        ctx.beginPath();
+        for (var k = 0; k < LOBE_N; k++) {
+          var a = (k / LOBE_N) * Math.PI * 2;
+          var dx = ux * Math.cos(a) - uy * Math.sin(a);
+          var dy = ux * Math.sin(a) + uy * Math.cos(a);
+          var r = rad[k] * sc;
+          if (k === 0) ctx.moveTo(cx + dx * r, cy + dy * r);
+          else ctx.lineTo(cx + dx * r, cy + dy * r);
+        }
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
     function drawDropCloud(body, f, atoms, alpha) {
+      if (body.g.lps.length && !body.mol.ion) {
+        drawLobedCloud(body, f, alpha);
+        return;
+      }
+      var pad = padFor(body);
       var ux = f.ux;
       var uy = f.uy;
       var sk = f.skew;
@@ -1857,9 +2024,9 @@
         tip = Math.max(tip, w.r + a);
         reach = Math.max(reach, w.r + Math.abs((w.y - f.y) * ux - (w.x - f.x) * uy));
       });
-      back += cloudPad * (0.6 + 0.2 * sk);
-      reach += cloudPad * (0.6 + 0.2 * sk);
-      tip += cloudPad * (0.6 - 0.35 * sk);
+      back += pad * (0.6 + 0.2 * sk);
+      reach += pad * (0.6 + 0.2 * sk);
+      tip += pad * (0.6 - 0.35 * sk);
       var half = (back + tip) / 2;
       var mid = (tip - back) / 2;
       var peak = 0;
@@ -1870,7 +2037,7 @@
         var a = (w.x - f.x) * ux + (w.y - f.y) * uy;
         var b = Math.abs((w.y - f.y) * ux - (w.x - f.x) * uy);
         var t = Math.acos(clamp((a - mid) / half, -1, 1));
-        wide = Math.max(wide, (b + w.r + cloudPad * 0.3) / Math.max(0.3, dropProfile(t, r0)));
+        wide = Math.max(wide, (b + w.r + pad * 0.3) / Math.max(0.3, dropProfile(t, r0)));
       });
       var tau = reduced ? 0 : clock + body.seed * 5;
       var breathe = 1 + 0.04 * Math.sin(tau * 1.4);
@@ -1929,6 +2096,7 @@
       var pm = len(px, py);
       var hasLp = g.lps.length > 0;
       var tint = fade.polar;
+      var pad = padFor(body);
       var frame = fade.drop > 0 ? dropFrame(body, atoms) : null;
       var dropK = frame ? fade.drop : 0;
       if (dropK > 0) drawDropCloud(body, frame, atoms, dropK * fade.clouds);
@@ -1946,13 +2114,13 @@
         if (body.mol.ion) rgb = T.posRgb;
         rgb = mixRgb(T.neutralRgb, rgb, tint);
         var alpha = (0.2 + (g.polar ? 0.08 * tint : 0)) * T.cloudAlpha * fade.clouds * (1 - dropK);
-        blob(w.x + px * k, w.y + py * k, w.r + cloudPad + pm * face, rgb, alpha);
+        blob(w.x + px * k, w.y + py * k, w.r + pad + pm * face, rgb, alpha);
       });
 
       // temporary / induced dipole: shift cloud colour across the molecule
       var td = body.tdip;
       if (tint > 0 && !g.polar && td.amp > 0.04) {
-        var R = g.R + cloudPad * 0.6;
+        var R = g.R + pad * 0.6;
         var lg = ctx.createLinearGradient(
           body.x - td.x * R,
           body.y - td.y * R,
@@ -1967,7 +2135,7 @@
         ctx.fillStyle = lg;
         ctx.beginPath();
         atoms.forEach(function (w) {
-          var rr = w.r + cloudPad * 0.85;
+          var rr = w.r + pad * 0.85;
           ctx.moveTo(w.x + px * 0.6 + rr, w.y + py * 0.6);
           ctx.arc(w.x + px * 0.6, w.y + py * 0.6, rr, 0, Math.PI * 2);
         });
@@ -1980,7 +2148,23 @@
       g.lps.forEach(function (l) {
         if (!l.behind) return;
         var c = toWorld(body, { x: l.lx, y: l.ly });
-        lobeShape(c.x + px * 0.8, c.y + py * 0.8, l.ang + body.angle, 12.5, 8.5, T.negRgb, 0.5 * T.lobeAlpha * fade.lobes * fade.clouds);
+        var k = 1 + 0.08 * l.depth;
+        var bx = c.x + px * 0.8;
+        var by = c.y + py * 0.8;
+        var ang = l.ang + body.angle;
+        var al = fade.lobes * fade.clouds;
+        lobeShape(bx, by, ang, 12.5 * k, 8.5 * k, T.negRgb, 0.6 * T.lobeAlpha * al);
+        // its electron pair shows faintly through, so it still reads as a lone pair
+        if (!T.lobeDot) return;
+        ctx.save();
+        ctx.globalAlpha = 0.7 * al;
+        ctx.fillStyle = T.lobeDot;
+        [1, -1].forEach(function (s) {
+          ctx.beginPath();
+          ctx.arc(bx - Math.sin(ang) * 2.2 * s, by + Math.cos(ang) * 2.2 * s, 1.1, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.restore();
       });
     }
 
@@ -1997,14 +2181,15 @@
         var cx = c.x + px * 0.8;
         var cy = c.y + py * 0.8;
         var ang = l.ang + body.angle;
-        lobeShape(cx, cy, ang, 12.5, 8.5, T.negRgb, 0.62 * T.lobeAlpha);
+        var k = 1 + 0.08 * l.depth;
+        lobeShape(cx, cy, ang, 12.5 * k, 8.5 * k, T.negRgb, 0.62 * T.lobeAlpha);
         if (!T.lobeDot) return;
-        var nx = -Math.sin(ang) * 2.6;
-        var ny = Math.cos(ang) * 2.6;
+        var nx = -Math.sin(ang) * 2.6 * k;
+        var ny = Math.cos(ang) * 2.6 * k;
         ctx.fillStyle = T.lobeDot;
         [1, -1].forEach(function (s) {
           ctx.beginPath();
-          ctx.arc(cx + nx * s, cy + ny * s, 1.3, 0, Math.PI * 2);
+          ctx.arc(cx + nx * s, cy + ny * s, 1.3 * k, 0, Math.PI * 2);
           ctx.fill();
         });
       });
@@ -2469,5 +2654,12 @@
     };
   }
 
-  global.ImfEngine = { create: create, prefersReduced: prefersReduced, GEOM: GEOM };
+  global.ImfEngine = {
+    create: create,
+    prefersReduced: prefersReduced,
+    GEOM: GEOM,
+    THEME: DEFAULT_THEME,
+    cloudLobes: cloudLobes,
+    lobedRadii: lobedRadii,
+  };
 })(window);

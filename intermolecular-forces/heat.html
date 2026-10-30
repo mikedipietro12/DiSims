@@ -7,10 +7,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/suite.css?v=5">
+  <link rel="stylesheet" href="assets/suite.css?v=15">
 </head>
 <body>
-  <div class="module-wrap">
+  <div class="module-wrap heat-wrap">
     <div class="top-nav">
       <a href="index.html" class="back-link">← IMF hub</a>
       <div class="mod-meta">Room 3 · Heat</div>
@@ -23,17 +23,215 @@
       <a href="heat.html" data-room="heat">Heat</a>
     </nav>
 
-    <section class="stub-panel" aria-labelledby="heatTitle">
-      <div class="stub-kicker">Stub · Task 1</div>
-      <h1 id="heatTitle">Heat</h1>
-      <p>Warm one substance at a time with temperature and pressure gauges. After you have poked a sample, compare two substances side by side.</p>
-      <p>Solo and compare modes build in later Heat tasks.</p>
-    </section>
+    <div class="sandbox-layout">
+      <div class="sandbox-lead">
+        <div class="stub-kicker">Room 3</div>
+        <h1 id="heatTitle">Heat</h1>
+        <p>One substance, sealed in a jar on a hot plate. Heat it or cool it and watch the thermometer, the pressure gauge and the molecules.</p>
+      </div>
 
-    <p class="colophon">Free jump · Hub · Guide · Sandbox</p>
+      <div class="controls-row">
+        <div class="field">
+          <label for="substance">Substance</label>
+          <select id="substance"></select>
+        </div>
+        <div class="field heat-power">
+          <label for="power">Hot plate · <output id="powerOut" for="power">Off</output></label>
+          <input type="range" id="power" min="-100" max="100" step="5" value="0" list="powerTicks" aria-describedby="powerHint">
+          <datalist id="powerTicks"><option value="-100"></option><option value="0"></option><option value="100"></option></datalist>
+          <div class="heat-power-ends" id="powerHint" aria-hidden="true"><span>Cool</span><span>Off</span><span>Heat</span></div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn" id="btnOff">Plate off</button>
+          <button type="button" class="btn" id="btnRoom">Back to 25 °C</button>
+        </div>
+      </div>
+
+      <div class="heat-main">
+        <div class="stage-wrap heat-stage">
+          <canvas id="jar" role="img" aria-label="A sealed jar of molecules on a hot plate."></canvas>
+        </div>
+
+        <div class="heat-gauges" aria-label="Gauges">
+          <section class="gauge" aria-labelledby="gTempLabel">
+            <h2 class="gauge-label" id="gTempLabel">Temperature</h2>
+            <div class="gauge-read"><span id="tempC">25</span><small> °C</small></div>
+            <div class="gauge-sub"><span id="tempK">298</span> K</div>
+            <div class="thermo" aria-hidden="true"><div class="thermo-fill" id="thermoFill"></div></div>
+          </section>
+
+          <section class="gauge" aria-labelledby="gPresLabel">
+            <h2 class="gauge-label" id="gPresLabel">Pressure in jar</h2>
+            <svg class="dial" viewBox="0 0 120 70" aria-hidden="true">
+              <path d="M18 62 A42 42 0 0 1 102 62" fill="none" stroke="#e6eaf1" stroke-width="8" stroke-linecap="round"/>
+              <g id="dialTicks"></g>
+              <line id="needle" x1="60" y1="62" x2="60" y2="26" stroke="#1d2433" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="60" cy="62" r="5" fill="#1d2433"/>
+            </svg>
+            <div class="gauge-read"><span id="pres">0.04</span><small> atm</small></div>
+          </section>
+        </div>
+      </div>
+
+      <section class="heat-curve" aria-labelledby="curveLabel">
+        <h2 class="gauge-label" id="curveLabel">Temperature over time</h2>
+        <canvas id="curve" role="img" aria-label="Line graph of temperature over the last two minutes."></canvas>
+      </section>
+    </div>
+
   </div>
-  <script src="assets/molecules.js?v=2"></script>
-  <script src="assets/pairs.js?v=5"></script>
+  <script src="assets/molecules.js?v=5"></script>
+  <script src="assets/pairs.js?v=6"></script>
+  <script src="assets/imf-engine.js?v=68"></script>
+  <script src="assets/heat-engine.js?v=16"></script>
   <script src="assets/suite-chrome.js?v=1"></script>
+  <script>
+(function () {
+  var sel = document.getElementById('substance');
+  var power = document.getElementById('power');
+  var powerOut = document.getElementById('powerOut');
+  var el = function (id) { return document.getElementById(id); };
+
+  ImfMolecules.HEAT_ROSTER.forEach(function (id) {
+    var m = ImfMolecules.get(id);
+    var o = document.createElement('option');
+    o.value = id;
+    o.textContent = m.formula + ' - ' + m.name;
+    sel.appendChild(o);
+  });
+  sel.value = 'h2o';
+
+  var PHASE_TEXT = { solid: 'Solid', melting: 'Melting', liquid: 'Liquid', gas: 'All gas' };
+  var P_MAX = 4;
+
+  // Pressure dial ticks 0–4 atm
+  var ticks = el('dialTicks');
+  for (var i = 0; i <= P_MAX; i++) {
+    var a = Math.PI * (1 - i / P_MAX);
+    var x1 = 60 + Math.cos(a) * 46, y1 = 62 - Math.sin(a) * 46;
+    var x2 = 60 + Math.cos(a) * 38, y2 = 62 - Math.sin(a) * 38;
+    var tx = 60 + Math.cos(a) * 54, ty = 62 - Math.sin(a) * 54 + 3;
+    ticks.insertAdjacentHTML('beforeend',
+      '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="#1d2433" stroke-width="1.5"/>' +
+      '<text x="' + tx + '" y="' + ty + '" font-size="8" font-family="Space Mono, monospace" text-anchor="middle" fill="#5b6474">' + i + '</text>');
+  }
+
+  /* ---------- heating curve ---------- */
+  var curve = el('curve');
+  var cctx = curve.getContext('2d');
+  var WINDOW = 120;
+  var history = [];
+  var timeBase = null;
+
+  function drawCurve() {
+    var r = curve.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (curve.width !== Math.round(r.width * dpr)) {
+      curve.width = Math.round(r.width * dpr);
+      curve.height = Math.round(r.height * dpr);
+    }
+    var w = r.width, h = r.height;
+    cctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cctx.clearRect(0, 0, w, h);
+    var L = 52, R = 10, Tp = 8, B = 22;
+    function yOf(T) { return Tp + (1 - (T - ImfHeat.T_MIN) / (ImfHeat.T_MAX - ImfHeat.T_MIN)) * (h - Tp - B); }
+    cctx.font = '10px "Space Mono", monospace';
+    cctx.textAlign = 'right';
+    cctx.textBaseline = 'middle';
+    [-200, -100, 0, 100, 200].forEach(function (c) {
+      var y = yOf(c + 273.15);
+      cctx.strokeStyle = c === 0 ? 'rgba(29,36,51,0.25)' : 'rgba(29,36,51,0.08)';
+      cctx.lineWidth = 1;
+      cctx.beginPath();
+      cctx.moveTo(L, y);
+      cctx.lineTo(w - R, y);
+      cctx.stroke();
+      cctx.fillStyle = '#5b6474';
+      cctx.fillText(c + ' °C', L - 6, y);
+    });
+    var now = history.length ? history[history.length - 1].t : 0;
+    var t0 = Math.max(0, now - WINDOW);
+    function xOf(t) { return L + ((t - t0) / WINDOW) * (w - L - R); }
+    cctx.textAlign = 'center';
+    cctx.textBaseline = 'top';
+    cctx.fillStyle = '#5b6474';
+    cctx.fillText('time →', (L + w - R) / 2, h - B + 7);
+    cctx.strokeStyle = '#4152d9';
+    cctx.lineWidth = 2.5;
+    cctx.lineJoin = 'round';
+    cctx.beginPath();
+    var started = false;
+    history.forEach(function (s) {
+      if (s.t < t0) return;
+      var x = xOf(s.t), y = yOf(s.T);
+      if (!started) { cctx.moveTo(x, y); started = true; }
+      else cctx.lineTo(x, y);
+    });
+    cctx.stroke();
+  }
+
+  /* ---------- gauges ---------- */
+  var lastPhaseText = '';
+
+  function update(s) {
+    var c = s.T - 273.15;
+    el('tempC').textContent = Math.round(c);
+    el('tempK').textContent = Math.round(s.T);
+    el('thermoFill').style.width = ((s.T - ImfHeat.T_MIN) / (ImfHeat.T_MAX - ImfHeat.T_MIN) * 100).toFixed(1) + '%';
+
+    var p = s.pressure;
+    el('pres').textContent = p < 0.01 ? p.toFixed(3) : p < 10 ? p.toFixed(2) : p.toFixed(1);
+    var ang = Math.min(p, P_MAX * 1.04) / P_MAX * 180 - 90;
+    el('needle').setAttribute('transform', 'rotate(' + ang.toFixed(1) + ' 60 62)');
+
+    var text = PHASE_TEXT[s.phase];
+    var sub = '';
+    if (s.phase !== 'gas') {
+      if (s.vapour >= 0.01) sub = 'with vapour above it';
+      if (s.phase === 'melting') sub = Math.round(s.melt * 100) + '% melted' + (sub ? ', ' + sub : '');
+    }
+    if (text !== lastPhaseText) {
+      lastPhaseText = text;
+      el('jar').setAttribute('aria-label', 'Sealed jar of ' + ImfMolecules.get(s.id).name + ': ' + text.toLowerCase() + (sub ? ', ' + sub : '') + '.');
+    }
+
+    if (timeBase === null) timeBase = s.time;
+    var t = s.time - timeBase;
+    if (!history.length || t - history[history.length - 1].t >= 0.25) {
+      history.push({ t: t, T: s.T });
+      if (history.length > 2000) history.splice(0, history.length - 2000);
+    }
+    drawCurve();
+  }
+
+  var heat = ImfHeat.create({ canvas: el('jar'), substance: sel.value, onUpdate: update });
+  heat.start();
+  window.__imfHeat = heat;
+
+  function setPower(v) {
+    power.value = v;
+    var n = +v;
+    powerOut.textContent = n === 0 ? 'Off' : (n > 0 ? 'Heating ' : 'Cooling ') + Math.abs(n) + '%';
+    heat.setPower(n / 100);
+  }
+
+  function restart() {
+    history = [];
+    timeBase = null;
+  }
+
+  power.addEventListener('input', function () { setPower(power.value); });
+  sel.addEventListener('change', function () {
+    restart();
+    heat.setSubstance(sel.value);
+  });
+  el('btnOff').addEventListener('click', function () { setPower(0); });
+  el('btnRoom').addEventListener('click', function () {
+    restart();
+    heat.reset();
+  });
+  window.addEventListener('resize', drawCurve);
+})();
+  </script>
 </body>
 </html>

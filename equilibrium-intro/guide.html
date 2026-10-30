@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide · Intro to Equilibrium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
+  <link rel="stylesheet" href="assets/eq-intro.css?v=3">
+</head>
+<body>
+  <div class="module-wrap guide-wrap eq-guide">
+    <div class="top-nav">
+      <a href="index.html" class="back-link">← Intro to Equilibrium</a>
+      <div class="mod-meta">Room 1 · Guide</div>
+    </div>
+
+    <nav class="room-switch" aria-label="Intro to Equilibrium rooms">
+      <a href="index.html" data-room="hub">Hub</a>
+      <a href="guide.html" data-room="guide">Guide</a>
+      <a href="sandbox.html" data-room="sandbox">Sandbox</a>
+    </nav>
+
+    <header class="guide-hero">
+      <div class="stub-kicker">Room 1 · Names on</div>
+      <h1>Guide</h1>
+      <p>Some changes give off heat. Some spread things out. Many reactions run both ways at once. This guide names each idea and shows how temperature decides which way a reaction goes.</p>
+      <p class="guide-hero-note">Scroll to move through the ideas. On example cards, make your prediction first, then press Reveal. Nothing is saved.</p>
+    </header>
+
+    <nav class="guide-toc" aria-label="Guide beats">
+      <a href="#beat-heat">Heat flows</a>
+      <a href="#beat-spread">Spreading out</a>
+      <a href="#beat-pulls">Two pulls</a>
+      <a href="#beat-arrows">Both arrows</a>
+      <a href="#beat-rates">Rates meet</a>
+      <a href="#beat-around">Around us</a>
+      <a href="#beat-state">State functions</a>
+      <a href="#beat-gibbs">ΔG</a>
+      <a href="#beat-limits">Limits</a>
+      <a href="#beat-next">Next</a>
+    </nav>
+
+    <div class="guide-layout">
+      <div class="guide-rail">
+
+        <article class="guide-beat" id="beat-heat" data-badge="Enthalpy" data-view="pic" data-pic="heat" data-cards="hotpack:H,melt:H">
+          <p class="beat-kicker">Part 1 · Enthalpy</p>
+          <h2>Where does the heat go?</h2>
+          <p>You already know this one. <strong>Enthalpy</strong> (H) is the heat stored in a system. <strong>ΔH</strong> is how much it changes. If heat leaves the system and warms the surroundings, ΔH is <strong>negative</strong>: the change is <strong>exothermic</strong>. If heat flows in from the surroundings, ΔH is <strong>positive</strong>: the change is <strong>endothermic</strong>.</p>
+          <p>The sign comes from a tug between breaking and forming. Breaking bonds or pulling particles apart always costs energy. Forming bonds or letting particles settle together always releases it.</p>
+          <ul class="beat-drivers">
+            <li><strong>ΔH +</strong> when more energy goes into breaking than comes out of forming. Melting and boiling are examples.</li>
+            <li><strong>ΔH −</strong> when forming wins. Burning fuel and freezing are examples.</li>
+            <li><strong>Watch:</strong> the arrows show heat crossing the edge of the system. Ember arrows point in for +, and out for −.</li>
+          </ul>
+          <p class="beat-aside">Physical changes like melting and chemical changes like burning both have a ΔH. The rule is the same for both.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-spread" data-badge="Entropy" data-view="pic" data-pic="spread" data-cards="melt:HS,evap:HS,freeze:HS,hotpack:S">
+          <p class="beat-kicker">Part 1 · Entropy</p>
+          <h2>Things tend to spread out</h2>
+          <p>Here is a new idea. Drop food colouring into water and it spreads until the colour is even. It never gathers itself back into a drop. <strong>Entropy</strong> (S) measures how spread out a system's particles and energy are. The more ways the particles can be arranged, the higher the entropy.</p>
+          <p><strong>ΔS</strong> is the change. Spreading out makes ΔS <strong>positive</strong>. Getting more ordered or more crowded makes ΔS <strong>negative</strong>.</p>
+          <ul class="beat-drivers">
+            <li><strong>Solid → liquid → gas:</strong> each step makes ΔS more positive. A gas has by far the most freedom.</li>
+            <li><strong>More gas particles:</strong> a reaction that makes more gas particles has ΔS +. N₂O₄ → 2NO₂ turns one particle into two.</li>
+            <li><strong>Dissolving:</strong> usually ΔS +, as a neat crystal breaks up into ions that wander through the water.</li>
+            <li><strong>Watch:</strong> the same particles before and after. Count how many ways they could be arranged.</li>
+          </ul>
+          <p class="beat-aside" id="hotpackAside" hidden>Rules of thumb have exceptions. Ca²⁺ is a small ion with a big charge, so it grabs water molecules and holds them tightly. Those trapped water molecules lose more freedom than the ions gain. Chemists check the data rather than trust the rule.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-pulls" data-badge="Enthalpy and entropy" data-view="pic" data-pic="pulls" data-cards="coldpack:HS">
+          <p class="beat-kicker">Part 1 · Enthalpy and entropy together</p>
+          <h2>Two different pulls</h2>
+          <p>ΔH and ΔS are not the same thing. ΔH is about <strong>heat</strong>. ΔS is about <strong>spreading</strong>. A change is favoured when it gives off heat (ΔH −), and also when it spreads things out (ΔS +).</p>
+          <p>Sometimes both pulls point the same way. Sometimes they fight. A cold pack fights. It <strong>takes in</strong> heat, which works against it, yet it still dissolves on its own. Spreading out wins.</p>
+          <ul class="beat-drivers">
+            <li><strong>Both favour it</strong> (ΔH −, ΔS +): it happens.</li>
+            <li><strong>Both oppose it</strong> (ΔH +, ΔS −): it does not happen on its own.</li>
+            <li><strong>They fight:</strong> the winner depends on temperature. That is Part 3.</li>
+            <li><strong>Notice:</strong> in the cold pack, the heat arrow and the spreading arrow point opposite ways.</li>
+          </ul>
+        </article>
+
+        <article class="guide-beat" id="beat-arrows" data-badge="Reversible reactions" data-view="vessel" data-reaction="n2o4" data-t="400" data-mix="reactants" data-counts="true">
+          <p class="beat-kicker">Part 2 · Reversible reactions</p>
+          <h2>Reactions that run both ways</h2>
+          <p>Many reactions are <strong>reversible</strong>. As soon as products form, some of them react back into reactants. We write this with a double arrow: ⇌.</p>
+          <p>Here is N₂O₄ ⇌ 2NO₂ in a sealed vessel. N₂O₄ is colourless and NO₂ is brown. Watch the colour (what you would see in the lab), then watch the particles (what you would see if you could zoom in).</p>
+          <ul class="beat-drivers">
+            <li><strong>Macro:</strong> the colour darkens, then holds steady.</li>
+            <li><strong>Micro:</strong> particles keep splitting and joining. They never stop.</li>
+            <li><strong>Watch:</strong> each ring is one reaction event. Count them after the colour stops changing.</li>
+          </ul>
+          <p class="beat-aside">The bottle looks finished, but it is not. Both reactions are still happening at the same speed.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-rates" data-badge="Rates and equilibrium" data-view="vessel" data-reaction="n2o4" data-t="400" data-mix="reactants" data-graphs="true" data-mixbtns="true">
+          <p class="beat-kicker">Part 2 · Rates and equilibrium</p>
+          <h2>When the rates meet</h2>
+          <p>At the start there is only N₂O₄, so the forward reaction is fast and the reverse is zero. As NO₂ builds up, the forward rate slows (fewer N₂O₄ left to split) and the reverse rate speeds up (more NO₂ to join).</p>
+          <p>Eventually the two rates are <strong>equal</strong>. From then on, every NO₂ made is matched by one used up. The amounts stop changing even though both reactions continue. This is <strong>dynamic equilibrium</strong>.</p>
+          <ul class="beat-drivers">
+            <li><strong>Amount graph:</strong> the lines curve, then go flat.</li>
+            <li><strong>Rate graph:</strong> the forward line falls and the reverse line rises until they meet.</li>
+            <li><strong>Equilibrium does not mean equal amounts.</strong> It means equal <strong>rates</strong>.</li>
+            <li><strong>Try:</strong> start with products instead. The rates still meet, from the other side.</li>
+          </ul>
+          <p class="beat-aside">You already know rates from collision theory. Equilibrium is what happens when two opposite rates balance.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-around" data-badge="Equilibrium around us" data-view="pic" data-pic="equation" data-cards="soda:HS,blood:,ocean:HS">
+          <p class="beat-kicker">Part 2 · Everywhere</p>
+          <h2>Equilibrium is all around you</h2>
+          <p>A sealed soda bottle is a system at equilibrium. CO₂ gas above the drink dissolves into the liquid at the same rate as dissolved CO₂ escapes. The fizz stays put. Open the cap and the system is no longer closed, so the gas escapes faster than it returns.</p>
+          <p>The same balance shows up far from the chemistry lab.</p>
+          <ul class="beat-drivers">
+            <li><strong>Your blood:</strong> CO₂ + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻ keeps your blood's acidity steady. Breathing faster removes CO₂ and shifts the balance.</li>
+            <li><strong>The ocean:</strong> CO₂(g) ⇌ CO₂(aq). Cold water holds more CO₂ than warm water, so warming oceans can take up less.</li>
+            <li><strong>Notice:</strong> each one needs a closed system and two opposite processes running at the same rate.</li>
+          </ul>
+          <p class="beat-aside">Where else might two opposite processes balance? Think about population in an ecosystem, or water evaporating and raining back down.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-state" data-badge="State functions" data-view="pic" data-pic="paths">
+          <p class="beat-kicker">Part 3 · State functions</p>
+          <h2>Only the start and finish matter</h2>
+          <p>Climb a mountain by the steep trail or the long switchbacks. Either way your change in height is the same, because it depends only on where you started and where you finished. The distance you walked is different for each route.</p>
+          <p>H, S and G are <strong>state functions</strong>. Like height, their change depends only on the start and end states, not the path. That is why Hess's law works: add up any route of steps and you get the same ΔH. Heat and work are <strong>not</strong> state functions. They depend on the path, like the distance walked.</p>
+          <ul class="beat-drivers">
+            <li><strong>State functions:</strong> H, S, G (and height, temperature, pressure).</li>
+            <li><strong>Path-dependent:</strong> heat, work (and distance walked).</li>
+            <li><strong>Watch:</strong> two different routes between the same start and end give the same Δ.</li>
+          </ul>
+        </article>
+
+        <article class="guide-beat" id="beat-gibbs" data-badge="Gibbs free energy" data-view="vessel" data-reaction="n2o4" data-t="250" data-mix="half" data-gibbs="true" data-slider="true" data-picker="n2o4,haber">
+          <p class="beat-kicker">Part 3 · Gibbs free energy</p>
+          <h2>Temperature picks the winner</h2>
+          <p>Combine the two pulls into one number, <strong>Gibbs free energy</strong>:</p>
+          <p class="strength-order">ΔG = ΔH − TΔS</p>
+          <p>If <strong>ΔG is negative</strong>, the reaction goes forward on its own; we call it <strong>spontaneous</strong>. If ΔG is positive, the reverse is favoured. The T in the middle is the temperature in kelvin. The hotter it gets, the more the entropy pull (−TΔS) counts.</p>
+          <ul class="beat-drivers">
+            <li><strong>The bars:</strong> ΔH stays put. −TΔS stretches as you drag T. ΔG is where they land together.</li>
+            <li><strong>When the pulls fight,</strong> dragging T across a certain point flips ΔG's sign.</li>
+            <li><strong>Try:</strong> N₂O₄ ⇌ 2NO₂ (ΔH +, ΔS +). Cold, ΔG is +; hot, ΔG is −.</li>
+            <li><strong>Try:</strong> Haber (ΔH −, ΔS −). It flips the other way.</li>
+          </ul>
+          <p class="beat-aside">"Spontaneous" does not mean fast or sudden. It only means "goes this way without being pushed". See the next beat.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-limits" data-badge="Limits of ΔG" data-view="pic" data-pic="equation" data-cards="diamond:HS">
+          <p class="beat-kicker">Part 3 · Limits</p>
+          <h2>What the formula leaves out</h2>
+          <p>ΔG is powerful, but it is a model, and every model has limits.</p>
+          <p><strong>It says nothing about speed.</strong> Diamond turning into graphite has ΔG −, so it is spontaneous at every temperature. It also takes millions of years. ΔG tells you which way a reaction can go. Rates (and collision theory) tell you how fast.</p>
+          <p><strong>It assumes ΔH and ΔS stay fixed.</strong> Real values drift as temperature changes, so the flip temperature you find with ΔG = ΔH − TΔS is an estimate, not an exact answer.</p>
+          <ul class="beat-drivers">
+            <li><strong>Which way:</strong> ΔG.</li>
+            <li><strong>How fast:</strong> rates and activation energy.</li>
+            <li><strong>Notice:</strong> a "spontaneous" reaction can still need a spark to get started (think of a match).</li>
+          </ul>
+          <p class="beat-aside">Can you think of another reaction that "should" happen but doesn't seem to? (Paper burning in air is one.)</p>
+        </article>
+
+        <article class="guide-beat guide-beat-end" id="beat-next" data-badge="Before you leave" data-view="vessel" data-reaction="custom" data-t="500" data-mix="reactants" data-gibbs="true" data-slider="true" data-signs="true">
+          <p class="beat-kicker">Before you leave</p>
+          <h2>What to take with you</h2>
+          <ul class="beat-drivers">
+            <li>ΔH is heat flow. ΔS is spreading out. They are different pulls.</li>
+            <li>Many reactions run both ways. At equilibrium the <strong>rates</strong> are equal, and both directions keep going.</li>
+            <li>ΔG = ΔH − TΔS. Temperature decides who wins when the pulls fight.</li>
+            <li>ΔG tells you which way, not how fast.</li>
+          </ul>
+          <p style="margin-top:1rem">Next, open the <a href="sandbox.html">Sandbox</a> and try every reaction at different temperatures. Then open <a href="../equilibrium_simulations.html">Equilibrium Simulations</a> to push a system at equilibrium and watch it respond.</p>
+        </article>
+      </div>
+
+      <aside class="guide-stage-panel eq-stage" aria-label="Interactive demo">
+        <div class="guide-stage-head">
+          <p class="force-badge" id="badge" aria-live="polite">Enthalpy</p>
+          <p class="pair-formulas" id="sub"></p>
+        </div>
+
+        <div class="stage-wrap guide-stage-wrap" id="picWrap">
+          <canvas id="pic" role="img" aria-label="Picture for this part of the guide."></canvas>
+        </div>
+        <div class="stage-wrap guide-stage-wrap" id="vesselWrap" hidden>
+          <canvas id="vessel" role="img" aria-label="A sealed vessel of particles reacting in both directions."></canvas>
+        </div>
+
+        <div class="g-charts" id="graphsWrap" hidden>
+          <div class="g-chart"><p class="gauge-label">Amount over time</p><div class="chart-box"><canvas id="chartConc" role="img" aria-label="Line graph of how many of each molecule are in the vessel over time."></canvas></div></div>
+          <div class="g-chart"><p class="gauge-label">Rates over time</p><div class="chart-box"><canvas id="chartRate" role="img" aria-label="Line graph of the forward and reverse rates over time."></canvas></div></div>
+        </div>
+
+        <div class="g-gibbs" id="gibbsWrap" hidden>
+          <div class="g-chart"><p class="gauge-label">Energy bars</p><div class="chart-box"><canvas id="chartGibbs" role="img" aria-label="Bars for ΔH, minus T ΔS and ΔG."></canvas></div></div>
+          <table class="sign-table" id="signTable">
+            <caption class="sr-only">Which way a reaction goes for each pair of signs</caption>
+            <thead><tr><th scope="col"></th><th scope="col">ΔS +</th><th scope="col">ΔS −</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">ΔH −</th><td data-case="always">Forward at every temperature</td><td data-case="flipCold">Forward only when cold</td></tr>
+              <tr><th scope="row">ΔH +</th><td data-case="flipHot">Forward only when hot</td><td data-case="never">Never forward on its own</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="controls-row eq-controls g-controls" id="ctlRow" hidden>
+          <div class="field" id="ctlPicker" hidden>
+            <label for="g-rxn">Reaction</label>
+            <select id="g-rxn"></select>
+          </div>
+          <div class="field eq-range" id="ctlSlider" hidden>
+            <label for="g-t">Temperature · <output id="g-tOut" for="g-t">298 K</output></label>
+            <input type="range" id="g-t" min="200" max="700" step="1" value="298">
+          </div>
+          <div class="field" id="ctlMix" hidden>
+            <span class="field-label" id="g-mixLbl">Start with</span>
+            <div class="seg" role="group" aria-labelledby="g-mixLbl" id="g-mixSeg">
+              <button type="button" class="btn" data-mix="reactants" aria-pressed="true">Reactants</button>
+              <button type="button" class="btn" data-mix="products" aria-pressed="false">Products</button>
+            </div>
+          </div>
+          <div class="field" id="ctlSigns" hidden>
+            <span class="field-label">Your signs</span>
+            <div class="btn-row">
+              <div class="seg seg-dh" role="group" aria-label="Sign of ΔH" id="g-dhSeg">
+                <button type="button" class="btn sign" data-sign="+" aria-pressed="true" aria-label="ΔH positive">ΔH +</button>
+                <button type="button" class="btn sign" data-sign="−" aria-pressed="false" aria-label="ΔH negative">ΔH −</button>
+              </div>
+              <div class="seg seg-ds" role="group" aria-label="Sign of ΔS" id="g-dsSeg">
+                <button type="button" class="btn sign" data-sign="+" aria-pressed="true" aria-label="ΔS positive">ΔS +</button>
+                <button type="button" class="btn sign" data-sign="−" aria-pressed="false" aria-label="ΔS negative">ΔS −</button>
+              </div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn" id="g-pause">❚❚ Pause</button>
+            <button type="button" class="btn" id="g-reset">Start over</button>
+          </div>
+        </div>
+        <p class="hud-quiet g-counts" id="counts" hidden></p>
+
+        <div class="g-cards" id="cardsWrap" hidden>
+          <div class="seg card-tabs" role="group" aria-label="Examples" id="cardTabs"></div>
+          <div class="card-body" id="cardBody"></div>
+        </div>
+        <p class="sr-only" id="live" aria-live="polite"></p>
+      </aside>
+    </div>
+  </div>
+
+  <script src="../intermolecular-forces/assets/suite-chrome.js"></script>
+  <script src="assets/reactions.js?v=2"></script>
+  <script src="assets/vessel-engine.js?v=2"></script>
+  <script src="assets/eq-charts.js?v=3"></script>
+  <script src="assets/guide-pictures.js?v=2"></script>
+  <script>
+  (function () {
+    'use strict';
+    var R = window.EqReactions;
+    var $ = function (id) { return document.getElementById(id); };
+    var reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+    var beats = Array.prototype.slice.call(document.querySelectorAll('.guide-beat'));
+    var panel = document.querySelector('.eq-stage');
+    var exById = {};
+    R.EXAMPLES.forEach(function (e) { exById[e.id] = e; });
+
+    // One shared vessel; it only runs while a vessel beat is showing
+    var engine = EqVessel.create({ canvas: $('vessel'), reaction: 'n2o4', T: 400, mix: 'reactants', autoplay: false });
+    var conc = EqCharts.concentration($('chartConc'), engine);
+    var rate = EqCharts.rates($('chartRate'), engine);
+    var gibbs = EqCharts.gibbs($('chartGibbs'), engine);
+    var cfg = {};          // active beat's options
+    var active = null;     // active beat element
+    var cardIdx = 0;       // selected card within the beat
+    var predictions = {};  // beatId:cardId → { H, S, revealed } (memory only)
+    var signs = { dH: '+', dS: '+' };
+
+    // ---------- vessel side ----------
+    function caseOfEngine() { return R.caseOf(engine.reaction()); }
+
+    function updateVesselUi() {
+      var st = engine.getState();
+      if (cfg.graphs) { conc.draw(); rate.draw(); }
+      if (cfg.gibbs) {
+        gibbs.draw();
+        var c = caseOfEngine();
+        document.querySelectorAll('#signTable td').forEach(function (td) {
+          td.classList.toggle('is-on', td.dataset.case === c);
+        });
+      }
+      if (cfg.counts) {
+        $('counts').textContent = Object.keys(st.counts).map(function (sp) {
+          return R.SPECIES[sp].label + ' ' + Math.round(st.counts[sp]);
+        }).join('  ·  ') + '  ·  reaction events so far: ' + (st.eventsForward + st.eventsReverse);
+      }
+      $('sub').textContent = engine.reaction().label + (cfg.slider ? '  ·  ' + Math.round(st.T) + ' K' : '');
+    }
+    var lastLive = 0;
+    engine.onUpdate(function () {
+      updateVesselUi();
+      var now = performance.now();
+      if (now - lastLive > 4000) { lastLive = now; $('live').textContent = engine.summary(); }
+    });
+
+    function loadVessel(b) {
+      var d = b.dataset;
+      cfg = {
+        graphs: d.graphs === 'true', gibbs: d.gibbs === 'true', slider: d.slider === 'true',
+        mixbtns: d.mixbtns === 'true', signs: d.signs === 'true', counts: d.counts === 'true',
+        picker: d.picker ? d.picker.split(',') : null,
+      };
+      $('vesselWrap').hidden = false; $('picWrap').hidden = true;
+      $('graphsWrap').hidden = !cfg.graphs;
+      $('gibbsWrap').hidden = !cfg.gibbs;
+      $('counts').hidden = !cfg.counts;
+      $('ctlRow').hidden = false;
+      $('ctlPicker').hidden = !cfg.picker;
+      $('ctlSlider').hidden = !cfg.slider;
+      $('ctlMix').hidden = !cfg.mixbtns;
+      $('ctlSigns').hidden = !cfg.signs;
+      panel.classList.toggle('is-compact', cfg.graphs || cfg.gibbs);
+      if (cfg.picker) {
+        $('g-rxn').innerHTML = cfg.picker.map(function (id) {
+          return '<option value="' + id + '">' + R.get(id).label + '</option>';
+        }).join('');
+        $('g-rxn').value = d.reaction;
+      }
+      var T = +d.t || 298;
+      $('g-t').value = T; $('g-tOut').textContent = T + ' K';
+      pressed($('g-mixSeg'), $('g-mixSeg').querySelector('[data-mix="' + (d.mix || 'reactants') + '"]'));
+      engine.preset({ reaction: d.reaction, T: T, mix: d.mix || 'reactants', signs: cfg.signs ? [signs.dH, signs.dS] : null });
+      engine.resize();
+      $('g-pause').textContent = '❚❚ Pause';
+      updateVesselUi();
+    }
+
+    // ---------- picture side ----------
+    var picPhase = 0, picRaf = 0;
+    function cardList(b) {
+      var spec = b.dataset.cards;
+      if (!spec) return [];
+      return spec.split(',').map(function (s) {
+        var p = s.split(':');
+        return { ex: exById[p[0]], askH: p[1].indexOf('H') >= 0, askS: p[1].indexOf('S') >= 0 };
+      });
+    }
+    function cardState(c) {
+      var k = active.id + ':' + c.ex.id;
+      return predictions[k] || (predictions[k] = { H: null, S: null, revealed: false });
+    }
+
+    function drawPic() {
+      if (!active || active.dataset.view !== 'pic') return;
+      var kind = active.dataset.pic, cards = cardList(active), c = cards[cardIdx], st = c ? cardState(c) : {};
+      var o = c ? { id: c.ex.id, title: c.ex.title, eq: c.ex.eq, dH: c.ex.dH, dS: c.ex.dS, revealed: st.revealed, phase: picPhase } : {};
+      if (kind === 'equation' && c && c.ex.id === 'diamond') o.note = st.revealed ? 'ΔG − at every temperature · takes millions of years' : '';
+      EqPictures[kind]($('pic'), o);
+      $('sub').textContent = c ? c.ex.eq : '';
+      $('pic').setAttribute('aria-label', c ? c.ex.title + ': ' + c.ex.eq : 'Two routes between the same start and end give the same change in enthalpy.');
+    }
+    function picLoop() {
+      picRaf = 0;
+      if (!active || active.dataset.view !== 'pic') return;
+      picPhase = (picPhase + 0.016) % 1;
+      drawPic();
+      if (!reduced && active.dataset.pic === 'heat') picRaf = requestAnimationFrame(picLoop);
+    }
+
+    function loadPic(b) {
+      cfg = {};
+      engine.pause();
+      $('vesselWrap').hidden = true; $('picWrap').hidden = false;
+      $('graphsWrap').hidden = true; $('gibbsWrap').hidden = true;
+      $('ctlRow').hidden = true; $('counts').hidden = true;
+      panel.classList.remove('is-compact');
+      drawPic();
+      if (!picRaf) picRaf = requestAnimationFrame(picLoop);
+    }
+
+    // ---------- example cards with prediction chips ----------
+    function chipRow(which, c, st) {
+      var sym = which === 'H' ? 'ΔH' : 'ΔS';
+      var ans = which === 'H' ? c.ex.dH : c.ex.dS;
+      var why = which === 'H' ? c.ex.whyH : c.ex.whyS;
+      var html = '<div class="chip-row"><span class="chip-sym">' + sym + '</span>' +
+        '<div class="seg" role="group" aria-label="Your prediction for ' + sym + '">' +
+        ['+', '−'].map(function (sg) {
+          return '<button type="button" class="btn sign" data-pred="' + which + '" data-sign="' + sg + '" aria-pressed="' + (st[which] === sg) + '">' + sg + '</button>';
+        }).join('') + '</div>';
+      if (st.revealed) html += '<span class="chip-answer"><b>' + sym + ' ' + ans + '</b> ' + why + '</span>';
+      return html + '</div>';
+    }
+
+    function renderCards() {
+      var cards = active ? cardList(active) : [];
+      $('cardsWrap').hidden = !cards.length;
+      if (!cards.length) return;
+      cardIdx = Math.min(cardIdx, cards.length - 1);
+      $('cardTabs').hidden = cards.length < 2;
+      $('cardTabs').innerHTML = cards.map(function (c, i) {
+        return '<button type="button" class="btn" data-card="' + i + '" aria-pressed="' + (i === cardIdx) + '">' + c.ex.title + '</button>';
+      }).join('');
+      var c = cards[cardIdx], st = cardState(c), asks = c.askH || c.askS;
+      var html = '<p class="card-title">' + c.ex.title + '</p>';
+      if (asks) {
+        html += '<p class="card-ask">Predict the sign' + (c.askH && c.askS ? 's' : '') + ', then reveal.</p>';
+        if (c.askH) html += chipRow('H', c, st);
+        if (c.askS) html += chipRow('S', c, st);
+        html += '<div class="btn-row"><button type="button" class="btn primary" id="btnReveal"' + (st.revealed ? ' disabled' : '') + '>' +
+          (st.revealed ? 'Revealed' : 'Reveal') + '</button></div>';
+      }
+      if (c.ex.context && (st.revealed || !asks)) html += '<p class="card-context">' + c.ex.context + '</p>';
+      $('cardBody').innerHTML = html;
+      var showAside = active.id === 'beat-spread' && cardState({ ex: exById.hotpack }).revealed;
+      $('hotpackAside').hidden = !showAside;
+    }
+
+    $('cardTabs').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-card]'); if (!b) return;
+      cardIdx = +b.dataset.card; renderCards(); drawPic();
+    });
+    $('cardBody').addEventListener('click', function (e) {
+      var c = cardList(active)[cardIdx]; if (!c) return;
+      var st = cardState(c);
+      var p = e.target.closest('[data-pred]');
+      if (p) { st[p.dataset.pred] = p.dataset.sign; renderCards(); return; }
+      if (e.target.closest('#btnReveal')) {
+        st.revealed = true; renderCards(); drawPic();
+        $('live').textContent = c.ex.title + ': ' + (c.askH ? 'ΔH ' + c.ex.dH + '. ' : '') + (c.askS ? 'ΔS ' + c.ex.dS + '.' : '');
+        var again = $('btnReveal'); if (again) again.focus();
+      }
+    });
+
+    // ---------- beat switching ----------
+    function applyBeat(b) {
+      if (!b || b === active) return;
+      beats.forEach(function (x) { x.classList.toggle('is-active', x === b); });
+      active = b; cardIdx = 0;
+      $('badge').textContent = b.dataset.badge || '';
+      if (b.dataset.view === 'vessel') loadVessel(b); else loadPic(b);
+      renderCards();
+    }
+
+    var activeDist = Infinity, pinUntil = 0, HYSTERESIS = 56;
+    function pickBeatFromScroll() {
+      if (Date.now() < pinUntil) return;
+      var mid = innerHeight * 0.38, best = null, bestDist = Infinity;
+      activeDist = Infinity;
+      beats.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.bottom < 80 || r.top > innerHeight - 80) return;
+        var dist = Math.abs((r.top + r.bottom) / 2 - mid);
+        if (el === active) activeDist = dist;
+        if (dist < bestDist) { bestDist = dist; best = el; }
+      });
+      var last = beats[beats.length - 1];
+      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4 && last.getBoundingClientRect().top < innerHeight - 80) {
+        best = last; bestDist = -Infinity;
+      }
+      if (best && best !== active && bestDist + HYSTERESIS < activeDist) applyBeat(best);
+    }
+    var tick = 0;
+    addEventListener('scroll', function () {
+      if (tick) return;
+      tick = requestAnimationFrame(function () { tick = 0; pickBeatFromScroll(); });
+    }, { passive: true });
+    function goToBeat(id) { var el = $(id); if (!el) return; pinUntil = Date.now() + 700; applyBeat(el); }
+    document.querySelectorAll('.guide-toc a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function () { goToBeat(a.getAttribute('href').slice(1)); });
+    });
+    addEventListener('hashchange', function () { var id = location.hash.slice(1); if (id) goToBeat(id); });
+
+    // ---------- stage controls ----------
+    function pressed(group, btn) {
+      group.querySelectorAll('.btn').forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
+    }
+    $('g-rxn').addEventListener('change', function () {
+      engine.preset({ reaction: this.value, T: +$('g-t').value, mix: 'half' }); updateVesselUi();
+    });
+    $('g-t').addEventListener('input', function () {
+      engine.setT(+this.value); $('g-tOut').textContent = this.value + ' K'; updateVesselUi();
+    });
+    $('g-mixSeg').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-mix]'); if (!b) return;
+      pressed($('g-mixSeg'), b); engine.setMix(b.dataset.mix); engine.play(); $('g-pause').textContent = '❚❚ Pause';
+    });
+    [['g-dhSeg', 'dH'], ['g-dsSeg', 'dS']].forEach(function (g) {
+      $(g[0]).addEventListener('click', function (e) {
+        var b = e.target.closest('[data-sign]'); if (!b) return;
+        pressed($(g[0]), b); signs[g[1]] = b.dataset.sign; engine.setSigns(signs.dH, signs.dS); updateVesselUi();
+      });
+    });
+    $('g-pause').addEventListener('click', function () {
+      if (engine.isRunning()) { engine.pause(); this.textContent = '▶ Play'; }
+      else { engine.play(); this.textContent = '❚❚ Pause'; }
+    });
+    $('g-reset').addEventListener('click', function () { engine.reset(); engine.play(); $('g-pause').textContent = '❚❚ Pause'; });
+    addEventListener('resize', function () { if (active && active.dataset.view === 'pic') drawPic(); else { engine.resize(); updateVesselUi(); } });
+
+    // Dev hook for headless checks (remove before ship: design-state DD-4)
+    window.__eqGuide = { engine: engine, applyBeat: function (id) { applyBeat($(id)); }, update: updateVesselUi };
+
+    var start = location.hash ? $(location.hash.slice(1)) : null;
+    applyBeat(start || beats[0]);
+  })();
+  </script>
+</body>
+</html>

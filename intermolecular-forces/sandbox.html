@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/suite.css?v=5">
+  <link rel="stylesheet" href="assets/suite.css?v=15">
 </head>
 <body>
   <div class="module-wrap">
@@ -39,25 +39,18 @@
           <label for="molB">Molecule B</label>
           <select id="molB"></select>
         </div>
-        <div class="btn-row">
-          <button type="button" class="btn primary" id="btnTogether">Bring together</button>
-          <button type="button" class="btn" id="btnSeparate">Separate</button>
-          <button type="button" class="btn" id="btnTurnA" aria-label="Turn molecule A a quarter turn">Turn A ↻</button>
-          <button type="button" class="btn" id="btnTurnB" aria-label="Turn molecule B a quarter turn">Turn B ↻</button>
-        </div>
       </div>
 
       <div class="stage-wrap">
-        <canvas id="stage" width="640" height="360" role="img" aria-label="Two molecules on a flat stage. Drag them, or use Bring together, Separate and Turn."></canvas>
+        <canvas id="stage" width="640" height="360" role="img" aria-label="Two molecules on a flat stage. Drag them close to see how they interact."></canvas>
       </div>
-      <p class="hud-quiet"><span id="hud">Drag a molecule · Or use Bring together / Separate</span> · <span id="status" aria-live="polite"></span></p>
+      <p class="hud-quiet"><span id="hud">Drag a molecule</span> · <span id="status" aria-live="polite"></span></p>
     </div>
 
-    <p class="colophon">Suggested next · Heat</p>
   </div>
-  <script src="assets/molecules.js?v=2"></script>
-  <script src="assets/pairs.js?v=5"></script>
-  <script src="assets/imf-engine.js?v=60"></script>
+  <script src="assets/molecules.js?v=5"></script>
+  <script src="assets/pairs.js?v=6"></script>
+  <script src="assets/imf-engine.js?v=68"></script>
   <script src="assets/suite-chrome.js?v=1"></script>
   <script>
 (function () {
@@ -89,6 +82,12 @@
   var stage = ImfEngine.create({
     canvas: canvas,
     showDeltas: false,
+    // same squishy teardrop clouds as the Guide's force beats
+    cloudMode: 'polar',
+    cloudShape: 'drop',
+    cloudPad: 24,
+    // keep a visible gap at contact so the clouds, not the atoms, do the touching
+    spacing: 12,
     onStatus: function (s) {
       statusEl.textContent = STATUS_TEXT[s] || '';
     },
@@ -107,18 +106,6 @@
 
   selA.addEventListener('change', applyPair);
   selB.addEventListener('change', applyPair);
-  document.getElementById('btnTogether').addEventListener('click', function () {
-    stage.bringTogether();
-  });
-  document.getElementById('btnSeparate').addEventListener('click', function () {
-    stage.separate();
-  });
-  document.getElementById('btnTurnA').addEventListener('click', function () {
-    stage.rotate('a', Math.PI / 2);
-  });
-  document.getElementById('btnTurnB').addEventListener('click', function () {
-    stage.rotate('b', Math.PI / 2);
-  });
 
   applyPair();
 })();
