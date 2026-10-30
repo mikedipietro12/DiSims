@@ -7,6 +7,8 @@
  *   - London dispersion: short-range atom–atom pull scaled by polarizability (contact area counts).
  *   - Induced dipole: a nonpolar molecule near a charge is pulled toward stronger field.
  *   - Overdamped motion (no momentum) with speed / spin caps and walls - nothing can fly away.
+ *     Steps are low-passed so stiff contact can't flip-flop frame to frame (stutter).
+ *   - Any number of molecules: every pair interacts; the first two are "A" and "B".
  * Positions are in model units; the canvas is scaled so molecules read large on a laptop.
  */
 (function (global) {
@@ -25,6 +27,7 @@
   var ROT_MOB = 0.045;
   var MAX_STEP = 2.0;       // model units / frame
   var MAX_SPIN = 0.06;      // rad / frame
+  var SMOOTH = 0.4;         // 0..1 share of each new step taken this frame (lower = smoother)
   var MAX_PAIR_F = 3.0;
   var MAX_IND_F = 1.2;
   var TIER = { soft: 0.75, medium: 1, strong: 1.3 };
@@ -58,6 +61,10 @@
   var POS_RGB = '232,38,79';
   var NEG_RGB = '255,194,26';
   var NEUTRAL_RGB = '150,160,200';
+
+  // View transitions: layer fades settle in ~3 time constants; molecule swaps dissolve
+  var FADE_TAU = 90;
+  var DISSOLVE_MS = 320;
 
   /**
    * Visual theme. Rooms (or the taste comparison page) can pass a partial override.
@@ -245,6 +252,25 @@
       ],
     };
 
+    // Acetone: polar C=O, no O–H, so between two acetones it's dipole-dipole (no H-bond)
+    G.acetone = {
+      atoms: [
+        { el: 'O', x: 0, y: -18, r: 13 },
+        { el: 'C', x: 0, y: -1, r: 12.5, q: 0.4 },
+        { el: 'C', x: -18, y: 8, r: 13 },
+        { el: 'H', x: -30, y: 3, r: 8.5 },
+        { el: 'H', x: -20, y: 20, r: 8.5, z: 1 },
+        { el: 'C', x: 18, y: 8, r: 13 },
+        { el: 'H', x: 30, y: 3, r: 8.5 },
+        { el: 'H', x: 20, y: 20, r: 8.5, z: 1 },
+      ],
+      lps: [lp(0, -18, -125, 14, 15, -0.2), lp(0, -18, -55, 14, 15, -0.2)],
+      labels: [
+        { x: 0, y: -18, t: 'δ−', out: [0, -1] },
+        { x: 0, y: -1, t: 'δ+', out: [0, 1] },
+      ],
+    };
+
     var oct = [];
     for (var i = 0; i < 8; i++) {
       oct.push({ el: 'C', x: -49 + i * 14, y: i % 2 ? 4 : -4, r: 12 });
@@ -276,7 +302,7 @@
     });
     G.glucose = { atoms: gl, labels: glLabels };
 
-    var HB = { h2o: 1, nh3: 1, hf: 1, ch3oh: 1, glucose: 1 };
+    var HB = { h2o: 1, nh3: 1, hf: 1, ch3oh: 1, glucose: 1, acetone: 1 };
 
     Object.keys(G).forEach(function (id) {
       var g = G[id];
@@ -380,6 +406,14 @@
       pullY: 0,
       tdip: { x: 0, y: 0, amp: 0 },
       field: { x: 0, y: 0 },
+      // smoothed step (see SMOOTH) and per-frame neighbour bookkeeping from computeForces
+      vx: 0,
+      vy: 0,
+      vs: 0,
+      pushing: false,
+      near: false,
+      nearest: null,
+      nearGap: Infinity,
     };
   }
 
@@ -466,16 +500,43 @@
     var showEN = !!opts.showEN;
     var showLobes = opts.showLobes !== false;
     var showSharedElectrons = !!opts.showSharedElectrons;
+    // Guide: valence electrons zipping through the cloud
+    var showCloudElectrons = !!opts.showCloudElectrons;
     // 'off' | 'neutral' | 'polar' : polar uses charge tint; neutral is even grey-blue
     var cloudMode = opts.cloudMode || 'polar';
+    // 'round' per-atom halos | 'drop' one squishy teardrop per molecule, swelling toward δ−
+    var cloudShape = opts.cloudShape || 'round';
+    // 'badge' δ signs in pills | 'plain' bare symbols, letting the cloud colour carry the sign
+    var deltaStyle = opts.deltaStyle || 'badge';
     var viewZoom = opts.zoom != null ? +opts.zoom : 1;
     var cloudPad = opts.cloudPad != null ? +opts.cloudPad : 16;
+    // Guide: dissolve the old frame when the molecules change
+    var crossfade = !!opts.crossfade;
+    var dissolve = null;
+    var snapCanvas = null;
+    // Drawn strength of each layer (0..1), eased toward the show* flags so view changes fade
+    var fade = fadeTargets();
+    // Solo layout eases too: scale (zoom) and vertical anchor
+    var soloY = 0.5;
+    var layoutAnim = false;
     var solo = false;
-    var hbPrimary = null;
+    // H-bond hysteresis per molecule pair, keyed 'i|j'
+    var hbPrimary = {};
+    var pairOutcomes = {};
+    // Extra contact padding (model units) so molecules settle with a visible gap
+    var spacing = opts.spacing != null ? +opts.spacing : 0;
+    // Seconds the formula labels stay up after a scene appears (0 = always)
+    var formulaHold = opts.formulaHold != null ? +opts.formulaHold : 0;
+    // Guide: a new scene waits, spread out, until the user grabs a molecule
+    var holdUntilDrag = !!opts.holdUntilDrag;
+    var waiting = false;
+    var sceneStart = 0;
     var T = mergeTheme(opts.theme);
     var onStatus = typeof opts.onStatus === 'function' ? opts.onStatus : null;
     var status = '';
     var outcome = null;
+    // All molecules on the tray; a and b alias the first two (Turn A / Turn B, status, Sandbox)
+    var bodies = [];
     var a = null;
     var b = null;
     var drag = null;
@@ -496,11 +557,81 @@
         var fill = Math.min(cssW, cssH) * frac;
         return clamp(fill / Math.max(28, span), 1.4, 4.0);
       }
-      return clamp(Math.min(cssW / 430, cssH / 220), 0.8, 2.6);
+      return clamp(Math.min(cssW / 430, cssH / 220) * (viewZoom || 1), 0.8, 3.2);
     }
 
     function computeScale() {
       return computeScaleFor(a && a.g ? a.g.R : 0);
+    }
+
+    function fadeTargets() {
+      return {
+        clouds: showClouds && cloudMode !== 'off' ? 1 : 0,
+        polar: cloudMode === 'neutral' ? 0 : 1,
+        drop: cloudShape === 'drop' ? 1 : 0,
+        badges: deltaStyle === 'badge' ? 1 : 0,
+        bonds: showBonds ? 1 : 0,
+        en: showEN ? 1 : 0,
+        deltas: showDeltas ? 1 : 0,
+        lobes: showLobes ? 1 : 0,
+        shared: showSharedElectrons ? 1 : 0,
+        electrons: showCloudElectrons ? 1 : 0,
+        labels: showLabels ? 1 : 0,
+      };
+    }
+
+    // Leave headroom for EN labels above the molecule
+    function soloYTarget() {
+      return showEN ? 0.58 : 0.5;
+    }
+
+    function placeSolo() {
+      if (!solo || !a) return;
+      a.x = W * 0.5;
+      a.y = H * soloY;
+    }
+
+    /** Jump straight to the current view (new molecules, first paint, reduced motion). */
+    function snapView() {
+      fade = fadeTargets();
+      soloY = soloYTarget();
+      S = computeScale();
+      W = cssW / S;
+      H = cssH / S;
+      placeSolo();
+      layoutAnim = false;
+    }
+
+    function animateView(dt) {
+      var k = reduced ? 1 : 1 - Math.exp(-dt / FADE_TAU);
+      var tg = fadeTargets();
+      Object.keys(tg).forEach(function (key) {
+        fade[key] += (tg[key] - fade[key]) * k;
+        if (Math.abs(tg[key] - fade[key]) < 0.003) fade[key] = tg[key];
+      });
+      if (!solo || !a) return;
+      var ts = computeScale();
+      var ty = soloYTarget();
+      S += (ts - S) * k;
+      soloY += (ty - soloY) * k;
+      var settled = Math.abs(ts - S) < 0.002 && Math.abs(ty - soloY) < 0.001;
+      if (settled) {
+        S = ts;
+        soloY = ty;
+      }
+      W = cssW / S;
+      H = cssH / S;
+      if (layoutAnim && !drag) placeSolo();
+      if (settled) layoutAnim = false;
+    }
+
+    function beginDissolve() {
+      if (!crossfade || reduced || !a || !global.document) return;
+      if (!snapCanvas) snapCanvas = global.document.createElement('canvas');
+      snapCanvas.width = canvas.width;
+      snapCanvas.height = canvas.height;
+      snapCanvas.getContext('2d').drawImage(canvas, 0, 0);
+      dissolve = { t: 0 };
     }
 
     function resize() {
@@ -511,15 +642,16 @@
       S = computeScale();
       W = cssW / S;
       H = cssH / S;
-      canvas.width = Math.round(cssW * dpr);
-      canvas.height = Math.round(cssH * dpr);
+      // Assigning width/height clears the canvas, so only do it on a real size change
+      var pw = Math.round(cssW * dpr);
+      var ph = Math.round(cssH * dpr);
+      if (canvas.width !== pw) canvas.width = pw;
+      if (canvas.height !== ph) canvas.height = ph;
       if (a && oldW && oldH) {
         if (solo) {
-          a.x = W * 0.5;
-          a.y = H * 0.48;
+          placeSolo();
         } else {
-          [a, b].forEach(function (body) {
-            if (!body) return;
+          bodies.forEach(function (body) {
             body.x *= W / oldW;
             body.y *= H / oldH;
             walls(body);
@@ -528,63 +660,130 @@
       }
     }
 
-    function homePose() {
-      return {
-        ax: W * 0.24,
-        ay: H * 0.5,
-        bx: W * 0.76,
-        by: H * 0.5,
-      };
+    function contactPad() {
+      return CONTACT_PAD + spacing;
+    }
+
+    // Where the k-th of n partners sits around A: two fan out right (a triangle, wider than
+    // tall), three or more ring A evenly
+    function clusterAngle(k, n) {
+      if (n === 2) return (k ? 1 : -1) * deg(40);
+      var off = n % 2 === 0 ? Math.PI / n : 0;
+      return off + (k * Math.PI * 2) / n;
+    }
+
+    // Partners at distance dist(body, angle) around A, the group centred on the tray
+    function clusterPoses(dist) {
+      var n = bodies.length - 1;
+      var pts = bodies.map(function (body, i) {
+        if (!i) return { x: 0, y: 0 };
+        var t = clusterAngle(i - 1, n);
+        var D = dist(body, t);
+        return { x: Math.cos(t) * D, y: Math.sin(t) * D };
+      });
+      var x0 = Infinity;
+      var x1 = -Infinity;
+      var y0 = Infinity;
+      var y1 = -Infinity;
+      pts.forEach(function (p, i) {
+        var R = bodies[i].g.R;
+        x0 = Math.min(x0, p.x - R);
+        x1 = Math.max(x1, p.x + R);
+        y0 = Math.min(y0, p.y - R);
+        y1 = Math.max(y1, p.y + R);
+      });
+      var ox = W / 2 - (x0 + x1) / 2;
+      var oy = H / 2 - (y0 + y1) / 2;
+      return pts.map(function (p) {
+        return { x: p.x + ox, y: p.y + oy };
+      });
+    }
+
+    // Spread-out start: two molecules side by side; more go in a staggered row across the wide
+    // tray, the first (A) in the middle
+    function homePoses() {
+      if (bodies.length === 2) {
+        return [
+          { x: W * 0.24, y: H * 0.5 },
+          { x: W * 0.76, y: H * 0.5 },
+        ];
+      }
+      var n = bodies.length;
+      var order = bodies.slice(1);
+      order.splice(Math.floor((n - 1) / 2), 0, bodies[0]);
+      var poses = [];
+      order.forEach(function (body, k) {
+        var stagger = n > 3 ? (k % 2 ? 1 : -1) * H * 0.1 : 0;
+        poses[bodies.indexOf(body)] = { x: (W * (k + 0.5)) / n, y: H * 0.5 + stagger };
+      });
+      return poses;
     }
 
     function placeDefault() {
-      if (!a || !b) return;
+      if (bodies.length < 2) return;
       tween = null;
-      var p = homePose();
-      a.x = p.ax;
-      a.y = p.ay;
-      b.x = p.bx;
-      b.y = p.by;
-      a.angle = 0;
-      b.angle = 0;
-      a.spinLeft = b.spinLeft = 0;
+      homePoses().forEach(function (p, i) {
+        var body = bodies[i];
+        body.x = p.x;
+        body.y = p.y;
+        body.angle = body.initAngle;
+        body.spinLeft = body.vx = body.vy = body.vs = 0;
+        walls(body);
+      });
     }
 
     function setPair(idA, idB) {
-      var mA = global.ImfMolecules.get(idA);
-      var mB = global.ImfMolecules.get(idB);
-      if (!mA || !mB || !GEOM[idA] || !GEOM[idB]) return;
+      setScene([idA, idB]);
+    }
+
+    /** Put several molecules on the tray; every pair interacts. ids[0] and ids[1] are A and B. */
+    function setScene(ids) {
+      if (!ids || ids.length < 2) return;
+      var mols = ids.map(function (id) {
+        return GEOM[id] ? global.ImfMolecules.get(id) : null;
+      });
+      if (mols.some(function (m) {
+        return !m;
+      })) return;
+      beginDissolve();
       solo = false;
-      viewZoom = 1;
       showSharedElectrons = false;
-      hbPrimary = null;
-      outcome = global.ImfPairs.resolve(idA, idB);
-      S = computeScale();
-      W = cssW / S;
-      H = cssH / S;
-      a = makeBody(mA, 0, 0, 0, 0.3);
-      b = makeBody(mB, 0, 0, 0, 2.1);
+      hbPrimary = {};
+      pairOutcomes = {};
+      for (var i = 0; i < ids.length; i++) {
+        for (var j = i + 1; j < ids.length; j++) pairOutcomes[i + '|' + j] = global.ImfPairs.resolve(ids[i], ids[j]);
+      }
+      outcome = pairOutcomes['0|1'];
+      snapView();
+      bodies = mols.map(function (m, k) {
+        var body = makeBody(m, 0, 0, 0, 0.3 + k * 1.8);
+        // extras start at varied angles so a cluster doesn't look stamped out
+        body.initAngle = k < 2 ? 0 : (k * 2.4) % (Math.PI * 2);
+        return body;
+      });
+      a = bodies[0];
+      b = bodies[1];
+      sceneStart = clock;
+      waiting = holdUntilDrag;
       placeDefault();
       status = '';
       computeForces();
       emitStatus();
     }
 
-    /** One molecule centred on the tray - Guide intro layers. */
     function setSolo(id) {
       var m = global.ImfMolecules.get(id);
       if (!m || !GEOM[id]) return;
+      beginDissolve();
       solo = true;
-      hbPrimary = null;
+      hbPrimary = {};
       outcome = null;
       bridges = [];
-      S = computeScaleFor(GEOM[id].R);
-      W = cssW / S;
-      H = cssH / S;
-      // Leave headroom for EN labels / shared-e caption above or below
-      var yFrac = showEN ? 0.58 : showSharedElectrons ? 0.5 : 0.5;
-      a = makeBody(m, W * 0.5, H * yFrac, 0, 0.3);
+      drag = null;
+      a = makeBody(m, 0, 0, 0, 0.3);
       b = null;
+      bodies = [a];
+      snapView();
       status = '';
       if (onStatus) onStatus('');
     }
@@ -598,12 +797,34 @@
       if (view.showEN !== undefined) showEN = !!view.showEN;
       if (view.showLobes !== undefined) showLobes = !!view.showLobes;
       if (view.showSharedElectrons !== undefined) showSharedElectrons = !!view.showSharedElectrons;
+      if (view.showCloudElectrons !== undefined) showCloudElectrons = !!view.showCloudElectrons;
       if (view.cloudMode !== undefined) cloudMode = view.cloudMode || 'polar';
+      if (view.cloudShape !== undefined) cloudShape = view.cloudShape || 'round';
+      if (view.deltaStyle !== undefined) deltaStyle = view.deltaStyle || 'badge';
       if (view.zoom !== undefined) viewZoom = Math.max(0.5, +view.zoom || 1);
       if (view.cloudPad !== undefined) cloudPad = Math.max(6, +view.cloudPad || 16);
-      if (solo && a) {
-        resize();
-      }
+      if (view.spacing !== undefined) spacing = Math.max(0, +view.spacing || 0);
+      if (view.formulaHold !== undefined) formulaHold = Math.max(0, +view.formulaHold || 0);
+      if (view.holdUntilDrag !== undefined) holdUntilDrag = !!view.holdUntilDrag;
+      // Layers, zoom and anchor ease toward the new view in animateView
+      layoutAnim = solo;
+      if (reduced) snapView();
+      if (!solo && bodies.length > 1) rescaleKeepCentre();
+    }
+
+    // Zoom change with molecules already out: keep the group centred on the tray
+    function rescaleKeepCentre() {
+      var oW = W;
+      var oH = H;
+      S = computeScale();
+      W = cssW / S;
+      H = cssH / S;
+      if (W === oW && H === oH) return;
+      bodies.forEach(function (body) {
+        body.x += (W - oW) / 2;
+        body.y += (H - oH) / 2;
+        walls(body);
+      });
     }
 
     function walls(body) {
@@ -616,18 +837,42 @@
 
     function computeForces() {
       bridges = [];
-      [a, b].forEach(function (body) {
+      bodies.forEach(function (body) {
         body.fx = body.fy = body.torque = 0;
         body.pullX = body.pullY = 0;
         body.field.x = body.field.y = 0;
+        body.pushing = false;
+        body.near = false;
+        body.nearest = null;
+        body.nearGap = Infinity;
       });
-      if (!a || !b) return { radial: 0, gap: Infinity, dist: Infinity };
+      if (bodies.length < 2) return { radial: 0, gap: Infinity, dist: Infinity };
+      var main = null;
+      for (var i = 0; i < bodies.length; i++) {
+        for (var j = i + 1; j < bodies.length; j++) {
+          var info = pairForces(bodies[i], bodies[j], i + '|' + j);
+          if (i === 0 && j === 1) main = info;
+        }
+      }
+      // cloud squish cue: sum of leans toward each partner, capped
+      bodies.forEach(function (body) {
+        var m = len(body.pullX, body.pullY);
+        if (m > 3.5) {
+          body.pullX *= 3.5 / m;
+          body.pullY *= 3.5 / m;
+        }
+      });
+      return main;
+    }
 
-      var dx = b.x - a.x;
-      var dy = b.y - a.y;
+    /** Forces between one pair of molecules (A before B in the scene). Info feeds status. */
+    function pairForces(A, B, key) {
+      var oc = pairOutcomes[key];
+      var dx = B.x - A.x;
+      var dy = B.y - A.y;
       var dist = len(dx, dy) || 0.0001;
       var fade = smoothFade(dist);
-      var mult = (TIER[outcome && outcome.attraction] || 1) * (BOOST[outcome && outcome.force] || 1);
+      var mult = (TIER[oc && oc.attraction] || 1) * (BOOST[oc && oc.force] || 1);
       var radial = 0;
       var esPush = false;
       var esRadialOut = 0;
@@ -638,9 +883,8 @@
         body.torque += (px - body.x) * fy - (py - body.y) * fx;
       }
 
-      var sa = worldSites(a);
-      var sb = worldSites(b);
-
+      var sa = worldSites(A);
+      var sb = worldSites(B);
       if (fade > 0) {
         // permanent charges: like repels, opposite attracts; off-centre → torque
         var cand = [];
@@ -678,14 +922,14 @@
           });
           var keep = null;
           hbList.forEach(function (p) {
-            if (keyOf(p) === hbPrimary) keep = p;
+            if (keyOf(p) === hbPrimary[key]) keep = p;
           });
           if (!keep || keep.f > bestHb.f * HB_SWITCH) keep = bestHb;
-          hbPrimary = keyOf(keep);
+          hbPrimary[key] = keyOf(keep);
           var aDonates = sa[keep.i].hb === 'don';
           // molecules with several acceptor atoms (glucose) really can hold more than one H-bond
           var docked =
-            !a.g.multiHB && !b.g.multiHB && len(sb[keep.j].x - sa[keep.i].x, sb[keep.j].y - sa[keep.i].y) < HB_DOCKED;
+            !A.g.multiHB && !B.g.multiHB && len(sb[keep.j].x - sa[keep.i].x, sb[keep.j].y - sa[keep.i].y) < HB_DOCKED;
           var used = {};
           used['a' + sa[keep.i].grp] = used['b' + sb[keep.j].grp] = true;
           hbList
@@ -694,14 +938,14 @@
               return m.f - n.f;
             })
             .forEach(function (p) {
-              if (keyOf(p) === hbPrimary) return;
+              if (keyOf(p) === hbPrimary[key]) return;
               var ka = 'a' + sa[p.i].grp;
               var kb = 'b' + sb[p.j].grp;
               if ((sa[p.i].hb === 'don') !== aDonates || used[ka] || used[kb]) p.f *= docked ? HB_EXTRA : HB_SHARED;
               else used[ka] = used[kb] = true;
             });
         } else {
-          hbPrimary = null;
+          hbPrimary[key] = null;
         }
 
         esPairs.forEach(function (p) {
@@ -715,8 +959,8 @@
         var scale = esMag > MAX_PAIR_F ? MAX_PAIR_F / esMag : 1;
         esPairs.forEach(function (p) {
           // force on B is +f along A→B; on A it is the reverse
-          apply(b, sb[p.j].x, sb[p.j].y, p.fx * scale, p.fy * scale);
-          apply(a, sa[p.i].x, sa[p.i].y, -p.fx * scale, -p.fy * scale);
+          apply(B, sb[p.j].x, sb[p.j].y, p.fx * scale, p.fy * scale);
+          apply(A, sa[p.i].x, sa[p.i].y, -p.fx * scale, -p.fy * scale);
         });
         radial += ((esX * dx + esY * dy) / dist) * scale;
 
@@ -730,7 +974,9 @@
         var top = 0;
         var shown = 0;
         var shownGroups = {};
-        for (var c = 0; c < cand.length && shown < 2 && wantKind; c++) {
+        // a cluster shows each pair's main link only, so the lines stay readable
+        var maxShown = bodies.length > 2 ? 1 : 2;
+        for (var c = 0; c < cand.length && shown < maxShown && wantKind; c++) {
           var cf = cand[c].f * scale;
           var kind = cf < 0 ? 'pull' : 'push';
           if (kind !== wantKind || Math.abs(cf) < 0.05) continue;
@@ -745,15 +991,15 @@
         }
 
         // induced dipole: each atom of a nonpolar partner is pulled toward stronger field
-        [[a, b, sb], [b, a, sa]].forEach(function (trip) {
+        [[A, B, sb], [B, A, sa]].forEach(function (trip) {
           var target = trip[0];
           var source = trip[1];
           var srcSites = trip[2];
           if (target.g.polar || !srcSites.length) return;
           var h = 1.5;
           var e0 = fieldAt(srcSites, target.x, target.y);
-          target.field.x = e0.x;
-          target.field.y = e0.y;
+          target.field.x += e0.x;
+          target.field.y += e0.y;
           function e2(px, py) {
             var e = fieldAt(srcSites, px, py);
             return e.x * e.x + e.y * e.y;
@@ -775,17 +1021,17 @@
             apply(target, pt.x, pt.y, pt.fx * sc, pt.fy * sc);
           });
           apply(source, source.x, source.y, -tx * sc, -ty * sc);
-          var sgn = target === b ? 1 : -1;
+          var sgn = target === B ? 1 : -1;
           radial += (sgn * sc * (tx * dx + ty * dy)) / dist;
         });
       }
 
       // dispersion + contact (atom–atom; shape and contact area matter)
-      var aa = worldAtoms(a);
-      var bb = worldAtoms(b);
+      var aa = worldAtoms(A);
+      var bb = worldAtoms(B);
       var gapMin = Infinity;
       // two polar molecules: orientation of the dipoles decides attract vs. repel
-      var ldfScale = a.g.polar && b.g.polar ? clamp(1 - esRadialOut / 0.03, 0, 1) : 1;
+      var ldfScale = A.g.polar && B.g.polar ? clamp(1 - esRadialOut / 0.03, 0, 1) : 1;
       var ldfX = 0;
       var ldfY = 0;
       for (var p = 0; p < aa.length; p++) {
@@ -793,7 +1039,7 @@
           var ax = bb[q].x - aa[p].x;
           var ay = bb[q].y - aa[p].y;
           var d = len(ax, ay) || 0.0001;
-          var gap = d - aa[p].r - bb[q].r - lobeReach(aa[p], bb[q], b) - lobeReach(bb[q], aa[p], a);
+          var gap = d - aa[p].r - bb[q].r - lobeReach(aa[p], bb[q], B) - lobeReach(bb[q], aa[p], A);
           if (gap < gapMin) gapMin = gap;
           var nx = ax / d;
           var ny = ay / d;
@@ -804,35 +1050,44 @@
             ldfX += nx * f2;
             ldfY += ny * f2;
           }
-          if (gap < CONTACT_PAD) {
-            var ov = CONTACT_PAD - gap;
+          if (gap < contactPad()) {
+            var ov = contactPad() - gap;
             f2 += CONTACT_K * (ov + 0.25 * ov * ov);
           }
           if (f2) {
             var cx = (aa[p].x + bb[q].x) / 2;
             var cy = (aa[p].y + bb[q].y) / 2;
-            apply(b, cx, cy, nx * f2, ny * f2);
-            apply(a, cx, cy, -nx * f2, -ny * f2);
+            apply(B, cx, cy, nx * f2, ny * f2);
+            apply(A, cx, cy, -nx * f2, -ny * f2);
           }
         }
       }
       radial += (ldfX * dx + ldfY * dy) / dist;
 
-      // cloud squish cue: lean toward partner when net non-contact pull is inward
+      // lean toward the partner when net non-contact pull is inward
       var inward = Math.max(0, -radial);
       var lean = clamp(inward * 2.5, 0, 3.5);
-      a.pullX = (dx / dist) * lean;
-      a.pullY = (dy / dist) * lean;
-      b.pullX = (-dx / dist) * lean;
-      b.pullY = (-dy / dist) * lean;
+      A.pullX += (dx / dist) * lean;
+      A.pullY += (dy / dist) * lean;
+      B.pullX -= (dx / dist) * lean;
+      B.pullY -= (dy / dist) * lean;
+
+      var pushing = esPush || radial > 0.02;
+      [[A, B], [B, A]].forEach(function (pr) {
+        var me = pr[0];
+        if (pushing) me.pushing = true;
+        if (dist < CUTOFF) me.near = true;
+        if (gapMin < me.nearGap) {
+          me.nearGap = gapMin;
+          me.nearest = pr[1];
+        }
+      });
 
       return { radial: radial, gap: gapMin, dist: dist, esPush: esPush };
     }
 
-    function updateTempDipoles(info) {
-      [[a, b], [b, a]].forEach(function (pair) {
-        var body = pair[0];
-        var other = pair[1];
+    function updateTempDipoles() {
+      bodies.forEach(function (body, bi) {
         var td = body.tdip;
         if (body.g.polar) {
           td.amp = 0;
@@ -844,29 +1099,30 @@
         var vx = Math.cos(wa) * wAmp;
         var vy = Math.sin(wa) * wAmp;
 
-        // shared A→B axis, so both temporary dipoles point the same way (δ+ faces δ−)
-        var ux = b.x - a.x;
-        var uy = b.y - a.y;
-        var ud = len(ux, uy) || 1;
-        ux /= ud;
-        uy /= ud;
-
-        if (other.g.polar) {
-          // induced: δ+ end points along the field (away from partner's + charge)
-          var ex = body.field.x;
-          var ey = body.field.y;
-          var em = len(ex, ey);
-          var c = clamp(em / 0.00035, 0, 1);
-          if (em > 0) {
-            vx = vx * (1 - c) + (ex / em) * c;
-            vy = vy * (1 - c) + (ey / em) * c;
-          }
-        } else {
-          // both nonpolar: fluctuations fall into step when close (δ+ faces δ−)
-          var corr = clamp(1 - (info.gap - 6) / 40, 0, 1);
+        var other = body.nearest;
+        if (other && !other.g.polar) {
+          // nonpolar neighbours: fluctuations fall into step when close (δ+ faces δ−). Both use
+          // the axis from the earlier molecule to the later one, so their dipoles point alike.
+          var first = bodies.indexOf(other) < bi ? other : body;
+          var second = first === body ? other : body;
+          var ux = second.x - first.x;
+          var uy = second.y - first.y;
+          var ud = len(ux, uy) || 1;
+          ux /= ud;
+          uy /= ud;
+          var corr = clamp(1 - (body.nearGap - 6 - spacing) / 40, 0, 1);
           var s = reduced ? 1 : Math.sin(t * 2.4);
           vx = vx * (1 - corr) + ux * s * corr;
           vy = vy * (1 - corr) + uy * s * corr;
+        }
+        // induced: δ+ end points along the field from nearby charges
+        var ex = body.field.x;
+        var ey = body.field.y;
+        var em = len(ex, ey);
+        if (em > 0) {
+          var c = clamp(em / 0.00035, 0, 1);
+          vx = vx * (1 - c) + (ex / em) * c;
+          vy = vy * (1 - c) + (ey / em) * c;
         }
         var m = len(vx, vy);
         td.amp = clamp(m, 0, 1);
@@ -890,15 +1146,19 @@
         sx *= cap / s;
         sy *= cap / s;
       }
-      body.x += sx;
-      body.y += sy;
+      var k = 1 - Math.pow(1 - SMOOTH, f);
+      body.vx += (sx - body.vx) * k;
+      body.vy += (sy - body.vy) * k;
+      body.x += body.vx;
+      body.y += body.vy;
 
       var spin = (body.torque * ROT_MOB * f * (pushing ? 1.8 : 1)) / body.g.inertia;
       if (jitter) spin += (Math.random() - 0.5) * 0.006 * f;
       // head-on like charges give zero torque; tip off the balance point so it turns
       if (pushing && body.g.polar && Math.abs(spin) < 0.002 * f) spin += 0.004 * f;
       spin = clamp(spin, -MAX_SPIN * f, MAX_SPIN * f);
-      body.angle += spin;
+      body.vs += (spin - body.vs) * k;
+      body.angle += body.vs;
       walls(body);
     }
 
@@ -912,9 +1172,9 @@
 
     function physicsStep(f, jitter) {
       var info = computeForces();
-      updateTempDipoles(info);
-      var held = drag ? (drag.which === 'a' ? a : b) : null;
-      [a, b].forEach(function (body) {
+      updateTempDipoles();
+      var held = drag ? drag.body : null;
+      bodies.forEach(function (body) {
         if (body.spinLeft) {
           applySpin(body, f);
           return;
@@ -924,8 +1184,25 @@
           body.angle += spin;
           return;
         }
-        integrate(body, f, jitter && info.dist < CUTOFF, info.esPush || info.radial > 0.02);
+        integrate(body, f, jitter && body.near, body.pushing);
       });
+      // keep a cluster on the tray: ease the group's centre back toward the middle, and each
+      // molecule softly toward the midline so chains lie along the wide tray, not off its edges
+      if (bodies.length > 2 && !drag) {
+        var gx = 0;
+        var gy = 0;
+        bodies.forEach(function (body) {
+          gx += body.x;
+          gy += body.y;
+        });
+        var kx = (W / 2 - gx / bodies.length) * 0.02 * f;
+        var ky = (H / 2 - gy / bodies.length) * 0.02 * f;
+        bodies.forEach(function (body) {
+          body.x += kx;
+          body.y += ky + (H / 2 - body.y) * 0.004 * f;
+          walls(body);
+        });
+      }
       return info;
     }
 
@@ -934,7 +1211,7 @@
       info = info || computeForces();
       var next;
       if (info.dist >= CUTOFF * 0.95) next = 'apart';
-      else if (info.gap < CONTACT_PAD + 2 && info.radial < 0) next = 'touching';
+      else if (info.gap < contactPad() + 2 && info.radial < 0) next = 'touching';
       else if (info.radial < -0.03) next = 'pulling';
       else if (info.radial > 0.03) next = 'pushing';
       else next = 'drifting';
@@ -953,13 +1230,14 @@
       emitStatus(info);
     }
 
-    function contactDistance(ux, uy) {
-      var probeA = { g: a.g, x: 0, y: 0, angle: a.angle };
-      var probeB = { g: b.g, x: 0, y: 0, angle: b.angle };
+    /** Centre distance along (ux, uy) at which B just clears A with the contact padding. */
+    function contactDistance(A, B, ux, uy) {
+      var probeA = { g: A.g, x: 0, y: 0, angle: A.angle };
+      var probeB = { g: B.g, x: 0, y: 0, angle: B.angle };
       for (var D = 0; D < 400; D += 1) {
         probeB.x = ux * D;
         probeB.y = uy * D;
-        if (minGap(probeA, probeB) >= 4) return D;
+        if (minGap(probeA, probeB) >= contactPad()) return D;
       }
       return 400;
     }
@@ -968,48 +1246,69 @@
       return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
     }
 
-    function startTween(ax2, ay2, bx2, by2, dur) {
-      tween = { t: 0, dur: dur, ax: a.x, ay: a.y, bx: b.x, by: b.y, ax2: ax2, ay2: ay2, bx2: bx2, by2: by2 };
+    function startTween(targets, dur) {
+      tween = {
+        t: 0,
+        dur: dur,
+        from: bodies.map(function (body) {
+          return { x: body.x, y: body.y };
+        }),
+        to: targets,
+      };
+    }
+
+    function jumpTo(targets) {
+      targets.forEach(function (p, i) {
+        bodies[i].x = p.x;
+        bodies[i].y = p.y;
+      });
+    }
+
+    // Meeting poses: a pair closes along its current line; partners gather around the first
+    function togetherPoses() {
+      if (bodies.length === 2) {
+        var dx = b.x - a.x;
+        var dy = b.y - a.y;
+        var d = len(dx, dy) || 1;
+        var ux = dx / d;
+        var uy = dy / d;
+        var D = contactDistance(a, b, ux, uy) + 6;
+        var mx = clamp((a.x + b.x) / 2, W * 0.3, W * 0.7);
+        var my = clamp((a.y + b.y) / 2, H * 0.3, H * 0.7);
+        return [
+          { x: mx - (ux * D) / 2, y: my - (uy * D) / 2 },
+          { x: mx + (ux * D) / 2, y: my + (uy * D) / 2 },
+        ];
+      }
+      return clusterPoses(function (body, t) {
+        return contactDistance(a, body, Math.cos(t), Math.sin(t)) + 6;
+      });
     }
 
     function bringTogether() {
-      if (!a || !b) return;
-      var dx = b.x - a.x;
-      var dy = b.y - a.y;
-      var d = len(dx, dy) || 1;
-      var ux = dx / d;
-      var uy = dy / d;
-      var D = contactDistance(ux, uy) + 10;
-      var mx = clamp((a.x + b.x) / 2, W * 0.3, W * 0.7);
-      var my = clamp((a.y + b.y) / 2, H * 0.3, H * 0.7);
-      var ax2 = mx - (ux * D) / 2;
-      var ay2 = my - (uy * D) / 2;
-      var bx2 = mx + (ux * D) / 2;
-      var by2 = my + (uy * D) / 2;
+      if (bodies.length < 2) return;
+      release();
+      var targets = togetherPoses();
       if (reduced) {
-        a.x = ax2;
-        a.y = ay2;
-        b.x = bx2;
-        b.y = by2;
+        jumpTo(targets);
         settleNow();
         return;
       }
-      startTween(ax2, ay2, bx2, by2, 700);
+      startTween(targets, bodies.length > 2 ? 900 : 700);
     }
 
     function separate() {
-      if (!a || !b) return;
-      var p = homePose();
+      if (bodies.length < 2) return;
       if (reduced) {
         placeDefault();
         emitStatus();
         return;
       }
-      startTween(p.ax, p.ay, p.bx, p.by, 600);
+      startTween(homePoses(), 600);
     }
 
     function rotate(which, delta) {
-      var body = which === 'b' ? b : a;
+      var body = typeof which === 'number' ? bodies[which] : which === 'b' ? b : a;
       if (!body) return;
       body.spinLeft += delta;
       if (reduced) {
@@ -1023,12 +1322,23 @@
       tween.t += dt;
       var u = clamp(tween.t / tween.dur, 0, 1);
       var e = easeInOut(u);
-      a.x = tween.ax + (tween.ax2 - tween.ax) * e;
-      a.y = tween.ay + (tween.ay2 - tween.ay) * e;
-      b.x = tween.bx + (tween.bx2 - tween.bx) * e;
-      b.y = tween.by + (tween.by2 - tween.by) * e;
+      bodies.forEach(function (body, i) {
+        var p0 = tween.from[i];
+        var p1 = tween.to[i];
+        if (!p0 || !p1) return;
+        body.x = p0.x + (p1.x - p0.x) * e;
+        body.y = p0.y + (p1.y - p0.y) * e;
+        body.vx = body.vy = 0;
+      });
       if (u >= 1) tween = null;
       return true;
+    }
+
+    // Start the physics on a waiting scene; status re-announces from scratch
+    function release() {
+      if (!waiting) return;
+      waiting = false;
+      status = '';
     }
 
     function step(dt) {
@@ -1036,9 +1346,16 @@
       clock += dt / 1000;
       if (!b || !outcome) return;
       var f = dt / 16.67;
-      if (stepTween(dt)) {
-        var infoT = computeForces();
-        updateTempDipoles(infoT);
+      if (stepTween(dt) || waiting) {
+        computeForces();
+        updateTempDipoles();
+        // still waiting: molecules stay put with no force lines, but Turn A / Turn B still turn them
+        if (waiting) {
+          bridges = [];
+          bodies.forEach(function (body) {
+            applySpin(body, f);
+          });
+        }
         return;
       }
       var info = physicsStep(f, !reduced);
@@ -1113,17 +1430,29 @@
       });
     }
 
+    // Polar-mode tint for one atom; drawCloud blends it with neutral by fade.polar
     function cloudRgb(atom) {
-      if (cloudMode === 'neutral') return T.neutralRgb;
       if (atom.q > 0.05) return T.posRgb;
       if (atom.q < -0.05) return T.negRgb;
       return T.neutralRgb;
     }
 
+    function mixRgb(from, to, t) {
+      if (t <= 0 || from === to) return from;
+      if (t >= 1) return to;
+      var p = from.split(',');
+      var q = to.split(',');
+      return [0, 1, 2]
+        .map(function (i) {
+          return Math.round(+p[i] + (q[i] - p[i]) * t);
+        })
+        .join(',');
+    }
+
     /** When teaching the bond, stretch a diatomic so the shared pair is readable. */
     function viewAtoms(body) {
       var atoms = worldAtoms(body);
-      if (!showSharedElectrons || atoms.length < 2) return atoms;
+      if (fade.shared <= 0 || atoms.length < 2) return atoms;
       var cx = 0;
       var cy = 0;
       atoms.forEach(function (w) {
@@ -1132,7 +1461,7 @@
       });
       cx /= atoms.length;
       cy /= atoms.length;
-      var k = 1.85;
+      var k = 1 + 0.85 * fade.shared;
       return atoms.map(function (w) {
         return {
           x: cx + (w.x - cx) * k,
@@ -1145,9 +1474,10 @@
     }
 
     function drawBonds(body) {
-      if (!showBonds || !body.g.bonds.length) return;
+      if (fade.bonds <= 0 || !body.g.bonds.length) return;
       var atoms = viewAtoms(body);
       ctx.save();
+      ctx.globalAlpha = fade.bonds;
       ctx.lineCap = 'round';
       body.g.bonds.forEach(function (pair) {
         var p0 = atoms[pair[0]];
@@ -1163,13 +1493,13 @@
         var x1 = p1.x - ux * p1.r;
         var y1 = p1.y - uy * p1.r;
         ctx.strokeStyle = 'rgba(29,36,51,0.7)';
-        ctx.lineWidth = showSharedElectrons ? 5 : 7;
+        ctx.lineWidth = 7 - 2 * fade.shared;
         ctx.beginPath();
         ctx.moveTo(x0, y0);
         ctx.lineTo(x1, y1);
         ctx.stroke();
         ctx.strokeStyle = 'rgba(255,255,255,0.92)';
-        ctx.lineWidth = showSharedElectrons ? 2.2 : 3;
+        ctx.lineWidth = 3 - 0.8 * fade.shared;
         ctx.beginPath();
         ctx.moveTo(x0, y0);
         ctx.lineTo(x1, y1);
@@ -1179,10 +1509,11 @@
     }
 
     function drawSharedElectrons(body) {
-      if (!showSharedElectrons || !body.g.bonds.length) return;
+      if (fade.shared <= 0 || !body.g.bonds.length) return;
       var atoms = viewAtoms(body);
       var pulse = reduced ? 1 : 0.85 + 0.15 * Math.sin(clock * 3.2);
       ctx.save();
+      ctx.globalAlpha = fade.shared;
       body.g.bonds.forEach(function (pair) {
         var p0 = atoms[pair[0]];
         var p1 = atoms[pair[1]];
@@ -1217,6 +1548,7 @@
       // Caption in CSS-pixel space so zoom keeps it readable
       ctx.save();
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.globalAlpha = fade.shared;
       ctx.font = '700 12px "Space Mono", ui-monospace, monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -1233,12 +1565,132 @@
       ctx.restore();
     }
 
+    // Deterministic 0..1 noise so each electron keeps the same orbit every frame
+    function hash01(n) {
+      var s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+      return s - Math.floor(s);
+    }
+
+    /**
+     * Valence electron paths: tilted orbits around each non-H atom that slowly precess,
+     * plus figure-8s through each bond so electrons visibly visit both atoms.
+     */
+    function cloudElectronPaths(body) {
+      var atoms = viewAtoms(body);
+      var paths = [];
+      atoms.forEach(function (w, i) {
+        if (w.src.el === 'H') return;
+        for (var k = 0; k < 3; k++) {
+          var n = i * 7 + k;
+          paths.push({
+            bond: false,
+            c: w,
+            R: w.r + cloudPad * (0.3 + 0.35 * hash01(n)),
+            inc: 0.9 + 0.5 * hash01(n + 0.3),
+            node: body.angle + k * 2.1 + 0.8 * hash01(n + 0.7),
+            phase: Math.PI * 2 * hash01(n + 0.9),
+            speed: (3.2 + 1.2 * hash01(n + 1.3)) * (k % 2 ? -1 : 1),
+            prec: 0.25 + 0.2 * hash01(n + 1.7),
+          });
+        }
+      });
+      body.g.bonds.forEach(function (pair, j) {
+        var p0 = atoms[pair[0]];
+        var p1 = atoms[pair[1]];
+        if (!p0 || !p1) return;
+        for (var k = 0; k < 2; k++) {
+          paths.push({
+            bond: true,
+            p0: p0,
+            p1: p1,
+            phase: k * Math.PI + j,
+            speed: 2.4 + 0.3 * k,
+            roll: k * Math.PI * 0.5 + j,
+            rollRate: 0.55,
+          });
+        }
+      });
+      return paths;
+    }
+
+    /** Electron position on its path at time t; z (-1..1) is depth toward the viewer. */
+    function electronAt(p, t) {
+      if (!p.bond) {
+        var th = p.phase + p.speed * t;
+        var ox = p.R * Math.cos(th);
+        var oy = p.R * Math.sin(th) * Math.cos(p.inc);
+        var nd = p.node + p.prec * t;
+        var cn = Math.cos(nd);
+        var sn = Math.sin(nd);
+        return { x: p.c.x + ox * cn - oy * sn, y: p.c.y + ox * sn + oy * cn, z: Math.sin(th) * Math.sin(p.inc) };
+      }
+      // Gerono figure-8 along the bond, each lobe sized to its atom, rolling about the bond axis
+      var dx = p.p1.x - p.p0.x;
+      var dy = p.p1.y - p.p0.y;
+      var d = len(dx, dy) || 1;
+      var ux = dx / d;
+      var uy = dy / d;
+      var s = p.phase + p.speed * t;
+      var gx = Math.cos(s);
+      var gy = Math.sin(s) * gx;
+      var host = gx >= 0 ? p.p1 : p.p0;
+      var reach = host.r + cloudPad * 0.45;
+      var along = gx * (d / 2 + reach);
+      var roll = p.roll + p.rollRate * t;
+      var lat = gy * 2 * reach * Math.cos(roll);
+      return {
+        x: (p.p0.x + p.p1.x) / 2 + ux * along - uy * lat,
+        y: (p.p0.y + p.p1.y) / 2 + uy * along + ux * lat,
+        z: gy * 2 * Math.sin(roll),
+      };
+    }
+
+    // Back half draws under the atoms, front half over them, so orbits read as 3D
+    function drawCloudElectrons(body, front) {
+      var alpha = fade.electrons * fade.clouds;
+      if (alpha <= 0) return;
+      var t = reduced ? 0 : clock;
+      var trail = reduced ? 0 : 12;
+      ctx.save();
+      ctx.lineCap = 'butt';
+      cloudElectronPaths(body).forEach(function (p) {
+        var head = electronAt(p, t);
+        if (head.z >= 0 !== front) return;
+        var depth = 0.5 + 0.5 * head.z;
+        var r = 1.5 + 0.8 * depth;
+        var a = alpha * (0.45 + 0.55 * depth);
+        // Comet tail from recent positions
+        var prev = head;
+        for (var i = 1; i <= trail; i++) {
+          var q = electronAt(p, t - i * 0.018);
+          var fadeK = 1 - i / (trail + 1);
+          ctx.strokeStyle = 'rgba(29,36,51,' + a * 0.5 * fadeK + ')';
+          ctx.lineWidth = r * 1.6 * fadeK;
+          ctx.beginPath();
+          ctx.moveTo(prev.x, prev.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.stroke();
+          prev = q;
+        }
+        ctx.fillStyle = 'rgba(29,36,51,' + 0.92 * a + ')';
+        ctx.beginPath();
+        ctx.arc(head.x, head.y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,' + 0.55 * a + ')';
+        ctx.beginPath();
+        ctx.arc(head.x - r * 0.3, head.y - r * 0.3, r * 0.35, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
+    }
+
     function drawEN(body) {
-      if (!showEN) return;
+      if (fade.en <= 0) return;
       var atoms = worldAtoms(body);
       // Draw in CSS-pixel space so zoom does not blow up the chrome
       ctx.save();
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.globalAlpha = fade.en;
       ctx.font = '700 12px "Space Mono", ui-monospace, monospace';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -1302,15 +1754,184 @@
       ctx.restore();
     }
 
+    // Teardrop half-width profile along t in 0..π (t = 0 is the tip). r0 = 1 gives an ellipse;
+    // smaller r0 tapers the tip while keeping it rounded.
+    function dropProfile(t, r0) {
+      return Math.sin(t) * (r0 + (1 - r0) * Math.sin(t / 2));
+    }
+
+    // Electron-rich atom: the yellow (δ−) end of the cloud
+    function cloudRich(body, w) {
+      if (body.mol.ion) return false;
+      if (w.src.q < -0.05) return true;
+      return body.g.lps.length > 0 && (w.src.el === 'O' || w.src.el === 'N' || w.src.el === 'F');
+    }
+
+    /**
+     * Where the teardrop points: origin, unit axis from electron-rich toward electron-poor, and
+     * skew 0..1. Polar molecules use their permanent dipole; everything else leans along its
+     * temporary / induced dipole, so a nonpolar cloud sloshes between round and teardrop.
+     * Null for polar molecules with no single clear axis (glucose): those keep per-atom halos.
+     */
+    function dropFrame(body, atoms) {
+      var cx = 0;
+      var cy = 0;
+      atoms.forEach(function (w) {
+        cx += w.x;
+        cy += w.y;
+      });
+      cx /= atoms.length;
+      cy /= atoms.length;
+      if (body.g.polar && !body.mol.ion) {
+        var rx = 0;
+        var ry = 0;
+        var rn = 0;
+        var qx = 0;
+        var qy = 0;
+        var qn = 0;
+        atoms.forEach(function (w) {
+          if (cloudRich(body, w)) {
+            rx += w.x;
+            ry += w.y;
+            rn++;
+          } else if (w.src.q > 0.05) {
+            qx += w.x;
+            qy += w.y;
+            qn++;
+          }
+        });
+        if (rn && qn) {
+          rx /= rn;
+          ry /= rn;
+          var dx = qx / qn - rx;
+          var dy = qy / qn - ry;
+          var d = len(dx, dy);
+          if (d > 3) return { x: rx, y: ry, ux: dx / d, uy: dy / d, skew: 1 };
+        }
+        return null;
+      }
+      // tdip points toward the δ+ side, i.e. rich → poor
+      var td = body.tdip;
+      var tl = len(td.x, td.y);
+      var ux = tl > 1e-3 ? td.x / tl : Math.cos(body.angle);
+      var uy = tl > 1e-3 ? td.y / tl : Math.sin(body.angle);
+      var skew = body.mol.ion ? 0 : clamp(td.amp, 0, 1);
+      // Elongated molecules (Br₂, CO₂, octane) keep the cloud on their long axis and slosh along
+      // it; a tilted fit around a long chain balloons
+      var sxx = 0;
+      var syy = 0;
+      var sxy = 0;
+      atoms.forEach(function (w) {
+        sxx += (w.x - cx) * (w.x - cx);
+        syy += (w.y - cy) * (w.y - cy);
+        sxy += (w.x - cx) * (w.y - cy);
+      });
+      var spread = sxx + syy;
+      if (spread > 1e-6 && len(sxx - syy, 2 * sxy) / spread > 0.3) {
+        var th = 0.5 * Math.atan2(2 * sxy, sxx - syy);
+        var dot = Math.cos(th) * ux + Math.sin(th) * uy;
+        var sgn = dot < 0 ? -1 : 1;
+        ux = Math.cos(th) * sgn;
+        uy = Math.sin(th) * sgn;
+        skew *= Math.abs(dot);
+      }
+      return { x: cx, y: cy, ux: ux, uy: uy, skew: skew };
+    }
+
+    /**
+     * One squishy cloud per molecule: a fat, wobbling bulb at the electron-rich end tapering to a
+     * rounded tip past the electron-poor end, so the cloud visibly favours the more
+     * electronegative side. Sized so every atom stays inside.
+     */
+    function drawDropCloud(body, f, atoms, alpha) {
+      var ux = f.ux;
+      var uy = f.uy;
+      var sk = f.skew;
+      var r0 = 1 - 0.65 * sk;
+      var back = 0;
+      var tip = 0;
+      var reach = 0;
+      atoms.forEach(function (w) {
+        var a = (w.x - f.x) * ux + (w.y - f.y) * uy;
+        back = Math.max(back, w.r - a);
+        tip = Math.max(tip, w.r + a);
+        reach = Math.max(reach, w.r + Math.abs((w.y - f.y) * ux - (w.x - f.x) * uy));
+      });
+      back += cloudPad * (0.6 + 0.2 * sk);
+      reach += cloudPad * (0.6 + 0.2 * sk);
+      tip += cloudPad * (0.6 - 0.35 * sk);
+      var half = (back + tip) / 2;
+      var mid = (tip - back) / 2;
+      var peak = 0;
+      for (var k = 1; k < 32; k++) peak = Math.max(peak, dropProfile((k / 32) * Math.PI, r0));
+      // Bulb as wide as the atoms reach sideways, widened if any atom would poke out the side
+      var wide = reach / peak;
+      atoms.forEach(function (w) {
+        var a = (w.x - f.x) * ux + (w.y - f.y) * uy;
+        var b = Math.abs((w.y - f.y) * ux - (w.x - f.x) * uy);
+        var t = Math.acos(clamp((a - mid) / half, -1, 1));
+        wide = Math.max(wide, (b + w.r + cloudPad * 0.3) / Math.max(0.3, dropProfile(t, r0)));
+      });
+      var tau = reduced ? 0 : clock + body.seed * 5;
+      var breathe = 1 + 0.04 * Math.sin(tau * 1.4);
+      var cx = f.x + body.pullX * 0.6;
+      var cy = f.y + body.pullY * 0.6;
+      var tint = fade.polar;
+
+      var neg;
+      var pos;
+      if (body.mol.ion) {
+        neg = pos = mixRgb(T.neutralRgb, T.posRgb, tint);
+      } else {
+        neg = mixRgb(T.neutralRgb, T.negRgb, tint * sk);
+        pos = mixRgb(T.neutralRgb, T.posRgb, tint * sk);
+      }
+      var lg = ctx.createLinearGradient(cx - ux * back, cy - uy * back, cx + ux * tip, cy + uy * tip);
+      lg.addColorStop(0, 'rgba(' + neg + ',1)');
+      lg.addColorStop(0.45, 'rgba(' + neg + ',1)');
+      lg.addColorStop(0.72, 'rgba(' + pos + ',1)');
+      lg.addColorStop(1, 'rgba(' + pos + ',1)');
+
+      ctx.save();
+      ctx.globalCompositeOperation = T.cloudBlend;
+      ctx.fillStyle = lg;
+      // Nested layers shrinking toward the rich end: soft edge, densest where electrons crowd
+      var LAYERS = 14;
+      for (var li = 0; li < LAYERS; li++) {
+        var sc = 1 - li * 0.05;
+        ctx.globalAlpha = alpha * 0.05 * T.cloudAlpha;
+        ctx.beginPath();
+        for (var i = 0; i <= 64; i++) {
+          var t = (i / 64) * Math.PI * 2;
+          var bulb = (1 - Math.cos(t)) / 2;
+          // Squish mostly on the bulb; the tip stays fairly steady
+          var wob =
+            1 + (0.4 + 0.6 * bulb) * (0.06 * Math.sin(2 * t + tau * 1.7) + 0.04 * Math.sin(3 * t - tau * 2.3));
+          var along = (mid + half * Math.cos(t)) * wob * sc;
+          var side = wide * dropProfile(t, r0) * wob * breathe * sc;
+          var x = cx + ux * along - uy * side;
+          var y = cy + uy * along + ux * side;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
     function drawCloud(body) {
-      if (!showClouds || cloudMode === 'off') return;
+      if (fade.clouds <= 0) return;
       var g = body.g;
       var atoms = worldAtoms(body);
       var px = body.pullX;
       var py = body.pullY;
       var pm = len(px, py);
       var hasLp = g.lps.length > 0;
-      var polarTint = cloudMode === 'polar';
+      var tint = fade.polar;
+      var frame = fade.drop > 0 ? dropFrame(body, atoms) : null;
+      var dropK = frame ? fade.drop : 0;
+      if (dropK > 0) drawDropCloud(body, frame, atoms, dropK * fade.clouds);
 
       ctx.save();
       ctx.globalCompositeOperation = T.cloudBlend;
@@ -1321,14 +1942,16 @@
         var face = pm ? Math.max(0, (ox * px + oy * py) / (od * pm)) : 0;
         var k = 0.4 + 0.6 * face;
         var rgb = cloudRgb(w.src);
-        if (polarTint && hasLp && (w.src.el === 'O' || w.src.el === 'N' || w.src.el === 'F')) rgb = T.negRgb;
-        if (polarTint && body.mol.ion) rgb = T.posRgb;
-        blob(w.x + px * k, w.y + py * k, w.r + cloudPad + pm * face, rgb, ((polarTint && g.polar) ? 0.28 : 0.2) * T.cloudAlpha);
+        if (hasLp && (w.src.el === 'O' || w.src.el === 'N' || w.src.el === 'F')) rgb = T.negRgb;
+        if (body.mol.ion) rgb = T.posRgb;
+        rgb = mixRgb(T.neutralRgb, rgb, tint);
+        var alpha = (0.2 + (g.polar ? 0.08 * tint : 0)) * T.cloudAlpha * fade.clouds * (1 - dropK);
+        blob(w.x + px * k, w.y + py * k, w.r + cloudPad + pm * face, rgb, alpha);
       });
 
       // temporary / induced dipole: shift cloud colour across the molecule
       var td = body.tdip;
-      if (polarTint && !g.polar && td.amp > 0.04) {
+      if (tint > 0 && !g.polar && td.amp > 0.04) {
         var R = g.R + cloudPad * 0.6;
         var lg = ctx.createLinearGradient(
           body.x - td.x * R,
@@ -1336,7 +1959,7 @@
           body.x + td.x * R,
           body.y + td.y * R
         );
-        var al = 0.42 * td.amp * T.cloudAlpha;
+        var al = 0.42 * td.amp * T.cloudAlpha * tint * fade.clouds * (1 - dropK);
         lg.addColorStop(0, 'rgba(' + T.negRgb + ',' + al + ')');
         lg.addColorStop(0.5, 'rgba(' + T.neutralRgb + ',0)');
         lg.addColorStop(1, 'rgba(' + T.posRgb + ',' + al + ')');
@@ -1353,19 +1976,21 @@
       ctx.restore();
 
       // lone pairs pointing away from the viewer sit behind the atoms
-      if (!showLobes) return;
+      if (fade.lobes <= 0) return;
       g.lps.forEach(function (l) {
         if (!l.behind) return;
         var c = toWorld(body, { x: l.lx, y: l.ly });
-        lobeShape(c.x + px * 0.8, c.y + py * 0.8, l.ang + body.angle, 12.5, 8.5, T.negRgb, 0.5 * T.lobeAlpha);
+        lobeShape(c.x + px * 0.8, c.y + py * 0.8, l.ang + body.angle, 12.5, 8.5, T.negRgb, 0.5 * T.lobeAlpha * fade.lobes * fade.clouds);
       });
     }
 
     // front lone pairs: drawn over all atoms so a docking H visibly meets the electrons, not the O
     function drawLobes(body) {
-      if (!showLobes) return;
+      if (fade.lobes <= 0) return;
       var px = body.pullX;
       var py = body.pullY;
+      ctx.save();
+      ctx.globalAlpha = fade.lobes;
       body.g.lps.forEach(function (l) {
         if (l.behind) return;
         var c = toWorld(body, { x: l.lx, y: l.ly });
@@ -1383,6 +2008,7 @@
           ctx.fill();
         });
       });
+      ctx.restore();
     }
 
     function drawAtoms(body) {
@@ -1398,7 +2024,11 @@
       ctx.font = '700 ' + size + 'px ' + T.font;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      if (T.badge) {
+      // Pill and plain styles crossfade as deltaStyle changes
+      var pill = T.badge ? fade.badges : 0;
+      var base = ctx.globalAlpha;
+      if (pill > 0) {
+        ctx.globalAlpha = base * pill;
         var isPos = t.indexOf('+') >= 0;
         var bw = ctx.measureText(t).width + size * 0.75;
         var bh = size + 4;
@@ -1417,13 +2047,34 @@
         ctx.stroke();
         ctx.fillStyle = isPos ? T.badge.pos : T.badge.neg;
         ctx.fillText(t, x, y + 0.5);
-        return;
       }
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = T.halo;
-      ctx.strokeText(t, x, y);
-      ctx.fillStyle = color;
-      ctx.fillText(t, x, y);
+      if (pill < 1) {
+        ctx.globalAlpha = base * (1 - pill);
+        // Badge themes go plain in ink: the cloud colour already says which end is which
+        if (T.badge) ctx.font = '700 ' + (size + 2) + 'px ' + T.font;
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = T.halo;
+        ctx.strokeText(t, x, y);
+        ctx.fillStyle = T.badge ? T.text : color;
+        ctx.fillText(t, x, y);
+      }
+      ctx.globalAlpha = base;
+    }
+
+    // Atoms of every other molecule on the tray (labels dodge them)
+    function othersAtoms(body) {
+      var out = [];
+      bodies.forEach(function (o) {
+        if (o !== body) out = out.concat(worldAtoms(o));
+      });
+      return out;
+    }
+
+    // Formula labels introduce the molecules, then fade once formulaHold seconds have passed
+    function formulaFade() {
+      if (!formulaHold || solo) return 1;
+      return 1 - clamp((clock - sceneStart - formulaHold) / 0.8, 0, 1);
     }
 
     function drawLabels(body) {
@@ -1433,7 +2084,7 @@
       g.labels.forEach(function (lb) {
         var w = toWorld(body, lb);
         var color = lb.t.indexOf('+') >= 0 ? T.pos : T.neg;
-        if (!lb.big && !showDeltas) return;
+        if (!lb.big && fade.deltas <= 0) return;
         if (lb.big) {
           ctx.save();
           ctx.font = '800 15px ' + T.font;
@@ -1451,8 +2102,7 @@
           if (at.x === lb.x && at.y === lb.y) atomR = at.r;
         });
         var push = atomR + (lb.small ? 6 : 9) + (lb.t === 'δ−' && g.lps.length ? 12 : 0);
-        var other = body === a ? b : a;
-        var otherAtoms = other ? worldAtoms(other) : [];
+        var otherAtoms = othersAtoms(body);
         // if the partner covers the spot, swing the label around the atom to a free side
         var tries = [0, 1.1, -1.1, 2.0, -2.0];
         for (var ti = 0; ti < tries.length; ti++) {
@@ -1464,7 +2114,9 @@
             return len(tx - oa.x, ty - oa.y) < oa.r + 3;
           });
           if (!covered) {
+            ctx.globalAlpha = fade.deltas;
             textBadge(tx, ty, lb.t, color, lb.small ? 9 : 11);
+            ctx.globalAlpha = 1;
             break;
           }
         }
@@ -1472,11 +2124,10 @@
 
       // temporary / induced δ signs appear only when the shift is strong
       var td = body.tdip;
-      if (showDeltas && !g.polar && td.amp > 0.6) {
+      if (fade.deltas > 0 && !g.polar && td.amp > 0.6) {
         var R = g.R + 4;
-        ctx.globalAlpha = clamp((td.amp - 0.6) / 0.3, 0, 1) * 0.85;
-        var partner = body === a ? b : a;
-        var partnerAtoms = partner ? worldAtoms(partner) : [];
+        ctx.globalAlpha = clamp((td.amp - 0.6) / 0.3, 0, 1) * 0.85 * fade.deltas;
+        var partnerAtoms = othersAtoms(body);
         [[1, 'δ+', T.pos], [-1, 'δ−', T.neg]].forEach(function (end) {
           var ex = body.x + end[0] * td.x * R;
           var ey = body.y + end[0] * td.y * R;
@@ -1490,11 +2141,12 @@
 
       // formula sits below; when crowded it slides to the far side of the partner
       // hide under bond-focus / EN chrome so labels stay clear
-      if (showSharedElectrons || showEN) return;
+      var formulaAlpha = (1 - Math.max(fade.shared, fade.en)) * formulaFade();
+      if (formulaAlpha <= 0) return;
       var fx = body.x;
       var fy = body.y + g.R + 16;
-      if (b && a) {
-        var other = body === a ? b : a;
+      var other = body.nearest || (body === a ? b : a);
+      if (other) {
         var awx = body.x - other.x;
         var awy = body.y - other.y;
         var awd = len(awx, awy) || 1;
@@ -1509,7 +2161,9 @@
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = T.text;
+      ctx.globalAlpha = formulaAlpha;
       ctx.fillText(body.mol.formula, fx, fy);
+      ctx.globalAlpha = 1;
     }
 
     function drawBridges() {
@@ -1565,7 +2219,9 @@
       drawShadow(body);
       drawCloud(body);
       drawBonds(body);
+      drawCloudElectrons(body, false);
       drawAtoms(body);
+      drawCloudElectrons(body, true);
       drawSharedElectrons(body);
       drawLobes(body);
       drawLabels(body);
@@ -1594,17 +2250,28 @@
       }
 
       ctx.setTransform(dpr * S, 0, 0, dpr * S, 0, 0);
-      drawBody(a);
-      if (b) drawBody(b);
-      if (b) drawBridges();
+      bodies.forEach(drawBody);
+      if (bodies.length > 1) drawBridges();
 
-      if (showLabels && outcome) {
+      if (fade.labels > 0 && outcome) {
         ctx.font = '700 12px ' + T.font;
         ctx.fillStyle = T.text;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'alphabetic';
+        ctx.globalAlpha = fade.labels;
         ctx.fillText(outcome.label, 12, 20);
+        ctx.globalAlpha = 1;
       }
+    }
+
+    // Old frame laid over the new one, fading out
+    function drawDissolve() {
+      if (!dissolve) return;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalAlpha = 1 - easeInOut(clamp(dissolve.t / DISSOLVE_MS, 0, 1));
+      // Centred, in case the canvas is changing height under the dissolve
+      ctx.drawImage(snapCanvas, (canvas.width - snapCanvas.width) / 2, (canvas.height - snapCanvas.height) / 2);
+      ctx.globalAlpha = 1;
     }
 
     /* ---------- loop + input ---------- */
@@ -1615,7 +2282,13 @@
       var dt = lastT ? Math.min(32, t - lastT) : 16;
       lastT = t;
       step(dt);
+      animateView(dt);
+      if (dissolve) {
+        dissolve.t += dt;
+        if (dissolve.t >= DISSOLVE_MS) dissolve = null;
+      }
       draw();
+      drawDissolve();
       raf = global.requestAnimationFrame(loop);
     }
 
@@ -1654,18 +2327,23 @@
     function onDown(evt) {
       if (!a) return;
       var p = canvasPoint(evt);
-      var which = hit(a, p) ? 'a' : b && hit(b, p) ? 'b' : null;
-      if (!which) return;
+      // topmost (last drawn) molecule wins
+      var body = null;
+      for (var i = bodies.length - 1; i >= 0 && !body; i--) {
+        if (hit(bodies[i], p)) body = bodies[i];
+      }
+      if (!body) return;
+      release();
       tween = null;
-      var body = which === 'a' ? a : b;
-      drag = { which: which, ox: body.x - p.x, oy: body.y - p.y };
+      layoutAnim = false;
+      drag = { body: body, ox: body.x - p.x, oy: body.y - p.y };
       evt.preventDefault();
     }
 
     function onMove(evt) {
       if (!drag) return;
       var p = canvasPoint(evt);
-      var body = drag.which === 'a' ? a : b;
+      var body = drag.body;
       body.x = p.x + drag.ox;
       body.y = p.y + drag.oy;
       walls(body);
@@ -1698,6 +2376,16 @@
 
     return {
       setPair: setPair,
+      setScene: setScene,
+      /** Test hook: advance the simulation dt ms without drawing. */
+      tick: function (dt) {
+        step(dt || 16.67);
+      },
+      getBodies: function () {
+        return bodies.map(function (body) {
+          return { id: body.id, x: body.x, y: body.y, angle: body.angle };
+        });
+      },
       setSolo: setSolo,
       setView: setView,
       bringTogether: bringTogether,
@@ -1713,6 +2401,9 @@
       },
       getStatus: function () {
         return status;
+      },
+      isWaiting: function () {
+        return waiting;
       },
       isSolo: function () {
         return solo;

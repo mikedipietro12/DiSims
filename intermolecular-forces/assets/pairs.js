@@ -99,6 +99,13 @@
       pulse: false,
       reorient: true,
     },
+    'acetone|acetone': {
+      force: 'dipole-dipole',
+      label: 'Dipole-dipole',
+      attraction: 'medium',
+      pulse: false,
+      reorient: true,
+    },
     'h2o|na': {
       force: 'ion-dipole',
       label: 'Ion-dipole',

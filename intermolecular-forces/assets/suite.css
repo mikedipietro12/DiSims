@@ -422,14 +422,47 @@ select:focus-visible{
   margin-bottom:0.75rem;
   box-shadow:none;
 }
+/* The stage body is one fixed height for every beat so the sticky panel never jumps.
+   Controls sit at its foot; on intro beats they fade out and the canvas grows into their space. */
+.guide-stage-panel{--stage-h:min(46vh,360px);}
+.guide-stage-body{
+  position:relative;
+  height:calc(var(--stage-h) + 4px + 0.75rem + var(--controls-h,160px));
+}
+/* Sequenced: leaving intro, the canvas shrinks and then controls fade in;
+   entering intro, controls fade out and then the canvas grows */
 .guide-stage-wrap canvas{
-  height:min(42vh,320px);
+  height:var(--stage-h);
+  transition:height 0.3s ease;
+}
+.guide-stage-panel.is-intro .guide-stage-wrap canvas{
+  height:calc(var(--stage-h) + 0.75rem + var(--controls-h,160px));
+  transition:height 0.3s ease 0.15s;
+}
+#guideControls{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
 }
 .guide-stage-controls{margin-bottom:0.45rem;}
-.guide-stage-panel .hud-quiet{min-height:1.2em;margin-top:0.55rem;}
-.guide-stage-panel.is-intro .guide-stage-wrap canvas{
-  height:min(52vh,400px);
+.guide-stage-panel .hud-quiet{min-height:1.55em;margin-top:0.55rem;}
+.alt-pair-row{margin-top:0.55rem;}
+/* Hidden controls keep their space and fade instead of collapsing */
+#guideControls,
+.alt-pair-row{
+  transition:opacity 0.25s ease 0.25s, visibility 0s linear 0s;
 }
+.guide-stage-panel.is-intro #guideControls,
+.alt-pair-row.is-off{
+  opacity:0;
+  visibility:hidden;
+  transition:opacity 0.15s ease, visibility 0s linear 0.15s;
+}
+.force-badge,
+.pair-formulas{transition:opacity 0.14s ease;}
+.force-badge.is-swapping,
+.pair-formulas.is-swapping{opacity:0;}
 .guide-beat-end{padding-bottom:4rem;}
 
 @media (max-width:860px){
@@ -443,5 +476,7 @@ select:focus-visible{
 }
 
 @media (prefers-reduced-motion: reduce){
-  .btn,.path a{transition:none;}
+  .btn,.path a,
+  #guideControls,.alt-pair-row,.guide-stage-wrap canvas,
+  .force-badge,.pair-formulas{transition:none !important;}
 }

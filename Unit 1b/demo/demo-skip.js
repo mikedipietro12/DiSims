@@ -1,14 +1,11 @@
 /* Skip bar — teacher (?demo=1) or student (after this module is complete).
-   First-time students never see it. Keyboard ← → / H are teacher-only. */
+   First-time students never see it. Keyboard ← → are teacher-only. */
 (function (global) {
   'use strict';
 
   var qs = new URLSearchParams(location.search);
   var teacher = qs.has('demo');
-  var HIDE_KEY = teacher ? 'unit1b_demo_bar_hidden' : 'unit1b_stages_bar_hidden';
   var COMPLETE_KEY = 'unit1b_complete';
-  var barHidden = false;
-  try { barHidden = sessionStorage.getItem(HIDE_KEY) === '1'; } catch (e) {}
 
   var controller = null;
   var mounted = false;
@@ -525,8 +522,7 @@
       '#demoSkip button:hover,#demoSkip button:focus-visible{color:var(--plate-ink,#e8e6d9);',
       'border-color:rgba(232,230,217,0.45);outline:none;}',
       '#demoSkip button.is-on{color:var(--plate-ink,#e8e6d9);border-color:var(--plate-ink,#e8e6d9);}',
-      '#demoSkip .demo-skip-keys{color:#8a8674;flex:none;letter-spacing:0.06em;}',
-      '#demoSkip .demo-skip-hide{margin-left:auto;flex:none;}'
+      '#demoSkip .demo-skip-keys{color:#8a8674;flex:none;letter-spacing:0.06em;}'
     ].join('');
     document.head.appendChild(css);
   }
@@ -537,40 +533,25 @@
     var nav = document.createElement('nav');
     nav.id = 'demoSkip';
     nav.setAttribute('aria-label', teacher ? 'Demo skip' : 'Stages');
-    if (barHidden) {
-      nav.hidden = true;
-      document.body.classList.remove('demo-skip-on');
-    }
     var partsHtml = ctrl.parts.map(function (p) {
       return '<button type="button" data-demo-part="' + p.id + '">' + p.label + '</button>';
     }).join('');
     var keys = teacher
-      ? '<span class="demo-skip-keys">← → skip · H hide</span>'
+      ? '<span class="demo-skip-keys">← → skip</span>'
       : '';
     nav.innerHTML =
       '<div class="demo-skip-inner">' +
         '<span class="demo-skip-kicker">' + (teacher ? 'Demo skip' : 'Stages') + '</span>' +
         '<div class="demo-skip-parts">' + partsHtml + '</div>' +
         keys +
-        '<button type="button" class="demo-skip-hide" data-demo-hide>Hide</button>' +
       '</div>';
     document.body.appendChild(nav);
     nav.addEventListener('click', function (e) {
-      var hideBtn = e.target.closest('[data-demo-hide]');
-      if (hideBtn) { toggleBar(true); return; }
       var btn = e.target.closest('[data-demo-part]');
       if (!btn) return;
       ctrl.go(btn.getAttribute('data-demo-part'));
       paint(ctrl);
     });
-  }
-
-  function toggleBar(forceHide) {
-    barHidden = forceHide == null ? !barHidden : !!forceHide;
-    try { sessionStorage.setItem(HIDE_KEY, barHidden ? '1' : '0'); } catch (e) {}
-    var nav = $('demoSkip');
-    if (nav) nav.hidden = barHidden;
-    document.body.classList.toggle('demo-skip-on', !barHidden);
   }
 
   function paint(ctrl) {
@@ -605,9 +586,6 @@
       } else if (e.key === 'ArrowLeft' || e.key === '[') {
         e.preventDefault();
         step(ctrl, -1);
-      } else if (e.key === 'h' || e.key === 'H' || e.key === '`') {
-        e.preventDefault();
-        toggleBar();
       }
     });
   }

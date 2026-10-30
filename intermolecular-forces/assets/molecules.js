@@ -354,6 +354,46 @@
       },
       notes: 'Organic H-bonder - another H-bonding example.',
     },
+    acetone: {
+      id: 'acetone',
+      formula: '(CH₃)₂CO',
+      name: 'Acetone',
+      polarity: 'polar',
+      vsepr: 'trigonal-planar-at-C',
+      hBondDonor: false,
+      hBondAcceptor: true,
+      ion: false,
+      charge: 0,
+      dipole: 1.3,
+      partialCharges: [
+        { site: 'C(=O)', sign: '+' },
+        { site: 'O', sign: '-' },
+      ],
+      ldfTier: 'medium',
+      polarizabilityScore: null,
+      bulk: false,
+      layout: {
+        simplified: {
+          kind: 'acetone',
+          atoms: [
+            { el: 'O', r: 0.95, delta: '-' },
+            { el: 'C', r: 1, delta: '+' },
+            { el: 'C', r: 1 },
+            { el: 'C', r: 1 },
+          ],
+        },
+        heatRich: {
+          kind: 'acetone',
+          atoms: [
+            { el: 'O', r: 0.95, delta: '-' },
+            { el: 'C', r: 1, delta: '+' },
+            { el: 'C', r: 1 },
+            { el: 'C', r: 1 },
+          ],
+        },
+      },
+      notes: 'Polar C=O but no O–H: the classic dipole-dipole example (no H-bonding between acetones).',
+    },
     na: {
       id: 'na',
       formula: 'Na⁺',
