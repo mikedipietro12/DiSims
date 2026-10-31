@@ -3,7 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BC Tide — White Rock &amp; Jericho Beach</title>
+<title>BC Tides: White Rock &amp; Jericho Beach Tide Chart</title>
+<meta name="description" content="Live tide heights for White Rock and Jericho Beach, BC, with a tide forecast, moon phase, and an animated view of why the tide moves.">
+<meta name="author" content="M DiPietro">
+<link rel="canonical" href="https://atomicsimulations.ca/bc-tides.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Atomic Simulations">
+<meta property="og:title" content="BC Tides: White Rock &amp; Jericho Beach Tide Chart">
+<meta property="og:description" content="Live tide heights for White Rock and Jericho Beach, BC, with a tide forecast, moon phase, and an animated view of why the tide moves.">
+<meta property="og:url" content="https://atomicsimulations.ca/bc-tides.html">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "BC Tides: White Rock & Jericho Beach Tide Chart", "url": "https://atomicsimulations.ca/bc-tides.html", "description": "Live tide heights for White Rock and Jericho Beach, BC, with a tide forecast, moon phase, and an animated view of why the tide moves.", "inLanguage": "en", "isAccessibleForFree": true, "learningResourceType": "Simulation", "author": {"@type": "Person", "name": "M DiPietro"}, "isPartOf": {"@type": "WebSite", "name": "Atomic Simulations", "url": "https://atomicsimulations.ca/"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -685,7 +695,7 @@ function applySite(key){
     SITE.water+" · "+Math.abs(SITE.lat).toFixed(2)+"°N "+Math.abs(SITE.lon).toFixed(2)+"°W · "+SITE.datum;
   document.getElementById("legendSite").textContent=SITE.name;
   document.getElementById("fitNote").textContent=SITE.fitNote;
-  document.title="BC Tide — "+SITE.name;
+  document.title=SITE.name+" Tide Chart | BC Tides";
 }
 const siteSel=document.getElementById("siteSel");
 siteSel.addEventListener("change",e=>applySite(e.target.value));

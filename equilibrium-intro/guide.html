@@ -3,7 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Guide · Intro to Equilibrium</title>
+  <title>Equilibrium Guide: Enthalpy, Entropy &amp; Gibbs Free Energy</title>
+  <meta name="description" content="Guided intro to equilibrium: enthalpy, entropy, reactions that run both ways, equal rates, state functions and Gibbs free energy, with predict-then-reveal examples.">
+  <meta name="author" content="M DiPietro">
+  <link rel="canonical" href="https://atomicsimulations.ca/equilibrium-intro/guide.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Atomic Simulations">
+  <meta property="og:title" content="Equilibrium Guide: Enthalpy, Entropy &amp; Gibbs Free Energy">
+  <meta property="og:description" content="Guided intro to equilibrium: enthalpy, entropy, reactions that run both ways, equal rates, state functions and Gibbs free energy, with predict-then-reveal examples.">
+  <meta property="og:url" content="https://atomicsimulations.ca/equilibrium-intro/guide.html">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Equilibrium Guide: Enthalpy, Entropy & Gibbs Free Energy", "url": "https://atomicsimulations.ca/equilibrium-intro/guide.html", "description": "Guided intro to equilibrium: enthalpy, entropy, reactions that run both ways, equal rates, state functions and Gibbs free energy, with predict-then-reveal examples.", "inLanguage": "en", "isAccessibleForFree": true, "learningResourceType": "Simulation", "author": {"@type": "Person", "name": "M DiPietro"}, "isPartOf": {"@type": "WebSite", "name": "Atomic Simulations", "url": "https://atomicsimulations.ca/"}, "educationalLevel": "Grade 12", "about": "Chemistry"}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -70,7 +80,7 @@
             <li><strong>Dissolving:</strong> usually ΔS +, as a neat crystal breaks up into ions that wander through the water.</li>
             <li><strong>Watch:</strong> the same particles before and after. Count how many ways they could be arranged.</li>
           </ul>
-          <p class="beat-aside" id="hotpackAside" hidden>Rules of thumb have exceptions. Ca²⁺ is a small ion with a big charge, so it grabs water molecules and holds them tightly. Those trapped water molecules lose more freedom than the ions gain. Chemists check the data rather than trust the rule.</p>
+          <p class="beat-aside" id="hotpackAside" hidden>Rules of thumb have exceptions. Ca²⁺ is a small ion with a big charge, so it attracts water molecules strongly and binds them in a tight shell. Those trapped water molecules lose more freedom than the ions gain. Chemists check the data rather than trust the rule.</p>
         </article>
 
         <article class="guide-beat" id="beat-pulls" data-badge="Enthalpy and entropy" data-view="pic" data-pic="pulls" data-cards="coldpack:HS">
@@ -294,7 +304,10 @@
         var c = caseOfEngine();
         document.querySelectorAll('#signTable td').forEach(function (td) {
           td.classList.toggle('is-on', td.dataset.case === c);
+          if (td.dataset.case === c) td.setAttribute('aria-current', 'true'); else td.removeAttribute('aria-current');
         });
+        var label = 'Energy bars. ' + EqCharts.gibbsText(st);
+        if ($('chartGibbs').getAttribute('aria-label') !== label) $('chartGibbs').setAttribute('aria-label', label);
       }
       if (cfg.counts) {
         $('counts').textContent = Object.keys(st.counts).map(function (sp) {

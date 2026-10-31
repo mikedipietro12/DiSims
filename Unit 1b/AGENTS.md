@@ -4,7 +4,7 @@
 > ChemActivities of Moog & Farrell, *Chemistry: A Guided Inquiry* (5th ed.).
 > Built for Chemistry 11 Honors / AP Chemistry. Vanilla HTML/CSS/JS,
 > one HTML entry per module (inline and/or shared `assets/`), deployed to
-> Netlify via GitHub. No build step.
+> GitHub Pages (atomicsimulations.ca). No build step.
 
 ---
 
@@ -77,7 +77,7 @@ Consistent with the existing toolchain — do not introduce a build step.
 - **Vanilla HTML/CSS/JS.** No frameworks, no bundlers, no npm at runtime.
 - **One HTML entry per module.** CSS/JS may be inline **or** linked from
   `assets/` (§2.2). No build step. A module must still open and run from the
-  repo root (or Netlify) with only relative paths.
+  repo root (or GitHub Pages) with only relative paths.
 - **A hub `index.html`** links the eight modules and shows unit progress
   (visited/not-visited only — no scoring).
 - **Graphics: SVG + HTML/CSS by default.** Compose module openers, structural
@@ -95,7 +95,7 @@ Consistent with the existing toolchain — do not introduce a build step.
   identical `:root` block. **Do not** re-paste tokens into a file on unrelated
   edits. If a token changes, change `assets/suite.css` once (and any remaining
   inlined copies only when that module is already being touched).
-- **Deploy:** GitHub → Netlify, no build command, publish directory = repo
+- **Deploy:** GitHub Pages, no build command, publish directory = repo
   root. GitHub Desktop for version control, Cursor as editor.
 - **Data:** small reference tables (§8) are embedded as JS objects in each
   module that needs them. No external data fetches; the suite runs fully
@@ -138,7 +138,7 @@ tasks. Agents editing an existing module MUST:
 
 Self-contained single files remain valid. Shared assets are **allowed and
 preferred for new work** (modules 06+) when they keep the suite offline and
-Netlify-static:
+GitHub Pages static:
 
 | Path | Contents |
 |------|----------|
@@ -150,7 +150,7 @@ Rules:
 
 - Relative URLs only (`href="assets/suite.css"`). No CDN CSS/JS except the
   existing Google Fonts links.
-- No bundler, no npm, no build command. Netlify publish dir stays repo root.
+- No bundler, no npm, no build command. GitHub Pages publishes from the repo root.
 - A module may still inline everything (legacy 01–05). **New modules (06+)
   should link shared assets** and keep only module-specific CSS/JS inline.
 - If a token changes, change **`assets/suite.css` once**. Do not ask agents to
@@ -1260,7 +1260,7 @@ Modules 01–05 are the shipped look-and-feel reference. For plate/illustration
 questions, open `01-nucleus-isotopes.html` (or the nearest finished peer) —
 do not clone the whole file. For tokens and chrome on new work, use `assets/`.
 
-- No build step. Netlify publish dir = repo root, no build command.
+- No build step. GitHub Pages publishes from the repo root, no build command.
 - Each module is independently openable and deployable (with its `assets/`
   siblings when linked).
 - Progress/visited state (hub only) may use `localStorage`; never required for a

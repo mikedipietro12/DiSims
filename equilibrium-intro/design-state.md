@@ -1,6 +1,6 @@
 # Design State: Intro to Equilibrium (AP Chem 12)
 
-_Last updated: 2026-10-30 by design-builder (Task 6 complete: Guide live)_
+_Last updated: 2026-10-30 by design-builder (Task 9 in progress: polish passes done)_
 
 ## Brief
 - **Problem:** AP Chem 12 students reach Le Châtelier without ΔH/ΔS/ΔG or reversibility/rates groundwork
@@ -68,6 +68,11 @@ _Last updated: 2026-10-30 by design-builder (Task 6 complete: Guide live)_
 | 2026-10-30 | design-builder | Predictions held in memory per beat + card; reveal shows the answer and reason beside the student's own choice, no right/wrong wording | Pre-load, not mastery; nothing saved or scored |
 | 2026-10-30 | design-builder | Guide stage column widened to 320–500 px (IMF: 280–400) | Vessel shares it with graphs, bars and sign table |
 | 2026-10-30 | design-builder | Verified: beats 1, 2 (hot pack surprise + aside), 3, 5, 7, 8 render correctly after predict + reveal / fast-forward; N₂O₄ at 450 K highlights "Forward only when hot"; no horizontal scroll at 390 px on any beat | Headless harness (removed) |
+| 2026-10-30 | design-builder | Task 9: copy passes. No `—`/`–` in user copy; hub title separator ` - ` → `·` to match the rooms. Repo-wide no-personification rule (AGENTS.md) applied: Ca²⁺ "grabs" water → "attracts water molecules strongly and binds them in a tight shell" (card + aside); ions "wander" → "spread"; "products win" → "the mix sits on the product side" | AGENTS.md landed after the beat copy was approved |
+| 2026-10-30 | design-builder | ΔH vs ΔS "fight / wins / picks the winner" framing kept | It describes two quantities (the "two pulls" metaphor, principle 2), not particles; flagged to user |
+| 2026-10-30 | design-builder | Fixed Guide phone layout: `.eq-guide .guide-layout` (wider stage column) out-ranked suite.css's ≤860 px single-column rule, so the stage collapsed into a sliver over the beat text. Added the single-column override inside eq-intro.css's 860 px query | Earlier "no horizontal scroll at 390 px" check passed while the layout was broken; screenshots now part of the check |
+| 2026-10-30 | design-builder | Guide Gibbs bars now update their aria-label with the signs (as the Sandbox does); the matching sign-table cell gets `aria-current` | Screen readers heard a fixed label while the bars changed with T |
+| 2026-10-30 | design-builder | Verified (headless Chrome, 1280 + 390 px, motion on + reduced): no console errors, no horizontal scroll, every tab stop has a visible focus ring and is named, every canvas has a label; Guide T slider crosses N₂O₄ 325 K by keyboard and the label flips | Task 9 checks |
 
 ## Open Questions
 See `DISCOVERY.md`.

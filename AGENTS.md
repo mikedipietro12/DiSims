@@ -11,3 +11,12 @@ with more specific build rules; those add to this file, they don't replace it.
   - Avoid: *wants to*, *likes*, *is happy/greedy/hungry*, *steals*, *shares nicely*, *wins*.
   - Physical verbs are fine: *pulls*, *attracts*, *repels*, *shifts*, *bonds*.
 - **Atoms are spheres, not balls**, when describing space-filling or model-kit atoms.
+
+## Hosting & search
+
+- The site is served by **GitHub Pages** at `https://atomicsimulations.ca/` (see `CNAME`). No build step.
+- Every public page's `<head>` carries: a descriptive `<title>` (`Topic Simulation | Course`),
+  `meta description`, an absolute `canonical` URL, Open Graph / Twitter tags, and a JSON-LD
+  `LearningResource` block. Copy them from an existing sim when adding a page.
+- Add each new public page to `sitemap.xml`. Dev-only pages (taste passes, screenshot harnesses)
+  get `<meta name="robots" content="noindex, nofollow">` instead.

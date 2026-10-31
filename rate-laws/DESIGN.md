@@ -64,7 +64,7 @@ situation, not one method with two coats of paint.
   stays unlocked across refreshes/sessions).
 - Known limitation, acceptable: `localStorage` is per-device, so a student on a different laptop
   starts locked again. Fine for single-class use. Do not over-engineer around this.
-- This sim is Netlify-hosted (not a sandboxed artifact), so `localStorage` is available and
+- This sim is hosted on GitHub Pages (not a sandboxed artifact), so `localStorage` is available and
   appropriate.
 
 ### Convergence beat (unification)

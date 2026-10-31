@@ -126,6 +126,7 @@
 .btn:disabled{opacity:0.55;cursor:default;transform:none;}
 
 @media (max-width:860px){
+  .eq-guide .guide-layout{grid-template-columns:1fr;}
   .eq-stage{max-height:none;overflow:visible;}
 }
 @media (max-width:520px){

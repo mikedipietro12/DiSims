@@ -44,7 +44,7 @@ the same (overall order sets units; leftover denominator M → M⁻¹; no numeri
   - `Barlow` — body
   - `IBM Plex Mono` — micro-labels, kickers, numeric readouts, data tables
   No other external scripts, styles, CDNs, or trackers.
-- **No `localStorage` ban here** — this is Netlify-hosted, not a sandboxed artifact. Use
+- **No `localStorage` ban here** — this is hosted on GitHub Pages, not a sandboxed artifact. Use
   `localStorage` for the completion/unlock state (see DESIGN.md §1). Wrap access in try/catch and
   degrade gracefully if it's unavailable.
 
@@ -62,7 +62,7 @@ the same (overall order sets units; leftover denominator M → M⁻¹; no numeri
   in the repo, **conform to them** (reuse the topbar, back-link, status-readout furniture, module
   wrapper, mono-label recipe) rather than reinventing. Read them before styling chrome.
 - Static hosting conventions: relative paths, versioned stylesheet query strings (e.g.
-  `home.css?v=N`) consistent with the rest of the stream. Deploy target is GitHub → Netlify.
+  `home.css?v=N`) consistent with the rest of the stream. Deploy target is GitHub Pages (atomicsimulations.ca).
 
 ## Following the existing sims (loose inspiration, not cloning)
 
