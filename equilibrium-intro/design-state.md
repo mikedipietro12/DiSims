@@ -73,6 +73,9 @@ _Last updated: 2026-10-30 by design-builder (Task 9 in progress: polish passes d
 | 2026-10-30 | design-builder | Fixed Guide phone layout: `.eq-guide .guide-layout` (wider stage column) out-ranked suite.css's ≤860 px single-column rule, so the stage collapsed into a sliver over the beat text. Added the single-column override inside eq-intro.css's 860 px query | Earlier "no horizontal scroll at 390 px" check passed while the layout was broken; screenshots now part of the check |
 | 2026-10-30 | design-builder | Guide Gibbs bars now update their aria-label with the signs (as the Sandbox does); the matching sign-table cell gets `aria-current` | Screen readers heard a fixed label while the bars changed with T |
 | 2026-10-30 | design-builder | Verified (headless Chrome, 1280 + 390 px, motion on + reduced): no console errors, no horizontal scroll, every tab stop has a visible focus ring and is named, every canvas has a label; Guide T slider crosses N₂O₄ 325 K by keyboard and the label flips | Task 9 checks |
+| 2026-10-30 | user + builder | Le Châtelier page gets a "New to equilibrium? Start with Intro to Equilibrium." line under its lead (not a second ← link in the nav) | `#leadText` is rewritten by script; two back-arrows would compete |
+| 2026-10-30 | user | Keep `taste-directions.html` as an unlinked archive (DD-1 → Accepted) | Matches IMF precedent |
+| 2026-10-30 | user | Keep dev hooks until after the playtest (DD-4 stays open) | Re-verify playtest fixes headlessly, then strip at final ship |
 
 ## Open Questions
 See `DISCOVERY.md`.
@@ -90,11 +93,11 @@ See `DISCOVERY.md`.
 
 ## Design Debt Register
 
-_Items: 6 (open 5) | Critical: 0 | Oldest: 2026-10-30_
+_Items: 6 (open 4) | Critical: 0 | Oldest: 2026-10-30_
 
 | ID | Date | Source | Severity | What | Who is affected | Suggested fix | Status | Notes |
 |----|------|--------|----------|------|----------------|---------------|--------|-------|
-| DD-1 | 2026-10-30 | design-taste | Minor | `taste-directions.html` is a dev page in the suite folder | None (dev only) | Delete before ship or keep as archived reference | Open | Same as IMF DD-6 |
+| DD-1 | 2026-10-30 | design-taste | Minor | `taste-directions.html` is a dev page in the suite folder | None (dev only) | Delete before ship or keep as archived reference | Accepted | Kept as unlinked archive (user, 2026-10-30) |
 | DD-2 | 2026-10-30 | builder | Minor | Ozone pair |ΔG| (~300 kJ) is ~6× the others; a shared bar scale would flatten N₂O₄/Haber | Sandbox readers | Per-reaction bar scale (fit the larger of ΔH, −TΔS over the T range) in Task 4 | Closed | Per-reaction bar scale in EqCharts.gibbs (Task 4) |
 | DD-3 | 2026-10-30 | builder | Minor | Ozone pair at equilibrium only fires ~2–4 events per 10 s each way (ξ clamp 0.96 with 12 units) | Students watching ozone for "it never stops" | Raise ozone units or xiMax headroom if playtest shows it reads as stopped | Open | Other reactions fire 5–43 per 10 s |
 | DD-4 | 2026-10-30 | builder | Minor | `sandbox.html` exposes `window.__eqSandbox` and `guide.html` exposes `window.__eqGuide` for headless checks | None (dev only) | Remove before ship | Open | Same pattern as IMF DD-1 |
@@ -132,3 +135,6 @@ _Items: 6 (open 5) | Critical: 0 | Oldest: 2026-10-30_
 
 ### 2026-10-30 Task 6 complete → Task 9 (polish + ship)
 > "Guide and Sandbox both live. Remaining: remove dev hooks (DD-4) and the taste comparison page (DD-1), keyboard-only + screen reader + reduced-motion passes, final dash grep, optional back-link from equilibrium_simulations.html, then a user playtest (watch DD-3 ozone 'looks stopped')."
+
+### 2026-10-30 Task 9 polish → playtest
+> "Copy, keyboard, reduced-motion, screen-reader and phone passes done (Guide phone layout fixed, Gibbs aria-label live in Guide, AGENTS.md personification fixes). Le Châtelier page links back to the suite. Remaining: user playtest (watch DD-3 ozone 'looks stopped', DD-5 graph zoom), then strip dev hooks (DD-4) and ship."

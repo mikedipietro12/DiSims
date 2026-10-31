@@ -99,4 +99,4 @@ Curricular Competencies
 
 ### 6. Constraints
 - [ ] Timeline / first slice
-- [x] Device priority: assume class laptop first, phone OK (same as IMF)
+- [x] Device priority: class laptop and tablet. Phones are not a target (user, 2026-10-30)

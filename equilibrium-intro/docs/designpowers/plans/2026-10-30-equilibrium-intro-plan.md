@@ -134,6 +134,6 @@
 
 - [x] Grep user-facing copy for `—` and `–`.
 - [x] Reduced-motion pass, keyboard-only pass, screen-reader spot check.
-- [x] Phone-width check (no horizontal scroll).
-- [ ] Optional: add a "← Intro to equilibrium" link on `equilibrium_simulations.html`.
+- [x] Narrow-width check (tablet portrait ~768 px; no horizontal scroll). Phones are not a target.
+- [x] Optional: add a "← Intro to equilibrium" link on `equilibrium_simulations.html`.
 - [ ] Update `design-state.md` (decisions, debt register, handoff).

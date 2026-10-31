@@ -165,6 +165,73 @@ select:focus-visible{
   color:var(--ink);
 }
 .path a:hover .mod-go{background:var(--accent-soft);}
+
+/* -- hub tile animations: a small looping picture fills the space between teaser and Open -- */
+.hub-anim-defs{position:absolute;width:0;height:0;overflow:hidden;}
+.path .mod-anim{position:relative;display:block;flex:1 1 0;min-height:90px;margin:0.4rem 0 0.6rem;}
+.hub-anim{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+.hub-anim .ga-cap{font-family:var(--font-mono);font-size:10px;fill:var(--dim);text-anchor:middle;}
+.hub-anim .ga-delta{font-family:var(--font-mono);font-size:13px;font-weight:700;fill:var(--ink);text-anchor:middle;}
+.hub-anim .ga-e{fill:var(--ink);}
+
+/* Guide: HCl, 12 s loop in three beats */
+.anim-guide .ga-p1{animation:ga-p1 12s infinite;}
+.anim-guide .ga-p2{animation:ga-p2 12s infinite;}
+.anim-guide .ga-p3{animation:ga-p3 12s infinite;}
+@keyframes ga-p1{0%,28%{opacity:1}33%,95%{opacity:0}100%{opacity:1}}
+@keyframes ga-p2{0%,30%{opacity:0}35%,61%{opacity:1}66%,100%{opacity:0}}
+@keyframes ga-p3{0%,63%{opacity:0}68%,95%{opacity:1}100%{opacity:0}}
+
+/* Sandbox: two CH4 drift in until the clouds touch, then drift apart */
+.anim-sandbox .sa-left{animation:sa-left 6s ease-in-out infinite;}
+.anim-sandbox .sa-right{animation:sa-right 6s ease-in-out infinite;}
+.anim-sandbox .sa-spin{animation:sa-spin 4.5s ease-in-out infinite alternate;}
+.anim-sandbox .sa-spin-b{animation-duration:3.7s;animation-delay:-1.4s;}
+@keyframes sa-left{0%,8%{transform:translateX(0)}42%,58%{transform:translateX(30px)}92%,100%{transform:translateX(0)}}
+@keyframes sa-right{0%,8%{transform:translateX(0)}42%,58%{transform:translateX(-30px)}92%,100%{transform:translateX(0)}}
+@keyframes sa-spin{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+
+/* Lab: sealed jar of water, 10 s loop: warm plate → evaporate, cool plate → condense */
+.anim-lab .la-plate{animation:la-plate 10s infinite;}
+.anim-lab .la-jig{animation:la-jig 0.9s ease-in-out infinite alternate;}
+.anim-lab .la-jig:nth-of-type(2n){animation-duration:1.1s;animation-delay:-0.4s;}
+.anim-lab .la-jig:nth-of-type(3n){animation-duration:0.8s;animation-delay:-0.7s;}
+.anim-lab .la-up-1{animation:la-up-1 10s ease-in-out infinite;}
+.anim-lab .la-up-2{animation:la-up-2 10s ease-in-out infinite;}
+.anim-lab .la-up-3{animation:la-up-3 10s ease-in-out infinite;}
+.anim-lab .la-cap-hot{animation:la-hot 10s infinite;}
+.anim-lab .la-cap-cool{animation:la-cool 10s infinite;}
+@keyframes la-plate{0%,45%{fill:#f08a4b}52%,92%{fill:#7fa3f5}100%{fill:#f08a4b}}
+@keyframes la-hot{0%,45%{opacity:1}50%,95%{opacity:0}100%{opacity:1}}
+@keyframes la-cool{0%,47%{opacity:0}52%,93%{opacity:1}98%,100%{opacity:0}}
+@keyframes la-jig{from{transform:translate(-0.8px,0.6px)}to{transform:translate(0.8px,-0.6px)}}
+@keyframes la-up-1{
+  0%,10%{transform:translate(0,0)}
+  22%{transform:translate(-14px,-36px)}
+  34%{transform:translate(-30px,-60px)}
+  46%{transform:translate(-8px,-52px)}
+  58%{transform:translate(6px,-58px)}
+  72%{transform:translate(2px,-26px)}
+  82%,100%{transform:translate(0,0)}
+}
+@keyframes la-up-2{
+  0%,16%{transform:translate(0,0)}
+  28%{transform:translate(12px,-40px)}
+  40%{transform:translate(-4px,-64px)}
+  52%{transform:translate(22px,-50px)}
+  64%{transform:translate(10px,-56px)}
+  78%{transform:translate(-2px,-22px)}
+  88%,100%{transform:translate(0,0)}
+}
+@keyframes la-up-3{
+  0%,20%{transform:translate(0,0)}
+  32%{transform:translate(-20px,-30px)}
+  42%{transform:translate(-40px,-50px)}
+  54%{transform:translate(-56px,-40px)}
+  66%{transform:translate(-30px,-46px)}
+  80%{transform:translate(-8px,-18px)}
+  90%,100%{transform:translate(0,0)}
+}
 .mod-title{
   display:block;
   font-family:var(--font-display);
@@ -487,6 +554,7 @@ select:focus-visible{
   .path{grid-template-columns:1fr;}
   .path a{aspect-ratio:auto;}
   .path .mod-go{margin-top:1rem;}
+  .path .mod-anim{flex:none;height:150px;}
   .guide-layout{grid-template-columns:1fr;}
   .guide-stage-panel{
     position:relative;
@@ -500,6 +568,11 @@ select:focus-visible{
   .btn,.path a,
   #guideControls,.alt-pair-row,.guide-stage-wrap canvas,
   .force-badge,.pair-formulas{transition:none !important;}
+  /* tile animations hold a still frame: Guide on the cloud, Lab on the cooling plate */
+  .hub-anim *{animation:none !important;}
+  .anim-guide .ga-p1,.anim-guide .ga-p2{opacity:0;}
+  .anim-lab .la-plate{fill:#7fa3f5;}
+  .anim-lab .la-cap-hot,.anim-lab .la-cap-cool{opacity:0;}
 }
 
 /* -- Heat (sealed jar + gauges) -- */
