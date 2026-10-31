@@ -170,7 +170,6 @@ select:focus-visible{
 .hub-anim-defs{position:absolute;width:0;height:0;overflow:hidden;}
 .path .mod-anim{position:relative;display:block;flex:1 1 0;min-height:90px;margin:0.4rem 0 0.6rem;}
 .hub-anim{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
-.hub-anim .ga-cap{font-family:var(--font-mono);font-size:10px;fill:var(--dim);text-anchor:middle;}
 .hub-anim .ga-delta{font-family:var(--font-mono);font-size:13px;font-weight:700;fill:var(--ink);text-anchor:middle;}
 .hub-anim .ga-e{fill:var(--ink);}
 
@@ -199,11 +198,7 @@ select:focus-visible{
 .anim-lab .la-up-1{animation:la-up-1 10s ease-in-out infinite;}
 .anim-lab .la-up-2{animation:la-up-2 10s ease-in-out infinite;}
 .anim-lab .la-up-3{animation:la-up-3 10s ease-in-out infinite;}
-.anim-lab .la-cap-hot{animation:la-hot 10s infinite;}
-.anim-lab .la-cap-cool{animation:la-cool 10s infinite;}
 @keyframes la-plate{0%,45%{fill:#f08a4b}52%,92%{fill:#7fa3f5}100%{fill:#f08a4b}}
-@keyframes la-hot{0%,45%{opacity:1}50%,95%{opacity:0}100%{opacity:1}}
-@keyframes la-cool{0%,47%{opacity:0}52%,93%{opacity:1}98%,100%{opacity:0}}
 @keyframes la-jig{from{transform:translate(-0.8px,0.6px)}to{transform:translate(0.8px,-0.6px)}}
 @keyframes la-up-1{
   0%,10%{transform:translate(0,0)}
@@ -550,6 +545,95 @@ select:focus-visible{
 .pair-formulas.is-swapping{opacity:0;}
 .guide-beat-end{padding-bottom:4rem;}
 
+/* -- Learn mode: text hidden, the stage fills the screen for live teaching.
+   Beats stay in the page as even, invisible spacers so scrolling still steps through them. -- */
+.top-nav-end{display:flex;align-items:center;gap:0.9rem;flex-wrap:wrap;}
+.learn-controls{display:flex;align-items:center;gap:0.45rem;}
+.learn-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:0.5rem;
+  padding:0.35rem 0.75rem 0.35rem 0.4rem;
+  font-family:var(--font-mono);
+  font-size:0.78rem;
+  font-weight:700;
+  color:var(--ink);
+  background:var(--tray);
+  border:2px solid var(--line-strong);
+  border-radius:999px;
+  cursor:pointer;
+}
+.learn-toggle:hover{background:var(--accent-soft);}
+.learn-toggle:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
+.learn-switch{
+  position:relative;
+  width:2.1rem;
+  height:1.15rem;
+  border-radius:999px;
+  background:var(--field-2);
+  border:2px solid var(--line-strong);
+  transition:background 0.15s ease;
+}
+.learn-switch::after{
+  content:'';
+  position:absolute;
+  top:1px;
+  left:1px;
+  width:calc(1.15rem - 6px);
+  height:calc(1.15rem - 6px);
+  border-radius:50%;
+  background:var(--ink);
+  transition:transform 0.15s ease, background 0.15s ease;
+}
+.learn-toggle[aria-pressed="true"] .learn-switch{background:var(--accent);}
+.learn-toggle[aria-pressed="true"] .learn-switch::after{transform:translateX(0.95rem);background:#ffffff;}
+.learn-step{display:none;padding:0.2rem 0.7rem;font-size:1.05rem;line-height:1.2;}
+
+body.learn-mode .learn-step{display:inline-flex;}
+body.learn-mode .top-nav{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:20;
+  height:3.6rem;
+  margin:0;
+  padding:0 0.75rem;
+  border:0;
+  justify-content:flex-end;
+}
+body.learn-mode .back-link,
+body.learn-mode .mod-meta,
+body.learn-mode .room-switch,
+body.learn-mode .guide-hero,
+body.learn-mode .guide-toc{display:none;}
+body.learn-mode .guide-layout{display:block;}
+body.learn-mode .guide-rail{padding-bottom:60vh;}
+body.learn-mode .guide-beat{
+  height:60vh;
+  min-height:0;
+  padding:0;
+  border:0;
+  overflow:hidden;
+  visibility:hidden;
+}
+body.learn-mode .guide-stage-panel{
+  position:fixed;
+  top:3.6rem;
+  left:0.75rem;
+  right:0.75rem;
+  z-index:10;
+  /* panel = viewport minus bar and margin; the canvas takes what's left after padding, borders and controls */
+  --stage-h:calc(100vh - 4.35rem - 1.8rem - 8px - 0.75rem - var(--controls-h,160px));
+}
+@supports (height:100dvh){
+  body.learn-mode .guide-stage-panel{
+    --stage-h:calc(100dvh - 4.35rem - 1.8rem - 8px - 0.75rem - var(--controls-h,160px));
+  }
+}
+body.learn-mode .guide-stage-head{display:none;}
+body.learn-mode .guide-stage-panel .hud-quiet{visibility:hidden;}
+
 @media (max-width:860px){
   .path{grid-template-columns:1fr;}
   .path a{aspect-ratio:auto;}
@@ -572,7 +656,6 @@ select:focus-visible{
   .hub-anim *{animation:none !important;}
   .anim-guide .ga-p1,.anim-guide .ga-p2{opacity:0;}
   .anim-lab .la-plate{fill:#7fa3f5;}
-  .anim-lab .la-cap-hot,.anim-lab .la-cap-cool{opacity:0;}
 }
 
 /* -- Heat (sealed jar + gauges) -- */

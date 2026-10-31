@@ -17,30 +17,37 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/suite.css?v=16">
+  <link rel="stylesheet" href="assets/suite.css?v=17">
 </head>
 <body>
   <div class="module-wrap guide-wrap">
     <div class="top-nav">
       <a href="index.html" class="back-link">← IMF hub</a>
-      <div class="mod-meta">Room 1 · Guide</div>
+      <div class="top-nav-end">
+        <div class="mod-meta">Room 1 · Introduction</div>
+        <div class="learn-controls">
+          <button type="button" class="btn learn-step" id="learnPrev" aria-label="Previous section">‹</button>
+          <button type="button" class="btn learn-step" id="learnNext" aria-label="Next section">›</button>
+          <button type="button" class="learn-toggle" id="learnToggle" aria-pressed="false"><span class="learn-switch" aria-hidden="true"></span>Learn mode</button>
+        </div>
+      </div>
     </div>
 
     <nav class="room-switch" aria-label="IMF rooms">
       <a href="index.html" data-room="hub">Hub</a>
-      <a href="guide.html" data-room="guide">Guide</a>
+      <a href="guide.html" data-room="guide">Introduction</a>
       <a href="sandbox.html" data-room="sandbox">Sandbox</a>
       <a href="heat.html" data-room="heat">Lab</a>
     </nav>
 
     <header class="guide-hero">
       <div class="stub-kicker">Room 1 · Names on</div>
-      <h1>Guide</h1>
+      <h1>Introduction</h1>
       <p>You already know bonds <em>inside</em> a molecule. Intermolecular forces are attractions <em>between</em> molecules. They are weaker than chemical bonds, but they decide what types of substances stick, melt, and boil in certain conditions.</p>
       <p class="guide-hero-note">Scroll to build the picture layer by layer. Red means δ+ / positive · yellow means δ− / negative.</p>
     </header>
 
-    <nav class="guide-toc" aria-label="Guide beats">
+    <nav class="guide-toc" aria-label="Introduction sections">
       <a href="#beat-molecule">Molecule</a>
       <a href="#beat-bond">Bond</a>
       <a href="#beat-cloud">Cloud</a>
@@ -196,7 +203,7 @@
         </div>
         <div class="guide-stage-body">
         <div class="stage-wrap guide-stage-wrap">
-          <canvas id="guideStage" width="640" height="360" role="img" aria-label="Demo stage for the current Guide beat. Drag molecules or turn molecules A and B."></canvas>
+          <canvas id="guideStage" width="640" height="360" role="img" aria-label="Demo stage for the current Introduction section. Drag molecules or turn molecules A and B."></canvas>
         </div>
         <div id="guideControls">
           <div class="btn-row guide-stage-controls">
@@ -332,7 +339,7 @@
 
   function beatTitle(el) {
     var h = el.querySelector('h2');
-    return h ? h.textContent : 'Guide';
+    return h ? h.textContent : 'Introduction';
   }
 
   function flag(el, name, fallbackTrue) {
@@ -507,10 +514,73 @@
     stage.rotate('b', Math.PI / 2);
   });
 
+  // Learn mode: text hidden, stage fills the screen for live teaching; scrolling still steps beats
+  var learnToggle = document.getElementById('learnToggle');
+  var LEARN_KEY = 'imf-guide-learn';
+
+  // Scroll so the beat sits on the reading line that pickBeatFromScroll uses
+  function scrollToBeat(el, smooth) {
+    var r = el.getBoundingClientRect();
+    var top = window.scrollY + r.top + r.height / 2 - window.innerHeight * 0.38;
+    window.scrollTo({ top: Math.max(0, top), behavior: smooth && !reduced ? 'smooth' : 'auto' });
+  }
+
+  function stepBeat(dir) {
+    var i = beats.indexOf(activeBeat) + dir;
+    if (i < 0 || i >= beats.length) return;
+    goToBeat(beats[i].id);
+    scrollToBeat(beats[i], true);
+  }
+
+  function setLearn(on) {
+    document.body.classList.toggle('learn-mode', on);
+    learnToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
+    try {
+      localStorage.setItem(LEARN_KEY, on ? '1' : '0');
+    } catch (e) {}
+    // The layout changes height, so bring the current beat back under the reading line
+    if (activeBeat) {
+      pinUntil = Date.now() + 300;
+      scrollToBeat(activeBeat, false);
+    }
+  }
+
+  learnToggle.addEventListener('click', function () {
+    setLearn(!document.body.classList.contains('learn-mode'));
+  });
+  document.getElementById('learnPrev').addEventListener('click', function () {
+    stepBeat(-1);
+  });
+  document.getElementById('learnNext').addEventListener('click', function () {
+    stepBeat(1);
+  });
+
+  // Arrow keys, Page Up/Down and presentation clickers step one beat at a time; Esc leaves
+  document.addEventListener('keydown', function (e) {
+    if (!document.body.classList.contains('learn-mode') || e.altKey || e.ctrlKey || e.metaKey) return;
+    var onControl = /^(BUTTON|SELECT|INPUT|TEXTAREA)$/.test(e.target.tagName);
+    var k = e.key;
+    if (k === 'Escape') {
+      setLearn(false);
+    } else if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !onControl && !e.shiftKey)) {
+      e.preventDefault();
+      stepBeat(1);
+    } else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && !onControl && e.shiftKey)) {
+      e.preventDefault();
+      stepBeat(-1);
+    }
+  });
+
   // Seed first beat (or hash target)
   var startId = (location.hash || '').slice(1);
   var startEl = startId ? document.getElementById(startId) : null;
   applyBeat(startEl || beats[0]);
+
+  var learnSaved = false;
+  try {
+    learnSaved = localStorage.getItem(LEARN_KEY) === '1';
+  } catch (e) {}
+  if (learnSaved) setLearn(true);
 })();
   </script>
 </body>

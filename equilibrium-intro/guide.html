@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
-  <link rel="stylesheet" href="assets/eq-intro.css?v=3">
+  <link rel="stylesheet" href="assets/eq-intro.css?v=5">
 </head>
 <body>
   <div class="module-wrap guide-wrap eq-guide">
@@ -33,14 +33,93 @@
       <a href="sandbox.html" data-room="sandbox">Sandbox</a>
     </nav>
 
+    <!-- Briefing: intentions and competencies before the Guide (same pattern as Unit 1b) -->
+    <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
+      <div class="stub-kicker">Before you begin</div>
+      <h1 id="briefingTitle">Intro to Equilibrium</h1>
+      <p class="briefing-lead">Read what this guide is aiming for. Then enter the guide and work through it.</p>
+
+      <div class="briefing-part">
+        <h2><span class="briefing-num">Part 1</span> Enthalpy and entropy</h2>
+        <div class="briefing-columns">
+          <div class="briefing-block">
+            <h3 class="briefing-label">Learning intentions</h3>
+            <ul class="briefing-li">
+              <li>Distinguish the differences and relationships between enthalpy and entropy.</li>
+              <li>Apply our understanding of enthalpy and entropy in physical and chemical systems.</li>
+              <li>Understand the factors which influence the "sign" of enthalpy and entropy.</li>
+            </ul>
+          </div>
+          <div class="briefing-block cc">
+            <h3 class="briefing-label">Curricular competencies</h3>
+            <ul class="briefing-cc">
+              <li><span class="cc-name">Questioning and predicting</span>We will make hypotheses about ΔH and our previous understandings of enthalpy.</li>
+              <li><span class="cc-name">Communicating</span>We will express and reflect on a variety of experiences both in the lab and outside of the lab.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="briefing-part">
+        <h2><span class="briefing-num">Part 2</span> Equilibrium</h2>
+        <div class="briefing-columns">
+          <div class="briefing-block">
+            <h3 class="briefing-label">Learning intentions</h3>
+            <ul class="briefing-li">
+              <li>See the relationship between macro and micro characteristics of equilibrium.</li>
+              <li>Start to realize that many important chemical reactions are reversible.</li>
+              <li>See how equilibrium is all around us.</li>
+              <li>Make connections between rates and equilibrium.</li>
+              <li>Understand how graphs can help illustrate equilibrium.</li>
+            </ul>
+          </div>
+          <div class="briefing-block cc">
+            <h3 class="briefing-label">Curricular competencies</h3>
+            <ul class="briefing-cc">
+              <li><span class="cc-name">Questioning and predicting</span>We will demonstrate our sustained intellectual curiosity by making connections between equilibrium and other disciplines and topics.</li>
+              <li><span class="cc-name">Processing and analyzing data and information</span>We will analyze graphs related to rates and equilibrium.</li>
+              <li><span class="cc-name">Processing and analyzing data and information</span>We will look at patterns and trends within chemical reactions from our environment.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="briefing-part">
+        <h2><span class="briefing-num">Part 3</span> Gibbs free energy</h2>
+        <div class="briefing-columns">
+          <div class="briefing-block">
+            <h3 class="briefing-label">Learning intentions</h3>
+            <ul class="briefing-li">
+              <li>Learn about the mathematical relationships between H and S.</li>
+              <li>Discover how to use "Gibbs free energy" to predict how a reaction will proceed, both in general and mathematically.</li>
+              <li>Look at what "state functions" are.</li>
+            </ul>
+          </div>
+          <div class="briefing-block cc">
+            <h3 class="briefing-label">Curricular competencies</h3>
+            <ul class="briefing-cc">
+              <li><span class="cc-name">Communicating</span>We will look at formulas that describe real life phenomena.</li>
+              <li><span class="cc-name">Evaluating</span>We will evaluate some limitations of this formula and "real life" applications.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="briefing-actions">
+        <button type="button" class="btn primary" id="briefingEnter">Enter the guide →</button>
+      </div>
+    </section>
+
+    <div id="guideContent" hidden>
     <header class="guide-hero">
       <div class="stub-kicker">Room 1 · Names on</div>
-      <h1>Guide</h1>
+      <h1 id="guideTitle" tabindex="-1">Guide</h1>
       <p>Some changes give off heat. Some spread things out. Many reactions run both ways at once. This guide names each idea and shows how temperature decides which way a reaction goes.</p>
       <p class="guide-hero-note">Scroll to move through the ideas. On example cards, make your prediction first, then press Reveal. Nothing is saved.</p>
     </header>
 
     <nav class="guide-toc" aria-label="Guide beats">
+      <a href="#beat-hill">Energy hill</a>
       <a href="#beat-heat">Heat flows</a>
       <a href="#beat-spread">Spreading out</a>
       <a href="#beat-pulls">Two pulls</a>
@@ -56,10 +135,23 @@
     <div class="guide-layout">
       <div class="guide-rail">
 
+        <article class="guide-beat" id="beat-hill" data-badge="Enthalpy" data-view="pic" data-pic="energy">
+          <p class="beat-kicker">Part 1 · Enthalpy</p>
+          <h2>Up the hill, then down</h2>
+          <p>You already know this one. <strong>Enthalpy</strong> (H) is the heat stored in a system. <strong>ΔH</strong> is how much it changes.</p>
+          <p>A <strong>potential energy diagram</strong> follows a reaction from left to right. To react, particles must collide hard enough to climb to the top of the hill, the <strong>activated complex</strong>. Past the top, they slide down to the products.</p>
+          <p>ΔH is the gap between where the reactants start and where the products end. If the products end <strong>lower</strong>, that energy leaves as heat and warms the surroundings. ΔH is <strong>negative</strong>: the change is <strong>exothermic</strong>. If the products end <strong>higher</strong>, the energy comes in as heat from the surroundings. ΔH is <strong>positive</strong>: the change is <strong>endothermic</strong>.</p>
+          <ul class="beat-drivers">
+            <li><strong>Watch:</strong> in Exothermic, A₂ and B₂ climb together. At the top, bonds break and new ones form, so the atoms re-pair as AB. Heat comes off as the products settle on the lower shelf.</li>
+            <li><strong>Switch to Endothermic:</strong> the same hill, read backwards. AB re-pairs into A₂ and B₂, and heat flows in.</li>
+            <li><strong>Notice:</strong> Eₐ and ΔH are different gaps. Eₐ is about how fast. ΔH is about how much heat.</li>
+          </ul>
+        </article>
+
         <article class="guide-beat" id="beat-heat" data-badge="Enthalpy" data-view="pic" data-pic="heat" data-cards="hotpack:H,melt:H">
           <p class="beat-kicker">Part 1 · Enthalpy</p>
           <h2>Where does the heat go?</h2>
-          <p>You already know this one. <strong>Enthalpy</strong> (H) is the heat stored in a system. <strong>ΔH</strong> is how much it changes. If heat leaves the system and warms the surroundings, ΔH is <strong>negative</strong>: the change is <strong>exothermic</strong>. If heat flows in from the surroundings, ΔH is <strong>positive</strong>: the change is <strong>endothermic</strong>.</p>
+          <p>Now try real changes. Picture the system as a box. Heat crossing its edge tells you the sign: <strong>out</strong> means ΔH −, <strong>in</strong> means ΔH +.</p>
           <p>The sign comes from a tug between breaking and forming. Breaking bonds or pulling particles apart always costs energy. Forming bonds or letting particles settle together always releases it.</p>
           <ul class="beat-drivers">
             <li><strong>ΔH +</strong> when more energy goes into breaking than comes out of forming. Melting and boiling are examples.</li>
@@ -199,6 +291,10 @@
         <div class="stage-wrap guide-stage-wrap" id="picWrap">
           <canvas id="pic" role="img" aria-label="Picture for this part of the guide."></canvas>
         </div>
+        <div class="seg g-energy" role="group" aria-label="Kind of reaction" id="g-energySeg" hidden>
+          <button type="button" class="btn" data-energy="exo" aria-pressed="true">Exothermic</button>
+          <button type="button" class="btn" data-energy="endo" aria-pressed="false">Endothermic</button>
+        </div>
         <div class="stage-wrap guide-stage-wrap" id="vesselWrap" hidden>
           <canvas id="vessel" role="img" aria-label="A sealed vessel of particles reacting in both directions."></canvas>
         </div>
@@ -263,13 +359,14 @@
         <p class="sr-only" id="live" aria-live="polite"></p>
       </aside>
     </div>
+    </div>
   </div>
 
   <script src="../intermolecular-forces/assets/suite-chrome.js"></script>
   <script src="assets/reactions.js?v=2"></script>
   <script src="assets/vessel-engine.js?v=2"></script>
   <script src="assets/eq-charts.js?v=3"></script>
-  <script src="assets/guide-pictures.js?v=2"></script>
+  <script src="assets/guide-pictures.js?v=9"></script>
   <script>
   (function () {
     'use strict';
@@ -331,6 +428,7 @@
         picker: d.picker ? d.picker.split(',') : null,
       };
       $('vesselWrap').hidden = false; $('picWrap').hidden = true;
+      $('g-energySeg').hidden = true;
       $('graphsWrap').hidden = !cfg.graphs;
       $('gibbsWrap').hidden = !cfg.gibbs;
       $('counts').hidden = !cfg.counts;
@@ -357,6 +455,7 @@
 
     // ---------- picture side ----------
     var picPhase = 0, picRaf = 0;
+    var energyMode = 'exo', energyT0 = performance.now();
     function cardList(b) {
       var spec = b.dataset.cards;
       if (!spec) return [];
@@ -373,6 +472,15 @@
     function drawPic() {
       if (!active || active.dataset.view !== 'pic') return;
       var kind = active.dataset.pic, cards = cardList(active), c = cards[cardIdx], st = c ? cardState(c) : {};
+      if (kind === 'energy') {
+        var exo = energyMode === 'exo';
+        EqPictures.energy($('pic'), { mode: energyMode, t: (performance.now() - energyT0) / 1000, still: reduced });
+        $('sub').textContent = exo ? 'A₂ + B₂ → 2AB' : '2AB → A₂ + B₂';
+        $('pic').setAttribute('aria-label', exo
+          ? 'Potential energy diagram, exothermic. A₂ and B₂ molecules climb together to the activated complex, where the atoms re-pair, then slide down as AB molecules on a lower shelf. The gap is ΔH, negative: heat leaves.'
+          : 'Potential energy diagram, endothermic. AB molecules climb together to the activated complex, where the atoms re-pair, then settle as A₂ and B₂ on a higher shelf. The gap is ΔH, positive: heat comes in.');
+        return;
+      }
       var o = c ? { id: c.ex.id, title: c.ex.title, eq: c.ex.eq, dH: c.ex.dH, dS: c.ex.dS, revealed: st.revealed, phase: picPhase } : {};
       if (kind === 'equation' && c && c.ex.id === 'diamond') o.note = st.revealed ? 'ΔG − at every temperature · takes millions of years' : '';
       EqPictures[kind]($('pic'), o);
@@ -384,7 +492,7 @@
       if (!active || active.dataset.view !== 'pic') return;
       picPhase = (picPhase + 0.016) % 1;
       drawPic();
-      if (!reduced && active.dataset.pic === 'heat') picRaf = requestAnimationFrame(picLoop);
+      if (!reduced && (active.dataset.pic === 'heat' || active.dataset.pic === 'energy')) picRaf = requestAnimationFrame(picLoop);
     }
 
     function loadPic(b) {
@@ -393,6 +501,8 @@
       $('vesselWrap').hidden = true; $('picWrap').hidden = false;
       $('graphsWrap').hidden = true; $('gibbsWrap').hidden = true;
       $('ctlRow').hidden = true; $('counts').hidden = true;
+      $('g-energySeg').hidden = b.dataset.pic !== 'energy';
+      if (b.dataset.pic === 'energy') energyT0 = performance.now();
       panel.classList.remove('is-compact');
       drawPic();
       if (!picRaf) picRaf = requestAnimationFrame(picLoop);
@@ -489,12 +599,19 @@
     document.querySelectorAll('.guide-toc a[href^="#"]').forEach(function (a) {
       a.addEventListener('click', function () { goToBeat(a.getAttribute('href').slice(1)); });
     });
-    addEventListener('hashchange', function () { var id = location.hash.slice(1); if (id) goToBeat(id); });
+    addEventListener('hashchange', function () {
+      var id = location.hash.slice(1);
+      if (id && $('guideContent').hidden) { start = $(id); enterGuide(false); } else if (id) goToBeat(id);
+    });
 
     // ---------- stage controls ----------
     function pressed(group, btn) {
       group.querySelectorAll('.btn').forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
     }
+    $('g-energySeg').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-energy]'); if (!b) return;
+      pressed($('g-energySeg'), b); energyMode = b.dataset.energy; energyT0 = performance.now(); drawPic();
+    });
     $('g-rxn').addEventListener('change', function () {
       engine.preset({ reaction: this.value, T: +$('g-t').value, mix: 'half' }); updateVesselUi();
     });
@@ -521,8 +638,18 @@
     // Dev hook for headless checks (remove before ship: design-state DD-4)
     window.__eqGuide = { engine: engine, applyBeat: function (id) { applyBeat($(id)); }, update: updateVesselUi };
 
+    // ---------- briefing ----------
+    // The Guide starts on Enter. A beat link (#beat-…) or ?start skips the briefing.
     var start = location.hash ? $(location.hash.slice(1)) : null;
-    applyBeat(start || beats[0]);
+    function enterGuide(focus) {
+      $('briefing').hidden = true;
+      $('guideContent').hidden = false;
+      if (focus) { scrollTo(0, 0); $('guideTitle').focus({ preventScroll: true }); }
+      applyBeat(start || beats[0]);
+      if (start) start.scrollIntoView();
+    }
+    $('briefingEnter').addEventListener('click', function () { enterGuide(true); });
+    if (start || new URLSearchParams(location.search).has('start')) enterGuide(false);
   })();
   </script>
 </body>

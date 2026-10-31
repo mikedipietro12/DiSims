@@ -103,6 +103,8 @@
 .g-gibbs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0.6rem;align-items:center;margin-bottom:0.6rem;}
 .g-gibbs .chart-box{height:150px;}
 .g-controls{gap:0.6rem 0.7rem;margin-bottom:0.4rem;}
+.g-energy{margin:0.1rem 0 0.6rem;}
+.g-energy .btn{flex:1;}
 .g-controls .eq-range{max-width:none;}
 .g-counts{margin:0.2rem 0 0.4rem;}
 
@@ -124,6 +126,31 @@
 .chip-answer b{font-family:var(--font-mono);color:var(--ink);margin-right:0.3rem;}
 .card-context{font-size:0.9rem;color:var(--ink-soft);margin-top:0.6rem;}
 .btn:disabled{opacity:0.55;cursor:default;transform:none;}
+
+/* ---------- Guide briefing: intentions + competencies before Enter (Unit 1b pattern) ---------- */
+.briefing{margin:0.4rem 0 1rem;}
+.briefing[hidden],#guideContent[hidden]{display:none;}
+.briefing h1{font-size:clamp(2rem,4.4vw,2.7rem);letter-spacing:-0.025em;line-height:1.05;margin:0.25rem 0 0.5rem;}
+.briefing-lead{font-size:1.12rem;line-height:1.55;color:var(--ink-soft);margin:0 0 1.4rem;}
+.briefing-part{border-top:1px solid var(--line-strong);padding:1.1rem 0 1.3rem;}
+.briefing-part h2{font-size:1.3rem;letter-spacing:-0.015em;margin:0 0 0.9rem;display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;}
+.briefing-num{font-family:var(--font-mono);font-size:0.75rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);}
+.briefing-columns{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem 2.4rem;align-items:start;}
+.briefing-block{border-left:4px solid var(--accent);padding:0.1rem 0 0.1rem 1rem;}
+.briefing-block.cc{border-left-color:var(--ink);}
+.briefing-label{font-family:var(--font-mono);font-size:0.72rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin:0 0 0.4rem;}
+.briefing-block.cc .briefing-label{color:var(--ink);}
+.briefing ul{list-style:none;margin:0;padding:0;}
+.briefing li{position:relative;padding-left:1.4rem;margin:0.5rem 0;font-size:1rem;line-height:1.5;color:var(--ink-soft);}
+.briefing li::before{content:'\25B8';position:absolute;left:0;color:var(--accent);}
+.briefing-cc li::before{color:var(--ink);}
+.briefing .cc-name{display:block;font-family:var(--font-mono);font-size:0.7rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);margin-bottom:0.1rem;}
+.briefing-actions{display:flex;justify-content:flex-end;border-top:1px solid var(--line-strong);padding-top:1.2rem;}
+.briefing-actions .btn{font-size:1.02rem;padding:0.7rem 1.3rem;}
+#guideTitle:focus{outline:none;}
+@media (max-width:760px){
+  .briefing-columns{grid-template-columns:1fr;}
+}
 
 @media (max-width:860px){
   .eq-guide .guide-layout{grid-template-columns:1fr;}
