@@ -172,11 +172,14 @@
       ],
     };
 
+    // like Ar: compact atoms inside a big, squishy, polarizable cloud (vs CH₄'s tight one)
     G.br2 = {
       atoms: [
-        { el: 'Br', x: -14, y: 0, r: 20 },
-        { el: 'Br', x: 14, y: 0, r: 20 },
+        { el: 'Br', x: -10, y: 0, r: 13 },
+        { el: 'Br', x: 10, y: 0, r: 13 },
       ],
+      cloud: 2.4,
+      shell: 8,
     };
 
     G.co2 = {

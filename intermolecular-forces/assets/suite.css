@@ -272,6 +272,7 @@ select:focus-visible{
 .btn:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink);}
 .btn.primary{background:var(--ink);color:#ffffff;}
 .btn.primary:hover{background:#2c3547;}
+.btn[aria-pressed="true"]{background:var(--ink);color:#ffffff;transform:translateY(3px);box-shadow:0 0 0 var(--ink);}
 
 .stage-wrap{
   border:2px solid var(--line-strong);
@@ -299,7 +300,7 @@ select:focus-visible{
 .guide-wrap{max-width:1280px;}
 .guide-hero{
   margin-bottom:1.4rem;
-  max-width:40rem;
+  max-width:64rem;
 }
 .guide-hero h1{
   font-family:var(--font-display);
