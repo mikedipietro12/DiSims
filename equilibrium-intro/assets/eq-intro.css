@@ -209,3 +209,38 @@ body.learn-mode .g-scene .g-step-text{display:none;}
 /* Bigger stage controls for the front of the room */
 body.learn-mode .eq-stage .btn{font-size:1rem;padding:0.55rem 1rem;}
 body.learn-mode .eq-stage .field-label,body.learn-mode .eq-stage label{font-size:0.85rem;}
+
+/* ---------- Hub tile animations (same frame as the IMF hub: .mod-anim / .hub-anim in suite.css) ---------- */
+/* Guide: the ice cube melts as heat flows in, then refreezes as heat flows out */
+.anim-melt .mt-cube{transform-origin:100px 96px;animation:mt-cube 10s ease-in-out infinite;}
+.anim-melt .mt-pool{transform-origin:100px 94px;animation:mt-pool 10s ease-in-out infinite;}
+.anim-melt .mt-in{animation:mt-in 10s infinite;}
+.anim-melt .mt-out{opacity:0;animation:mt-out 10s infinite;}
+@keyframes mt-cube{0%,10%{transform:scale(1,1)}45%,58%{transform:scale(0.82,0.3)}90%,100%{transform:scale(1,1)}}
+@keyframes mt-pool{0%,10%{transform:scale(0.7,0.7)}45%,58%{transform:scale(1.25,1.25)}90%,100%{transform:scale(0.7,0.7)}}
+@keyframes mt-in{0%,8%{opacity:0}14%,42%{opacity:1}48%,100%{opacity:0}}
+@keyframes mt-out{0%,58%{opacity:0}64%,86%{opacity:1}92%,100%{opacity:0}}
+
+/* Sandbox: A and B keep turning into each other; the mix holds steady but never stops */
+.anim-flip .fl-p{animation:fl-p 7s infinite;}
+.anim-flip .fl-j{animation:fl-j 1.6s ease-in-out infinite alternate;}
+.anim-flip .fl-j:nth-of-type(2n){animation-duration:2.1s;animation-delay:-0.7s;}
+.anim-flip .fl-j:nth-of-type(3n){animation-duration:1.3s;animation-delay:-1.1s;}
+@keyframes fl-p{0%,42%{fill:var(--eq-a)}50%,92%{fill:var(--eq-b)}100%{fill:var(--eq-a)}}
+@keyframes fl-j{from{transform:translate(-2px,1.5px)}to{transform:translate(2px,-1.5px)}}
+
+/* Le Châtelier: a weight tips the balance, particles shift to the other side, and it levels again */
+.anim-shift .sh-beam{transform-origin:120px 58px;animation:sh-beam 10s ease-in-out infinite;}
+.anim-shift .sh-weight{animation:sh-weight 10s ease-in infinite;}
+.anim-shift .sh-move{animation:sh-move 10s ease-in-out infinite;}
+.anim-shift .sh-move-b{animation-name:sh-move-b;}
+.anim-shift .sh-all{animation:sh-all 10s infinite;}
+@keyframes sh-beam{0%,16%{transform:rotate(0)}24%,34%{transform:rotate(-11deg)}62%,90%{transform:rotate(0)}100%{transform:rotate(0)}}
+@keyframes sh-weight{0%,8%{transform:translateY(-46px);opacity:0}12%{opacity:1}18%,100%{transform:translateY(0);opacity:1}}
+@keyframes sh-move{0%,36%{transform:translate(0,0)}46%{transform:translate(48px,-24px)}58%,100%{transform:translate(95px,7px)}}
+@keyframes sh-move-b{0%,42%{transform:translate(0,0)}52%{transform:translate(56px,-30px)}62%,100%{transform:translate(111px,0)}}
+@keyframes sh-all{0%,90%{opacity:1}95%{opacity:0}100%{opacity:1}}
+/* Reduced motion: suite.css stops every tile animation; these keep the still frame honest */
+@media (prefers-reduced-motion: reduce){
+  .anim-melt .mt-in,.anim-shift .sh-weight{opacity:0;}
+}

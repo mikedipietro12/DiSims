@@ -18,11 +18,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
+  <link rel="stylesheet" href="assets/eq-intro.css?v=17">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
 <body>
+  <!-- shared fills for the tile animations -->
+  <svg class="hub-anim-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="eaW" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9aa3b5"/></radialGradient>
+    </defs>
+  </svg>
+
   <div class="hub">
     <div class="top-nav">
       <a href="../ap-chemistry-12/" class="back-link">← AP Chemistry 12</a>
@@ -41,6 +49,28 @@
           <span class="mod-num">Room 1 · Guide</span>
           <span class="mod-title">Guide</span>
           <span class="mod-teaser">Learn about entropy, enthalpy, and Gibbs free energy.</span>
+          <span class="mod-anim" aria-hidden="true">
+            <!-- ice cube: heat flows in and it melts into a puddle; heat flows out and it freezes again -->
+            <svg class="hub-anim anim-melt" viewBox="20 22 160 88" focusable="false">
+              <ellipse class="mt-pool" cx="100" cy="94" rx="46" ry="12" fill="rgba(150,200,236,0.5)" stroke="rgba(79,140,190,0.55)" stroke-width="1.4"/>
+              <g class="mt-cube" stroke-linejoin="round">
+                <polygon points="74,58 100,70 100,96 74,84" fill="#c6e3f7" stroke="#5f9fcf" stroke-width="1.6"/>
+                <polygon points="100,70 126,58 126,84 100,96" fill="#9ccbec" stroke="#5f9fcf" stroke-width="1.6"/>
+                <polygon points="100,46 126,58 100,70 74,58" fill="#eef8fe" stroke="#5f9fcf" stroke-width="1.6"/>
+                <path d="M80,66 L80,78 M88,53 L98,49" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+              </g>
+              <g class="mt-in" fill="none" stroke="var(--eq-dh)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M30,64 q4,-5 8,0 t8,0 t8,0 m-5,-5 l5,5 l-5,5"/>
+                <path d="M146,64 q4,5 8,0 t8,0 t8,0 m-24,-5 l-5,5 l5,5" transform="translate(4 0)"/>
+                <path d="M100,24 q5,4 0,8 t0,8 m-5,-4 l5,5 l5,-5"/>
+              </g>
+              <g class="mt-out" fill="none" stroke="var(--eq-dh)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M56,64 q-4,-5 -8,0 t-8,0 t-8,0 m5,-5 l-5,5 l5,5"/>
+                <path d="M144,64 q4,-5 8,0 t8,0 t8,0 m-5,-5 l5,5 l-5,5"/>
+                <path d="M100,42 q5,-4 0,-8 t0,-8 m-5,4 l5,-5 l5,5"/>
+              </g>
+            </svg>
+          </span>
           <span class="mod-go" aria-hidden="true">Open →</span>
         </a>
       </li>
@@ -49,6 +79,26 @@
           <span class="mod-num">Room 2 · Sandbox</span>
           <span class="mod-title">Sandbox</span>
           <span class="mod-teaser">Play with entropy, enthalpy and see how reactions reach equilibrium.</span>
+          <span class="mod-anim" aria-hidden="true">
+            <!-- a sealed vessel of A and B: each keeps turning into the other, so the mix holds steady -->
+            <svg class="hub-anim anim-flip" viewBox="30 18 180 96" focusable="false">
+              <rect x="44" y="26" width="152" height="84" rx="10" fill="#f6f8fc" stroke="#1d2433" stroke-width="2"/>
+              <g class="fl-j"><circle class="fl-p" cx="66" cy="46" r="7" fill="var(--eq-a)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-0.0s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="92" cy="40" r="7" fill="var(--eq-b)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-6.4s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="120" cy="50" r="7" fill="var(--eq-a)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-5.8s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="150" cy="42" r="7" fill="var(--eq-b)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-5.2s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="176" cy="52" r="7" fill="var(--eq-a)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-4.6s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="80" cy="70" r="7" fill="var(--eq-b)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-4.0s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="108" cy="74" r="7" fill="var(--eq-a)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-3.4s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="138" cy="68" r="7" fill="var(--eq-b)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-9.8s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="166" cy="76" r="7" fill="var(--eq-a)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-2.2s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="62" cy="94" r="7" fill="var(--eq-b)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-8.6s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="96" cy="96" r="7" fill="var(--eq-a)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-1.0s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="126" cy="92" r="7" fill="var(--eq-b)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-7.4s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="158" cy="98" r="7" fill="var(--eq-a)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-6.8s"/></g>
+              <g class="fl-j"><circle class="fl-p" cx="184" cy="90" r="7" fill="var(--eq-b)" stroke="rgba(29,36,51,0.35)" style="animation-delay:-6.2s"/></g>
+            </svg>
+          </span>
           <span class="mod-go" aria-hidden="true">Open →</span>
         </a>
       </li>
@@ -57,6 +107,29 @@
           <span class="mod-num">Next · Le Châtelier</span>
           <span class="mod-title">Equilibrium Simulations</span>
           <span class="mod-teaser">Ready for more? Push a system at equilibrium and watch it shift back.</span>
+          <span class="mod-anim" aria-hidden="true">
+            <!-- a balance: a weight lands on one side, particles shift to the other, and it levels again -->
+            <svg class="hub-anim anim-shift" viewBox="40 6 160 108" focusable="false">
+              <g class="sh-all">
+                <polygon points="120,58 106,104 134,104" fill="#e0e6ef" stroke="#7f8ea6" stroke-width="1.6" stroke-linejoin="round"/>
+                <rect x="92" y="104" width="56" height="5" rx="2.5" fill="#7f8ea6"/>
+                <g class="sh-beam">
+                  <line x1="70" y1="58" x2="170" y2="58" stroke="#1d2433" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="120" cy="58" r="3.5" fill="#1d2433"/>
+                  <path d="M70,58 L60,82 M70,58 L80,82 M170,58 L160,82 M170,58 L180,82" stroke="#7f8ea6" stroke-width="1.2"/>
+                  <path d="M54,82 Q70,92 86,82 Z" fill="#dfe5f0" stroke="#7f8ea6" stroke-width="1.4" stroke-linejoin="round"/>
+                  <path d="M154,82 Q170,92 186,82 Z" fill="#dfe5f0" stroke="#7f8ea6" stroke-width="1.4" stroke-linejoin="round"/>
+                  <rect class="sh-weight" x="72" y="66" width="14" height="14" rx="3" fill="#1d2433"/>
+                  <circle cx="62" cy="77" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/>
+                  <g class="sh-move"><circle cx="64" cy="70" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/></g>
+                  <g class="sh-move sh-move-b"><circle cx="54" cy="68" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/></g>
+                  <circle cx="170" cy="77" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/>
+                  <circle cx="181" cy="77" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/>
+                  <circle cx="176" cy="68" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/>
+                </g>
+              </g>
+            </svg>
+          </span>
           <span class="mod-go" aria-hidden="true">Open →</span>
         </a>
       </li>
