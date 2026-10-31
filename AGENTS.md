@@ -18,5 +18,7 @@ with more specific build rules; those add to this file, they don't replace it.
 - Every public page's `<head>` carries: a descriptive `<title>` (`Topic Simulation | Course`),
   `meta description`, an absolute `canonical` URL, Open Graph / Twitter tags, and a JSON-LD
   `LearningResource` block. Copy them from an existing sim when adding a page.
+- Every page (public or dev-only) links the water-molecule tab icon just before `</head>`:
+  `/favicon.svg`, with `/favicon-32.png` and `/apple-touch-icon.png` as fallbacks.
 - Add each new public page to `sitemap.xml`. Dev-only pages (taste passes, screenshot harnesses)
   get `<meta name="robots" content="noindex, nofollow">` instead.

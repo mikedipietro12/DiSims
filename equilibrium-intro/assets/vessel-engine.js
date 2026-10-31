@@ -256,7 +256,8 @@
       cw = canvas.clientWidth || 600; ch = canvas.clientHeight || 400;
       canvas.width = Math.round(cw * dpr); canvas.height = Math.round(ch * dpr);
       // The vessel fills the canvas: width stays 100 units, height follows the aspect.
-      var nh = clamp(vw * ch / cw, 45, 160);
+      // Low floor so wide, short canvases (Learn mode with graphs) still fill edge to edge
+      var nh = clamp(vw * ch / cw, 25, 160);
       if (nh !== vh) {
         parts.forEach(function (p) { p.y = clamp(p.y * nh / vh, 3.5, nh - 3.5); });
         events.forEach(function (e) { e.cy = e.cy * nh / vh; });

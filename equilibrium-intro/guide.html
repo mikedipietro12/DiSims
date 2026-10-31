@@ -18,13 +18,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
-  <link rel="stylesheet" href="assets/eq-intro.css?v=5">
+  <link rel="stylesheet" href="assets/eq-intro.css?v=16">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
 <body>
   <div class="module-wrap guide-wrap eq-guide">
     <div class="top-nav">
       <a href="index.html" class="back-link">← Intro to Equilibrium</a>
-      <div class="mod-meta">Room 1 · Guide</div>
+      <div class="top-nav-end">
+        <div class="mod-meta">Room 1 · Guide</div>
+        <div class="learn-controls">
+          <button type="button" class="btn learn-step" id="learnPrev" aria-label="Previous section">‹</button>
+          <button type="button" class="btn learn-step" id="learnNext" aria-label="Next section">›</button>
+          <button type="button" class="learn-toggle" id="learnToggle" aria-pressed="false"><span class="learn-switch" aria-hidden="true"></span>Learn mode</button>
+        </div>
+      </div>
     </div>
 
     <nav class="room-switch" aria-label="Intro to Equilibrium rooms">
@@ -121,8 +131,9 @@
     <nav class="guide-toc" aria-label="Guide beats">
       <a href="#beat-hill">Energy hill</a>
       <a href="#beat-heat">Heat flows</a>
-      <a href="#beat-spread">Spreading out</a>
+      <a href="#beat-spread">Randomness</a>
       <a href="#beat-pulls">Two pulls</a>
+      <a href="#beat-four">Four cases</a>
       <a href="#beat-arrows">Both arrows</a>
       <a href="#beat-rates">Rates meet</a>
       <a href="#beat-around">Around us</a>
@@ -148,43 +159,69 @@
           </ul>
         </article>
 
-        <article class="guide-beat" id="beat-heat" data-badge="Enthalpy" data-view="pic" data-pic="heat" data-cards="hotpack:H,melt:H">
+        <article class="guide-beat" id="beat-heat" data-badge="Enthalpy" data-view="pic" data-pic="beaker" data-cards="naoh:H,melt:H">
           <p class="beat-kicker">Part 1 · Enthalpy</p>
           <h2>Where does the heat go?</h2>
-          <p>Now try real changes. Picture the system as a box. Heat crossing its edge tells you the sign: <strong>out</strong> means ΔH −, <strong>in</strong> means ΔH +.</p>
-          <p>The sign comes from a tug between breaking and forming. Breaking bonds or pulling particles apart always costs energy. Forming bonds or letting particles settle together always releases it.</p>
+          <p>Now we need to think about actual systems, and the flow of heat energy into or out of the system.</p>
+          <p>The sign tells us part of the story, but combined with our understanding of the PE diagrams, we can get a full picture of what is going on.</p>
+          <p><strong>Recall:</strong> breaking bonds or pulling particles apart costs energy. Forming bonds or letting particles settle into a lower energy state releases energy.</p>
           <ul class="beat-drivers">
             <li><strong>ΔH +</strong> when more energy goes into breaking than comes out of forming. Melting and boiling are examples.</li>
             <li><strong>ΔH −</strong> when forming wins. Burning fuel and freezing are examples.</li>
-            <li><strong>Watch:</strong> the arrows show heat crossing the edge of the system. Ember arrows point in for +, and out for −.</li>
+            <li><strong>Watch:</strong> what changes in each demo? Use it to decide which way heat flows, then predict the sign of ΔH.</li>
+            <li><strong>Heat is a term in the equation:</strong> when heat comes out, it is written on the products side. When heat goes in, it is written on the reactants side.</li>
           </ul>
           <p class="beat-aside">Physical changes like melting and chemical changes like burning both have a ΔH. The rule is the same for both.</p>
         </article>
 
-        <article class="guide-beat" id="beat-spread" data-badge="Entropy" data-view="pic" data-pic="spread" data-cards="melt:HS,evap:HS,freeze:HS,hotpack:S">
+        <article class="guide-beat" id="beat-spread" data-badge="Entropy" data-view="pic" data-pic="spread" data-cards="dye:,melt:HS,freeze:HS,ammonia:HS,hotpack:HS">
           <p class="beat-kicker">Part 1 · Entropy</p>
-          <h2>Things tend to spread out</h2>
-          <p>Here is a new idea. Drop food colouring into water and it spreads until the colour is even. It never gathers itself back into a drop. <strong>Entropy</strong> (S) measures how spread out a system's particles and energy are. The more ways the particles can be arranged, the higher the entropy.</p>
+          <h2>Let's talk about randomness</h2>
+          <p>One of the ways we can talk about <strong>entropy</strong> is thinking about randomness. Or, things "spreading out". Think about dropping food colouring into water. It spreads out until the colour is even. It never gathers itself back into the drop. <strong>Entropy</strong> (S) measures how spread out, or random, a system's particles and energy are. The more random ways the particles can be arranged, the higher the entropy.</p>
           <p><strong>ΔS</strong> is the change. Spreading out makes ΔS <strong>positive</strong>. Getting more ordered or more crowded makes ΔS <strong>negative</strong>.</p>
           <ul class="beat-drivers">
             <li><strong>Solid → liquid → gas:</strong> each step makes ΔS more positive. A gas has by far the most freedom.</li>
             <li><strong>More gas particles:</strong> a reaction that makes more gas particles has ΔS +. N₂O₄ → 2NO₂ turns one particle into two.</li>
-            <li><strong>Dissolving:</strong> usually ΔS +, as a neat crystal breaks up into ions that wander through the water.</li>
-            <li><strong>Watch:</strong> the same particles before and after. Count how many ways they could be arranged.</li>
+            <li><strong>Dissolving:</strong> usually ΔS +, as a neat crystal breaks up into ions that spread through the water.</li>
+            <li><strong>Watch:</strong> the same particles before and after. Think about how many ways they could be arranged.</li>
           </ul>
           <p class="beat-aside" id="hotpackAside" hidden>Rules of thumb have exceptions. Ca²⁺ is a small ion with a big charge, so it attracts water molecules strongly and binds them in a tight shell. Those trapped water molecules lose more freedom than the ions gain. Chemists check the data rather than trust the rule.</p>
         </article>
 
-        <article class="guide-beat" id="beat-pulls" data-badge="Enthalpy and entropy" data-view="pic" data-pic="pulls" data-cards="coldpack:HS">
+        <article class="guide-beat" id="beat-pulls" data-badge="Enthalpy and entropy" data-view="pic" data-pic="coldpack">
           <p class="beat-kicker">Part 1 · Enthalpy and entropy together</p>
           <h2>Two different pulls</h2>
-          <p>ΔH and ΔS are not the same thing. ΔH is about <strong>heat</strong>. ΔS is about <strong>spreading</strong>. A change is favoured when it gives off heat (ΔH −), and also when it spreads things out (ΔS +).</p>
-          <p>Sometimes both pulls point the same way. Sometimes they fight. A cold pack fights. It <strong>takes in</strong> heat, which works against it, yet it still dissolves on its own. Spreading out wins.</p>
+          <p>ΔH and ΔS are not the same thing. ΔH is about <strong>heat</strong>. ΔS is about <strong>randomness</strong>. A change is favoured when it gives off heat (ΔH −), and also when a system gets more random, or spread out (ΔS +).</p>
+          <p>We will now look at systems and decide which direction entropy and enthalpy are "pointing", or which side is favoured. A cold pack fights. It <strong>takes in</strong> heat, which works against it, yet it still dissolves on its own. Spreading out wins.</p>
           <ul class="beat-drivers">
             <li><strong>Both favour it</strong> (ΔH −, ΔS +): it happens.</li>
             <li><strong>Both oppose it</strong> (ΔH +, ΔS −): it does not happen on its own.</li>
             <li><strong>They fight:</strong> the winner depends on temperature. That is Part 3.</li>
-            <li><strong>Notice:</strong> in the cold pack, the heat arrow and the spreading arrow point opposite ways.</li>
+            <li><strong>Notice:</strong> step through the cold pack with the arrows under the picture. Watch which way each half of the ⇌ points.</li>
+          </ul>
+        </article>
+
+        <article class="guide-beat" id="beat-four" data-badge="Gibbs free energy" data-view="pic" data-pic="gibbs4">
+          <p class="beat-kicker">Part 1 · Putting them together</p>
+          <h2>Four ways the pulls can line up</h2>
+          <p>Chemists combine ΔH and ΔS into one quantity, the <strong>Gibbs free energy</strong> change:</p>
+          <p class="gibbs-eq">ΔG = <span class="t-h">ΔH</span> <span class="t-s">− TΔS</span></p>
+          <p class="gibbs-line">If <strong>ΔG is negative</strong>, the products are favoured.</p>
+          <p class="gibbs-line">If <strong>ΔG is positive</strong>, the reactants are favoured.</p>
+          <p class="gibbs-line">T is the temperature in kelvin, which is always positive.</p>
+          <p class="gibbs-note"><strong>Notice the minus sign:</strong> when ΔS is +, the entropy term (−TΔS) is negative, so it helps make ΔG negative.</p>
+          <table class="sign-table beat-table">
+            <caption class="sr-only">The four sign combinations of ΔH and ΔS, and what each means for ΔG</caption>
+            <thead><tr><th scope="col" class="th-num"><span class="sr-only">Case</span></th><th scope="col" class="th-h">ΔH</th><th scope="col" class="th-s">ΔS</th><th scope="col">ΔG</th></tr></thead>
+            <tbody>
+              <tr data-case-row="0"><th scope="row" class="th-num">1</th><td><span class="cell-sign">( − )</span><span class="cell-note">products favoured</span></td><td><span class="cell-sign">( + )</span><span class="cell-note">products favoured</span></td><td><span class="cell-sign">( − )</span><span class="cell-note">products favoured</span></td></tr>
+              <tr data-case-row="1"><th scope="row" class="th-num">2</th><td><span class="cell-sign">( + )</span><span class="cell-note">reactants favoured</span></td><td><span class="cell-sign">( − )</span><span class="cell-note">reactants favoured</span></td><td><span class="cell-sign">( + )</span><span class="cell-note">reactants favoured</span></td></tr>
+              <tr data-case-row="2"><th scope="row" class="th-num">3</th><td><span class="cell-sign">( − )</span><span class="cell-note">products favoured</span></td><td><span class="cell-sign">( − )</span><span class="cell-note">reactants favoured</span></td><td><span class="cell-sign">( ? )</span><span class="cell-note">depends on which term is bigger</span></td></tr>
+              <tr data-case-row="3"><th scope="row" class="th-num">4</th><td><span class="cell-sign">( + )</span><span class="cell-note">reactants favoured</span></td><td><span class="cell-sign">( + )</span><span class="cell-note">products favoured</span></td><td><span class="cell-sign">( ? )</span><span class="cell-note">depends on which term is bigger</span></td></tr>
+            </tbody>
+          </table>
+          <ul class="beat-drivers">
+            <li><strong>Try:</strong> pick each case under the picture. Watch which way each term's arrow points, and where the bars land.</li>
           </ul>
         </article>
 
@@ -215,15 +252,16 @@
           <p class="beat-aside">You already know rates from collision theory. Equilibrium is what happens when two opposite rates balance.</p>
         </article>
 
-        <article class="guide-beat" id="beat-around" data-badge="Equilibrium around us" data-view="pic" data-pic="equation" data-cards="soda:HS,blood:,ocean:HS">
+        <article class="guide-beat" id="beat-around" data-badge="Equilibrium around us" data-view="pic" data-pic="scene" data-cards="soda:,ocean:,blood:">
           <p class="beat-kicker">Part 2 · Everywhere</p>
           <h2>Equilibrium is all around you</h2>
           <p>A sealed soda bottle is a system at equilibrium. CO₂ gas above the drink dissolves into the liquid at the same rate as dissolved CO₂ escapes. The fizz stays put. Open the cap and the system is no longer closed, so the gas escapes faster than it returns.</p>
           <p>The same balance shows up far from the chemistry lab.</p>
           <ul class="beat-drivers">
             <li><strong>Your blood:</strong> CO₂ + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻ keeps your blood's acidity steady. Breathing faster removes CO₂ and shifts the balance.</li>
-            <li><strong>The ocean:</strong> CO₂(g) ⇌ CO₂(aq). Cold water holds more CO₂ than warm water, so warming oceans can take up less.</li>
+            <li><strong>The ocean:</strong> CO₂(g) ⇌ CO₂(aq) at the surface, then CO₂(aq) + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻ in the water. More CO₂ in the air means more H⁺ in the sea: ocean acidification.</li>
             <li><strong>Notice:</strong> each one needs a closed system and two opposite processes running at the same rate.</li>
+            <li><strong>Try:</strong> change a condition under the picture, watch the two arrows in the equation pull apart, then settle to equal again. Change it back and the system returns.</li>
           </ul>
           <p class="beat-aside">Where else might two opposite processes balance? Think about population in an ecosystem, or water evaporating and raining back down.</p>
         </article>
@@ -295,6 +333,24 @@
           <button type="button" class="btn" data-energy="exo" aria-pressed="true">Exothermic</button>
           <button type="button" class="btn" data-energy="endo" aria-pressed="false">Endothermic</button>
         </div>
+        <div class="g-scene" id="g-scene" hidden>
+          <div class="g-scene-ctl" id="g-sceneCtl"></div>
+          <p class="g-step-text" id="g-sceneText" aria-live="polite"></p>
+        </div>
+        <div class="g-cases" id="g-cases" hidden>
+          <div class="seg g-case-seg" role="group" aria-label="Sign case" id="g-caseSeg">
+            <button type="button" class="btn" data-case="0" aria-pressed="true">ΔH − · ΔS +</button>
+            <button type="button" class="btn" data-case="1" aria-pressed="false">ΔH + · ΔS −</button>
+            <button type="button" class="btn" data-case="2" aria-pressed="false">ΔH − · ΔS −</button>
+            <button type="button" class="btn" data-case="3" aria-pressed="false">ΔH + · ΔS +</button>
+          </div>
+          <p class="g-step-text" id="g-caseText" aria-live="polite"></p>
+        </div>
+        <div class="g-steps" id="g-steps" hidden>
+          <button type="button" class="btn" id="g-prev" aria-label="Previous step">←</button>
+          <p class="g-step-text" id="g-stepText" aria-live="polite"></p>
+          <button type="button" class="btn" id="g-next" aria-label="Next step">→</button>
+        </div>
         <div class="stage-wrap guide-stage-wrap" id="vesselWrap" hidden>
           <canvas id="vessel" role="img" aria-label="A sealed vessel of particles reacting in both directions."></canvas>
         </div>
@@ -363,10 +419,11 @@
   </div>
 
   <script src="../intermolecular-forces/assets/suite-chrome.js"></script>
-  <script src="assets/reactions.js?v=2"></script>
-  <script src="assets/vessel-engine.js?v=2"></script>
+  <script src="assets/reactions.js?v=7"></script>
+  <script src="assets/vessel-engine.js?v=3"></script>
   <script src="assets/eq-charts.js?v=3"></script>
-  <script src="assets/guide-pictures.js?v=9"></script>
+  <script src="assets/guide-pictures.js?v=32"></script>
+  <script src="assets/eq-scenes.js?v=17"></script>
   <script>
   (function () {
     'use strict';
@@ -428,7 +485,7 @@
         picker: d.picker ? d.picker.split(',') : null,
       };
       $('vesselWrap').hidden = false; $('picWrap').hidden = true;
-      $('g-energySeg').hidden = true;
+      $('g-energySeg').hidden = true; $('g-steps').hidden = true; $('g-cases').hidden = true; $('g-scene').hidden = true;
       $('graphsWrap').hidden = !cfg.graphs;
       $('gibbsWrap').hidden = !cfg.gibbs;
       $('counts').hidden = !cfg.counts;
@@ -455,7 +512,33 @@
 
     // ---------- picture side ----------
     var picPhase = 0, picRaf = 0;
-    var energyMode = 'exo', energyT0 = performance.now();
+    var energyMode = 'exo', picT0 = performance.now();
+    var coldStep = 0, COLD_STEPS = [
+      'A cold pack: solid ammonium nitrate (NH₄NO₃) sits in water.',
+      'It dissolves. The ions spread through the water, and the thermometer drops. Which way does each energy term push the reaction?',
+      'Heat flows <strong>in</strong> from the water, so ΔH is <strong>+</strong>. On its own, that favours the <strong>reactants</strong> (←).',
+      'The ions are far more spread out than the crystal, so ΔS is <strong>+</strong>. That favours the <strong>products</strong> (→). The two pulls point opposite ways.'
+    ];
+    var caseIdx = 0, CASE_TEXT = [
+      '<strong>Hydrogen peroxide breaking down.</strong> Heat comes out (ΔH −) and a gas forms (ΔS +). Both terms push toward the products, so ΔG is always <strong>−</strong>.',
+      '<strong>Making ozone from oxygen.</strong> Heat goes in (ΔH +) and three gas molecules become two (ΔS −). Both terms push toward the reactants, so ΔG is always <strong>+</strong>.',
+      '<strong>Making ammonia.</strong> Heat comes out (ΔH −), but four gas molecules become two (ΔS −). The terms push opposite ways, so the sign of ΔG depends on which term is bigger.',
+      '<strong>The cold pack.</strong> Heat goes in (ΔH +), but the ions spread out (ΔS +). The terms push opposite ways. At room temperature the entropy term is bigger, which is why the pack works.'
+    ];
+    function caseUi() {
+      $('g-caseText').innerHTML = CASE_TEXT[caseIdx];
+      // Light the matching row of the table in the beat text
+      document.querySelectorAll('[data-case-row]').forEach(function (tr) {
+        var on = +tr.dataset.caseRow === caseIdx;
+        tr.classList.toggle('is-on', on);
+        if (on) tr.setAttribute('aria-current', 'true'); else tr.removeAttribute('aria-current');
+      });
+    }
+    function coldStepUi() {
+      $('g-stepText').innerHTML = '<span class="g-step-num">' + (coldStep + 1) + ' / ' + COLD_STEPS.length + '</span>' + COLD_STEPS[coldStep];
+      $('g-prev').disabled = coldStep === 0;
+      $('g-next').disabled = coldStep === COLD_STEPS.length - 1;
+    }
     function cardList(b) {
       var spec = b.dataset.cards;
       if (!spec) return [];
@@ -469,12 +552,59 @@
       return predictions[k] || (predictions[k] = { H: null, S: null, revealed: false });
     }
 
+    // ---------- live equilibrium scenes (soda, ocean, blood) ----------
+    var scene = null, sceneId = null, sceneTs = 0, sceneTextAt = 0;
+    function buildSceneCtl() {
+      $('g-sceneCtl').innerHTML = scene.controls.map(function (c) {
+        if (c.type === 'btn') return '<button type="button" class="btn" data-act="' + c.key + '">' + c.label + '</button>';
+        return '<div class="field"><span class="field-label" id="sc-' + c.key + '">' + c.label + '</span>' +
+          '<div class="seg" role="group" aria-labelledby="sc-' + c.key + '">' + c.options.map(function (o) {
+            return '<button type="button" class="btn" data-key="' + c.key + '" data-val="' + o[0] + '" aria-pressed="' + (scene.get(c.key) === o[0]) + '">' + o[1] + '</button>';
+          }).join('') + '</div></div>';
+      }).join('');
+      $('g-sceneText').textContent = scene.describe();
+    }
+    function syncSceneCtl() {
+      $('g-sceneCtl').querySelectorAll('[data-key]').forEach(function (b) { b.setAttribute('aria-pressed', String(scene.get(b.dataset.key) === b.dataset.val)); });
+    }
+    $('g-sceneCtl').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b || !scene) return;
+      if (b.dataset.key) scene.set(b.dataset.key, b.dataset.val); else scene.action(b.dataset.act);
+      syncSceneCtl(); sceneTextAt = 0;
+    });
+    function drawScene(id) {
+      if (sceneId !== id) { scene = EqScenes.create(id, $('pic'), { reduced: reduced }); sceneId = id; sceneTs = 0; buildSceneCtl(); }
+      var now = performance.now(), dt = sceneTs ? Math.min(0.05, (now - sceneTs) / 1000) : 0;
+      sceneTs = now;
+      scene.update(dt); scene.draw();
+      $('sub').textContent = '';
+      if (now - sceneTextAt > 1500) {
+        sceneTextAt = now;
+        var d = scene.describe();
+        if ($('g-sceneText').textContent !== d) $('g-sceneText').textContent = d;
+        if ($('pic').getAttribute('aria-label') !== d) $('pic').setAttribute('aria-label', d);
+      }
+    }
+
     function drawPic() {
       if (!active || active.dataset.view !== 'pic') return;
       var kind = active.dataset.pic, cards = cardList(active), c = cards[cardIdx], st = c ? cardState(c) : {};
+      if (kind === 'scene') { if (c) drawScene(c.ex.id); return; }
+      if (kind === 'gibbs4') {
+        var gd = EqPictures.gibbs4($('pic'), { idx: caseIdx, t: (performance.now() - picT0) / 1000, still: reduced });
+        $('sub').textContent = '';
+        if ($('pic').getAttribute('aria-label') !== gd) $('pic').setAttribute('aria-label', gd);
+        return;
+      }
+      if (kind === 'coldpack') {
+        var cd = EqPictures.coldpack($('pic'), { step: coldStep, t: (performance.now() - picT0) / 1000, still: reduced });
+        $('sub').textContent = '';
+        if ($('pic').getAttribute('aria-label') !== cd) $('pic').setAttribute('aria-label', cd);
+        return;
+      }
       if (kind === 'energy') {
         var exo = energyMode === 'exo';
-        EqPictures.energy($('pic'), { mode: energyMode, t: (performance.now() - energyT0) / 1000, still: reduced });
+        EqPictures.energy($('pic'), { mode: energyMode, t: (performance.now() - picT0) / 1000, still: reduced });
         $('sub').textContent = exo ? 'A₂ + B₂ → 2AB' : '2AB → A₂ + B₂';
         $('pic').setAttribute('aria-label', exo
           ? 'Potential energy diagram, exothermic. A₂ and B₂ molecules climb together to the activated complex, where the atoms re-pair, then slide down as AB molecules on a lower shelf. The gap is ΔH, negative: heat leaves.'
@@ -483,16 +613,18 @@
       }
       var o = c ? { id: c.ex.id, title: c.ex.title, eq: c.ex.eq, dH: c.ex.dH, dS: c.ex.dS, revealed: st.revealed, phase: picPhase } : {};
       if (kind === 'equation' && c && c.ex.id === 'diamond') o.note = st.revealed ? 'ΔG − at every temperature · takes millions of years' : '';
-      EqPictures[kind]($('pic'), o);
-      $('sub').textContent = c ? c.ex.eq : '';
-      $('pic').setAttribute('aria-label', c ? c.ex.title + ': ' + c.ex.eq : 'Two routes between the same start and end give the same change in enthalpy.');
+      if (kind === 'beaker' || kind === 'spread') { o.t = (performance.now() - picT0) / 1000; o.still = reduced; }
+      var desc = EqPictures[kind]($('pic'), o);
+      $('sub').textContent = c && kind !== 'beaker' ? c.ex.eq : '';   // the beaker draws its own equation
+      var aria = desc || (c ? c.ex.title + ': ' + c.ex.eq : 'Two routes between the same start and end give the same change in enthalpy.');
+      if ($('pic').getAttribute('aria-label') !== aria) $('pic').setAttribute('aria-label', aria);
     }
     function picLoop() {
       picRaf = 0;
       if (!active || active.dataset.view !== 'pic') return;
       picPhase = (picPhase + 0.016) % 1;
       drawPic();
-      if (!reduced && (active.dataset.pic === 'heat' || active.dataset.pic === 'energy')) picRaf = requestAnimationFrame(picLoop);
+      if (!reduced && (active.dataset.pic === 'beaker' || active.dataset.pic === 'energy' || active.dataset.pic === 'spread' || active.dataset.pic === 'coldpack' || active.dataset.pic === 'gibbs4' || active.dataset.pic === 'scene')) picRaf = requestAnimationFrame(picLoop);
     }
 
     function loadPic(b) {
@@ -502,7 +634,13 @@
       $('graphsWrap').hidden = true; $('gibbsWrap').hidden = true;
       $('ctlRow').hidden = true; $('counts').hidden = true;
       $('g-energySeg').hidden = b.dataset.pic !== 'energy';
-      if (b.dataset.pic === 'energy') energyT0 = performance.now();
+      $('g-steps').hidden = b.dataset.pic !== 'coldpack';
+      $('g-cases').hidden = b.dataset.pic !== 'gibbs4';
+      $('g-scene').hidden = b.dataset.pic !== 'scene';
+      sceneId = null;                                   // a fresh scene each time the beat opens
+      if (b.dataset.pic === 'gibbs4') caseUi();
+      if (b.dataset.pic === 'coldpack') { coldStep = 0; coldStepUi(); }
+      picT0 = performance.now();
       panel.classList.remove('is-compact');
       drawPic();
       if (!picRaf) picRaf = requestAnimationFrame(picLoop);
@@ -548,7 +686,7 @@
 
     $('cardTabs').addEventListener('click', function (e) {
       var b = e.target.closest('[data-card]'); if (!b) return;
-      cardIdx = +b.dataset.card; renderCards(); drawPic();
+      cardIdx = +b.dataset.card; picT0 = performance.now(); renderCards(); drawPic();
     });
     $('cardBody').addEventListener('click', function (e) {
       var c = cardList(active)[cardIdx]; if (!c) return;
@@ -608,9 +746,19 @@
     function pressed(group, btn) {
       group.querySelectorAll('.btn').forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
     }
+    $('g-caseSeg').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-case]'); if (!b) return;
+      pressed($('g-caseSeg'), b); caseIdx = +b.dataset.case; picT0 = performance.now(); caseUi(); drawPic();
+    });
+    [['g-prev', -1], ['g-next', 1]].forEach(function (pair) {
+      $(pair[0]).addEventListener('click', function () {
+        coldStep = Math.max(0, Math.min(COLD_STEPS.length - 1, coldStep + pair[1]));
+        picT0 = performance.now(); coldStepUi(); drawPic();
+      });
+    });
     $('g-energySeg').addEventListener('click', function (e) {
       var b = e.target.closest('[data-energy]'); if (!b) return;
-      pressed($('g-energySeg'), b); energyMode = b.dataset.energy; energyT0 = performance.now(); drawPic();
+      pressed($('g-energySeg'), b); energyMode = b.dataset.energy; picT0 = performance.now(); drawPic();
     });
     $('g-rxn').addEventListener('change', function () {
       engine.preset({ reaction: this.value, T: +$('g-t').value, mix: 'half' }); updateVesselUi();
@@ -636,7 +784,7 @@
     addEventListener('resize', function () { if (active && active.dataset.view === 'pic') drawPic(); else { engine.resize(); updateVesselUi(); } });
 
     // Dev hook for headless checks (remove before ship: design-state DD-4)
-    window.__eqGuide = { engine: engine, applyBeat: function (id) { applyBeat($(id)); }, update: updateVesselUi };
+    window.__eqGuide = { scene: function () { return scene; }, engine: engine, applyBeat: function (id) { applyBeat($(id)); }, update: updateVesselUi };
 
     // ---------- briefing ----------
     // The Guide starts on Enter. A beat link (#beat-…) or ?start skips the briefing.
@@ -649,7 +797,67 @@
       if (start) start.scrollIntoView();
     }
     $('briefingEnter').addEventListener('click', function () { enterGuide(true); });
-    if (start || new URLSearchParams(location.search).has('start')) enterGuide(false);
+
+    // ---------- Learn mode (as in the IMF Guide) ----------
+    // Text hidden, the stage fills the screen for live teaching; scrolling, ‹ ›, arrow keys and
+    // presentation clickers step one beat at a time; Esc leaves. The briefing is skipped.
+    var learnToggle = $('learnToggle'), LEARN_KEY = 'eq-guide-learn';
+    function learnOn() { return document.body.classList.contains('learn-mode'); }
+    function scrollToBeat(el, smooth) {
+      var r = el.getBoundingClientRect();
+      var y = window.scrollY + r.top + r.height / 2 - window.innerHeight * 0.38;
+      window.scrollTo({ top: Math.max(0, y), behavior: smooth && !reduced ? 'smooth' : 'auto' });
+    }
+    function stepBeat(dir) {
+      var i = beats.indexOf(active) + dir;
+      if (i < 0 || i >= beats.length) return;
+      goToBeat(beats[i].id);
+      scrollToBeat(beats[i], true);
+    }
+    // The stage's controls change from beat to beat, so size the canvas to whatever space is left
+    var fitting = false;
+    function fitLearnStage() {
+      if (fitting) return;
+      if (!learnOn()) { panel.style.removeProperty('--stage-h'); return; }
+      var wrap = !$('picWrap').hidden ? $('picWrap') : $('vesselWrap'), cv = wrap.querySelector('canvas');
+      var avail = window.innerHeight - panel.getBoundingClientRect().top - 12;
+      var h = Math.max(220, Math.round(cv.offsetHeight + avail - panel.scrollHeight));
+      if (Math.abs(h - cv.offsetHeight) > 2) {
+        fitting = true;
+        panel.style.setProperty('--stage-h', h + 'px');
+        window.dispatchEvent(new Event('resize'));
+        fitting = false;
+      }
+    }
+    if (window.ResizeObserver) new ResizeObserver(function () { requestAnimationFrame(fitLearnStage); }).observe(panel);
+    addEventListener('resize', function () { if (!fitting) requestAnimationFrame(fitLearnStage); });
+    function setLearn(on) {
+      if (on && $('guideContent').hidden) enterGuide(false);
+      document.body.classList.toggle('learn-mode', on);
+      learnToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
+      try { localStorage.setItem(LEARN_KEY, on ? '1' : '0'); } catch (e) {}
+      fitLearnStage();
+      window.dispatchEvent(new Event('resize'));
+      // The layout changes height, so bring the current beat back under the reading line
+      if (active) { pinUntil = Date.now() + 300; scrollToBeat(active, false); }
+    }
+    learnToggle.addEventListener('click', function () { setLearn(!learnOn()); });
+    $('learnPrev').addEventListener('click', function () { stepBeat(-1); });
+    $('learnNext').addEventListener('click', function () { stepBeat(1); });
+    document.addEventListener('keydown', function (e) {
+      if (!learnOn() || e.altKey || e.ctrlKey || e.metaKey) return;
+      var t = e.target.tagName, onControl = /^(BUTTON|SELECT|INPUT|TEXTAREA)$/.test(t), field = /^(SELECT|INPUT|TEXTAREA)$/.test(t);
+      var k = e.key;
+      if (k === 'Escape') setLearn(false);
+      else if (field && /^Arrow/.test(k)) return;              // sliders and pickers keep their arrow keys
+      else if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !onControl && !e.shiftKey)) { e.preventDefault(); stepBeat(1); }
+      else if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && !onControl && e.shiftKey)) { e.preventDefault(); stepBeat(-1); }
+    });
+
+    var learnSaved = false;
+    try { learnSaved = localStorage.getItem(LEARN_KEY) === '1'; } catch (e) {}
+    if (start || learnSaved || new URLSearchParams(location.search).has('start')) enterGuide(false);
+    if (learnSaved) setLearn(true);
   })();
   </script>
 </body>
