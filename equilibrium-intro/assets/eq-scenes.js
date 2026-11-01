@@ -1,9 +1,10 @@
 /**
- * Intro to Equilibrium - live equilibrium scenes for the Guide's "Equilibrium around us" beat.
+ * Intro to Equilibrium - live scenes for the Guide ("Equilibrium around us" and the diamond in "Limits of ΔG").
  *
  *   soda  - CO₂(g) ⇌ CO₂(aq): a fizzing bottle zooms into its neck. Cap on / off, cold / warm.
  *   ocean - CO₂(g) ⇌ CO₂(aq) between the air and the sea. Cold / warm, add CO₂ to the air.
- *   blood - CO₂ + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻ in a blood vessel. Breathing slow / normal / fast.
+ *   diamond - C(diamond) → C(graphite): ΔG −, but a huge hill. Time-lapse clock; heat it (no air) to cross.
+ *   blood - the four carbonic acid equilibria, written large and small with each breath. Regular breathing / panic attack / exercise.
  *
  * Unlike the looping pictures, these keep state: change a condition and the particles settle
  * into a new balance, then change it back and they return. Crossings happen one particle at a
@@ -19,7 +20,7 @@
 
   var U = global.EqPictures.util;
   var fit = U.fit, ball = U.ball, label = U.label, roundBox = U.roundBox, mix = U.mix, rng = U.rng, smooth = U.smooth;
-  var INK = U.INK, DIM = U.DIM, EMBER = U.EMBER, TIDE = U.TIDE, BODY = U.BODY;
+  var INK = U.INK, DIM = U.DIM, EMBER = U.EMBER, TIDE = U.TIDE, BODY = U.BODY, FAINT_LINE = U.FAINT;
   var C_A = ['#3a3f4b', '#9aa3b5'], O_A = ['#e0503a', '#ff8a6a'], H_A = ['#d5d9e3', '#ffffff'];
   var RATE_WINDOW = 3;   // seconds of events behind each live arrow
 
@@ -166,6 +167,99 @@
     ctx.restore();
   }
 
+  /* ---------- the soda bottle (shared by the soda scene and the Guide's opening picture) ----------
+     World units: the bottle is 100 tall, x centred on 0, y down from the top of the glass lip.
+     b = { fill: liquid surface y, asp: close-up x stretch, base: the canvas's own transform, capK: 0 on → 1 off } */
+  // Outer half-width of the glass at height y, and the inner bore
+  function hw(y) {
+    if (y < 3.2) return 5.6;                                   // lip bead (under the cap)
+    if (y < 4.4) return 5.0;
+    if (y < 30) return 5.0 + (y - 4.4) / 25.6 * 0.9;           // long, slightly tapering neck
+    if (y < 52) return 5.9 + 7.1 * smooth((y - 30) / 22);      // sloping shoulder
+    return 13;
+  }
+  function bore(y) { return y < 4.4 ? 3.7 : hw(y) - 0.9; }
+
+  // Stroke the current path with a width in screen pixels, even inside the stretched close-up
+  function linePx(ctx, lw, base) { ctx.save(); ctx.setTransform(base); ctx.lineWidth = lw; ctx.stroke(); ctx.restore(); }
+
+  // Glass outline (outer) or bore (inner), traced in world units
+  function glassPath(ctx, inner) {
+    var f = inner ? bore : hw, base = inner ? 98.4 : 100, y;
+    ctx.beginPath(); ctx.moveTo(-f(0), 0);
+    for (y = 0; y <= 95; y += 0.5) ctx.lineTo(f(y), y);
+    ctx.quadraticCurveTo(f(95), base, f(95) - 3, base);
+    ctx.lineTo(-f(95) + 3, base);
+    ctx.quadraticCurveTo(-f(95), base, -f(95), 95);
+    for (y = 95; y >= 0; y -= 0.5) ctx.lineTo(-f(y), y);
+    ctx.closePath();
+  }
+
+  // Crown cap, drawn at the origin of the lip; capK 0 = on, 1 = lifted away to the upper left
+  function cap(ctx, b) {
+    var k = smooth(b.capK);
+    ctx.save();
+    ctx.translate(-18 * k, -16 * k); ctx.rotate(-1.1 * k);
+    var top = -2.6, skirt = 2.4, half = 6.1;
+    var g = ctx.createLinearGradient(-half, 0, half, 0);
+    g.addColorStop(0, '#c9960f'); g.addColorStop(0.4, '#f6cf3e'); g.addColorStop(0.6, '#f9db6a'); g.addColorStop(1, '#b8870c');
+    ctx.beginPath();
+    ctx.moveTo(-half + 0.6, top); ctx.quadraticCurveTo(0, top - 0.7, half - 0.6, top);
+    ctx.quadraticCurveTo(half, top, half, top + 0.8);
+    var n = 9, step = (2 * half) / n;
+    for (var i = 0; i <= n; i++) ctx.lineTo(half - i * step, i % 2 ? skirt - 0.6 : skirt);
+    ctx.lineTo(-half, top + 0.8); ctx.quadraticCurveTo(-half, top, -half + 0.6, top);
+    ctx.closePath();
+    ctx.fillStyle = g; ctx.fill();
+    ctx.strokeStyle = INK; ctx.lineJoin = 'round'; linePx(ctx, 1.8, b.base);
+    // Crimp flutes
+    ctx.strokeStyle = 'rgba(120,80,0,0.45)';
+    for (var j = 1; j < n; j++) { var fx = half - j * step; ctx.beginPath(); ctx.moveTo(fx, top + 1.2); ctx.lineTo(fx, skirt - 0.7); linePx(ctx, 1, b.base); }
+    ctx.restore();
+  }
+
+  // Back of the bottle: glass, then the bore filled with gas above the line and drink below it
+  function drawGlass(ctx, cold, b) {
+    var FILL = b.fill;
+    glassPath(ctx, false); ctx.fillStyle = 'rgba(214,232,240,0.75)'; ctx.fill();
+    glassPath(ctx, true); ctx.fillStyle = 'rgba(244,250,253,0.95)'; ctx.fill();
+    ctx.save(); glassPath(ctx, true); ctx.clip();
+    var tint = cold ? '#dceef8' : '#e3f0f6';
+    var lg = ctx.createLinearGradient(-13, 0, 13, 0);
+    lg.addColorStop(0, mix(tint, '#6f9cbd', 0.3)); lg.addColorStop(0.45, tint); lg.addColorStop(0.6, tint); lg.addColorStop(1, mix(tint, '#6f9cbd', 0.35));
+    ctx.fillStyle = lg;
+    ctx.beginPath(); ctx.moveTo(-14, FILL - 0.5); ctx.quadraticCurveTo(-3, FILL + 0.15, 0, FILL); ctx.quadraticCurveTo(3, FILL + 0.15, 14, FILL - 0.5);
+    ctx.lineTo(14, 101); ctx.lineTo(-14, 101); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(111,156,189,0.6)';
+    ctx.beginPath(); ctx.moveTo(-14, FILL - 0.5); ctx.quadraticCurveTo(-3, FILL + 0.15, 0, FILL); ctx.quadraticCurveTo(3, FILL + 0.15, 14, FILL - 0.5); linePx(ctx, 1.5, b.base);
+    ctx.restore();
+  }
+  // Front of the bottle: labels, condensation, edges and highlights
+  function drawFront(ctx, cold, b) {
+    var asp = b.asp;
+    // Labels: a round one on the shoulder, a band around the body
+    ctx.fillStyle = '#f6cf3e'; ctx.strokeStyle = INK;
+    ctx.beginPath(); ctx.ellipse(0, 42, 3.1 / asp, 3.1, 0, 0, Math.PI * 2); ctx.fill(); linePx(ctx, 1.4, b.base);
+    ctx.beginPath(); ctx.rect(-13, 68, 26, 15); ctx.fill(); linePx(ctx, 1.4, b.base);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(-10.5, 68.6, 2.2, 13.8);
+    // Condensation on a cold bottle
+    if (cold) {
+      var dr = rng(7);
+      for (var k = 0; k < 90; k++) {
+        var dy = 6 + dr() * 88, side = dr() < 0.5 ? -1 : 1, dx = side * hw(dy) * (0.55 + dr() * 0.42), rs = 0.12 + dr() * 0.3;
+        if (dy > 67.5 && dy < 83.5) continue;
+        ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.beginPath(); ctx.ellipse(dx, dy, rs / asp, rs, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(110,150,180,0.5)'; linePx(ctx, 0.8, b.base);
+      }
+    }
+    // Glass edges and highlights
+    ctx.strokeStyle = 'rgba(29,36,51,0.35)'; glassPath(ctx, true); linePx(ctx, 1, b.base);
+    ctx.strokeStyle = INK; ctx.lineJoin = 'round'; glassPath(ctx, false); linePx(ctx, 2.4, b.base);
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineCap = 'round';
+    ctx.beginPath(); for (var y = 6; y <= 64; y += 1) ctx[y === 6 ? 'moveTo' : 'lineTo'](-hw(y) * 0.68, y); linePx(ctx, 1.2, b.base);
+    ctx.beginPath(); ctx.moveTo(-9, 86); ctx.lineTo(-9, 94); linePx(ctx, 1.2, b.base);
+  }
+
   /* =====================================================================
      SODA: CO₂(g) ⇌ CO₂(aq) in a glass bottle
      Opens on the whole bottle fizzing, then the camera zooms into the neck, where the cap, the
@@ -183,15 +277,8 @@
     var st = { cap: 'on', temp: 'cold' }, parts, bubbles, flashes, time, opened, capK, inR, outR, intro;
     var asp = 1, baseT;                            // close-up x stretch; the canvas's own transform
 
-    // Outer half-width of the glass at height y, and the inner bore
-    function hw(y) {
-      if (y < 3.2) return 5.6;                                   // lip bead (under the cap)
-      if (y < 4.4) return 5.0;
-      if (y < 30) return 5.0 + (y - 4.4) / 25.6 * 0.9;           // long, slightly tapering neck
-      if (y < 52) return 5.9 + 7.1 * smooth((y - 30) / 22);      // sloping shoulder
-      return 13;
-    }
-    function bore(y) { return y < 4.4 ? 3.7 : hw(y) - 0.9; }
+    function line(ctx, lw) { linePx(ctx, lw, baseT); }
+    function kit() { return { fill: FILL, asp: asp, base: baseT, capK: capK }; }
 
     function reset() {
       parts = []; bubbles = []; flashes = []; time = 0; opened = -10; capK = 0;
@@ -291,84 +378,6 @@
       };
     }
 
-    // Stroke the current path with a width in screen pixels, even inside the stretched close-up
-    function line(ctx, lw) { ctx.save(); ctx.setTransform(baseT); ctx.lineWidth = lw; ctx.stroke(); ctx.restore(); }
-
-    // Glass outline (outer) or bore (inner), traced in world units
-    function glassPath(ctx, inner) {
-      var f = inner ? bore : hw, base = inner ? 98.4 : 100, y;
-      ctx.beginPath(); ctx.moveTo(-f(0), 0);
-      for (y = 0; y <= 95; y += 0.5) ctx.lineTo(f(y), y);
-      ctx.quadraticCurveTo(f(95), base, f(95) - 3, base);
-      ctx.lineTo(-f(95) + 3, base);
-      ctx.quadraticCurveTo(-f(95), base, -f(95), 95);
-      for (y = 95; y >= 0; y -= 0.5) ctx.lineTo(-f(y), y);
-      ctx.closePath();
-    }
-
-    // Crown cap, drawn at the origin of the lip; capK 0 = on, 1 = lifted away to the upper left
-    function cap(ctx) {
-      var k = smooth(capK);
-      ctx.save();
-      ctx.translate(-18 * k, -16 * k); ctx.rotate(-1.1 * k);
-      var top = -2.6, skirt = 2.4, half = 6.1;
-      var g = ctx.createLinearGradient(-half, 0, half, 0);
-      g.addColorStop(0, '#c9960f'); g.addColorStop(0.4, '#f6cf3e'); g.addColorStop(0.6, '#f9db6a'); g.addColorStop(1, '#b8870c');
-      ctx.beginPath();
-      ctx.moveTo(-half + 0.6, top); ctx.quadraticCurveTo(0, top - 0.7, half - 0.6, top);
-      ctx.quadraticCurveTo(half, top, half, top + 0.8);
-      var n = 9, step = (2 * half) / n;
-      for (var i = 0; i <= n; i++) ctx.lineTo(half - i * step, i % 2 ? skirt - 0.6 : skirt);
-      ctx.lineTo(-half, top + 0.8); ctx.quadraticCurveTo(-half, top, -half + 0.6, top);
-      ctx.closePath();
-      ctx.fillStyle = g; ctx.fill();
-      ctx.strokeStyle = INK; ctx.lineJoin = 'round'; line(ctx, 1.8);
-      // Crimp flutes
-      ctx.strokeStyle = 'rgba(120,80,0,0.45)';
-      for (var j = 1; j < n; j++) { var fx = half - j * step; ctx.beginPath(); ctx.moveTo(fx, top + 1.2); ctx.lineTo(fx, skirt - 0.7); line(ctx, 1); }
-      ctx.restore();
-    }
-
-    // Back of the bottle: glass, then the bore filled with gas above the line and drink below it
-    function drawGlass(ctx, cold) {
-      glassPath(ctx, false); ctx.fillStyle = 'rgba(214,232,240,0.75)'; ctx.fill();
-      glassPath(ctx, true); ctx.fillStyle = 'rgba(244,250,253,0.95)'; ctx.fill();
-      ctx.save(); glassPath(ctx, true); ctx.clip();
-      var tint = cold ? '#dceef8' : '#e3f0f6';
-      var lg = ctx.createLinearGradient(-13, 0, 13, 0);
-      lg.addColorStop(0, mix(tint, '#6f9cbd', 0.3)); lg.addColorStop(0.45, tint); lg.addColorStop(0.6, tint); lg.addColorStop(1, mix(tint, '#6f9cbd', 0.35));
-      ctx.fillStyle = lg;
-      ctx.beginPath(); ctx.moveTo(-14, FILL - 0.5); ctx.quadraticCurveTo(-3, FILL + 0.15, 0, FILL); ctx.quadraticCurveTo(3, FILL + 0.15, 14, FILL - 0.5);
-      ctx.lineTo(14, 101); ctx.lineTo(-14, 101); ctx.closePath(); ctx.fill();
-      ctx.strokeStyle = 'rgba(111,156,189,0.6)';
-      ctx.beginPath(); ctx.moveTo(-14, FILL - 0.5); ctx.quadraticCurveTo(-3, FILL + 0.15, 0, FILL); ctx.quadraticCurveTo(3, FILL + 0.15, 14, FILL - 0.5); line(ctx, 1.5);
-      ctx.restore();
-    }
-    // Front of the bottle: labels, condensation, edges and highlights
-    function drawFront(ctx, cold) {
-      // Labels: a round one on the shoulder, a band around the body
-      ctx.fillStyle = '#f6cf3e'; ctx.strokeStyle = INK;
-      ctx.beginPath(); ctx.ellipse(0, 42, 3.1 / asp, 3.1, 0, 0, Math.PI * 2); ctx.fill(); line(ctx, 1.4);
-      ctx.beginPath(); ctx.rect(-13, 68, 26, 15); ctx.fill(); line(ctx, 1.4);
-      ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(-10.5, 68.6, 2.2, 13.8);
-      // Condensation on a cold bottle
-      if (cold) {
-        var dr = rng(7);
-        for (var k = 0; k < 90; k++) {
-          var dy = 6 + dr() * 88, side = dr() < 0.5 ? -1 : 1, dx = side * hw(dy) * (0.55 + dr() * 0.42), rs = 0.12 + dr() * 0.3;
-          if (dy > 67.5 && dy < 83.5) continue;
-          ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.beginPath(); ctx.ellipse(dx, dy, rs / asp, rs, 0, 0, Math.PI * 2); ctx.fill();
-          ctx.strokeStyle = 'rgba(110,150,180,0.5)'; line(ctx, 0.8);
-        }
-      }
-      // Glass edges and highlights
-      ctx.strokeStyle = 'rgba(29,36,51,0.35)'; glassPath(ctx, true); line(ctx, 1);
-      ctx.strokeStyle = INK; ctx.lineJoin = 'round'; glassPath(ctx, false); line(ctx, 2.4);
-      ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineCap = 'round';
-      ctx.beginPath(); for (var y = 6; y <= 64; y += 1) ctx[y === 6 ? 'moveTo' : 'lineTo'](-hw(y) * 0.68, y); line(ctx, 1.2);
-      ctx.beginPath(); ctx.moveTo(-9, 86); ctx.lineTo(-9, 94); line(ctx, 1.2);
-    }
-
     function draw() {
       var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h;
       baseT = ctx.getTransform();
@@ -387,7 +396,7 @@
       var sh = ctx.createRadialGradient(0, 100, 0.5, 0, 100, 18);
       sh.addColorStop(0, 'rgba(29,36,51,0.22)'); sh.addColorStop(1, 'rgba(29,36,51,0)');
       ctx.fillStyle = sh; ctx.beginPath(); ctx.ellipse(0, 100, 18, 2.6, 0, 0, Math.PI * 2); ctx.fill();
-      drawGlass(ctx, cold);
+      drawGlass(ctx, cold, kit());
       ctx.save(); glassPath(ctx, true); ctx.clip();
       bubbles.forEach(function (b) {
         var bx = b.x * (bore(b.y) - b.r) + Math.sin(time * 3 + b.w) * 0.15;
@@ -412,7 +421,7 @@
       ctx.restore(); ctx.restore();
       ctx.save();
       ctx.translate(cam.ax, cam.ay); ctx.scale(cam.sx, cam.s); ctx.translate(-cam.fx, -cam.fy);
-      drawFront(ctx, cold); cap(ctx);
+      drawFront(ctx, cold, kit()); cap(ctx, kit());
       ctx.restore();
       if (show > 0) {
         var rr = R * cam.s;
@@ -446,7 +455,7 @@
       var ts = (h * 0.32) / 104, tx = 34, ty = h - 10 - 100 * ts;
       var zoomAsp = asp; asp = 1;
       ctx.save(); ctx.translate(tx, ty); ctx.scale(ts, ts);
-      drawGlass(ctx, cold); drawFront(ctx, cold); if (capK < 0.5) cap(ctx);
+      drawGlass(ctx, cold, kit()); drawFront(ctx, cold, kit()); if (capK < 0.5) cap(ctx, kit());
       ctx.restore();
       asp = zoomAsp;
       ctx.strokeStyle = TIDE; ctx.lineWidth = 1.5; ctx.setLineDash([3, 2]);
@@ -795,186 +804,311 @@
   }
 
   /* =====================================================================
-     BLOOD: CO₂ + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻ in a blood vessel
-     Body cells below add CO₂; the lungs above remove it at the breathing rate.
-     Reactions fire from rates (event budgets); particles change in place, and H⁺ + HCO₃⁻
-     glide together before they join. Vessel coordinates: x 0–1 (wraps), y 0 (lung side) – 1.
+     BLOOD: the four carbonic acid equilibria, breathing
+     No particles. Each species is written at a size that follows its amount, greatly
+     exaggerated, and keeps that size in every equation it appears in.
+     Regular breathing: one slow breath. Breathing in brings fresh air with almost no CO₂, so CO₂(g) drops
+     and the chain shifts left; breathing out, CO₂ builds up in the lungs and the chain shifts
+     right. CO₃²⁻ moves against H⁺. Each step down the chain trails the one before it.
+     Panic attack: fast, shallow breaths blow off CO₂; everything shifts left and H⁺ falls.
+     Exercise: muscles add H⁺ and CO₂; the extra H⁺ drives the chain left, using up HCO₃⁻ and CO₃²⁻.
+     Each ⇌ has two half-arrows; the longer one shows which way that equilibrium is shifting.
      ===================================================================== */
   function blood(canvas, opts) {
-    var K = { k1: 0.6, k1r: 1.5, k2: 2.0, k2r: 0.02, src: 3.75 };
-    var BREATH = { slow: { kb: 0.13, period: 6 }, normal: { kb: 0.375, period: 3.5 }, fast: { kb: 1.2, period: 1.6 } };
-    var st = { breath: 'normal' }, parts, flashes, cells, time, bud, meters, H0;
+    var LAG = 0.35, TAU = 2.5, IN = 0.45;               // delay per step down the chain (s); settling time (s); share of a breath spent breathing in
+    // swing: how far the size moves with the CO₂ load over a breath (− moves against it); lag: steps down the chain
+    var SP = {
+      g: { t: 'CO₂(g)', swing: 0.45, lag: 0 }, aq: { t: 'CO₂(aq)', swing: 0.45, lag: 1 }, w: { t: 'H₂O', swing: 0, lag: 0 },
+      a: { t: 'H₂CO₃', swing: 0.45, lag: 2 }, b: { t: 'HCO₃⁻', swing: 0.2, lag: 3 }, h: { t: 'H⁺', swing: 0.5, lag: 3 },
+      c: { t: 'CO₃²⁻', swing: -0.4, lag: 4 }
+    };
+    var EQS = [[['g'], ['aq']], [['aq', 'w'], ['a']], [['a'], ['b', 'h']], [['b'], ['c', 'h']]];
+    // Each state: breath length (s), breath depth, steady size offsets, and which way each equilibrium shifts on the way in
+    var MODES = {
+      rest: { cyc: 10, depth: 1, off: {}, dir: [0, 0, 0, 0],
+        sub: ['fresh air, almost no CO₂', 'air leaves; CO₂ builds up in the lungs'] },
+      panic: { cyc: 2.4, depth: 0.5, off: { g: -0.5, aq: -0.5, a: -0.5, h: -0.55, b: -0.15, c: 0.6 }, dir: [-1, -1, -1, 1],
+        sub: ['fast, shallow breaths', 'blowing off CO₂'] },
+      exercise: { cyc: 4, depth: 1.2, off: { g: 0.35, aq: 0.35, a: 0.45, h: 0.7, b: -0.35, c: -0.45 }, dir: [-1, -1, -1, -1],
+        sub: ['breathing hard', 'muscles add CO₂ and H⁺'] }
+    };
+    var st = { mode: 'rest', run: 'on' }, ph, cur, dir;
 
-    function mk(sp, x, y) { var a = rand(0, Math.PI * 2); return { sp: sp, x: x, y: y, vx: Math.cos(a) * 0.04, vy: Math.sin(a) * 0.04, rot: rand(0, 6.3), vr: rand(-1, 1), turn: rand(0, 0.6), busy: false, born: 0 }; }
-    function reset() {
-      parts = []; flashes = []; time = 0;
-      bud = { r1: 0, r1r: 0, r2: 0, r2r: 0, src: 0, out: 0 };
-      meters = { r1: rateMeter(), r1r: rateMeter(), r2: rateMeter(), r2r: rateMeter() };
-      [['C', 10], ['A', 4], ['B', 20], ['H', 20]].forEach(function (q) { for (var i = 0; i < q[1]; i++) parts.push(mk(q[0], rand(0, 1), rand(0.1, 0.9))); });
-      cells = []; for (var c = 0; c < 6; c++) cells.push({ x: c / 6 + rand(0, 0.08), y: rand(0.25, 0.75), rot: rand(-0.4, 0.4), s: rand(0.9, 1.1) });
-      H0 = 20;
+    function reset() { ph = 0; cur = {}; dir = [0, 0, 0, 0]; Object.keys(SP).forEach(function (id) { cur[id] = 0; }); }
+    // Lung volume over a breath (p in breaths): fills while breathing in, empties while breathing out
+    function lungVol(p) { var u = ((p % 1) + 1) % 1; return u < IN ? smooth(u / IN) : 1 - smooth((u - IN) / (1 - IN)); }
+    function load(p) { return 1 - lungVol(p); }        // CO₂ load over a breath: lowest just after fresh air comes in
+    function lagP(id) { return ph - SP[id].lag * LAG / MODES[st.mode].cyc; }
+    function size(id) { var m = MODES[st.mode]; return Math.max(0.42, 1 + cur[id] + m.depth * SP[id].swing * (2 * load(lagP(id)) - 1)); }
+    function breathShift(eq) {                          // + shifting right, − shifting left, per second
+      var id = eq[1][0], p = lagP(id), m = MODES[st.mode];
+      return (SP[id].swing < 0 ? -1 : 1) * m.depth * (load(p + 0.005) - load(p - 0.005)) / 0.01 / m.cyc;
     }
-    function count(sp) { var n = 0; parts.forEach(function (p) { if (p.sp === sp && !p.busy) n++; }); return n; }
-    function pick(sp) { var c = parts.filter(function (p) { return p.sp === sp && !p.busy; }); return c.length ? c[Math.floor(Math.random() * c.length)] : null; }
-    function flash(p) { flashes.push({ x: p.x, y: p.y, t: 0 }); }
-
-    function fire(name) {
-      var p, q;
-      if (name === 'r1') { p = pick('C'); if (!p) return; p.sp = 'A'; flash(p); }
-      if (name === 'r1r') { p = pick('A'); if (!p) return; p.sp = 'C'; flash(p); }
-      if (name === 'r2') { p = pick('A'); if (!p) return; p.sp = 'B'; var h = mk('H', p.x + 0.02, p.y + 0.03); h.born = 0.3; parts.push(h); flash(p); }
-      if (name === 'r2r') {
-        p = pick('B'); if (!p) return;
-        // nearest free H⁺ glides over and joins
-        var best = null, bd = 9;
-        parts.forEach(function (o) { if (o.sp === 'H' && !o.busy) { var d = Math.hypot(o.x - p.x, o.y - p.y); if (d < bd) { bd = d; best = o; } } });
-        if (!best) return;
-        p.busy = best.busy = true; p.glide = { to: best, t: 0 };
-      }
-      if (name === 'src') { var n = mk('C', rand(0, 1), 1.0); n.rise = rand(0.1, 0.9); n.born = 0.4; parts.push(n); }   // drifts up into the flow
-      if (name === 'out') { p = pick('C'); if (!p) return; p.busy = true; p.exhale = 0; }
-      if (meters[name]) meters[name].add(time);
+    function unsettled() {
+      var m = MODES[st.mode], d = 0;
+      Object.keys(SP).forEach(function (id) { d = Math.max(d, Math.abs((m.off[id] || 0) - cur[id])); });
+      return d;
     }
 
     function update(dt) {
-      time += dt;
-      var sp = opts.reduced ? 0.35 : 1, kb = BREATH[st.breath].kb;
-      var C = count('C'), A = count('A'), B = count('B'), H = count('H');
-      var rates = { r1: K.k1 * C, r1r: K.k1r * A, r2: K.k2 * A, r2r: K.k2r * H * B, src: K.src, out: kb * C };
-      Object.keys(rates).forEach(function (k) {
-        bud[k] += rates[k] * dt;
-        while (bud[k] >= 1) { bud[k] -= 1; fire(k); }
+      if (st.run !== 'on') return;
+      dt *= opts.reduced ? 0.35 : 1;
+      var m = MODES[st.mode];
+      ph += dt / m.cyc;
+      Object.keys(SP).forEach(function (id) { cur[id] += ((m.off[id] || 0) - cur[id]) * Math.min(1, dt / TAU); });
+    }
+
+    function lungs(ctx, cx, cy, v) {
+      ctx.save(); ctx.translate(cx, cy); ctx.scale(0.8 + 0.28 * v, 0.8 + 0.28 * v);
+      [-1, 1].forEach(function (sd) {
+        var g = ctx.createRadialGradient(sd * 11, -2, 2, sd * 13, 3, 20);
+        g.addColorStop(0, '#fde6e9'); g.addColorStop(1, '#eba5ae');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(sd * 13, 4, 10, 17, sd * -0.15, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(160,80,95,0.6)'; ctx.lineWidth = 1.2; ctx.stroke();
       });
-      for (var i = parts.length - 1; i >= 0; i--) {
-        var p = parts[i];
-        p.rot += p.vr * dt * sp; if (p.born > 0) p.born = Math.max(0, p.born - dt);
-        if (p.exhale != null) {                       // leaving through the lung wall
-          p.exhale += dt; p.y -= dt * 0.35; p.x += dt * 0.03;
-          if (p.exhale > 1.6) parts.splice(i, 1);
-          continue;
-        }
-        if (p.glide) {                                // H⁺ + HCO₃⁻ → H₂CO₃
-          var o = p.glide.to; p.glide.t += dt;
-          var k = Math.min(1, dt / Math.max(0.01, 0.45 - p.glide.t + dt));
-          o.x += (p.x - o.x) * k; o.y += (p.y - o.y) * k;
-          if (p.glide.t >= 0.45) {
-            var oi = parts.indexOf(o); parts.splice(oi, 1); if (oi < i) i--;
-            p.sp = 'A'; p.busy = false; p.glide = null; flash(p);
-          }
-          continue;
-        }
-        if (p.busy) continue;
-        if (p.rise != null) {
-          p.y += (p.rise - p.y) * Math.min(1, dt * 2.2 * sp); p.x += 0.03 * dt * sp;
-          if (Math.abs(p.y - p.rise) < 0.02) p.rise = null;
-          continue;
-        }
-        p.turn -= dt;
-        if (p.turn <= 0) { var a = rand(0, Math.PI * 2), v = rand(0.08, 0.16); p.vx = Math.cos(a) * v; p.vy = Math.sin(a) * v * 1.4; p.turn = rand(0.6, 1.2); }
-        p.x += (p.vx + 0.03) * dt * sp; p.y += p.vy * dt * sp;
-        if (p.y < 0.06) { p.y = 0.06; p.vy = Math.abs(p.vy); }
-        if (p.y > 0.94) { p.y = 0.94; p.vy = -Math.abs(p.vy); }
-        p.x = (p.x + 1) % 1;
-      }
-      cells.forEach(function (c) { c.x = (c.x + dt * 0.03 * sp) % 1.15; c.rot += dt * sp; });
-      flashes.forEach(function (f) { f.t += dt; }); flashes = flashes.filter(function (f) { return f.t < 0.5; });
+      ctx.strokeStyle = '#c47883'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath(); ctx.moveTo(0, -22); ctx.lineTo(0, -6); ctx.lineTo(-8, 1); ctx.moveTo(0, -6); ctx.lineTo(8, 1); ctx.stroke();
+      ctx.restore();
     }
 
     function draw() {
-      var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h;
-      var top = 40, vy0 = top + (h - top) * 0.3, vy1 = top + (h - top) * 0.82, wall = 9;
-      var X = function (x) { return x * w; }, Y = function (y) { return vy0 + wall + y * (vy1 - vy0 - 2 * wall); };
-      var r = Math.max(3.2, Math.min(w, h) * 0.014);
-      var br = BREATH[st.breath], phase = (Math.sin(time * Math.PI * 2 / br.period) + 1) / 2;
+      var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h, m = MODES[st.mode];
+      var u = ((ph % 1) + 1) % 1, inhale = u < IN;
 
-      // Lungs above: air sacs that swell with each breath
-      var lungBg = ctx.createLinearGradient(0, top, 0, vy0);
-      lungBg.addColorStop(0, '#fdf1f2'); lungBg.addColorStop(1, '#f7dfe2');
-      ctx.fillStyle = lungBg; ctx.fillRect(0, top, w, vy0 - top);
-      for (var a = 0; a < 9; a++) {
-        var ax = X(0.06 + a * 0.115), ay = top + (vy0 - top) * 0.5, ar = (vy0 - top) * (0.3 + 0.08 * phase) * (a % 2 ? 0.85 : 1);
-        var ag = ctx.createRadialGradient(ax - ar * 0.3, ay - ar * 0.3, 2, ax, ay, ar);
-        ag.addColorStop(0, '#fffafa'); ag.addColorStop(1, '#efc3c9');
-        ctx.fillStyle = ag; ctx.beginPath(); ctx.arc(ax, ay, ar, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = 'rgba(190,110,120,0.45)'; ctx.lineWidth = 1; ctx.stroke();
-      }
-      label(ctx, 'lungs · breathing ' + st.breath, w - 10, top + 10, { size: 10, color: INK, align: 'right' });
+      // Header: lungs filling and emptying, which half of the breath this is, and how far through
+      var top = 74;
+      lungs(ctx, 42, 40, lungVol(ph) * Math.min(1, m.depth));
+      var ay = inhale ? 10 + 8 * ((u * m.cyc / 0.8) % 1) : 18 - 8 * (((u - IN) * m.cyc / 0.8) % 1);
+      ctx.globalAlpha = 0.7; U.arrow(ctx, 42, inhale ? ay - 8 : ay + 8, 42, ay, inhale ? TIDE : DIM, 1.8); ctx.globalAlpha = 1;
+      label(ctx, inhale ? 'Breathe in' : 'Breathe out', 84, 28, { font: BODY, size: 18, color: INK, align: 'left' });
+      label(ctx, m.sub[inhale ? 0 : 1], 84, 48, { size: 10, align: 'left' });
+      var pw = Math.min(150, w - 260), pf = inhale ? u / IN : (u - IN) / (1 - IN);
+      ctx.fillStyle = 'rgba(29,36,51,0.08)'; roundBox(ctx, 84, 58, pw, 6, 3); ctx.fill();
+      ctx.fillStyle = inhale ? TIDE : DIM; roundBox(ctx, 84, 58, Math.max(6, pw * pf), 6, 3); ctx.fill();
+      label(ctx, 'text size = amount', w - 12, 22, { size: 10, color: INK, align: 'right' });
+      label(ctx, '(exaggerated)', w - 12, 36, { size: 10, align: 'right' });
+      var acid = cur.h > 0.25 ? ['blood: more acidic', '#c81e45'] : cur.h < -0.25 ? ['blood: less acidic', TIDE] : ['blood: normal acidity', DIM];
+      label(ctx, acid[0], w - 12, 56, { size: 11, color: acid[1], align: 'right' });
+      ctx.strokeStyle = 'rgba(29,36,51,0.12)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(12, top - 4); ctx.lineTo(w - 12, top - 4); ctx.stroke();
 
-      // Body cells below
-      var cellBg = ctx.createLinearGradient(0, vy1, 0, h);
-      cellBg.addColorStop(0, '#f6ead9'); cellBg.addColorStop(1, '#eedcc3');
-      ctx.fillStyle = cellBg; ctx.fillRect(0, vy1, w, h - vy1);
-      for (var b = 0; b < 6; b++) {
-        var cx = X(0.08 + b * 0.17), cy = vy1 + (h - vy1) * 0.55, cw = w * 0.07, ch = (h - vy1) * 0.32;
-        ctx.fillStyle = '#f9efe1'; ctx.strokeStyle = 'rgba(150,110,70,0.5)'; ctx.lineWidth = 1.2;
-        ctx.beginPath(); ctx.ellipse(cx, cy, cw, ch, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = 'rgba(150,110,170,0.45)'; ctx.beginPath(); ctx.arc(cx + cw * 0.2, cy, ch * 0.35, 0, Math.PI * 2); ctx.fill();
-      }
-      label(ctx, 'body cells · making CO₂', w - 10, h - 8, { size: 10, color: INK, align: 'right' });
-
-      // Vessel: plasma between two walls
-      var pl = ctx.createLinearGradient(0, vy0, 0, vy1);
-      pl.addColorStop(0, '#fbe3cf'); pl.addColorStop(0.5, '#fdf0e3'); pl.addColorStop(1, '#fbe3cf');
-      ctx.fillStyle = pl; ctx.fillRect(0, vy0, w, vy1 - vy0);
-      ctx.fillStyle = '#e3a5ab'; ctx.fillRect(0, vy0, w, wall); ctx.fillRect(0, vy1 - wall, w, wall);
-      ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.fillRect(0, vy0 + 2, w, 2); ctx.fillRect(0, vy1 - wall + 2, w, 2);
-
-      // Red blood cells drifting with the flow
-      cells.forEach(function (c) {
-        var cx = X(c.x - 0.08), cy = Y(c.y), rx = w * 0.05 * c.s, ry = rx * 0.55;
-        ctx.save(); ctx.translate(cx, cy); ctx.rotate(Math.sin(c.rot * 0.4) * 0.35);
-        var rg = ctx.createRadialGradient(0, 0, rx * 0.15, 0, 0, rx);
-        rg.addColorStop(0, '#d9666c'); rg.addColorStop(0.45, '#b8323a'); rg.addColorStop(1, '#8f1f28');
-        ctx.globalAlpha = 0.55; ctx.fillStyle = rg; ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
+      // Four equations: reactants right-aligned against a fixed arrow column, products left-aligned
+      var rowH = (h - top - 6) / 4, base = Math.min(rowH * 0.34, w / 26), cx = w / 2, aw = 58, push = Math.min(1, unsettled() * 2.5);
+      EQS.forEach(function (eq, i) {
+        var y = top + rowH * (i + 0.5);
+        if (i) { ctx.strokeStyle = 'rgba(29,36,51,0.06)'; ctx.beginPath(); ctx.moveTo(24, top + rowH * i); ctx.lineTo(w - 24, top + rowH * i); ctx.stroke(); }
+        [0, 1].forEach(function (side) {
+          var ids = side ? eq[1] : eq[0].slice().reverse(), x = side ? cx + aw / 2 + 10 : cx - aw / 2 - 10;
+          ids.forEach(function (id, k) {
+            if (k) { label(ctx, '+', x + (side ? 8 : -8), y, { font: BODY, size: base * 0.9, color: DIM }); x += side ? 16 : -16; }
+            var sz = base * size(id);
+            ctx.font = '700 ' + sz + 'px ' + BODY;
+            var tw = ctx.measureText(SP[id].t).width;
+            label(ctx, SP[id].t, x, y, { font: BODY, size: sz, color: id === 'h' ? '#c81e45' : INK, align: side ? 'left' : 'right' });
+            x += side ? tw + 4 : -tw - 4;
+          });
+        });
+        var d = clamp(breathShift(eq) * 2.2 * (1 - push) + dir[i] * push * 0.75, -0.75, 0.75), half0 = aw * 0.42;
+        var lf = half0 * (1 + d), lr = half0 * (1 - d);
+        half(ctx, cx - lf / 2, cx + lf / 2, y - 4, true);
+        half(ctx, cx - lr / 2, cx + lr / 2, y + 4, false);
       });
-
-      // Molecules, ions and events
-      ctx.save(); ctx.beginPath(); ctx.rect(0, vy0 + wall - 30, w, vy1 - vy0 - 2 * wall + 30); ctx.clip();
-      parts.forEach(function (p) {
-        var grow = p.born > 0 ? 1 - p.born / 0.4 * 0.6 : 1;
-        var alpha = p.exhale != null ? Math.max(0, 1 - p.exhale / 1.6) : 1;
-        carbonSp(ctx, p.sp, X(p.x), Y(p.y), r * grow, p.rot, alpha);
-      });
-      flashes.forEach(function (fl) { ring(ctx, X(fl.x), Y(fl.y), fl.t / 0.5, r * 2); });
-      ctx.restore();
-
-      // Equation band with both live ⇌
-      ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fillRect(0, 0, w, top);
-      liveEquation(ctx, w, 22, ['CO₂ + H₂O', { f: meters.r1.rate(time), r: meters.r1r.rate(time) }, 'H₂CO₃',
-        { f: meters.r2.rate(time), r: meters.r2r.rate(time) }, 'H⁺ + HCO₃⁻'], 14, 14);
-
-      // Meters: CO₂ and acidity (H⁺), with a mark at the normal level
-      var C = count('C') + parts.filter(function (p) { return p.sp === 'C' && p.busy && p.exhale == null; }).length;
-      meterPanel(ctx, 10, top + 6, 150, [
-        { name: 'CO₂', k: C / 30, color: '#5b6474', mark: 10 / 30 },
-        { name: 'acidity', k: count('H') / 40, color: '#e8264f', mark: H0 / 40 },
-      ]);
     }
 
     function describe() {
-      var Hn = count('H'), tag = Hn > H0 + 3 ? 'more acidic than normal' : Hn < H0 - 3 ? 'less acidic than normal' : 'at its normal acidity';
-      if (st.breath === 'normal') return 'Normal breathing. CO₂ is breathed out as fast as your cells make it. The blood is ' + tag + '.';
-      if (st.breath === 'fast') return 'Fast breathing removes CO₂ quickly. The equilibria shift back toward CO₂ to replace it, using up H⁺. The blood is ' + tag + '.';
-      return 'Slow breathing lets CO₂ build up. The equilibria shift toward H⁺ + HCO₃⁻, making more H⁺. The blood is ' + tag + '.';
+      if (st.mode === 'panic') return 'Panic attack. Fast, shallow breathing blows CO₂ out of the lungs faster than the body makes it. CO₂(g) falls, so every equilibrium shifts left, back toward CO₂(g), using up H⁺. Only CO₃²⁻ grows. Blood CO₂ and H⁺ drop far below normal and the blood becomes less acidic, which brings on the dizziness and tingling of a panic attack. Slow breathing lets CO₂ build back up.';
+      if (st.mode === 'exercise') return 'Exercise. Working muscles release extra CO₂ and acid (H⁺). The extra H⁺ drives the last two equilibria left: HCO₃⁻ and CO₃²⁻ are used up making H₂CO₃, which breaks down into more CO₂. CO₂ piles up in the blood and lungs, so you breathe hard to get rid of it. H⁺ stays high and the blood becomes more acidic.';
+      if (((ph % 1) + 1) % 1 < IN) return 'Regular breathing, in. Fresh air has almost no CO₂, so CO₂(g) in the lungs drops and each equilibrium shifts left, back toward CO₂(g). H₂CO₃, H⁺ and HCO₃⁻ drop. With less H⁺, the last equilibrium shifts right, so CO₃²⁻ rises.';
+      return 'Regular breathing, out. The air left in the lungs fills with CO₂ from the blood, so CO₂(g) rises and each equilibrium shifts right. H₂CO₃, H⁺ and HCO₃⁻ rise. The extra H⁺ pushes the last equilibrium back, so CO₃²⁻ drops.';
     }
 
     reset();
     return {
       controls: [
-        { type: 'seg', key: 'breath', label: 'Breathing', options: [['slow', 'Slow'], ['normal', 'Normal'], ['fast', 'Fast']] },
+        { type: 'seg', key: 'mode', label: 'Situation', options: [['rest', 'Regular breathing'], ['panic', 'Panic attack'], ['exercise', 'Exercise']] },
+        { type: 'seg', key: 'run', label: 'Animation', options: [['on', 'Play'], ['hold', 'Pause']] },
         { type: 'btn', key: 'reset', label: 'Start over' },
       ],
       get: function (k) { return st[k]; },
-      set: function (k, v) { st[k] = v; },
-      action: function (k) { if (k === 'reset') { reset(); st.breath = 'normal'; } },
-      stats: function () { return { C: count('C'), A: count('A'), B: count('B'), H: count('H') }; },
+      set: function (k, v) {
+        if (k === 'mode' && v !== st.mode) {
+          // The breath carries on from where it is; the arrows lean the way this change pushes each equilibrium
+          dir = v === 'rest' ? MODES[st.mode].dir.map(function (d) { return -d; }) : MODES[v].dir;
+        }
+        st[k] = v;
+      },
+      action: function (k) { if (k === 'reset') { reset(); st.mode = 'rest'; st.run = 'on'; } },
+      stats: function () { var o = {}; Object.keys(SP).forEach(function (id) { o[id] = +size(id).toFixed(2); }); return o; },
       update: update, draw: draw, describe: describe,
     };
   }
 
-  var MAKERS = { soda: soda, ocean: ocean, blood: blood };
+  /* =====================================================================
+     DIAMOND: C(diamond) → C(graphite). ΔG is negative, but the hill is enormous.
+     A free energy diagram, not to scale (the real gap is tiny next to the hill). Carbon atoms on
+     the diamond shelf keep getting random kicks, climbing part way up and sliding back. A clock
+     runs in time-lapse to the age of Earth and nothing changes. Heat it (no air) and the kicks
+     get big enough to cross: most atoms end up as graphite, a few cross back. ΔG never changed
+     sign, only the rate. Kicks are energies, so crossing back from the lower graphite shelf is rarer.
+     ===================================================================== */
+  function diamond(canvas, opts) {
+    var N = 8, SH = { d: 0.24, g: 0.17, pk: 0.94 }, FOOT = [0.36, 0.64];
+    var MIN_PER_S = 4, AGE = 4.5e9;                      // heating time-lapse; the age of Earth (years)
+    var st = { temp: 'room' }, atoms, clock, heatT;
+
+    function energy(x) {
+      if (x <= FOOT[0]) return SH.d;
+      if (x >= FOOT[1]) return SH.g;
+      if (x <= 0.5) return SH.d + (SH.pk - SH.d) * smooth((x - FOOT[0]) / (0.5 - FOOT[0]));
+      return SH.pk + (SH.g - SH.pk) * smooth((x - 0.5) / (FOOT[1] - 0.5));
+    }
+    // x on the near slope where the curve reaches height e (side 0 diamond, 1 graphite)
+    function reachX(side, e) {
+      var lo = side ? 0.5 : FOOT[0], hi = side ? FOOT[1] : 0.5;
+      for (var i = 0; i < 30; i++) {
+        var mid = (lo + hi) / 2, above = energy(mid) > e;
+        if (side ? above : !above) lo = mid; else hi = mid;
+      }
+      return (lo + hi) / 2;
+    }
+    function slotX(side, i) { return side ? 0.96 - i * 0.04 : 0.04 + i * 0.04; }
+    function freeSlot(side) {
+      var used = {};
+      atoms.forEach(function (a) { if (a.move && a.move.over) { if (a.move.side === side) used[a.move.slot] = 1; } else if (a.side === side) used[a.slot] = 1; });
+      for (var i = 0; i < N; i++) if (!used[i]) return i;
+      return null;
+    }
+    function count(side) { return atoms.filter(function (a) { return (a.move && a.move.over ? a.move.side : a.side) === side; }).length; }
+
+    function reset() {
+      clock = 0; heatT = 0; st.temp = 'room'; atoms = [];
+      for (var i = 0; i < N; i++) atoms.push({ side: 0, slot: i, x: slotX(0, i), wait: rand(0.2, 2), move: null, ph: rand(0, 6.3) });
+    }
+    function kick(a) {
+      var hot = st.temp === 'hot', u = Math.random();
+      var K = (hot ? 0.35 + 0.8 * u * u : 0.06 + 0.3 * u * u) * (SH.pk - SH.d);   // energy of this kick
+      var e = (a.side ? SH.g : SH.d) + K, to = e >= SH.pk ? freeSlot(1 - a.side) : null;
+      if (to != null) a.move = { over: true, side: 1 - a.side, slot: to, from: a.x, to: slotX(1 - a.side, to), t: 0, dur: 1.8 };
+      else a.move = { over: false, from: a.x, to: reachX(a.side, Math.min(e, SH.pk - 0.03)), t: 0, dur: 0.7 + 1.4 * Math.min(1, K / (SH.pk - SH.d)) };
+    }
+    function atomX(a) {
+      var m = a.move; if (!m) return a.x;
+      var p = Math.min(1, m.t / m.dur);
+      if (!m.over) return m.from + (m.to - m.from) * Math.sin(Math.PI * p);
+      return p < 0.45 ? m.from + (0.5 - m.from) * smooth(p / 0.45) : 0.5 + (m.to - 0.5) * smooth((p - 0.45) / 0.55);
+    }
+
+    function update(dt) {
+      dt *= opts.reduced ? 0.35 : 1;
+      if (st.temp === 'hot') heatT += dt; else clock += dt;
+      atoms.forEach(function (a) {
+        a.ph += dt;
+        if (a.move) {
+          a.move.t += dt;
+          if (a.move.t >= a.move.dur) {
+            if (a.move.over) { a.side = a.move.side; a.slot = a.move.slot; }
+            a.x = slotX(a.side, a.slot); a.move = null;
+            a.wait = st.temp === 'hot' ? rand(0.3, 1) : rand(0.5, 2);
+          }
+          return;
+        }
+        a.wait -= dt;
+        if (a.wait <= 0) kick(a);
+      });
+    }
+
+    // Time-lapse: 1 year after 6 s, then ×1000 every 6 s, stopping at the age of Earth
+    function years() { return Math.min(AGE, Math.pow(10, clock / 2 - 3) - 0.001); }
+    function fmtYears(y) {
+      if (y < 1) { var d = Math.max(1, Math.round(y * 365)); return d + (d === 1 ? ' day' : ' days'); }
+      if (y < 1e3) return Math.round(y) + (Math.round(y) === 1 ? ' year' : ' years');
+      if (y < 1e6) return (y / 1e3).toFixed(y < 1e4 ? 1 : 0) + ' thousand years';
+      if (y < 1e9) return (y / 1e6).toFixed(y < 1e7 ? 1 : 0) + ' million years';
+      return (y / 1e9).toFixed(1) + ' billion years';
+    }
+    function fmtHeat() { var m = Math.round(heatT * MIN_PER_S); return m < 60 ? m + ' min' : (m / 60).toFixed(1) + ' h'; }
+
+    function draw() {
+      var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h, hot = st.temp === 'hot';
+      if (hot) {
+        var hg = ctx.createLinearGradient(0, h, 0, h * 0.3);
+        hg.addColorStop(0, 'rgba(240,140,60,0.22)'); hg.addColorStop(1, 'rgba(240,140,60,0)');
+        ctx.fillStyle = hg; ctx.fillRect(0, 0, w, h);
+      }
+      label(ctx, 'C(diamond) → C(graphite)', w / 2, 20, { font: BODY, size: 16, color: INK });
+
+      // Clock and counts
+      label(ctx, hot ? 'heated to about 1,800 °C, no air' : 'time-lapse at room temperature', 14, 46, { size: 10, color: hot ? EMBER : DIM, align: 'left' });
+      var y = years();
+      label(ctx, hot ? fmtHeat() : fmtYears(y), 14, 66, { font: BODY, size: 17, color: INK, align: 'left' });
+      if (!hot && y >= AGE) label(ctx, 'the age of Earth', 14, 84, { size: 10, color: DIM, align: 'left' });
+      label(ctx, 'diamond ' + count(0) + '  ·  graphite ' + count(1), w - 14, 46, { size: 11, color: INK, align: 'right' });
+      label(ctx, 'ΔG −  ·  spontaneous', w - 14, 66, { size: 11, color: TIDE, align: 'right' });
+
+      // Free energy diagram
+      var PL = 46, PR = w - 64, top = 100, bot = h - 44, pw = PR - PL;
+      var X = function (x) { return PL + x * pw; }, Y = function (e) { return bot - e * (bot - top); };
+      var r = Math.max(4.5, Math.min(6.5, pw / 60));
+      ctx.strokeStyle = INK; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(PL - 14, top - 10); ctx.lineTo(PL - 14, bot + 8); ctx.lineTo(PR + 8, bot + 8); ctx.stroke();
+      ctx.save(); ctx.translate(PL - 28, (top + bot) / 2); ctx.rotate(-Math.PI / 2);
+      label(ctx, 'free energy →', 0, 0, { size: 11 }); ctx.restore();
+      label(ctx, 'reaction progress →', (PL + PR) / 2, h - 10, { size: 11 });
+      label(ctx, 'diamond', X(0.18), bot + 22, { color: INK, size: 11 });
+      label(ctx, 'graphite', X(0.82), bot + 22, { color: INK, size: 11 });
+      label(ctx, 'not to scale', PR + 8, h - 10, { size: 9, align: 'right', weight: '400' });
+
+      // ΔG between the shelves, Eₐ up the hill
+      var yd = Y(SH.d), yg = Y(SH.g), yk = Y(SH.pk), ax = PR + 24;
+      ctx.strokeStyle = FAINT_LINE; ctx.lineWidth = 1.5; ctx.setLineDash([4, 5]);
+      ctx.beginPath(); ctx.moveTo(X(0.34), yd); ctx.lineTo(ax + 6, yd); ctx.stroke(); ctx.setLineDash([]);
+      U.arrow(ctx, ax, yd, ax, yg, TIDE, 2.2);
+      label(ctx, 'ΔG', ax + 8, yd - 12, { color: TIDE, size: 11, align: 'left' });
+      ctx.strokeStyle = DIM; ctx.lineWidth = 1.2; ctx.setLineDash([3, 4]);
+      ctx.beginPath(); ctx.moveTo(X(0.5), yd); ctx.lineTo(X(0.5), yk + 4); ctx.stroke(); ctx.setLineDash([]);
+      label(ctx, 'Eₐ: huge', X(0.5) + 7, (yd + yk) / 2, { size: 11, align: 'left', weight: '400' });
+
+      ctx.strokeStyle = INK; ctx.lineWidth = 3.2; ctx.lineJoin = 'round';
+      ctx.beginPath();
+      for (var i = 0; i <= 160; i++) { var xx = i / 160; if (i) ctx.lineTo(X(xx), Y(energy(xx))); else ctx.moveTo(X(xx), Y(energy(xx))); }
+      ctx.stroke();
+
+      // Carbon atoms: resting ones jiggle (harder when hot); climbing ones ride the curve
+      atoms.forEach(function (a) {
+        var x = atomX(a), j = a.move ? 0 : Math.sin(a.ph * (hot ? 19 : 9)) * (hot ? 2.2 : 0.9);
+        var px = X(x) + j, py = Y(energy(x)) - r - 1.5;
+        if (hot) {
+          var gl = ctx.createRadialGradient(px, py, r * 0.3, px, py, r * 2.4);
+          gl.addColorStop(0, 'rgba(240,140,60,0.45)'); gl.addColorStop(1, 'rgba(240,140,60,0)');
+          ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(px, py, r * 2.4, 0, Math.PI * 2); ctx.fill();
+        }
+        ball(ctx, px, py, r, C_A[0], C_A[1]);
+      });
+    }
+
+    function describe() {
+      if (st.temp === 'hot') return 'Heated to about 1,800 °C with no air, the atoms get kicks big enough to cross the hill, and they settle as graphite. A few cross back, but far fewer. ΔG has the same sign as before; only the rate changed. (In air, the diamond would burn to CO₂ first.)';
+      if (count(1)) return 'Back at room temperature. The atoms that crossed stay as graphite and the rest stay as diamond: none of them can get back over the hill.';
+      return 'Room temperature. ΔG is negative, so diamond turning into graphite is spontaneous. But the hill (Eₐ) is so high that every atom slides back down. After ' + fmtYears(years()) + ', the diamond is still diamond.';
+    }
+
+    reset();
+    return {
+      controls: [
+        { type: 'seg', key: 'temp', label: 'Temperature', options: [['room', 'Room temperature'], ['hot', 'Heat it (no air)']] },
+        { type: 'btn', key: 'reset', label: 'Start over' },
+      ],
+      get: function (k) { return st[k]; },
+      set: function (k, v) { if (k === 'temp' && v !== st.temp) { if (v === 'hot') heatT = 0; else clock = 0; } st[k] = v; },
+      action: function (k) { if (k === 'reset') reset(); },
+      stats: function () { return { diamond: count(0), graphite: count(1) }; },
+      update: update, draw: draw, describe: describe,
+    };
+  }
+
+  var MAKERS = { soda: soda, ocean: ocean, blood: blood, diamond: diamond };
   global.EqScenes = {
+    bottle: { hw: hw, bore: bore, glassPath: glassPath, drawGlass: drawGlass, drawFront: drawFront, cap: cap, co2: co2 },
     has: function (id) { return !!MAKERS[id]; },
     create: function (id, canvas, opts) { return MAKERS[id](canvas, opts || {}); },
   };

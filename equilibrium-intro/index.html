@@ -53,11 +53,14 @@
             <!-- ice cube: heat flows in and it melts into a puddle; heat flows out and it freezes again -->
             <svg class="hub-anim anim-melt" viewBox="20 22 160 88" focusable="false">
               <ellipse class="mt-pool" cx="100" cy="94" rx="46" ry="12" fill="rgba(150,200,236,0.5)" stroke="rgba(79,140,190,0.55)" stroke-width="1.4"/>
+              <!-- drawn like the Guide's canvas cube: a wider rim outline, then each face stroked in its own colour so the corners round -->
               <g class="mt-cube" stroke-linejoin="round">
-                <polygon points="74,58 100,70 100,96 74,84" fill="#c6e3f7" stroke="#5f9fcf" stroke-width="1.6"/>
-                <polygon points="100,70 126,58 126,84 100,96" fill="#9ccbec" stroke="#5f9fcf" stroke-width="1.6"/>
-                <polygon points="100,46 126,58 100,70 74,58" fill="#eef8fe" stroke="#5f9fcf" stroke-width="1.6"/>
-                <path d="M80,66 L80,78 M88,53 L98,49" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+                <polygon points="100,44 122.5,57 122.5,83 100,96 77.5,83 77.5,57" fill="none" stroke="#5f9fcf" stroke-width="5.9"/>
+                <polygon points="77.5,83 100,96 100,70 77.5,57" fill="#c6e3f7" stroke="#c6e3f7" stroke-width="4.7" paint-order="stroke"/>
+                <polygon points="122.5,83 100,96 100,70 122.5,57" fill="#9ccbec" stroke="#9ccbec" stroke-width="4.7" paint-order="stroke"/>
+                <polygon points="100,44 122.5,57 100,70 77.5,57" fill="#eef8fe" stroke="#eef8fe" stroke-width="4.7" paint-order="stroke"/>
+                <path d="M100,96 L100,70 M77.5,57 L100,70 L122.5,57" stroke="rgba(70,130,180,0.55)" stroke-width="1.3" fill="none"/>
+                <path d="M82,64.8 L82,77.8 M96.6,52.5 L105.6,52.5" stroke="rgba(255,255,255,0.9)" stroke-width="2.4" stroke-linecap="round" fill="none"/>
               </g>
               <g class="mt-in" fill="none" stroke="var(--eq-dh)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M30,64 q4,-5 8,0 t8,0 t8,0 m-5,-5 l5,5 l-5,5"/>

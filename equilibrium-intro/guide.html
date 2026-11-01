@@ -129,6 +129,7 @@
     </header>
 
     <nav class="guide-toc" aria-label="Guide beats">
+      <a href="#beat-start">Start here</a>
       <a href="#beat-hill">Energy hill</a>
       <a href="#beat-heat">Heat flows</a>
       <a href="#beat-spread">Randomness</a>
@@ -145,6 +146,17 @@
 
     <div class="guide-layout">
       <div class="guide-rail">
+
+        <article class="guide-beat" id="beat-start" data-badge="Completion or equilibrium" data-view="pic" data-pic="intro4">
+          <p class="beat-kicker">Start here</p>
+          <h2>All the way, or stuck partway?</h2>
+          <p>Up until this point in chemistry, we've assumed that all reactions go to <strong>completion</strong>, favouring the products. We've thought of reversible reactions only as physical changes.</p>
+          <p>In this lesson, we'll start to discover the energetic forces that cause some systems to react fully, and others to get stuck in <strong>equilibrium</strong>.</p>
+          <ul class="beat-drivers">
+            <li><strong>Watch the first two:</strong> the reactants are used up, and the products never turn back.</li>
+            <li><strong>Watch the last two:</strong> particles keep crossing both ways, but the amounts on each side stay the same.</li>
+          </ul>
+        </article>
 
         <article class="guide-beat" id="beat-hill" data-badge="Enthalpy" data-view="pic" data-pic="energy">
           <p class="beat-kicker">Part 1 · Enthalpy</p>
@@ -258,7 +270,7 @@
           <p>A sealed soda bottle is a system at equilibrium. CO₂ gas above the drink dissolves into the liquid at the same rate as dissolved CO₂ escapes. The fizz stays put. Open the cap and the system is no longer closed, so the gas escapes faster than it returns.</p>
           <p>The same balance shows up far from the chemistry lab.</p>
           <ul class="beat-drivers">
-            <li><strong>Your blood:</strong> CO₂ + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻ keeps your blood's acidity steady. Breathing faster removes CO₂ and shifts the balance.</li>
+            <li><strong>Your blood:</strong> four linked equilibria, from CO₂(g) in your lungs to H⁺ and CO₃²⁻ in your blood. Each breath in removes a little CO₂ and shifts them all left; each breath out lets CO₂ build up and shifts them right. A panic attack blows off so much CO₂ that the blood becomes less acidic. Exercise adds H⁺ and pushes the blood the other way.</li>
             <li><strong>The ocean:</strong> CO₂(g) ⇌ CO₂(aq) at the surface, then CO₂(aq) + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻ in the water. More CO₂ in the air means more H⁺ in the sea: ocean acidification.</li>
             <li><strong>Notice:</strong> each one needs a closed system and two opposite processes running at the same rate.</li>
             <li><strong>Try:</strong> change a condition under the picture, watch the two arrows in the equation pull apart, then settle to equal again. Change it back and the system returns.</li>
@@ -293,15 +305,17 @@
           <p class="beat-aside">"Spontaneous" does not mean fast or sudden. It only means "goes this way without being pushed". See the next beat.</p>
         </article>
 
-        <article class="guide-beat" id="beat-limits" data-badge="Limits of ΔG" data-view="pic" data-pic="equation" data-cards="diamond:HS">
+        <article class="guide-beat" id="beat-limits" data-badge="Limits of ΔG" data-view="pic" data-pic="scene" data-cards="diamond:HS">
           <p class="beat-kicker">Part 3 · Limits</p>
           <h2>What the formula leaves out</h2>
           <p>ΔG is powerful, but it is a model, and every model has limits.</p>
-          <p><strong>It says nothing about speed.</strong> Diamond turning into graphite has ΔG −, so it is spontaneous at every temperature. It also takes millions of years. ΔG tells you which way a reaction can go. Rates (and collision theory) tell you how fast.</p>
+          <p><strong>It says nothing about speed.</strong> Diamond turning into graphite has ΔG −, so it is spontaneous at every temperature. But at room temperature it is so slow that it has never been observed: the hill between diamond and graphite is enormous. ΔG tells you which way a reaction can go. Rates (and collision theory) tell you how fast.</p>
           <p><strong>It assumes ΔH and ΔS stay fixed.</strong> Real values drift as temperature changes, so the flip temperature you find with ΔG = ΔH − TΔS is an estimate, not an exact answer.</p>
           <ul class="beat-drivers">
             <li><strong>Which way:</strong> ΔG.</li>
             <li><strong>How fast:</strong> rates and activation energy.</li>
+            <li><strong>Watch:</strong> the carbon atoms climb part way up the hill and slide back, while the clock runs to billions of years.</li>
+            <li><strong>Heat it (no air):</strong> now atoms get over the hill and settle as graphite. ΔG didn't change sign. Only the rate did.</li>
             <li><strong>Notice:</strong> a "spontaneous" reaction can still need a spark to get started (think of a match).</li>
           </ul>
           <p class="beat-aside">Can you think of another reaction that "should" happen but doesn't seem to? (Paper burning in air is one.)</p>
@@ -419,11 +433,11 @@
   </div>
 
   <script src="../intermolecular-forces/assets/suite-chrome.js"></script>
-  <script src="assets/reactions.js?v=7"></script>
+  <script src="assets/reactions.js?v=10"></script>
   <script src="assets/vessel-engine.js?v=3"></script>
   <script src="assets/eq-charts.js?v=3"></script>
-  <script src="assets/guide-pictures.js?v=32"></script>
-  <script src="assets/eq-scenes.js?v=17"></script>
+  <script src="assets/guide-pictures.js?v=34"></script>
+  <script src="assets/eq-scenes.js?v=22"></script>
   <script>
   (function () {
     'use strict';
@@ -552,7 +566,7 @@
       return predictions[k] || (predictions[k] = { H: null, S: null, revealed: false });
     }
 
-    // ---------- live equilibrium scenes (soda, ocean, blood) ----------
+    // ---------- live scenes (soda, ocean, blood, diamond) ----------
     var scene = null, sceneId = null, sceneTs = 0, sceneTextAt = 0;
     function buildSceneCtl() {
       $('g-sceneCtl').innerHTML = scene.controls.map(function (c) {
@@ -590,6 +604,12 @@
       if (!active || active.dataset.view !== 'pic') return;
       var kind = active.dataset.pic, cards = cardList(active), c = cards[cardIdx], st = c ? cardState(c) : {};
       if (kind === 'scene') { if (c) drawScene(c.ex.id); return; }
+      if (kind === 'intro4') {
+        var id4 = EqPictures.intro4($('pic'), { t: (performance.now() - picT0) / 1000, still: reduced });
+        $('sub').textContent = '';
+        if ($('pic').getAttribute('aria-label') !== id4) $('pic').setAttribute('aria-label', id4);
+        return;
+      }
       if (kind === 'gibbs4') {
         var gd = EqPictures.gibbs4($('pic'), { idx: caseIdx, t: (performance.now() - picT0) / 1000, still: reduced });
         $('sub').textContent = '';
@@ -612,7 +632,6 @@
         return;
       }
       var o = c ? { id: c.ex.id, title: c.ex.title, eq: c.ex.eq, dH: c.ex.dH, dS: c.ex.dS, revealed: st.revealed, phase: picPhase } : {};
-      if (kind === 'equation' && c && c.ex.id === 'diamond') o.note = st.revealed ? 'ΔG − at every temperature · takes millions of years' : '';
       if (kind === 'beaker' || kind === 'spread') { o.t = (performance.now() - picT0) / 1000; o.still = reduced; }
       var desc = EqPictures[kind]($('pic'), o);
       $('sub').textContent = c && kind !== 'beaker' ? c.ex.eq : '';   // the beaker draws its own equation
@@ -624,7 +643,7 @@
       if (!active || active.dataset.view !== 'pic') return;
       picPhase = (picPhase + 0.016) % 1;
       drawPic();
-      if (!reduced && (active.dataset.pic === 'beaker' || active.dataset.pic === 'energy' || active.dataset.pic === 'spread' || active.dataset.pic === 'coldpack' || active.dataset.pic === 'gibbs4' || active.dataset.pic === 'scene')) picRaf = requestAnimationFrame(picLoop);
+      if (!reduced && (active.dataset.pic === 'intro4' || active.dataset.pic === 'beaker' || active.dataset.pic === 'energy' || active.dataset.pic === 'spread' || active.dataset.pic === 'coldpack' || active.dataset.pic === 'gibbs4' || active.dataset.pic === 'scene')) picRaf = requestAnimationFrame(picLoop);
     }
 
     function loadPic(b) {

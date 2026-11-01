@@ -125,13 +125,13 @@
     { id: 'soda', beat: 'around', title: 'Sealed soda bottle', eq: 'CO₂(g) ⇌ CO₂(aq)', dH: '−', dS: '−',
       whyH: 'Dissolving gas gives off a little heat.', whyS: 'Gas particles lose their freedom when they dissolve.',
       context: 'Sealed, gas dissolves as fast as it escapes. Take the cap off, or warm the bottle, and watch the balance move.' },
-    { id: 'blood', beat: 'around', title: 'Carbon dioxide in your blood', eq: 'CO₂ + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻', dH: null, dS: null,
-      context: 'Your blood keeps its acidity steady because these reactions run both ways. Change how fast you breathe and watch the acidity follow.' },
+    { id: 'blood', beat: 'around', title: 'Carbon dioxide in your blood', eq: 'CO₂(g) ⇌ CO₂(aq) · CO₂ + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻ ⇌ H⁺ + CO₃²⁻', dH: null, dS: null,
+      context: 'Four linked equilibria connect the air in your lungs to the acidity of your blood. Watch each species grow and shrink as you breathe, then see what a panic attack and hard exercise do to the balance. The sizes are exaggerated so you can see the shifts.' },
     { id: 'ocean', beat: 'around', title: 'Carbon dioxide in the ocean', eq: 'CO₂(g) ⇌ CO₂(aq) · CO₂(aq) + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻', dH: null, dS: null,
       context: 'CO₂ from cars and factories dissolves into the sea, where it forms carbonic acid (H₂CO₃), which splits into H⁺ and HCO₃⁻. Raise the carbon output and watch both equilibria shift toward more H⁺: ocean acidification.' },
     { id: 'diamond', beat: 'limits', title: 'Diamond to graphite', eq: 'C(diamond) → C(graphite)', dH: '−', dS: '+',
       whyH: 'Graphite is slightly lower in energy.', whyS: 'Graphite\'s layers are a little less rigid than diamond.',
-      context: 'ΔG says this should happen at any temperature. It takes millions of years. ΔG tells you which way, not how fast.' },
+      context: 'ΔG says this should happen at any temperature. At room temperature it is so slow that it has never been observed. Heat it with no air and it does happen. ΔG tells you which way, not how fast.' },
   ];
 
   var byId = {};

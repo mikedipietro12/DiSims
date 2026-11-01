@@ -157,9 +157,64 @@
 .eqnSmall .rxnRev{font-size:var(--revSize,16px);font-weight:700;}
 .eqnSmall .rxnHeat{font-size:var(--heatSize,14px);font-weight:700;color:var(--dim);}
 
+/* ICE table: opens from the K card in place of the graph, with a wider side column */
+.eq-main.ice-open{grid-template-columns:minmax(0,1fr) 28rem;}
+.eq-curve[hidden],.ice-card[hidden],.ice-pane[hidden]{display:none;}
+.k-head{display:flex;justify-content:space-between;align-items:center;gap:0.6rem;}
+.k-head .gauge-label{margin:0;}
+.btn.btn-sm{padding:0.3rem 0.65rem;font-size:0.8rem;min-height:0;box-shadow:0 2px 0 var(--ink);}
+.btn.btn-sm:active,.btn.btn-sm[aria-pressed="true"]{transform:translateY(2px);box-shadow:0 0 0 var(--ink);}
+.ice-card{display:flex;flex-direction:column;gap:0.5rem;}
+.ice-card .curve-head{align-items:center;margin:0;}
+.ice-modes{display:flex;gap:0.4rem;margin-left:auto;}
+.ice-card .btn-close{padding:0.15rem 0.55rem;font-size:1rem;line-height:1;}
+.ice-pane{display:flex;flex-direction:column;gap:0.5rem;}
+.ice-units{font-family:var(--font-mono);font-size:0.72rem;font-weight:700;color:var(--dim);}
+.ice-table{width:100%;border-collapse:separate;border-spacing:4px;table-layout:fixed;margin:-4px;width:calc(100% + 8px);
+  font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+.ice-table th{font-size:0.95rem;font-weight:700;padding:0.15rem;text-align:center;}
+.ice-table th sub,.ice-table th sup{font-size:0.72em;line-height:0;}
+.ice-table .ice-row{width:2.7rem;font-size:1rem;color:var(--ink);}
+.ice-table td{
+  background:var(--field);border-radius:8px;text-align:center;padding:0.3rem 0.15rem;
+  font-weight:700;font-size:0.9rem;height:2.5rem;white-space:nowrap;overflow:hidden;
+}
+.ice-table td.ice-solid,.ice-table tr.ice-e td.ice-solid{background:transparent;border:2px dashed var(--line);color:var(--dim);}
+.ice-table td.ice-added{background:var(--delta-pos);color:#ffffff;padding:0.2rem 0.15rem;}
+.ice-add{display:block;font-size:0.72rem;line-height:1.15;}
+.ice-add-note{color:#b3123a;font-weight:700;}
+.ice-x{display:block;font-size:0.7rem;color:var(--dim);line-height:1.1;}
+.ice-table tr.ice-e td{background:var(--accent-soft);}
+.ice-table tr.ice-e.at-eq td{background:#dff3e8;}
+.ice-table tr.ice-e.at-eq th{color:var(--chem-nh3);}
+.ice-note{font-size:0.85rem;line-height:1.4;color:var(--ink-soft);}
+.ice-note b{color:var(--ink);}
+.ice-edit td{padding:0;}
+.ice-edit input{
+  width:100%;box-sizing:border-box;height:100%;min-height:2.5rem;border:2px solid transparent;border-radius:8px;
+  background:transparent;font:inherit;text-align:center;color:var(--ink);padding:0.3rem 0.15rem;
+}
+.ice-edit input:focus{outline:none;border-color:var(--accent);background:var(--tray);}
+.ice-edit input.calc{color:var(--accent);}
+.ice-edit input.bad{border-color:var(--delta-pos);}
+.ice-edit input::placeholder{color:var(--dim);opacity:0.75;}
+.ice-k{display:flex;flex-wrap:wrap;align-items:center;gap:0.45rem 0.5rem;}
+.ice-k label{font-family:var(--font-mono);font-weight:700;font-size:0.95rem;}
+.ice-k input{
+  width:8rem;font-family:var(--font-mono);font-weight:700;font-size:0.9rem;text-align:center;
+  border:2px solid var(--line-strong);border-radius:8px;padding:0.3rem 0.4rem;background:var(--tray);color:var(--ink);
+}
+.ice-k input:focus{outline:3px solid var(--accent);outline-offset:2px;}
+.ice-k input.bad{border-color:var(--delta-pos);}
+.ice-result{font-size:0.86rem;line-height:1.45;min-height:2.6em;color:var(--ink-soft);}
+.ice-result p{margin:0 0 0.3rem;}
+.ice-result .ice-math{display:block;font-family:var(--font-mono);font-size:0.8rem;color:var(--ink);margin-top:0.1rem;overflow-wrap:anywhere;}
+.ice-result .ice-err{color:#b3123a;font-weight:700;}
+.ice-result .ice-x-out{color:var(--accent);font-weight:700;}
+
 @media (max-width:980px){
   /* minmax(0,…) so a canvas's pixel width can't widen the column */
-  .eq-main{grid-template-columns:minmax(0,1fr);}
+  .eq-main,.eq-main.ice-open{grid-template-columns:minmax(0,1fr);}
   .eq-main .heat-stage{min-height:min(60vh,480px);}
 }
 @media (max-width:640px){
@@ -265,9 +320,46 @@
             </div>
             <div class="chart-box"><canvas id="chart" role="img" aria-label="Line graph of each gas's concentration over the last few seconds."></canvas></div>
           </section>
-  
+
+          <section class="heat-curve ice-card" id="icePanel" aria-labelledby="iceLabel" hidden>
+            <div class="curve-head">
+              <h2 class="gauge-label" id="iceLabel">ICE table</h2>
+              <div class="ice-modes" role="group" aria-label="ICE table mode">
+                <button type="button" class="btn btn-sm" id="iceModeLive" aria-pressed="true">Live</button>
+                <button type="button" class="btn btn-sm" id="iceModeOwn" aria-pressed="false">Enter your own data</button>
+              </div>
+              <button type="button" class="btn btn-close" id="iceClose" aria-label="Close ICE table and show the graph">×</button>
+            </div>
+
+            <div class="ice-pane" id="iceLive">
+              <span class="ice-units" id="iceLiveUnits"></span>
+              <table class="ice-table" id="iceLiveTable"></table>
+              <p class="ice-note" id="iceLiveNote"></p>
+            </div>
+
+            <div class="ice-pane" id="iceOwn" hidden>
+              <p class="ice-note">Type into any squares you know and leave the rest blank. <span style="color:var(--accent);font-weight:700">Blue</span> numbers are worked out for you.</p>
+              <span class="ice-units" id="iceOwnUnits"></span>
+              <table class="ice-table ice-edit" id="iceOwnTable"></table>
+              <div class="ice-k">
+                <label for="iceK" id="iceKLbl">K<sub>c</sub> =</label>
+                <input type="text" id="iceK" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="type K">
+                <button type="button" class="btn btn-sm" id="iceRevealK">Reveal K</button>
+                <button type="button" class="btn btn-sm" id="iceCalcQ">Calculate Q</button>
+              </div>
+              <div class="ice-k">
+                <button type="button" class="btn btn-sm" id="iceCopyLive" title="Fill the I row with the live table's I row">Copy the live I row</button>
+                <button type="button" class="btn btn-sm" id="iceClear">Clear</button>
+              </div>
+              <div class="ice-result" id="iceResult" aria-live="polite"></div>
+            </div>
+          </section>
+
           <section class="heat-curve" id="k-panel" aria-labelledby="kLabel">
-            <h2 class="gauge-label" id="kLabel">Equilibrium check</h2>
+            <div class="k-head">
+              <h2 class="gauge-label" id="kLabel">Equilibrium check</h2>
+              <button type="button" class="btn btn-sm" id="iceOpen" aria-expanded="false" aria-controls="icePanel">See ICE table</button>
+            </div>
             <div class="k-rows">
               <div class="k-row"><span class="k-name" id="k-kc-lbl">Kc</span><span class="k-val" id="k-kc"></span></div>
               <div class="k-row"><span class="k-name" id="k-q-lbl">Q</span><span class="k-val" id="k-q"></span></div>
@@ -567,6 +659,11 @@
   let nextSpriteId = 1;
   let pendingForward = 0;
   let pendingReverse = 0;
+  // ICE table: extent of reaction (mol, forward +) since the latest change, and that change
+  let iceXi = 0;
+  let iceMark = null;
+  // gas added in that change (mol per species): its I square turns red and counts down
+  let iceAdded = {};
   let bias = { no2: 0, n2o4: 0, n2: 0, h2: 0, nh3: 0, i2: 0, hi: 0, pbi2s: 0 };
 
   function activeRxn() {
@@ -579,6 +676,12 @@
 
   function setN(id, val) {
     n[id] = Math.max(0, val);
+  }
+
+  // an add-gas button's dose, remembered for the ICE table
+  function addDose(id, mol) {
+    setN(id, getN(id) + mol);
+    iceAdded[id] = (iceAdded[id] || 0) + mol;
   }
 
   function initNearEquilibrium_NO2() {
@@ -682,6 +785,9 @@
     pendingForward = 0;
     pendingReverse = 0;
     for (const k of Object.keys(bias)) bias[k] = 0;
+    iceXi = 0;
+    iceMark = null;
+    iceAdded = {};
   }
 
   function updateLegend() {
@@ -748,27 +854,28 @@
     el('gCountLabel').textContent = solid ? 'Particles shown' : 'Molecules shown';
   }
 
+  const SPECIES_HTML = {
+    no2: '<span class="chemNO2">NO<sub>2</sub></span>',
+    n2o4: '<span class="chemN2O4">N<sub>2</sub>O<sub>4</sub></span>',
+    n2: '<span class="chemN2">N<sub>2</sub></span>',
+    h2: '<span class="chemH2">H<sub>2</sub></span>',
+    nh3: '<span class="chemNH3">NH<sub>3</sub></span>',
+    i2: '<span class="chemI2">I<sub>2</sub></span>',
+    hi: '<span class="chemHI">HI</span>',
+    pbi2s: '<span class="chemPbI2">PbI<sub>2</sub>(s)</span>',
+    pb: '<span class="chemPb">Pb<sup>2+</sup></span>',
+    i: '<span class="chemI">I<sup>−</sup></span>',
+  };
+
   function updateCountsInK() {
     if (!kCountList) return;
     const rxn = activeRxn();
     const sc = spriteCounts();
     const order = rxn.species;
-    const labels = {
-      no2: '<span class="chemNO2">NO<sub>2</sub></span>',
-      n2o4: '<span class="chemN2O4">N<sub>2</sub>O<sub>4</sub></span>',
-      n2: '<span class="chemN2">N<sub>2</sub></span>',
-      h2: '<span class="chemH2">H<sub>2</sub></span>',
-      nh3: '<span class="chemNH3">NH<sub>3</sub></span>',
-      i2: '<span class="chemI2">I<sub>2</sub></span>',
-      hi: '<span class="chemHI">HI</span>',
-      pbi2s: '<span class="chemPbI2">PbI<sub>2</sub>(s)</span>',
-      pb: '<span class="chemPb">Pb<sup>2+</sup></span>',
-      i: '<span class="chemI">I<sup>−</sup></span>',
-    };
     kCountList.innerHTML = order
       .map((sp) => {
         const v = Math.round(sc[sp] || 0);
-        return `<div class="count-row"><span>${labels[sp] || sp}</span><span class="val">${v}</span></div>`;
+        return `<div class="count-row"><span>${SPECIES_HTML[sp] || sp}</span><span class="val">${v}</span></div>`;
       })
       .join('');
   }
@@ -962,6 +1069,9 @@
       const v = (s0[sp] || 0) + (dt / 6) * ((a[sp] || 0) + 2 * (b[sp] || 0) + 2 * (c[sp] || 0) + (d[sp] || 0));
       next[sp] = Math.max(0, v);
     }
+    // the ICE table's extent since the last change, read off the first product
+    const xiSp = rxn.species.find((sp) => rxn.nu[sp] > 0);
+    iceXi += (next[xiSp] - (s0[xiSp] || 0)) / rxn.nu[xiSp];
     n = next;
   }
 
@@ -3145,6 +3255,10 @@
       return;
     }
     markers.push({ t: clock, tEnd: clock, kind, label, n: 1 });
+    // a new change: the live ICE table's I row is taken from here
+    iceXi = 0;
+    iceMark = markers[markers.length - 1];
+    iceAdded = {};
   }
 
   function resize() {
@@ -3337,6 +3451,436 @@
     if (kArrowRevEl) kArrowRevEl.style.opacity = rOp.toFixed(3);
   }
 
+  /* ---------- ICE table ----------
+     Opens from the K card in place of the small graph. Two modes:
+     Live: I is the mix just after the latest change (before it began to shift back), C is
+     the change since then in multiples of x, and E is the mix now ("Now" until Q ≈ K).
+     iceXi tallies the extent since that change in rk4Step, so I = n − ν·ξ at the current
+     volume, which keeps I right even while the volume is being dragged.
+     Own data: students fill in any squares and K; the rest is solved through x.
+     Ammonia's table is in partial pressures (atm) to match Kp; the solid's column stays blank. */
+  const icePanel = el('icePanel');
+  const iceOpenBtn = el('iceOpen');
+  const iceLiveTable = el('iceLiveTable');
+  const iceOwnTable = el('iceOwnTable');
+  const iceKIn = el('iceK');
+  const iceResult = el('iceResult');
+  const ICE_TXT = { no2: 'NO₂', n2o4: 'N₂O₄', n2: 'N₂', h2: 'H₂', nh3: 'NH₃', i2: 'I₂', hi: 'HI', pb: 'Pb²⁺', i: 'I⁻', pbi2s: 'PbI₂(s)' };
+  const SUPS = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+  let iceOpen = false;
+  let iceMode = 'live';
+  let iceLiveCells = null; // { I: {sp: td}, C, E, eRow, eLbl }
+  const own = { kNote: '', showQ: false };
+
+  const isSolid = (sp) => sp === 'pbi2s';
+  const icePressure = () => activeRxn().id === 'ammonia';
+  const iceUnitName = () => (icePressure() ? 'atm' : 'M');
+
+  // reactants, then products
+  function iceSpecies() {
+    const rxn = activeRxn();
+    return rxn.species.filter((sp) => rxn.nu[sp] < 0).concat(rxn.species.filter((sp) => rxn.nu[sp] > 0));
+  }
+  const iceDissolved = () => iceSpecies().filter((sp) => !isSolid(sp));
+
+  // mol → the table's unit: mol/L, or atm for ammonia
+  function iceUnit(mol) {
+    if (V_L <= 0) return 0;
+    return icePressure() ? (mol * CFG.R_L_atm * T) / V_L : mol / V_L;
+  }
+  function iceK() { return icePressure() ? Kp_NH3(T) : Kc(T); }
+  function iceKName() {
+    const id = activeRxn().id;
+    return id === 'ammonia' ? 'K<sub>p</sub>' : id === 'pbi2' ? 'K<sub>sp</sub>' : 'K<sub>c</sub>';
+  }
+
+  function supNum(s) { return String(s).replace(/-/g, '⁻').replace(/\d/g, (d) => SUPS[d]); }
+  // 3 significant figures; scientific notation outside 0.001–9999
+  function fmt(v) {
+    if (v == null || Number.isNaN(v)) return '';
+    if (!isFinite(v)) return '∞';
+    if (v === 0) return '0';
+    const a = Math.abs(v);
+    const sign = v < 0 ? '−' : '';
+    if (a >= 1000 && a < 1e4) return sign + Math.round(a);
+    if (a >= 1e-3 && a < 1000) return sign + a.toPrecision(3);
+    let e = Math.floor(Math.log10(a));
+    let m = a / Math.pow(10, e);
+    if (Number(m.toFixed(2)) >= 10) { m /= 10; e += 1; }
+    return `${sign}${m.toFixed(2)}×10${supNum(e)}`;
+  }
+  function fmtSigned(v) { return v > 0 ? '+' + fmt(v) : fmt(v); }
+  // "1.2e-3", "1.2x10^-3", "1.2×10⁻³" and "−0.5" all read
+  function parseNum(s) {
+    let t = String(s).replace(/\s+/g, '').replace(/[−–]/g, '-').replace(/⁻/g, '-')
+      .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, (c) => SUPS.indexOf(c));
+    t = t.replace(/[x×*·]10\^?/i, 'e');
+    if (!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(t)) return NaN;
+    return Number(t);
+  }
+  // "−x", "+2x"
+  function coefX(nu) { return (nu < 0 ? '−' : '+') + (Math.abs(nu) === 1 ? '' : Math.abs(nu)) + 'x'; }
+
+  // Q (or K) from one row: Π value^ν over the dissolved species
+  function iceQ(vals) {
+    const rxn = activeRxn();
+    let lq = 0;
+    let zeroR = false;
+    let zeroP = false;
+    for (const sp of iceDissolved()) {
+      const v = vals[sp];
+      if (!(v > 0)) { if (rxn.nu[sp] < 0) zeroR = true; else zeroP = true; continue; }
+      lq += rxn.nu[sp] * Math.log(v);
+    }
+    if (zeroR) return zeroP ? NaN : Infinity;
+    return zeroP ? 0 : Math.exp(lq);
+  }
+
+  // K written out, e.g. "[NO₂]² / [N₂O₄]" or "P(NH₃)² / P(N₂) P(H₂)³"
+  function iceKExpr() {
+    const rxn = activeRxn();
+    const term = (sp) => (icePressure() ? `P(${ICE_TXT[sp]})` : `[${ICE_TXT[sp]}]`) + (Math.abs(rxn.nu[sp]) > 1 ? supNum(Math.abs(rxn.nu[sp])) : '');
+    const sps = iceDissolved();
+    const top = sps.filter((sp) => rxn.nu[sp] > 0).map(term).join(' ');
+    const bot = sps.filter((sp) => rxn.nu[sp] < 0).map(term).join(' ');
+    return bot ? `${top} / ${bot}` : top;
+  }
+
+  function iceHeadRow() {
+    return '<tr><th class="ice-row" scope="col"></th>' +
+      iceSpecies().map((sp) => `<th scope="col">${SPECIES_HTML[sp]}</th>`).join('') + '</tr>';
+  }
+  const ICE_ROWS = [
+    ['I', 'Initial: just after your latest change'],
+    ['C', 'Change since then'],
+    ['E', 'Equilibrium (or the mix right now, until it settles)'],
+  ];
+
+  function iceBuild() {
+    const sps = iceSpecies();
+    const rxn = activeRxn();
+    const units = icePressure() ? 'Partial pressures in atm' : 'Concentrations in mol/L';
+    el('iceLiveUnits').textContent = units;
+    el('iceOwnUnits').textContent = units;
+    el('iceKLbl').innerHTML = iceKName() + ' =';
+
+    iceLiveTable.innerHTML = iceHeadRow() + ICE_ROWS.map(([r, title]) =>
+      `<tr class="ice-${r.toLowerCase()}"><th class="ice-row" scope="row" title="${title}">${r}</th>` +
+      sps.map((sp) => (isSolid(sp) ? '<td class="ice-solid">—</td>' : `<td data-r="${r}" data-sp="${sp}"></td>`)).join('') +
+      '</tr>').join('');
+    iceLiveCells = { I: {}, C: {}, E: {} };
+    iceLiveTable.querySelectorAll('td[data-r]').forEach((td) => { iceLiveCells[td.dataset.r][td.dataset.sp] = td; });
+    iceLiveCells.eRow = iceLiveTable.querySelector('tr.ice-e');
+    iceLiveCells.eLbl = iceLiveCells.eRow.querySelector('th');
+
+    iceOwnTable.innerHTML = iceHeadRow() + ICE_ROWS.map(([r]) =>
+      `<tr class="ice-${r.toLowerCase()}"><th class="ice-row" scope="row">${r}</th>` +
+      sps.map((sp) => (isSolid(sp)
+        ? '<td class="ice-solid" title="A solid stays out of the K expression">—</td>'
+        : `<td><input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" data-r="${r}" data-sp="${sp}"` +
+          ` aria-label="${r} for ${ICE_TXT[sp]}"${r === 'C' ? ` placeholder="${coefX(rxn.nu[sp])}"` : ''}></td>`)).join('') +
+      '</tr>').join('');
+    iceClearOwn();
+  }
+
+  function setCell(td, html) {
+    if (td._h !== html) { td._h = html; td.innerHTML = html; }
+  }
+
+  // The live I and E rows (table units) and x
+  function iceLiveValues() {
+    const rxn = activeRxn();
+    const I = {};
+    const E = {};
+    for (const sp of iceDissolved()) {
+      E[sp] = iceUnit(getN(sp));
+      I[sp] = Math.max(0, iceUnit(getN(sp) - rxn.nu[sp] * iceXi));
+    }
+    return { I, E, x: iceUnit(iceXi) };
+  }
+
+  function iceUpdateLive() {
+    if (!iceOpen || iceMode !== 'live' || !iceLiveCells) return;
+    const rxn = activeRxn();
+    const { I, E, x: x0 } = iceLiveValues();
+    // hide round-off once x is tiny next to the amounts present
+    const big = Math.max(1e-30, ...Object.values(E), ...Object.values(I));
+    const x = Math.abs(x0) < 1e-5 * big ? 0 : x0;
+    // x stays positive, as students write it: a shift back flips the signs in the C row
+    const dir = x < 0 ? -1 : 1;
+    const added = [];
+    for (const sp of iceDissolved()) {
+      // what's left of the added gas: the dose, less what the shift has used up since
+      const dose = iceAdded[sp] || 0;
+      const left = Math.max(0, Math.min(dose, dose + rxn.nu[sp] * iceXi));
+      iceLiveCells.I[sp].classList.toggle('ice-added', dose > 0);
+      if (dose > 0) {
+        added.push(`${ICE_TXT[sp]} +${fmt(iceUnit(dose))}, ${fmt(iceUnit(left))} not used up yet`);
+        setCell(iceLiveCells.I[sp], `${fmt(I[sp])}<span class="ice-add">+${fmt(iceUnit(left))}</span>`);
+      } else setCell(iceLiveCells.I[sp], fmt(I[sp]));
+      setCell(iceLiveCells.C[sp], `<span class="ice-x">${coefX(dir * rxn.nu[sp])}</span>${fmtSigned(rxn.nu[sp] * x)}`);
+      setCell(iceLiveCells.E[sp], fmt(E[sp]));
+    }
+    const q = iceQ(E);
+    const k = iceK();
+    const atEq = isFinite(q) && k > 0 && Math.abs(q / k - 1) < 0.06;
+    const allGone = rxn.id === 'pbi2' && getN('pbi2s') <= 1e-7 && !atEq;
+    iceLiveCells.eRow.classList.toggle('at-eq', atEq);
+    setCell(iceLiveCells.eLbl, atEq ? 'E' : 'Now');
+    const after = iceMark ? `just after “${iceMark.n > 1 ? `${iceMark.label} ×${iceMark.n}` : iceMark.label}”` : 'at the start';
+    const unit = iceUnitName();
+    let state;
+    if (atEq) state = x === 0 ? 'At equilibrium: nothing has shifted yet. Heat, squeeze or add something.' : '<b>Settled:</b> Q = K again, so the E row is the new equilibrium.';
+    else if (allGone) state = 'All the solid has dissolved, so Q stays below K<sub>sp</sub>: no equilibrium.';
+    else state = `<b>Still shifting ${q < k ? 'forward →' : 'back ←'}</b>: C keeps changing until Q = K.`;
+    const xTxt = x === 0 ? 'x = 0' : `x = ${fmt(Math.abs(x))} ${unit}, ${x > 0 ? 'toward products' : 'back toward reactants'}`;
+    const addTxt = added.length ? `<br><span class="ice-add-note">Added ${added.join('; ')}.</span>` : '';
+    setCell(el('iceLiveNote'), `I is the mix ${after}. ${xTxt}.${addTxt}<br>${state}`);
+  }
+
+  /* --- Own data --- */
+  const ownInputs = () => iceOwnTable.querySelectorAll('input');
+
+  function iceClearOwn() {
+    ownInputs().forEach((inp) => { inp.value = ''; delete inp.dataset.user; inp.classList.remove('calc', 'bad'); });
+    iceKIn.value = '';
+    iceKIn.classList.remove('bad');
+    own.kNote = '';
+    own.showQ = false;
+    iceSolveOwn();
+  }
+
+  // Bisect for x in K = Π E(x)^ν. ln of the right side rises with x, so one root at most,
+  // inside the range where no I or E goes negative.
+  function iceSolveX(sps, nu, I, E, K) {
+    let lo = -Infinity;
+    let hi = Infinity;
+    let scale = 1;
+    for (const sp of sps) {
+      const v = nu[sp];
+      if (I[sp] != null) { const b = -I[sp] / v; if (v > 0) lo = Math.max(lo, b); else hi = Math.min(hi, b); scale = Math.max(scale, I[sp]); }
+      else { const b = E[sp] / v; if (v > 0) hi = Math.min(hi, b); else lo = Math.max(lo, b); scale = Math.max(scale, E[sp]); }
+    }
+    if (!isFinite(lo)) lo = (isFinite(hi) ? hi : 0) - 1e6 * scale;
+    if (!isFinite(hi)) hi = lo + 2e6 * scale;
+    if (!(lo < hi)) return null;
+    const f = (x) => {
+      let s = -Math.log(K);
+      for (const sp of sps) s += nu[sp] * Math.log(Math.max(1e-300, I[sp] != null ? I[sp] + nu[sp] * x : E[sp]));
+      return s;
+    };
+    if (f(lo) > 1e-9 || f(hi) < -1e-9) return null;
+    for (let i = 0; i < 200; i++) {
+      const mid = 0.5 * (lo + hi);
+      if (f(mid) < 0) lo = mid;
+      else hi = mid;
+    }
+    return 0.5 * (lo + hi);
+  }
+
+  // "(0.100 − x)(0.100 − x)" style working, with I filled in
+  function iceSubstituted(sps, nu, I, E) {
+    const term = (sp) => {
+      const v = nu[sp];
+      const p = Math.abs(v) > 1 ? supNum(Math.abs(v)) : '';
+      if (I[sp] == null) return `(${fmt(E[sp])})${p}`;
+      const c = Math.abs(v) === 1 ? '' : Math.abs(v);
+      const body = I[sp] === 0 ? `${v < 0 ? '−' : ''}${c}x` : `${fmt(I[sp])} ${v < 0 ? '−' : '+'} ${c}x`;
+      return `(${body})${p}`;
+    };
+    const top = sps.filter((sp) => nu[sp] > 0).map(term).join('');
+    const bot = sps.filter((sp) => nu[sp] < 0).map(term).join('');
+    return bot ? `${top} / ${bot}` : top;
+  }
+
+  const close = (a, b, tol) => Math.abs(a - b) <= (tol || 0.02) * Math.max(Math.abs(a), Math.abs(b)) + 1e-15;
+
+  function iceSolveOwn() {
+    const rxn = activeRxn();
+    const nu = rxn.nu;
+    const sps = iceDissolved();
+    const names = (list) => list.map((sp) => ICE_TXT[sp]).join(', ');
+    const unit = iceUnitName();
+    const kName = iceKName();
+    const given = { I: {}, C: {}, E: {} };
+    let typo = false;
+    ownInputs().forEach((inp) => {
+      inp.classList.remove('bad');
+      if (!inp.dataset.user) return;
+      const v = parseNum(inp.value);
+      if (Number.isNaN(v)) { inp.classList.add('bad'); typo = true; return; }
+      given[inp.dataset.r][inp.dataset.sp] = v;
+    });
+    let K = null;
+    iceKIn.classList.remove('bad');
+    if (iceKIn.value.trim()) {
+      const v = parseNum(iceKIn.value);
+      if (Number.isNaN(v) || v <= 0) { iceKIn.classList.add('bad'); typo = true; }
+      else K = v;
+    }
+
+    const I = { ...given.I };
+    const E = { ...given.E };
+    let x = null;
+    const msgs = [];
+    let err = '';
+    let need = '';
+    let solvedFromK = false;
+
+    if (typo) err = 'A red square isn’t a number I can read. Try 0.25, 1.5e-3 or 1.5×10^-3.';
+    else if (sps.some((sp) => I[sp] < 0 || E[sp] < 0)) err = `${icePressure() ? 'Pressures' : 'Concentrations'} can’t be negative. Only the C row can go below zero.`;
+
+    if (!err) {
+      // every square that pins x has to agree on it
+      const pins = [];
+      for (const sp of sps) {
+        if (given.C[sp] != null) pins.push({ x: given.C[sp] / nu[sp], why: `C for ${ICE_TXT[sp]}` });
+        if (I[sp] != null && E[sp] != null) pins.push({ x: (E[sp] - I[sp]) / nu[sp], why: `I → E for ${ICE_TXT[sp]}` });
+      }
+      if (pins.length) {
+        x = pins[0].x;
+        const off = pins.find((p) => !close(p.x, x));
+        if (off) err = `These don’t agree on x: ${pins[0].why} gives x = ${fmt(pins[0].x)}, but ${off.why} gives x = ${fmt(off.x)}. Each C has to be its coefficient × x.`;
+      }
+    }
+
+    if (!err && x == null && K != null) {
+      const blank = sps.filter((sp) => I[sp] == null && E[sp] == null);
+      if (blank.length) need = `To solve for x, fill in an I or E square for ${names(blank)}.`;
+      else if (sps.some((sp) => I[sp] != null)) {
+        const r = iceSolveX(sps, nu, I, E, K);
+        if (r == null) err = `No x fits ${kName} = ${fmt(K)} without making something negative. Check K and the I row.`;
+        else {
+          x = r;
+          solvedFromK = true;
+          msgs.push(`Put the I row into ${kName} and solve for x:` +
+            `<span class="ice-math">${kName} = ${iceKExpr()}</span>` +
+            `<span class="ice-math">${fmt(K)} = ${iceSubstituted(sps, nu, I, E)}</span>` +
+            `<span class="ice-math ice-x-out">x = ${fmt(x)} ${unit}</span>`);
+        }
+      }
+    }
+
+    if (!err && x != null) {
+      if (!msgs.length) msgs.push(`From the squares you filled in, <span class="ice-x-out">x = ${fmt(x)} ${unit}</span>.`);
+      if (x < 0) msgs.push('A negative x means it shifted back ←: products turned into reactants.');
+      for (const sp of sps) {
+        if (I[sp] == null && E[sp] != null) I[sp] = E[sp] - nu[sp] * x;
+        else if (E[sp] == null && I[sp] != null) E[sp] = I[sp] + nu[sp] * x;
+      }
+      const blank = sps.filter((sp) => E[sp] == null);
+      if (blank.length === 1 && K != null) {
+        // the one unknown species comes from K itself
+        const m = blank[0];
+        let rest = 0;
+        for (const sp of sps) if (sp !== m) rest += nu[sp] * Math.log(Math.max(1e-300, E[sp]));
+        E[m] = Math.exp((Math.log(K) - rest) / nu[m]);
+        I[m] = E[m] - nu[m] * x;
+        msgs.push(`${ICE_TXT[m]} was the only unknown left, so its E comes from ${kName}.`);
+      } else if (blank.length) {
+        need = `To finish ${names(blank)}, fill in its I or E square${K == null ? `, or give ${kName}` : ''}.`;
+      }
+      const neg = sps.find((sp) => I[sp] < -1e-12 || E[sp] < -1e-12);
+      if (neg) err = `With x = ${fmt(x)}, ${ICE_TXT[neg]} would go negative. Check the signs in the C row.`;
+    }
+
+    if (!err && sps.every((sp) => E[sp] != null)) {
+      const kCalc = iceQ(E);
+      if (K == null) msgs.push(`The E row gives <span class="ice-math">${kName} = ${iceKExpr()} = ${fmt(kCalc)}</span>`);
+      else if (!solvedFromK) {
+        if (close(kCalc, K, 0.03)) msgs.push(`The E row checks out: it gives ${kName} = ${fmt(kCalc)}.`);
+        else msgs.push(`<span class="ice-err">The E row gives ${kName} = ${fmt(kCalc)}, not ${fmt(K)}.</span> That mix isn’t at equilibrium.`);
+      }
+    }
+
+    if (!err && x == null && !need && !sps.every((sp) => E[sp] != null)) {
+      const any = sps.some((sp) => I[sp] != null || E[sp] != null);
+      need = any
+        ? `Now give ${kName} (type it or Reveal K), or one square that pins x: a C value, or both I and E for one species.`
+        : `Start with the I row: what's in the ${icePressure() ? 'vessel' : 'mix'} before it shifts.`;
+    }
+
+    // Q from the I row, once asked for
+    if (own.showQ) {
+      if (!err && sps.every((sp) => I[sp] != null)) {
+        const q = iceQ(I);
+        let line = `From the I row, <span class="ice-math">Q = ${iceKExpr()} = ${fmt(q)}</span>`;
+        if (Number.isNaN(q)) line = 'Q can’t be worked out when both sides start at zero.';
+        else if (K != null) {
+          if (close(q, K, 0.03)) line += ` Q = ${kName}: already at equilibrium, so x = 0.`;
+          else if (q < K) line += ` Q < ${kName}, so it shifts <b>forward →</b>: reactants drop, products rise (x is positive).`;
+          else line += ` Q > ${kName}, so it shifts <b>back ←</b>: products drop, reactants rise (x is negative).`;
+        } else line += ` Give ${kName} to see which way it shifts.`;
+        msgs.unshift(line);
+      } else if (!err) msgs.unshift('Fill in the whole I row to calculate Q.');
+    }
+
+    // write the worked-out squares
+    ownInputs().forEach((inp) => {
+      if (inp.dataset.user) { inp.classList.remove('calc'); return; }
+      const sp = inp.dataset.sp;
+      const v = err ? null : inp.dataset.r === 'I' ? I[sp] : inp.dataset.r === 'E' ? E[sp] : (x != null ? nu[sp] * x : null);
+      inp.value = v == null ? '' : (inp.dataset.r === 'C' ? fmtSigned(v) : fmt(Math.max(0, v)));
+      inp.classList.toggle('calc', v != null);
+    });
+
+    let html = '';
+    if (own.kNote) html += `<p>${own.kNote}</p>`;
+    if (err) html += `<p class="ice-err">${err}</p>`;
+    else {
+      html += msgs.map((m) => `<p>${m}</p>`).join('');
+      if (need) html += `<p>${need}</p>`;
+    }
+    iceResult.innerHTML = html;
+  }
+
+  iceOwnTable.addEventListener('input', (e) => {
+    const inp = e.target;
+    if (inp.tagName !== 'INPUT') return;
+    if (inp.value.trim()) inp.dataset.user = '1';
+    else delete inp.dataset.user;
+    iceSolveOwn();
+  });
+  iceKIn.addEventListener('input', () => { own.kNote = ''; iceSolveOwn(); });
+  el('iceRevealK').addEventListener('click', () => {
+    iceKIn.value = fmt(iceK());
+    own.kNote = `${iceKName()} at ${T.toFixed(0)} K, from the simulation.`;
+    iceSolveOwn();
+  });
+  el('iceCalcQ').addEventListener('click', () => { own.showQ = true; iceSolveOwn(); });
+  el('iceClear').addEventListener('click', iceClearOwn);
+  el('iceCopyLive').addEventListener('click', () => {
+    const { I } = iceLiveValues();
+    ownInputs().forEach((inp) => {
+      if (inp.dataset.r === 'I') { inp.value = fmt(I[inp.dataset.sp]); inp.dataset.user = '1'; }
+      else { inp.value = ''; delete inp.dataset.user; }
+    });
+    iceSolveOwn();
+  });
+
+  function setIceMode(mode) {
+    iceMode = mode;
+    el('iceModeLive').setAttribute('aria-pressed', String(mode === 'live'));
+    el('iceModeOwn').setAttribute('aria-pressed', String(mode === 'own'));
+    el('iceLive').hidden = mode !== 'live';
+    el('iceOwn').hidden = mode !== 'own';
+  }
+  el('iceModeLive').addEventListener('click', () => setIceMode('live'));
+  el('iceModeOwn').addEventListener('click', () => setIceMode('own'));
+
+  function setIceOpen(on) {
+    iceOpen = on;
+    icePanel.hidden = !on;
+    curvePanel.hidden = on;
+    document.querySelector('.eq-main').classList.toggle('ice-open', on);
+    iceOpenBtn.textContent = on ? 'Show graph' : 'See ICE table';
+    iceOpenBtn.setAttribute('aria-expanded', String(on));
+    resize();
+    iceUpdateLive();
+  }
+  iceOpenBtn.addEventListener('click', () => setIceOpen(!iceOpen));
+  el('iceClose').addEventListener('click', () => { setIceOpen(false); iceOpenBtn.focus(); });
+
   let last = performance.now();
   function frame(now) {
     const dtReal = Math.min(0.05, (now - last) / 1000);
@@ -3346,7 +3890,8 @@
     updateKPanel();
     updateCountsInK();
     drawSim();
-    drawChart();
+    if (iceOpen) iceUpdateLive();
+    else drawChart();
     drawBigChart();
     requestAnimationFrame(frame);
   }
@@ -3411,10 +3956,10 @@
   injNO2.addEventListener('click', () => {
     mark('add-injNO2', 'Added ' + injNO2.textContent.replace('+', '').trim());
     const id = activeRxn().id;
-    if (id === 'ammonia') setN('n2', getN('n2') + CFG.doseN2);
-    else if (id === 'hi') setN('h2', getN('h2') + CFG.doseHIH2);
-    else if (id === 'pbi2') setN('i', getN('i') + CFG.doseKI);
-    else setN('no2', getN('no2') + CFG.doseNO2);
+    if (id === 'ammonia') addDose('n2', CFG.doseN2);
+    else if (id === 'hi') addDose('h2', CFG.doseHIH2);
+    else if (id === 'pbi2') addDose('i', CFG.doseKI);
+    else addDose('no2', CFG.doseNO2);
     const sR = sim.getBoundingClientRect();
     const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
     const scale = 0.72 + 0.55 * vNorm;
@@ -3424,10 +3969,10 @@
   injN2O4.addEventListener('click', () => {
     mark('add-injN2O4', 'Added ' + injN2O4.textContent.replace('+', '').trim());
     const id = activeRxn().id;
-    if (id === 'ammonia') setN('h2', getN('h2') + CFG.doseH2);
-    else if (id === 'hi') setN('i2', getN('i2') + CFG.doseHII2);
-    else if (id === 'pbi2') setN('pb', getN('pb') + CFG.dosePb);
-    else setN('n2o4', getN('n2o4') + CFG.doseN2O4);
+    if (id === 'ammonia') addDose('h2', CFG.doseH2);
+    else if (id === 'hi') addDose('i2', CFG.doseHII2);
+    else if (id === 'pbi2') addDose('pb', CFG.dosePb);
+    else addDose('n2o4', CFG.doseN2O4);
     const sR = sim.getBoundingClientRect();
     const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
     const scale = 0.72 + 0.55 * vNorm;
@@ -3438,9 +3983,9 @@
     inj3.addEventListener('click', () => {
       mark('add-inj3', 'Added ' + inj3.textContent.replace('+', '').trim());
       const id = activeRxn().id;
-      if (id === 'ammonia') setN('nh3', getN('nh3') + CFG.doseNH3);
-      else if (id === 'hi') setN('hi', getN('hi') + CFG.doseHI);
-      else if (id === 'pbi2') { setN('pbi2s', getN('pbi2s') + CFG.dosePbI2); dropNextCrystal = true; }
+      if (id === 'ammonia') addDose('nh3', CFG.doseNH3);
+      else if (id === 'hi') addDose('hi', CFG.doseHI);
+      else if (id === 'pbi2') { addDose('pbi2s', CFG.dosePbI2); dropNextCrystal = true; }
       const sR = sim.getBoundingClientRect();
       const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
       const scale = 0.72 + 0.55 * vNorm;
@@ -3482,6 +4027,7 @@
     updateInjectUI();
     updateReactionText();
     buildDialTicks();
+    iceBuild();
   });
 
   // Pressure dial ticks, 0 → pMax (20 atm for NO2, 400 atm for Haber)
@@ -3512,6 +4058,7 @@
   T = parseFloat(slT.value);
   // Start NO2 system near equilibrium immediately (faster “settling” on first load).
   resetForReaction();
+  iceBuild();
   requestAnimationFrame(frame);
 })();
 </script>

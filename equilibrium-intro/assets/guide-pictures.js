@@ -2,6 +2,7 @@
  * Intro to Equilibrium - Guide stage pictures (Task 6).
  *
  * Small drawn scenes for the Guide's non-vessel beats:
+ *   intro4 - four changes side by side: two go to completion, two reach equilibrium
  *   energy - animated potential energy diagram, exothermic or endothermic
  *   beaker - NaOH dissolving in a beaker (with thermometer), or an ice cube melting into a puddle
  *   spread - one jar animated from before to after (IMF heat-room look); food colouring spreading
@@ -909,6 +910,199 @@
   }
   energy.cycle = energyCycle;
 
+  /* ---------- intro4: four everyday changes side by side ----------
+     Two go to completion (methane burning, iron rusting) and two settle at equilibrium
+     (CO₂ in a sealed bottle, salt in a saturated solution). A stateless function of time t (s);
+     each tile has its equation underneath. Reduced motion: one still frame. */
+  var C_A = ['#3a3f4b', '#9aa0ad'], NA_A = ['#7d6bd6', '#e0dafc'];
+  var RUST = { clean: 1.2, grow: 6.0, hold: 2.0, fade: 0.6 };
+  var I4 = [
+    { id: 'burn', eq: ['CH₄(g) + 2O₂(g)', '→', 'CO₂(g) + 2H₂O(g)'], desc: 'Methane burns in a gas flame. O₂ is used up at the flame, and CO₂ and H₂O rise away.' },
+    { id: 'rust', eq: ['4Fe(s) + 3O₂(g)', '→', '2Fe₂O₃(s)'], desc: 'An iron nail rusts until it is rust all over.' },
+    { id: 'soda', eq: ['CO₂(g)', '→', 'CO₂(aq)'], desc: 'In a sealed bottle, CO₂ molecules move from the gas into the liquid and back out at the same time.' },
+    { id: 'salt', eq: ['NaCl(s)', '→', 'Na⁺(aq) + Cl⁻(aq)'], desc: 'In a saturated salt solution, ions leave the crystal and others join it at the same time.' }
+  ];
+  function co2(ctx, x, y, r, a) {
+    var dx = Math.cos(a) * r * 1.5, dy = Math.sin(a) * r * 1.5;
+    ball(ctx, x - dx, y - dy, r, O_A[0], O_A[1]); ball(ctx, x + dx, y + dy, r, O_A[0], O_A[1]);
+    ball(ctx, x, y, r * 0.95, C_A[0], C_A[1]);
+  }
+  function h2o(ctx, x, y, r, a) {
+    [-0.9, 0.9].forEach(function (d) { ball(ctx, x + Math.sin(a + d) * r * 1.1, y + Math.cos(a + d) * r * 1.1, r * 0.6, H_A[0], H_A[1]); });
+    ball(ctx, x, y, r, O_A[0], O_A[1]);
+  }
+  function o2(ctx, x, y, r, a) {
+    var dx = Math.cos(a) * r * 0.8, dy = Math.sin(a) * r * 0.8;
+    ball(ctx, x - dx, y - dy, r, O_A[0], O_A[1]); ball(ctx, x + dx, y + dy, r, O_A[0], O_A[1]);
+  }
+  function ion(ctx, x, y, na) {
+    var c = na ? NA_A : CL_A;
+    ball(ctx, x, y, na ? 4.2 : 5.6, c[0], c[1]);
+    label(ctx, na ? '+' : '−', x, y + 0.5, { size: 8, color: INK });
+  }
+  function flame(ctx, cx, base, hw, hh, col) {
+    ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(cx - hw, base);
+    ctx.bezierCurveTo(cx - hw, base - hh * 0.5, cx - hw * 0.3, base - hh * 0.8, cx, base - hh);
+    ctx.bezierCurveTo(cx + hw * 0.3, base - hh * 0.8, cx + hw, base - hh * 0.5, cx + hw, base);
+    ctx.closePath(); ctx.fill();
+  }
+  // A particle drifting in straight lines and bouncing inside a box, from a seeded start
+  function drift(R, t, x0, x1, y0, y1) {
+    var a = R(), b = R(), c = R(), d = R();
+    return [tri(x0 + a * (x1 - x0) + t * (6 + 10 * c) * (d > 0.5 ? 1 : -1), x0, x1),
+            tri(y0 + b * (y1 - y0) + t * (4 + 8 * d) * (c > 0.5 ? 1 : -1), y0, y1)];
+  }
+
+  var I4_TILE = {
+    /* Methane burner: O₂ drifts in and is used up; CO₂ and H₂O (1 : 2) rise away and never come back */
+    burn: function (ctx, x, y, w, h, t) {
+      var cx = x + w / 2, base = y + h - 14, tubeTop = base - 62;
+      ctx.fillStyle = '#c3c8d2'; roundBox(ctx, cx - 22, base - 8, 44, 8, 3); ctx.fill();
+      var tg = ctx.createLinearGradient(cx - 7, 0, cx + 7, 0);
+      tg.addColorStop(0, '#9aa1ae'); tg.addColorStop(0.4, '#eef0f4'); tg.addColorStop(1, '#8a91a0');
+      ctx.fillStyle = tg; ctx.fillRect(cx - 7, tubeTop, 14, base - 8 - tubeTop);
+      ctx.strokeStyle = 'rgba(29,36,51,0.45)'; ctx.lineWidth = 1; ctx.strokeRect(cx - 7, tubeTop, 14, base - 8 - tubeTop);
+      for (var k = 0; k < 4; k++) {
+        var p = (t * 0.3 + k / 4) % 1, side = k % 2 ? 1 : -1;
+        ctx.globalAlpha = Math.min(1, (1 - p) * 5, p * 5);
+        o2(ctx, cx + side * (10 + (w / 2 - 4) * (1 - p)), tubeTop - 6 + (Math.floor(k / 2) ? 12 : -12) * (1 - p), 3.2, t * 1.5 + k);
+      }
+      ctx.globalAlpha = 1;
+      var fl = 1 + 0.07 * Math.sin(t * 13) + 0.05 * Math.sin(t * 21.7);
+      flame(ctx, cx, tubeTop, 10, 46 * fl, 'rgba(120,170,255,0.45)');
+      flame(ctx, cx, tubeTop, 6, 22 * (2 - fl), 'rgba(40,90,230,0.85)');
+      var y0 = tubeTop - 44, y1 = y + 10;
+      for (var j = 0; j < 6; j++) {
+        var q = (t * 0.22 + j / 6) % 1;
+        ctx.globalAlpha = Math.min(1, q * 6, (1 - q) * 5);
+        var mx = cx + Math.sin(q * 5 + j * 1.7) * w * 0.25 * q, my = y0 + (y1 - y0) * q;
+        if (j % 3 === 0) co2(ctx, mx, my, 3.2, t * 0.8 + j); else h2o(ctx, mx, my, 3.6, t * 0.8 + j);
+      }
+      ctx.globalAlpha = 1;
+    },
+
+    /* Iron nail: rust spreads until the whole nail is rust, holds, then a fresh nail */
+    rust: function (ctx, x, y, w, h, t) {
+      var cyc = RUST.clean + RUST.grow + RUST.hold + RUST.fade, u = t % cyc;
+      var prog = smooth((u - RUST.clean) / RUST.grow), fade = Math.min(1, (cyc - u) / RUST.fade);
+      var cx = x + w / 2, top = y + 34, tip = y + h - 18, sw = 6;
+      function nail() {
+        ctx.beginPath();
+        [[-17, 0], [17, 0], [17, 7], [sw, 7], [sw, tip - top - 18], [0, tip - top], [-sw, tip - top - 18], [-sw, 7], [-17, 7]]
+          .forEach(function (q, i) { if (i) ctx.lineTo(cx + q[0], top + q[1]); else ctx.moveTo(cx + q[0], top + q[1]); });
+        ctx.closePath();
+      }
+      // O₂ drifts to the surface while the iron is still reacting
+      ctx.globalAlpha = 1 - smooth((prog - 0.85) / 0.15);
+      for (var k = 0; k < 3; k++) {
+        var p = (t * 0.35 + k / 3) % 1, side = k % 2 ? 1 : -1;
+        o2(ctx, cx + side * (sw + 6 + (w / 2 - sw - 8) * (1 - p)), top + 30 + k * (tip - top - 60) / 2, 3.2, t + k);
+      }
+      ctx.globalAlpha = 1;
+      var mg = ctx.createLinearGradient(cx - 17, 0, cx + 17, 0);
+      mg.addColorStop(0, '#7d8491'); mg.addColorStop(0.4, '#eef0f4'); mg.addColorStop(1, '#7d8491');
+      nail(); ctx.fillStyle = mg; ctx.fill();
+      ctx.save(); nail(); ctx.clip(); ctx.globalAlpha = fade;
+      var R = rng(31);
+      for (var b = 0; b < 24; b++) {
+        var fx = R() * 2 - 1, fy = R(), r = 3 + R() * 6, at = R() * 0.75;
+        var g = smooth((prog - at) / 0.2); if (g <= 0) continue;
+        ctx.fillStyle = b % 3 ? 'rgba(181,83,42,0.9)' : 'rgba(143,63,31,0.9)';
+        ctx.beginPath(); ctx.arc(cx + fx * 14 * (fy < 0.05 ? 1 : sw / 14), top + fy * (tip - top), r * g, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.fillStyle = 'rgba(169,81,43,' + (0.92 * smooth((prog - 0.75) / 0.25)) + ')'; ctx.fillRect(cx - 18, top - 1, 36, tip - top + 2);
+      ctx.restore();
+      nail(); ctx.strokeStyle = 'rgba(29,36,51,0.6)'; ctx.lineWidth = 1.3; ctx.lineJoin = 'round'; ctx.stroke();
+    },
+
+    /* The soda scene's bottle (EqScenes.bottle), filled to the shoulder so the gas shows.
+       Four molecules keep crossing the surface, staggered so two are always on each side. */
+    soda: function (ctx, x, y, w, h, t) {
+      var B = global.EqScenes && global.EqScenes.bottle; if (!B) return;
+      var FILL = 44, s = Math.min((h - 22) / 104, (w - 16) / 28);
+      var ox = x + w / 2, oy = y + 12 + 3 * s + (h - 22 - 104 * s) / 2;
+      var kit = { fill: FILL, asp: 1, base: ctx.getTransform(), capK: 0 };
+      var X = function (wx) { return ox + wx * s; }, Y = function (wy) { return oy + wy * s; };
+      var r = 3, m = 6.4 / s;                         // molecule radius (px); its half-length in world units
+      function at(u, wy) { return [X(u * Math.max(0, B.bore(wy) - m)), Y(wy)]; }
+      ctx.save(); ctx.translate(ox, oy); ctx.scale(s, s);
+      B.drawGlass(ctx, false, kit);
+      ctx.save(); B.glassPath(ctx, true); ctx.clip();
+      ctx.setTransform(kit.base);
+      var R = rng(11), k, p, q;
+      for (k = 0; k < 3; k++) { p = drift(R, t * 0.025, 0, 1, 0, 1); q = at(p[0] * 2 - 1, 16 + p[1] * (FILL - 19)); B.co2(ctx, q[0], q[1], r, t * 0.7 + k, 1, 'gas'); }
+      for (k = 0; k < 4; k++) { p = drift(R, t * 0.015, 0, 1, 0, 1); q = at(p[0] * 2 - 1, FILL + 4 + p[1] * (92 - FILL)); B.co2(ctx, q[0], q[1], r, t * 0.5 + k * 2, 1, 'aq'); }
+      for (k = 0; k < 4; k++) {
+        var sn = Math.sin(2 * Math.PI * ((t * 0.12 + k / 4) % 1)), wy = FILL - (sn < 0 ? -1 : 1) * Math.pow(Math.abs(sn), 0.5) * 14;
+        q = at(tri(-0.7 + 0.45 * k + t * 0.06, -1, 1), wy);
+        if (Math.abs(sn) < 0.15) {
+          ctx.strokeStyle = 'rgba(20,145,143,' + (1 - Math.abs(sn) / 0.15) * 0.8 + ')'; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.ellipse(q[0], Y(FILL), 8, 3, 0, 0, Math.PI * 2); ctx.stroke();
+        }
+        B.co2(ctx, q[0], q[1], r, t * 0.6 + k, 1, wy < FILL ? 'gas' : 'aq');
+      }
+      ctx.restore();
+      B.drawFront(ctx, false, kit); B.cap(ctx, kit);
+      ctx.restore();
+    },
+
+    /* Saturated salt solution: ions leave the crystal's top row and come back; others wander */
+    salt: function (ctx, x, y, w, h, t) {
+      var G = beakerGeom(x + 12, y + 34, w - 24, h - 52);
+      beakerBack(ctx, G, '#ddeefa');
+      var sp = 10, lx = G.cx - 1.5 * sp, ly = G.bb - 4;
+      var away = [];
+      for (var k = 0; k < 4; k++) {
+        var p = (t * 0.09 + k / 4 + 0.13 * (k % 2)) % 1;
+        away.push(p < 0.3 ? null : (p - 0.3) / 0.7);
+      }
+      for (var row = 0; row < 3; row++) for (var col = 0; col < 4; col++) {
+        if (row === 2 && away[col] !== null) continue;
+        ion(ctx, lx + col * sp, ly - row * sp, (row + col) % 2 === 0);
+      }
+      var R = rng(5);
+      for (var i = 0; i < 4; i++) { var fp = drift(R, t * 0.8, G.bx + 8, G.bx + G.bw - 8, G.wt + G.ry + 6, ly - 3 * sp - 6); ion(ctx, fp[0], fp[1], i % 2 === 0); }
+      away.forEach(function (u, col) {
+        if (u === null) return;
+        var sx = lx + col * sp, sy = ly - 2 * sp, lift = Math.pow(Math.sin(Math.PI * u), 0.8);
+        ion(ctx, sx + Math.sin(2 * Math.PI * u) * G.bw * 0.28 * (col < 2 ? -1 : 1), sy - lift * (sy - G.wt - G.ry - 10), (2 + col) % 2 === 0);
+      });
+      beakerFront(ctx, G);
+    }
+  };
+
+  function intro4(canvas, o) {
+    var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h;
+    var t = o.still ? 7 : (o.t || 0);
+    var pad = 12, gap = 10, tw = (w - pad * 2 - gap * 3) / 4;
+    var top = 42, eqH = 62, th = h - top - eqH - pad;
+    ['Go to completion', 'Reach equilibrium'].forEach(function (g, gi) {
+      var x0 = pad + gi * 2 * (tw + gap), x1 = x0 + tw * 2 + gap;
+      label(ctx, g, (x0 + x1) / 2, 18, { size: 11, color: INK });
+      ctx.strokeStyle = FAINT; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(x0 + 4, 30); ctx.lineTo(x1 - 4, 30); ctx.stroke();
+    });
+    // One text size for every equation, shrunk so the longest line fits a tile
+    ctx.font = '700 12px ' + MONO;
+    var widest = 0;
+    I4.forEach(function (s) { widest = Math.max(widest, ctx.measureText(s.eq[0]).width, ctx.measureText(s.eq[2]).width); });
+    var size = Math.min(12, 12 * (tw - 4) / widest);
+    I4.forEach(function (s, i) {
+      var x = pad + i * (tw + gap);
+      ctx.save();
+      roundBox(ctx, x, top, tw, th, 12); ctx.fillStyle = '#ffffff'; ctx.fill();
+      ctx.strokeStyle = 'rgba(29,36,51,0.28)'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.clip();
+      I4_TILE[s.id](ctx, x, top, tw, th, t);
+      ctx.restore();
+      var ey = top + th + 16;
+      label(ctx, s.eq[0], x + tw / 2, ey, { size: size, color: INK });
+      label(ctx, s.eq[1], x + tw / 2, ey + 17, { size: 16, color: INK, font: BODY });
+      label(ctx, s.eq[2], x + tw / 2, ey + 34, { size: size, color: INK });
+    });
+    return 'Four changes side by side. ' + I4.map(function (s) { return s.desc; }).join(' ');
+  }
+
   /* ---------- equation card ---------- */
   function equation(canvas, o) {
     var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h;
@@ -918,7 +1112,7 @@
     if (o.note) label(ctx, o.note, w / 2, h * 0.72, { size: 11 });
   }
 
-  global.EqPictures = { energy: energy, beaker: beaker, spread: spread, coldpack: coldpack, gibbs4: gibbs4, paths: paths, equation: equation };
+  global.EqPictures = { energy: energy, beaker: beaker, spread: spread, coldpack: coldpack, gibbs4: gibbs4, paths: paths, equation: equation, intro4: intro4 };
   // Shared drawing helpers for the live scenes (eq-scenes.js)
   global.EqPictures.util = { fit: fit, ball: ball, label: label, roundBox: roundBox, arrow: arrow, mix: mix, rng: rng, smooth: smooth,
     INK: INK, DIM: DIM, FAINT: FAINT, EMBER: EMBER, TIDE: TIDE, MONO: MONO, BODY: BODY };
