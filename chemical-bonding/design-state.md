@@ -1,0 +1,151 @@
+# Design State: Chemical Bonding (Chem 11H)
+
+_Last updated: 2026-11-10 by design-builder (one gesture, one job)_
+
+## Brief
+- **Problem:** Students leave Unit 1b knowing EN and IE as atom trends. IMF assumes bond polarity, Lewis structures, shape and molecular polarity. This module bridges them: atomic properties → bond type → Lewis / formal charge → VSEPR / hybridization → molecular polarity.
+- **Primary persona:** Chem 11H student fresh from Unit 1b, laptop or touch screen (click / tap; no stylus features), self-paced or following in class.
+- **Secondary persona:** Teacher in presentation mode, using a clicker, jumping chapters and drawing live on the projector.
+- **Success metric:** Students build Lewis structures on touch, use formal charge to compare them, predict shape and polarity, link sp³/sp²/sp to their angles, and arrive at IMF fluent in δ colours, clouds and lone pairs.
+- **Brief document:** `docs/designpowers/briefs/2026-11-10-chemical-bonding.md`
+- **Discovery notes:** `DISCOVERY.md`
+
+## Personas
+_Inclusive-personas not yet run. Primary and secondary users and the ability spectrum are captured in the brief._
+
+## Design Principles
+1. The count teaches; the sim never grades
+2. Paper before sphere (3D last; Lewis drawing stays beside 3D)
+3. One canvas for every hand (one draw engine; touch-first; tap path for every drag)
+4. Built as IMF's on-ramp (same δ colours, clouds, lobes, chrome)
+5. Big motion, never in the way (interruptible; a tap settles it)
+
+## Taste Profile
+- **Direction:** carry IMF **Toy Box** (see `../intermolecular-forces/docs/designpowers/taste/2026-10-16-intermolecular-forces-taste.md`)
+- **Charge convention:** red = δ+ / positive, yellow = δ− / negative, reserved. **Introduced in this module.**
+- **Lewis canvas (locked):** Direction A "Ink on the tray": ink letters, bonds and dots on a plain white tray; **no colour** in Lewis structures. Colour arrives with VSEPR / 3D.
+- **No dot-grid / dotted backgrounds** series-wide (also removed from IMF engine; rule in repo `AGENTS.md`).
+- **Formal charge:** full equation per atom in beats 12–13; compact ink pill from practice onward.
+- **Taste document:** `docs/designpowers/taste/2026-11-10-chemical-bonding-taste.md`
+- **Motion:** robust, never in the way. Interruptible, a tap settles it. No reduced-motion path (user decision).
+
+## Decisions Log
+
+| Date | Agent | Decision | Rationale |
+|------|-------|----------|-----------|
+| 2026-11-10 | user + discovery | Bridge module between Unit 1b and IMF | IMF assumes intramolecular / shape / polarity knowledge |
+| 2026-11-10 | user + discovery | Draw mode: snap-and-count (Ch B onward), then snap-and-reveal to 3D after VSEPR and hybridization | Connections, bond order and formal charge first; 3D is the payoff |
+| 2026-11-10 | user + discovery | Draw beats inside the Guide **plus** a standalone Draw Lab | In-flow practice and open practice |
+| 2026-11-10 | user + discovery | Presentation mode: step beats, jump chapters, teacher draws live | Teacher-led use |
+| 2026-11-10 | user + discovery | One long guide, three chapters (A / B / C) | Single continuous story |
+| 2026-11-10 | user + discovery | Ch A: EN-difference slider → real examples of all 3 (with ionic dot transfer) → salts side by side as a discussion prompt | Not a prediction task |
+| 2026-11-10 | user + discovery | Sim carries the teaching (full guide copy) | IMF posture, no worksheet |
+| 2026-11-10 | user + discovery | Carry Toy Box identity | Continuity into IMF; charge colours introduced here |
+| 2026-11-10 | user + discovery | Touch-first: stylus preferred, finger fully supported | All students have touch screens |
+| 2026-11-10 | user | No reduced-motion path; animation must never get in the way | User wants robust animation. Accepted a11y trade-off (see DD-1) |
+| 2026-11-10 | user | Tech open: libraries / CDN fine, vanilla not required | Best tool for 3D and animation; static on GitHub Pages |
+| 2026-11-10 | user | Electrons as Lewis dots, clouds, or electron configurations / orbital diagrams. Never Bohr orbits | Widened representation set |
+| 2026-11-10 | user | Ch C hybridization limited to C in ethane → ethene → ethyne; s + p orbital diagrams combine into sp³ / sp² / sp | Teacher's own simplified sequence |
+| 2026-11-10 | user | In scope: resonance, expanded octets (2–6 domain VSEPR), polyatomic ions, ionic dot transfer | Full Lewis/VSEPR coverage |
+| 2026-11-10 | user | Students can save a drawing as JPEG | Hand-in |
+| 2026-11-10 | user + discovery | Brief approved; title "Chemical Bonding"; Chem 11H hub between Unit 1b and IMF | |
+| 2026-11-10 | design-strategist | Five principles approved | Guides all later craft |
+| 2026-11-10 | user + strategist | "Show one structure" reveal on draw beats; Lab 3D available from day one | No stranded students; no gates |
+| 2026-11-10 | user + strategist | 33-beat list (A 8 · B 17 · C 8) with practice beats ★ in B and C | User: B needs practice as they go |
+| 2026-11-10 | user | Teacher starter list is the Lewis practice backbone: H₂ HBr PCl₃ SF₂ H₂CCH₂ HNNH H₂CNH NO⁻ N₂ CO CN⁻ | Teacher's own sequence; demos avoid these |
+| 2026-11-10 | design-strategist | 3D = turntable, not camera: vertical-axis spin, tilt ±25°, no zoom/pan, presets Front/Top/Side/Down a bond | Avoid IMF camera failure |
+| 2026-11-10 | user | Strategy approved | |
+| 2026-11-10 | user | Plan approved (16 tasks); tech: SVG draw engine + three.js turntable + GSAP, no build step | |
+| 2026-11-10 | design-builder | Task 1: hub (Guide + Draw Lab cards), guide/lab stubs, Chem 11H card between Unit 1b and IMF ("3 Suites"), sitemap entries; links IMF suite.css + thin bonding.css | One Toy Box source |
+| 2026-11-10 | design-taste | Task 0: `taste-paper.html` (dev, noindex) compares A Ink on the tray · B Vinyl chips · C Keycap tiles on CO₂ / NH₄⁺ / CO / unfinished H₂O; proposes ink FC pills and dashed-ring + "6 / 8" tag for off counts | Paper/graph-paper textures are an IMF anti-pattern, so the "paper" is the tray |
+| 2026-11-10 | user | Taste: Direction A "Ink on the tray" | Looks like tests and the board |
+| 2026-11-10 | user | No colour in Lewis structures; colour arrives with VSEPR / 3D | Keep Lewis about connections and electrons |
+| 2026-11-10 | user | Remove dot-grid backgrounds series-wide: IMF `toyTray` dot loop removed (engine v=70), IMF taste doc + repo `AGENTS.md` updated | User doesn't like it |
+| 2026-11-10 | user | FC shown as full equation (FC = valence − nonbonding − ½ bonding, with numbers) in first FC beats; compact pill from practice on | Teach the method before shortening it |
+| 2026-11-10 | user | Salts: melting point is the lens; other factors come up when comparing salts with covalent crystals | Teacher's usual framing |
+| 2026-11-10 | design-builder | Task 2: `assets/bonding-kit.js`: 20 elements, 43 reference Lewis structures (all demos, practice sets, starter list), ionic examples, 8 salts (mp from CRC, Shannon radii) | One source for Guide + Lab |
+| 2026-11-10 | design-builder | Task 3: `assets/lewis-model.js` (edit ops, tally as working, FC teach + compact text, VSEPR domains/shape, C hybridization, layout-free matching, resonance forms) + `dev/lewis-tests.*` 206/206 in node and browser | Logic tested before any UI |
+| 2026-11-10 | user | SO₂ reference = O=S=O expanded octet (S 10 e⁻, all FC 0) | Good moment to start the expanded octet |
+| 2026-11-10 | user | Beat 8 previews covalent network (diamond, SiO₂) and molecular crystals (ice, I₂, dry ice) beside the salts on one melting-point scale; full treatment later in the course | Introduction only |
+| 2026-11-10 | design-builder | Task 4: `assets/draw-engine.js`, an SVG + Pointer Events builder in ink. Tools: Build · + pair · − pair · Move · Erase · Undo · Clear · Charge stepper (brackets). Tap path for everything: with an atom selected, a palette tap grows a bonded atom in its most open direction; tap A then B bonds; tap a bond cycles 1→2→3→none. Drag atom→atom or atom→space also works | One canvas for every hand |
+| 2026-11-10 | design-builder | Palm rejection: touches ignored for 1.5 s after any pen contact; `touch-action:none` on the stage only | Stylus-first without trapping page scroll |
+| 2026-11-10 | design-builder | Off-count rings and FC pills appear only once every electron is placed; the selected atom always shows its count. Tally rows select their atom | Count teaches without nagging mid-build |
+| 2026-11-10 | design-builder | Lone pairs placed automatically: the four sides when all stay ≥ 60° clear, else widest spacing; marks (FC pill, count tag) take the remaining open directions | Lewis convention; no collisions |
+| 2026-11-10 | user | Development happens on a MacBook Pro; no iPad / class tablet until the pages are live | Device testing (pen, palm rejection, iOS Safari) waits for a live preview URL; trackpad + Chrome touch emulation in the meantime |
+| 2026-11-10 | user | **No stylus features**: clicking / tapping to build is the model. Palm rejection and pen code removed | Clicking works well; keep it simple |
+| 2026-11-10 | user + builder | **Electron model** replaces tap-to-bond + lone-pair tools: atoms arrive with valence dots; drag electron → electron shares one each; electron → letter gives a pair (coordinate bond, so FC emerges); metals transfer (ions); drag letter moves; click bond breaks one pair; +e⁻ / −e⁻ for ions; brackets per charged fragment | User notes 2–3: dots disappear as they are shared; letters drag, electrons share |
+| 2026-11-10 | user | Hovering an atom highlights its count and formal charge in the tally below | User note 4 |
+| 2026-11-10 | design-builder | Newly bonded loose atoms snap to bond length in the partner's open direction; drawing re-centres as atoms are placed | Avoids bonds running through other atoms |
+| 2026-11-10 | user | Electron-model draw engine approved ("looks great") | |
+| 2026-11-10 | design-builder | Task 5: "Show one structure" panel beside the drawing (beat reference or auto-matched by atoms); resonance forms with ↔; Save JPEG painted to canvas with title, count and date (download / share sheet) | Reveal never overwrites; principle 1 |
+| 2026-11-10 | design-builder | Task 6: one-scroll guide with 33 beats (draft copy), scene registry, chapter markers, practice carousel; draw/practice beats wired to the engine | Skeleton before chapter scenes |
+| 2026-11-10 | design-builder | Presentation mode keeps the beat text (large, left) with the stage right; **T hides text**; chapter jump menu; P / Esc; clicker keys | Guide carries full teaching, unlike IMF learn mode which hid text. Flagged for user |
+| 2026-11-10 | user | Ionic section: no formal charge; electron transfer shown as a **solid curved "send" arrow** (not the dashed sharing line), with the electron flying along it; arrow stays on the tray | Sending ≠ sharing |
+| 2026-11-10 | user | **All molecules of a draw / practice beat on one tray**, with a blue prompt at the top ("Draw CH₄ and H₂O"); carousel removed; reveal shows every molecule; tally grouped per molecule | Students build several side by side |
+| 2026-11-10 | user | **Formal charge hidden until beat 13** (FC off for beats 6, 10, 11, 12) | Don't show FC before it is taught |
+| 2026-11-10 | user | Beat 13: CO₂ A and B loaded side by side (letters on tray and in tally); hover any atom to see its FC equation | Compare by hovering |
+| 2026-11-10 | user | Copy: B·1 chapter intro, beat 9 (the count) and beat 12 (multiple bonds) rewritten in the teacher's words | Teacher voice |
+| 2026-11-10 | design-builder | Metal + nonmetal always sends from the metal, whichever end is dragged; ions relax apart so brackets and arrows have room; palette spaces new atoms 2 bond lengths apart | Clean ionic layouts |
+| 2026-11-10 | user | **Skeleton-first draw model replaces the valence-dots model.** How it is taught: surround the least electronegative atom, bond, then add electrons to satisfy each atom. Atoms arrive bare; drag atom onto atom = bond (repeat for double/triple); click atom = add one electron; drag an electron to pair it, onto another atom to move it (metal involved = curved send arrow), or off to remove it; click a bond = one line less | Matches the teacher's method; the valence-dots model forced the wrong order |
+| 2026-11-10 | user | **Atom tray:** element tiles are dragged into the box; clicking a tile does not place (keyboard Enter still places, for access). No auto re-centring or auto-snapping | Adding atoms to a built structure went "wonky" |
+| 2026-11-10 | user | **Charge number** above each atom = valence − lone electrons − bonds, shown once the atom has a bond or electron, hidden at 0 (so CO's C shows −1). Brackets + overall charge appear only once every atom in that molecule/ion is satisfied | Charge emerges while building; no −e⁻/+e⁻ tools needed |
+| 2026-11-10 | user | **One gesture, one job** (mouse was ambiguous): click an atom = add an electron (only); drag an electron onto another atom's electron = share (bond +1); onto its letter = move it there (CO, Na → Cl with send arrow); drag an atom = move it, and dragging a **central** atom moves the whole structure (terminal atoms move alone); dropping an electron in space snaps it back; clicking an electron does nothing; Erase removes; click a bond = break one pair (each atom gets one electron back) | Clicking did several things |
+| 2026-11-10 | user | **Five fixes:** (1) ionic send: the arrow shows only during the flight (~1.1 s), then clears; the ions' electrons re-settle evenly (four pairs on Cl⁻). (2) The number above an atom now **counts to the octet** (electrons still needed; +n if over; none for metals, none once satisfied); formal charge lives in the tally only. (3) No arrow or move for covalent atoms: an electron dropped on a nonmetal's letter shares with its nearest electron; CO is fixed with Erase + click. (4) The stage fills the panel height (tray flexes, tally never scrolls, molecules get columns side by side; the tray zooms out to fit; the tally hides while the reveal is open). (5) Presentation mode = full-screen stage like the Equilibrium intro; text hidden for now (Hide-text button hidden) | User review |
+| 2026-11-11 | user | **The view holds still while drawing.** Zoom-to-fit and centring happen only on load / restore / clear / window resize (incl. presentation toggle); placing atoms or the tally growing never rescales or shifts the drawing | Too much resizing on every new atom |
+| 2026-11-11 | user | **First pass of every remaining scene** so the lesson flow can be judged: Ch A (dot symbol, H₂ cloud, ΔEN slider, continuum, examples, lattice, salts by mp), B·1 count, B·2 VSEPR (2D wedge/dash, colour starts here; gallery; name-the-shape practice), B·3 polarity (dipoles add tip to tail below the molecule; what-if; sort), Ch C (orbital boxes, three.js hybrid orbitals → σ/π molecule, pattern table, label carbons, lift, which picture). New files: geometry.js, shape-view.js, turntable.js, scenes/scene-kit.js, ch-a.js, ch-b.js, ch-c.js. three.js r128 (cdnjs, global build); GSAP not used. Copy is draft + one-line 'try' prompts; Task 14 copy pass still to come | "Start building the other parts" |
+| 2026-11-11 | user | **Ionic send, finished:** after the electron lands, the cation snaps in beside the anion (1.8 bond lengths, small overshoot; a second anion takes the cation's free side). Transfer ions glow red (+) / yellow (−) with a matching charge label, the same charge colours as the clouds. The anion's electrons are set once they arrive (no drag, add or remove; grabbing them grabs the ion). Ions that traded electrons move as one. Animated clouds: drifting noise edges, breathing, swirling density (SVG SMIL) | User review |
+| 2026-11-11 | user | **3D arrives earlier (overrides 'paper before sphere' for shapes):** the beat 7 lattice is a rotatable three.js rock-salt crystal (pair → row → layer → 3×3×3 cube with faint cube edges; red Na⁺ / yellow Cl⁻; ions drop in; click an ion to light the ions it touches; pack/spread toggle). VSEPR beats 19–22 use the same turntable: the Lewis drawing lifts into the 3D shape, then a 3D angle arc and lone-pair lobes appear; the gallery and the practice answer are 3D too. Lewis drawing stays ink; polarity (B·3) is still 2D wedge/dash for now | "Make it a 3D model… applicable to all the VSEPR stuff" |
+| 2026-11-11 | user | **Two packings in beat 7:** salt picker NaCl (6 neighbours, rock salt: pair → row of 7 → layer → 3×3×3) vs CsCl (8 neighbours: pair → one cube → 2×2×2 cubes). Sizes from Shannon radii (Na⁺ 102, Cs⁺ 174 (8-coord), Cl⁻ 181 pm); 'touching' = opposite ions at contact distance, so clicks count true neighbours. Matte spheres, cation red, Cl⁻ chlorine green | "Show that different salts pack in different ways" |
+| 2026-11-11 | user | **Resonance animated (beat 16 → own scene):** O₃, NO₃⁻, CO₃²⁻ cycle form to form: blue curved arrows draw in, electron pairs travel along them (a lone pair swings into a new bond; the π pair moves out to the other O), the next form crossfades in; formal charges shown on each form. Thumbnail strip with ↔. 'Show the hybrid': solid + dashed delocalised bonds, a pulsing cloud over them, averaged charges (−⅔, −½, +1), brackets kept for ions. Replaced the draw tray on this beat | "Animate the resonance structures… show how the electrons move" |
+| 2026-11-12 | user | **The count animates the bonding:** separate atoms with their dots + the count → atoms gather (centre first) → electrons swing round their own atom into shared pairs / lone pairs → pairs become bond lines (ink). Ion charges show as electrons arriving (blue) from or leaving to the charge label | "Actually show the hydrogens heading towards the carbon" |
+| 2026-11-12 | user | **Formal charge = examples, no tray:** chips CO₂ · HCN vs HNC · OCN⁻ (two arrangements each), per-example prompt; tray and Clear hidden. Engine re-centres when the stage grows > 40 px (layout settling, Present) | User review |
+| 2026-11-12 | user | **VSEPR shape mode:** practice lifts to 3D when all three answers are right. A 'Shape' button (all VSEPR scenes, exclusive with space filling) draws the atoms' convex hull as a blue see-through solid (tetrahedron, octahedron, triangle, square, pyramids, bipyramid, seesaw); linear / bent / T-shaped are traced along the bonds; name label at the bottom | User review |
+| 2026-11-12 | user | **Dipole sum, rethought:** pulls drop straight down, then slide in so all tails share one centre point (CO₂: one each side). Then: split into along-the-net / sideways parts → sideways parts cancel → same-way parts stack → opposite parts shrink each other away → blue net arrow or 'net = 0'. Captions name each step; panel arrows normalised (longest ≈ 1 S). Same code drives what-if and sort cards | "I don't love how the vectors combine" |
+| 2026-11-12 | user | **Net dipole goes home, then the cloud:** after the sum, the blue net arrow slides back up and sits across the molecule (cross at δ+); then the molecule gets the IMF unit's electron cloud: one soft layered cloud, yellow δ− → red δ+ (teardrop, or lobes when the centre has lone pairs), grey and even when nonpolar; it keeps breathing on the polarity beat. Same cloud on what-if and sort cards | User review |
+| 2026-11-12 | user | **Polarity molecules turn:** drag (or arrow keys) turns the polarity and what-if molecules like the VSEPR turntable (yaw with a short coast, tilt ±1.2). Still the 2D shape view, so the bond dipoles, sum panel, net arrow and cloud all redraw from the new angle: the net arrow shortens as it points out of the page and the cloud's lean fades to a mixed colour end-on. The fit leaves room for any angle; changing molecule or replaying resets the view. Sort cards stay still (a click puts them back) | "can the polarity molecules be clickable and shiftable like the vsper ones?" |
+| 2026-11-13 | user | **Count ends higher:** once the Lewis structure is in, the sum row and the total pill slide up into the empty band where the atoms began (the 'charge' label fades), and the structure rises and grows (up to 1.35×) to fill the space below | "slide upwards to take up more of the white space at the end" |
+| 2026-11-13 | user | **Formal charge page:** the equation sits under the prompt in a blue pill ('FC = valence − lone − ½(bonds)', with a key on wide screens) in the tally's own words; repeated atoms in each structure get blue subscripts (O₁, O₂, left to right) that the tally rows repeat; loaded structures are centred in the free space between the header and the hint, and this beat may zoom in to 1.6× (`data-zoom`) | User review |
+| 2026-11-13 | user | **Sort cards fill up:** a sorted card keeps no room for the sum panel (a polar card's net arrow sits on the molecule; a nonpolar card keeps a small band for the net = 0 ring), so the molecule scales up to fill it; three cards per row in each column, drawing height capped by the window so both rows fit without scrolling | "too much white space on this page" |
+
+## Open Questions
+- [x] Design principles + experience map + chapter beat list (design-strategy)
+- [x] 3D constraint → turntable + presets (strategy)
+- [x] Molecule roster → `assets/bonding-kit.js`
+- [x] Covalent + molecular crystals → preview beside salts in beat 8
+- [ ] Live preview for device testing: hide the Chem 11H card, push `chemical-bonding/`, test by direct URL? (user)
+- [ ] Draw-mode interaction model: tap vs drag for bonds, cycling bond order, placing lone pairs, brackets/charge, resonance sets (interaction-design)
+- [x] Paper canvas look → Direction A, ink only (design-taste)
+- [ ] Tech choice: proposed SVG draw engine + three.js turntable + GSAP, no build step (plan, awaiting approval)
+- [ ] Inclusive personas formal pass (optional)
+
+## Artefact Index
+
+| Artefact | Path | Status |
+|----------|------|--------|
+| Discovery notes | `DISCOVERY.md` | Complete |
+| Brief | `docs/designpowers/briefs/2026-11-10-chemical-bonding.md` | Approved |
+| Strategy | `docs/designpowers/strategy/2026-11-10-chemical-bonding-strategy.md` | Approved |
+| Personas | - | Pending (optional) |
+| Plan | `docs/designpowers/plans/2026-11-10-chemical-bonding-plan.md` | Approved |
+| Taste | `docs/designpowers/taste/2026-11-10-chemical-bonding-taste.md` | Locked |
+| Taste comparison (dev page) | `taste-paper.html` | Reference only - not linked from hub |
+
+## Design Debt Register
+
+_Items: 5 | Critical: 0 | Oldest: 2026-11-10_
+
+| ID | Date | Source | Severity | What | Who is affected | Suggested fix | Status | Notes |
+|----|------|--------|----------|------|----------------|---------------|--------|-------|
+| DD-5 | 2026-11-10 | builder | Minor | Formal-charge pills on neighbouring atoms can sit close together in crowded ions (e.g. N +1 near an O −1 in NO₃⁻) | Low-vision readers | Let pill placement avoid other atoms’ marks, not just its own bonds and dots | Open | Readable, just tight |
+| DD-4 | 2026-11-10 | builder | Minor | Keyboard path cannot place a second, unbonded atom | Keyboard-only users | - | Closed 2026-11-10 | Palette now places atoms directly |
+| DD-3 | 2026-11-10 | builder | Minor | Kit layouts for SF₄, BrF₅, PCl₅ look crowded in small thumbnails | Readers of static previews | Spread those layouts, or let the 2D VSEPR renderer (Task 9) draw them | Open | Fine at full canvas size |
+| DD-2 | 2026-11-10 | builder | Minor | Chem 11H hub card + sitemap point at stub pages | Students who find it early | Hold the push, or keep stubs "Coming soon" until Guide lands | Open | Nothing is pushed yet |
+| DD-1 | 2026-11-10 | discovery | Minor | No reduced-motion path | Motion-sensitive students | Optional "calm motion" toggle if it becomes an issue | Accepted by user | Mitigation: all animation interruptible, a tap settles it |
+
+## Handoff Chain
+
+### 2026-11-10 design-discovery → design-strategist
+> "Brief's approved. It's a bridge module: one long Toy Box guide in three chapters plus a Draw Lab, touch-first with stylus or finger, and a presentation mode the teacher can draw in. The hard part is draw mode's arc: a quiet snap-and-count Lewis builder for most of the module, with 3D shown only after VSEPR and hybridization. I need principles, an experience map, a beat list per chapter, and a call on how to constrain 3D so we don't repeat IMF's camera failure. Scope is wide (resonance, expanded octets, polyatomic ions), so keep the beat list from bloating."
+
+### 2026-11-10 design-strategist → writing-design-plans
+> "Strategy's approved: five principles, 33 beats with practice built into B and C, and the teacher's starter list driving Lewis practice. 3D is a turntable, not a camera. The draw engine is the critical path, since every draw beat, practice beat, the Lab and presentation mode run on it. Plan it so the Lewis logic is testable without the UI."

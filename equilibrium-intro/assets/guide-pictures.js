@@ -7,6 +7,7 @@
  *   beaker - NaOH dissolving in a beaker (with thermometer), or an ice cube melting into a puddle
  *   spread - one jar animated from before to after (IMF heat-room look); food colouring spreading
  *   gibbs4 - the four ΔH / ΔS sign cases: term arrows on the equation + waterfall bars
+ *   favour - which side ΔH or ΔS favours: energy shelves, or ordered vs spread out
  *   coldpack - stepped cold pack story: dissolving, then ΔH ← and ΔS → on the equation's half-arrows
  *   paths  - two routes between the same start and end (state functions)
  *   equation - big equation for example cards
@@ -626,12 +627,12 @@
 
   /* ---------- gibbs4: the four sign cases, before temperature comes in ----------
      o.idx 0–3 picks the case; o.t = seconds since it was picked (bars grow in).
-     Shows ΔG = ΔH − TΔS, the example equation with ⇌, one arrow per term pointing at the
-     side that term favours, and waterfall bars (ΔH, −TΔS, ΔG) with + / − glyphs, no numbers.
+     Shows ΔG = ΔH − TΔS, the example equation (⇌ turns into a single → or ← once ΔG has a sign),
+     one arrow per term pointing at the side that term favours (labelled), and waterfall bars (ΔH, −TΔS, ΔG) with + / − glyphs, no numbers.
      When the terms push opposite ways ΔG is drawn as a dashed "?": it depends which is bigger. */
   var G4 = [
-    { dH: '−', dS: '+', L: '2H₂O₂(l)', R: '2H₂O(l) + O₂(g)', h: -0.55, s: -0.42 },
-    { dH: '+', dS: '−', L: '3O₂(g)', R: '2O₃(g)', h: 0.55, s: 0.42 },
+    { dH: '−', dS: '+', L: 'C₃H₈(g) + 5O₂(g)', R: '3CO₂(g) + 4H₂O(g)', h: -0.55, s: -0.42 },
+    { dH: '+', dS: '−', L: 'N₂(g) + 2O₂(g)', R: '2NO₂(g)', h: 0.55, s: 0.42 },
     { dH: '−', dS: '−', L: 'N₂(g) + 3H₂(g)', R: '2NH₃(g)', h: -0.6, s: 0.45 },
     { dH: '+', dS: '+', L: 'NH₄NO₃(s)', R: 'NH₄⁺(aq) + NO₃⁻(aq)', h: 0.45, s: -0.6 },
   ];
@@ -642,89 +643,251 @@
     var hFwd = c.dH === '−', sFwd = c.dS === '+';
     var verdict = hFwd === sFwd ? (hFwd ? 'f' : 'r') : '?';
 
+    // Wide canvas (Learn mode, projector): equation + term arrows on the left, big bars on the right.
+    // Narrow canvas (side panel): everything stacked, bars underneath.
+    var wide = w >= 640 && w / h > 1.6;
+    var lx0 = wide ? 12 : 0, lx1 = wide ? w * 0.55 : w, lw = lx1 - lx0, lmid = (lx0 + lx1) / 2;
+    var S = wide
+      ? { fm: 28, eq: 21, term: 18, note: 14, aw: 86, gap: 22, fy: h * 0.15, ey: h * 0.38, ay: [h * 0.62, h * 0.84], reach: Math.min(170, lw * 0.3), stroke: 5 }
+      : { fm: 17, eq: 15, term: 13, note: 10, aw: 64, gap: 20, fy: 22, ey: 66, ay: [102, 134], reach: Math.min(110, w * 0.26), stroke: 4 };
+
     // ΔG = ΔH − TΔS, each part in its colour
-    ctx.font = '700 17px ' + BODY;
+    ctx.font = '700 ' + S.fm + 'px ' + BODY;
     var fp = [['ΔG', INK], [' = ', INK], ['ΔH', EMBER], [' − TΔS', TIDE]];
-    var fw = fp.reduce(function (a, q) { return a + ctx.measureText(q[0]).width; }, 0), fx = (w - fw) / 2;
-    fp.forEach(function (q) { label(ctx, q[0], fx, 22, { font: BODY, size: 17, color: q[1], align: 'left' }); fx += ctx.measureText(q[0]).width; });
+    var fw = fp.reduce(function (a, q) { return a + ctx.measureText(q[0]).width; }, 0), fx = lmid - fw / 2;
+    fp.forEach(function (q) { label(ctx, q[0], fx, S.fy, { font: BODY, size: S.fm, color: q[1], align: 'left' }); ctx.font = '700 ' + S.fm + 'px ' + BODY; fx += ctx.measureText(q[0]).width; });
 
     // The equation with an equilibrium double arrow
     // Heat is a term: products side when heat comes out (ΔH −), reactants side when it goes in (ΔH +)
-    var ey = 66, aw = 64, gap = 20, HEAT = ' + heat';
-    ctx.font = '700 15px ' + BODY;
-    var hw = ctx.measureText(HEAT).width, heatL = c.dH === '+', heatR = c.dH === '−';
-    var wl = ctx.measureText(c.L).width + (heatL ? hw : 0), wr = ctx.measureText(c.R).width + (heatR ? hw : 0);
-    var x0 = (w - (wl + gap + aw + gap + wr)) / 2, ax0 = x0 + wl + gap, ax1 = ax0 + aw, xr = ax1 + gap;
+    var ey = S.ey, aw = S.aw, gap = S.gap, HEAT = ' + heat', es = S.eq;
+    var heatL = c.dH === '+', heatR = c.dH === '−', hw, wl, wr;
+    function measureEq() {
+      ctx.font = '700 ' + es + 'px ' + BODY;
+      hw = ctx.measureText(HEAT).width;
+      wl = ctx.measureText(c.L).width + (heatL ? hw : 0); wr = ctx.measureText(c.R).width + (heatR ? hw : 0);
+    }
+    measureEq();
+    // Shrink the equation only if the longest one would not fit its column
+    var need = wl + gap + aw + gap + wr + 24;
+    if (need > lw) { es = Math.max(12, Math.floor(es * lw / need)); measureEq(); }
+    var x0 = lmid - (wl + gap + aw + gap + wr) / 2, ax0 = x0 + wl + gap, ax1 = ax0 + aw, xr = ax1 + gap;
+    var ph = es * 2, pr = es;
     // Favoured side gets a soft ink pill once ΔG has settled
     if (verdict !== '?' && kG > 0) {
       ctx.save(); ctx.globalAlpha = kG;
-      ctx.fillStyle = 'rgba(29,36,51,0.08)'; ctx.strokeStyle = INK; ctx.lineWidth = 1.6;
-      if (verdict === 'f') roundBox(ctx, xr - 7, ey - 15, wr + 14, 30, 15); else roundBox(ctx, x0 - 7, ey - 15, wl + 14, 30, 15);
+      ctx.fillStyle = 'rgba(29,36,51,0.08)'; ctx.strokeStyle = INK; ctx.lineWidth = wide ? 2 : 1.6;
+      if (verdict === 'f') roundBox(ctx, xr - 8, ey - ph / 2, wr + 16, ph, pr); else roundBox(ctx, x0 - 8, ey - ph / 2, wl + 16, ph, pr);
       ctx.fill(); ctx.stroke(); ctx.restore();
     }
-    label(ctx, c.L, x0, ey, { font: BODY, size: 15, color: INK, align: 'left' });
-    label(ctx, c.R, xr, ey, { font: BODY, size: 15, color: INK, align: 'left' });
-    if (heatL) label(ctx, HEAT, x0 + wl - hw, ey, { font: BODY, size: 15, color: EMBER, align: 'left' });
-    if (heatR) label(ctx, HEAT, xr + wr - hw, ey, { font: BODY, size: 15, color: EMBER, align: 'left' });
+    label(ctx, c.L, x0, ey, { font: BODY, size: es, color: INK, align: 'left' });
+    label(ctx, c.R, xr, ey, { font: BODY, size: es, color: INK, align: 'left' });
+    if (heatL) label(ctx, HEAT, x0 + wl - hw, ey, { font: BODY, size: es, color: EMBER, align: 'left' });
+    if (heatR) label(ctx, HEAT, xr + wr - hw, ey, { font: BODY, size: es, color: EMBER, align: 'left' });
+    var hs = wide ? 1.35 : 1;
     function half(y, right, lw, col) {
       var tip = right ? ax1 : ax0, tail = right ? ax0 : ax1, dir = right ? 1 : -1, barb = right ? -1 : 1;
       ctx.strokeStyle = col; ctx.lineWidth = lw; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(tail, y); ctx.lineTo(tip, y); ctx.lineTo(tip - dir * (6 + lw * 1.6), y + barb * (5 + lw * 1.4)); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(tail, y); ctx.lineTo(tip, y); ctx.lineTo(tip - dir * (6 + lw * 1.6) * hs, y + barb * (5 + lw * 1.4) * hs); ctx.stroke();
     }
-    var fwdBold = verdict === 'f' && kG > 0.5, revBold = verdict === 'r' && kG > 0.5;
-    half(ey - 4, true, fwdBold ? 3.4 : 1.8, verdict === 'r' && kG > 0.5 ? FAINT : INK);
-    half(ey + 4, false, revBold ? 3.4 : 1.8, verdict === 'f' && kG > 0.5 ? FAINT : INK);
+    // Once ΔG settles on a sign the reaction goes one way, so ⇌ becomes a single arrow
+    if (verdict !== '?' && kG > 0.5) {
+      var right = verdict === 'f', tip = right ? ax1 : ax0, tail = right ? ax0 : ax1, dir = right ? 1 : -1;
+      ctx.strokeStyle = INK; ctx.lineWidth = 3 * hs; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath(); ctx.moveTo(tail, ey); ctx.lineTo(tip, ey);
+      ctx.moveTo(tip - dir * 10 * hs, ey - 7 * hs); ctx.lineTo(tip, ey); ctx.lineTo(tip - dir * 10 * hs, ey + 7 * hs); ctx.stroke();
+    } else {
+      half(ey - 4 * hs, true, 1.8 * hs, INK);
+      half(ey + 4 * hs, false, 1.8 * hs, INK);
+    }
 
     // One arrow per term toward the side it favours; both labels sit in one column under the ⇌
-    var mx = (ax0 + ax1) / 2, reach = Math.min(110, w * 0.26);
-    ctx.font = '700 13px ' + MONO;
-    var lab = Math.max(ctx.measureText('ΔH ' + c.dH).width, ctx.measureText('ΔS ' + c.dS).width) / 2 + 8;
-    [[c.dH, hFwd, EMBER, 'ΔH ' + c.dH, 100], [c.dS, sFwd, TIDE, 'ΔS ' + c.dS, 126]].forEach(function (q) {
+    var mx = (ax0 + ax1) / 2, reach = S.reach;
+    ctx.font = '700 ' + S.term + 'px ' + MONO;
+    var lab = Math.max(ctx.measureText('ΔH ' + c.dH).width, ctx.measureText('ΔS ' + c.dS).width) / 2 + 10;
+    // Each arrow carries a note above its shaft naming the side it favours
+    [[c.dH, hFwd, EMBER, 'ΔH ' + c.dH, S.ay[0]], [c.dS, sFwd, TIDE, 'ΔS ' + c.dS, S.ay[1]]].forEach(function (q) {
       var y = q[4], dir = q[1] ? 1 : -1, from = mx + dir * lab, tip = from + dir * reach * kArr;
       ctx.save(); ctx.globalAlpha = kArr;
-      arrow(ctx, from, y, tip, y, q[2], 4);
-      label(ctx, q[3], mx, y, { color: q[2], size: 13 });
+      arrow(ctx, from, y, tip, y, q[2], S.stroke);
+      label(ctx, q[3], mx, y, { color: q[2], size: S.term });
+      label(ctx, q[1] ? 'favours products' : 'favours reactants', from + dir * reach / 2, y - S.note - 2, { color: q[2], size: S.note });
       ctx.restore();
     });
 
     // Waterfall bars: ΔH, then −TΔS from where ΔH ends, then ΔG from zero
-    var top = 150, bot = h - 26, mid = (top + bot) / 2, unit = (bot - top) / 2 / 1.1;
-    var gw = Math.min(w * 0.6, 270), L0 = (w - gw) / 2 + 16, slot = (gw - 16) / 3, bw = Math.min(52, slot * 0.58);
-    ctx.strokeStyle = INK; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(L0 - 6, mid); ctx.lineTo(L0 + gw - 16, mid); ctx.stroke();
-    label(ctx, '+', L0 - 20, top + 8, { size: 12 }); label(ctx, '0', L0 - 20, mid, { size: 12 }); label(ctx, '−', L0 - 20, bot - 8, { size: 12 });
+    var top, bot, gw, L0, axisPad, nameY, nameSize, glyph, axisSize;
+    if (wide) {
+      var rx0 = w * 0.58, rw = w - 16 - rx0;
+      top = 30; bot = h - 44; axisPad = 30;
+      gw = Math.min(rw, 460); L0 = rx0 + (rw - gw) / 2 + axisPad;
+      nameY = h - 18; nameSize = 18; glyph = 20; axisSize = 17;
+      // A faint rule separates the two halves
+      ctx.strokeStyle = 'rgba(29,36,51,0.12)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(w * 0.565, 24); ctx.lineTo(w * 0.565, h - 24); ctx.stroke();
+    } else {
+      top = 150; bot = h - 26; axisPad = 16;
+      gw = Math.min(w * 0.6, 270); L0 = (w - gw) / 2 + axisPad;
+      nameY = h - 10; nameSize = 11; glyph = 14; axisSize = 12;
+    }
+    var mid = (top + bot) / 2, unit = (bot - top) / 2 / 1.1;
+    var slot = (gw - axisPad) / 3, bw = Math.min(wide ? 96 : 52, slot * 0.58);
+    ctx.strokeStyle = INK; ctx.lineWidth = wide ? 2 : 1.5;
+    ctx.beginPath(); ctx.moveTo(L0 - 6, mid); ctx.lineTo(L0 + gw - axisPad, mid); ctx.stroke();
+    var ax = L0 - axisPad + 2;
+    label(ctx, '+', ax, top + 8, { size: axisSize }); label(ctx, '0', ax, mid, { size: axisSize }); label(ctx, '−', ax, bot - 8, { size: axisSize });
     var hv = c.h * kBars, sv = c.s * kBars;
     var cols = [
-      { name: 'ΔH', from: 0, to: hv, fill: EMBER, k: kBars },
-      { name: '−TΔS', from: hv, to: hv + sv, fill: TIDE, k: kBars },
-      { name: 'ΔG', from: 0, to: hv + sv, fill: INK, k: kG, unknown: verdict === '?' },
+      { name: 'ΔH', from: 0, to: hv, fill: EMBER, k: kBars, col: EMBER },
+      { name: '−TΔS', from: hv, to: hv + sv, fill: TIDE, k: kBars, col: TIDE },
+      { name: 'ΔG', from: 0, to: hv + sv, fill: INK, k: kG, unknown: verdict === '?', col: INK },
     ];
     cols.forEach(function (b, i) {
       var x = L0 + slot * i + (slot - bw) / 2;
-      label(ctx, b.name, x + bw / 2, h - 10, { size: 11 });
+      label(ctx, b.name, x + bw / 2, nameY, { size: nameSize, color: wide ? b.col : DIM });
       if (b.k <= 0) return;
       ctx.save(); ctx.globalAlpha = b.k;
       if (b.unknown) {
-        ctx.setLineDash([4, 4]); ctx.strokeStyle = INK; ctx.lineWidth = 1.6;
+        ctx.setLineDash(wide ? [6, 6] : [4, 4]); ctx.strokeStyle = INK; ctx.lineWidth = wide ? 2.2 : 1.6;
         roundBox(ctx, x, mid - unit * 0.45, bw, unit * 0.9, 5); ctx.stroke(); ctx.setLineDash([]);
-        label(ctx, '?', x + bw / 2, mid, { color: INK, size: 22 });
+        label(ctx, '?', x + bw / 2, mid, { color: INK, size: wide ? 36 : 22 });
         ctx.restore(); return;
       }
       var y0 = mid - b.from * unit, y1 = mid - b.to * unit, tp = Math.min(y0, y1), hh = Math.max(2, Math.abs(y1 - y0));
-      ctx.fillStyle = b.fill; roundBox(ctx, x, tp, bw, hh, 5); ctx.fill();
-      ctx.strokeStyle = INK; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.fillStyle = b.fill; roundBox(ctx, x, tp, bw, hh, wide ? 7 : 5); ctx.fill();
+      ctx.strokeStyle = INK; ctx.lineWidth = wide ? 2 : 1.5; ctx.stroke();
       if (i === 0) {
-        ctx.setLineDash([2, 3]); ctx.strokeStyle = DIM; ctx.lineWidth = 1;
+        ctx.setLineDash([2, 3]); ctx.strokeStyle = DIM; ctx.lineWidth = wide ? 1.4 : 1;
         ctx.beginPath(); ctx.moveTo(x + bw, y1); ctx.lineTo(x + slot, y1); ctx.stroke(); ctx.setLineDash([]);
       }
-      var up = b.to - b.from >= 0;
-      label(ctx, up ? '+' : '−', x + bw / 2, up ? tp - 9 : tp + hh + 9, { color: INK, size: 14 });
+      var up = b.to - b.from >= 0, go = glyph * 0.65;
+      label(ctx, up ? '+' : '−', x + bw / 2, up ? tp - go : tp + hh + go, { color: INK, size: glyph });
       ctx.restore();
     });
 
     var side = { f: 'the products are favoured', r: 'the reactants are favoured', '?': 'the sign of ΔG depends on which term is bigger' }[verdict];
     return c.L + ' to ' + c.R + '. ΔH is ' + (c.dH === '+' ? 'positive' : 'negative') + ', pushing toward the ' + (hFwd ? 'products' : 'reactants') +
       '. ΔS is ' + (c.dS === '+' ? 'positive' : 'negative') + ', pushing toward the ' + (sFwd ? 'products' : 'reactants') + '. So ' + side + '.';
+  }
+
+  /* ---------- favour: what "favours the products / reactants" looks like, one term at a time ----------
+     o.idx 0–3 picks ΔH −, ΔH +, ΔS +, ΔS −; o.t = seconds since it was picked.
+     Two panels, reactants and products. Enthalpy: each side sits on an energy shelf, and the lower
+     shelf is favoured (heat leaves as particles settle there). Entropy: one side is a packed lattice,
+     the other spread out, and the spread-out side is favoured. The matching half of ⇌ goes bold. */
+  var FV = [
+    { H: true, sign: '−', fwd: true }, { H: true, sign: '+', fwd: false },
+    { H: false, sign: '+', fwd: true }, { H: false, sign: '−', fwd: false },
+  ];
+  var R_A = ['#4152d9', '#8494ff'];
+  function favour(canvas, o) {
+    var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h;
+    var c = FV[o.idx || 0], t = o.still ? 9 : (o.t || 0), k = smooth((t - 0.3) / 0.6);
+    var col = c.H ? EMBER : TIDE, term = (c.H ? 'ΔH ' : 'ΔS ') + c.sign;
+
+    // Reactants ⇌ Products, with heat written in as a term for the enthalpy cases
+    var ey = 28, aw = 64, gap = 16, HEAT = ' + heat';
+    ctx.font = '700 15px ' + BODY;
+    var hw = ctx.measureText(HEAT).width, heatL = c.H && c.sign === '+', heatR = c.H && c.sign === '−';
+    var wl = ctx.measureText('Reactants').width + (heatL ? hw : 0), wr = ctx.measureText('Products').width + (heatR ? hw : 0);
+    var x0 = (w - (wl + gap + aw + gap + wr)) / 2, ax0 = x0 + wl + gap, ax1 = ax0 + aw, xr = ax1 + gap;
+    label(ctx, 'Reactants', x0, ey, { font: BODY, size: 15, color: INK, align: 'left' });
+    label(ctx, 'Products', xr, ey, { font: BODY, size: 15, color: INK, align: 'left' });
+    if (heatL) label(ctx, HEAT, x0 + wl - hw, ey, { font: BODY, size: 15, color: EMBER, align: 'left' });
+    if (heatR) label(ctx, HEAT, xr + wr - hw, ey, { font: BODY, size: 15, color: EMBER, align: 'left' });
+    function half(y, right, on) {
+      var lw = on ? 3.6 : 1.8, tip = right ? ax1 : ax0, tail = right ? ax0 : ax1, dir = right ? 1 : -1, barb = right ? -1 : 1;
+      ctx.strokeStyle = on ? col : (k > 0.5 ? FAINT : INK); ctx.lineWidth = lw; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(tail, y); ctx.lineTo(tip, y); ctx.lineTo(tip - dir * (6 + lw * 1.6), y + barb * (5 + lw * 1.4)); ctx.stroke();
+    }
+    half(ey - 4, true, c.fwd && k > 0.5);
+    half(ey + 4, false, !c.fwd && k > 0.5);
+
+    // Two panels with a gap for the arrow between them
+    var top = 64, bot = h - 46, ph = bot - top;
+    var pw = Math.min(180, w * 0.34), cg = Math.max(64, Math.min(120, w * 0.2));
+    var px = [w / 2 - cg / 2 - pw, w / 2 + cg / 2];
+    var fav = c.fwd ? 1 : 0;
+    [0, 1].forEach(function (i) {
+      var on = i === fav;
+      ctx.fillStyle = on ? mix('#ffffff', col, 0.07 * k) : 'rgba(255,255,255,0.85)';
+      roundBox(ctx, px[i], top, pw, ph, 10); ctx.fill();
+      ctx.strokeStyle = on && k > 0 ? col : 'rgba(29,36,51,0.3)'; ctx.lineWidth = on ? 1.4 + 1.2 * k : 1.4; ctx.stroke();
+      label(ctx, i ? 'Products' : 'Reactants', px[i] + pw / 2, bot + 14, { font: BODY, size: 13, color: INK });
+      if (on && k > 0) {
+        ctx.save(); ctx.globalAlpha = k;
+        label(ctx, 'favoured', px[i] + pw / 2, bot + 32, { color: col, size: 12 });
+        ctx.restore();
+      }
+    });
+
+    var r = Math.max(6, Math.min(9, pw / 18)), n = 9;
+    function sphere(x, y, i) { ball(ctx, x, y, r, i ? O_A[0] : R_A[0], i ? O_A[1] : R_A[1]); }
+
+    if (c.H) {
+      // Energy axis on the left
+      var axX = px[0] - 16;
+      arrow(ctx, axX, bot - 4, axX, top + 4, DIM, 1.6);
+      ctx.save(); ctx.translate(axX - 10, (top + bot) / 2); ctx.rotate(-Math.PI / 2);
+      label(ctx, 'Potential energy', 0, 0, { size: 11 }); ctx.restore();
+      // Shelves: the favoured side sits low
+      var hi = top + ph * 0.32, lo = top + ph * 0.8, sy = [fav === 0 ? lo : hi, fav === 1 ? lo : hi];
+      [0, 1].forEach(function (i) {
+        var y = sy[i], inset = 14;
+        ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(px[i] + inset, y); ctx.lineTo(px[i] + pw - inset, y); ctx.stroke();
+        for (var j = 0; j < 5; j++) {
+          var bx = px[i] + inset + r + 4 + j * (pw - 2 * inset - 2 * r - 8) / 4;
+          sphere(bx, y - r - 1.5 - Math.abs(Math.sin(t * 3 + j * 1.7 + i)) * 2.2, i);
+        }
+        label(ctx, i === fav ? 'lower potential energy' : 'higher potential energy', px[i] + pw / 2, y + 16, { color: i === fav ? col : DIM, size: 11 });
+      });
+      // Heat leaves as particles settle on the lower shelf
+      var fx = px[fav] + pw / 2, pulse = o.still ? 0.5 : (t % 1.4) / 1.4, ha = (o.still ? 1 : Math.sin(Math.PI * pulse)) * k;
+      [-0.28, 0.28].forEach(function (dx) {
+        var x = fx + dx * pw, y0 = sy[fav] - 2 * r - 10 - pulse * 10;
+        heatWave(ctx, x, y0, x + dx * 40, y0 - 40, ha);
+      });
+      // Downhill arrow from the higher shelf to the lower one
+      var a0x = fav ? px[0] + pw - 6 : px[1] + 6, a1x = fav ? px[1] + 6 : px[0] + pw - 6;
+      var a0y = hi - 6, a1y = lo - 6;
+      if (k > 0) {
+        ctx.save(); ctx.globalAlpha = k;
+        arrow(ctx, a0x, a0y, a0x + (a1x - a0x) * k, a0y + (a1y - a0y) * k, col, 3.6);
+        label(ctx, term, w / 2, hi - 22, { color: col, size: 13 });
+        ctx.restore();
+      }
+    } else {
+      // Packed lattice on one side, spread out on the other; the spread-out side is favoured
+      [0, 1].forEach(function (i) {
+        var spreadOut = i === fav, x0p = px[i] + r + 10, x1p = px[i] + pw - r - 10, y0p = top + 30, y1p = bot - r - 10;
+        for (var j = 0; j < n; j++) {
+          // Evenly scattered starts (golden-ratio steps), each drifting at its own speed
+          var sx = (j * 0.618 + 0.11) % 1, sy2 = (j * 0.382 + 0.57) % 1, vx = 16 + (j * 7) % 30, vy = 12 + (j * 11) % 26;
+          var x, y;
+          if (spreadOut) {
+            x = tri(x0p + sx * (x1p - x0p) + vx * t, x0p, x1p);
+            y = tri(y0p + sy2 * (y1p - y0p) + vy * t, y0p, y1p);
+          } else {
+            var cx = px[i] + pw / 2 + (j % 3 - 1) * 2.2 * r, cy = bot - r - 12 - Math.floor(j / 3) * 2.2 * r;
+            x = cx + Math.sin(t * 14 + j) * r * 0.1; y = cy + Math.cos(t * 12 + j * 2) * r * 0.1;
+          }
+          sphere(x, y, i);
+        }
+        label(ctx, spreadOut ? 'more spread out' : 'more ordered', px[i] + pw / 2, top + 14, { color: spreadOut ? col : DIM, size: 11 });
+      });
+      var my = top + ph * 0.5, s0 = fav ? px[0] + pw + 8 : px[1] - 8, s1 = fav ? px[1] - 8 : px[0] + pw + 8;
+      if (k > 0) {
+        ctx.save(); ctx.globalAlpha = k;
+        arrow(ctx, s0, my, s0 + (s1 - s0) * k, my, col, 3.6);
+        label(ctx, term, w / 2, my - 18, { color: col, size: 13 });
+        ctx.restore();
+      }
+    }
+
+    var side = c.fwd ? 'products' : 'reactants';
+    return c.H
+      ? term + '. The ' + side + ' have the lower potential energy, and the difference is released as heat. Enthalpy favours the ' + side + '.'
+      : term + '. The ' + side + ' are more spread out than the other side, with more ways to be arranged. Entropy favours the ' + side + '.';
   }
 
   /* ---------- paths: state function picture ---------- */
@@ -1112,7 +1275,7 @@
     if (o.note) label(ctx, o.note, w / 2, h * 0.72, { size: 11 });
   }
 
-  global.EqPictures = { energy: energy, beaker: beaker, spread: spread, coldpack: coldpack, gibbs4: gibbs4, paths: paths, equation: equation, intro4: intro4 };
+  global.EqPictures = { energy: energy, beaker: beaker, spread: spread, coldpack: coldpack, favour: favour, gibbs4: gibbs4, paths: paths, equation: equation, intro4: intro4 };
   // Shared drawing helpers for the live scenes (eq-scenes.js)
   global.EqPictures.util = { fit: fit, ball: ball, label: label, roundBox: roundBox, arrow: arrow, mix: mix, rng: rng, smooth: smooth,
     INK: INK, DIM: DIM, FAINT: FAINT, EMBER: EMBER, TIDE: TIDE, MONO: MONO, BODY: BODY };

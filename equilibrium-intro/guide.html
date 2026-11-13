@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
-  <link rel="stylesheet" href="assets/eq-intro.css?v=17">
+  <link rel="stylesheet" href="assets/eq-intro.css?v=18">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -133,6 +133,7 @@
       <a href="#beat-hill">Energy hill</a>
       <a href="#beat-heat">Heat flows</a>
       <a href="#beat-spread">Randomness</a>
+      <a href="#beat-favour">Favoured side</a>
       <a href="#beat-pulls">Two pulls</a>
       <a href="#beat-four">Four cases</a>
       <a href="#beat-arrows">Both arrows</a>
@@ -159,7 +160,7 @@
         </article>
 
         <article class="guide-beat" id="beat-hill" data-badge="Enthalpy" data-view="pic" data-pic="energy">
-          <p class="beat-kicker">Part 1 · Enthalpy</p>
+          <p class="beat-kicker">Enthalpy</p>
           <h2>Up the hill, then down</h2>
           <p>You already know this one. <strong>Enthalpy</strong> (H) is the heat stored in a system. <strong>ΔH</strong> is how much it changes.</p>
           <p>A <strong>potential energy diagram</strong> follows a reaction from left to right. To react, particles must collide hard enough to climb to the top of the hill, the <strong>activated complex</strong>. Past the top, they slide down to the products.</p>
@@ -172,7 +173,7 @@
         </article>
 
         <article class="guide-beat" id="beat-heat" data-badge="Enthalpy" data-view="pic" data-pic="beaker" data-cards="naoh:H,melt:H">
-          <p class="beat-kicker">Part 1 · Enthalpy</p>
+          <p class="beat-kicker">Enthalpy</p>
           <h2>Where does the heat go?</h2>
           <p>Now we need to think about actual systems, and the flow of heat energy into or out of the system.</p>
           <p>The sign tells us part of the story, but combined with our understanding of the PE diagrams, we can get a full picture of what is going on.</p>
@@ -187,7 +188,7 @@
         </article>
 
         <article class="guide-beat" id="beat-spread" data-badge="Entropy" data-view="pic" data-pic="spread" data-cards="dye:,melt:HS,freeze:HS,ammonia:HS,hotpack:HS">
-          <p class="beat-kicker">Part 1 · Entropy</p>
+          <p class="beat-kicker">Entropy</p>
           <h2>Let's talk about randomness</h2>
           <p>One of the ways we can talk about <strong>entropy</strong> is thinking about randomness. Or, things "spreading out". Think about dropping food colouring into water. It spreads out until the colour is even. It never gathers itself back into the drop. <strong>Entropy</strong> (S) measures how spread out, or random, a system's particles and energy are. The more random ways the particles can be arranged, the higher the entropy.</p>
           <p><strong>ΔS</strong> is the change. Spreading out makes ΔS <strong>positive</strong>. Getting more ordered or more crowded makes ΔS <strong>negative</strong>.</p>
@@ -200,21 +201,34 @@
           <p class="beat-aside" id="hotpackAside" hidden>Rules of thumb have exceptions. Ca²⁺ is a small ion with a big charge, so it attracts water molecules strongly and binds them in a tight shell. Those trapped water molecules lose more freedom than the ions gain. Chemists check the data rather than trust the rule.</p>
         </article>
 
-        <article class="guide-beat" id="beat-pulls" data-badge="Enthalpy and entropy" data-view="pic" data-pic="coldpack">
-          <p class="beat-kicker">Part 1 · Enthalpy and entropy together</p>
+        <article class="guide-beat" id="beat-favour" data-badge="Enthalpy and entropy" data-view="pic" data-pic="favour">
+          <p class="beat-kicker">Enthalpy and entropy</p>
+          <h2>Which side is favoured?</h2>
+          <p>Every reaction is written with reactants on the left and products on the right. When we say ΔH or ΔS <strong>favours the products</strong>, we mean that, on its own, it pushes the reaction <strong>forward</strong> (→). <strong>Favours the reactants</strong> means it pushes the reaction in <strong>reverse</strong> (←).</p>
+          <p>Each term has its own rule for which side it favours.</p>
+          <ul class="beat-drivers">
+            <li><strong>Enthalpy favours the side with lower potential energy.</strong> ΔH − means the products store less potential energy in their bonds and attractions than the reactants. Going forward, the difference is released to the surroundings as heat, so the products are favoured. ΔH + means the products store more potential energy, so heat must be absorbed from the surroundings to form them, and the reactants are favoured.</li>
+            <li><strong>Entropy favours the side that is more spread out.</strong> ΔS + means the products have more ways to be arranged: the products are favoured. ΔS − means the reactants are more spread out, so the reactants are favoured.</li>
+            <li><strong>Watch:</strong> switch between the four cases under the picture. The bold half of ⇌ points at the side that term favours.</li>
+          </ul>
+          <p class="beat-aside">"Favoured" is one push, not the final answer. A reaction feels both pushes at once, which is where we go next.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-pulls"data-badge="Enthalpy and entropy" data-view="pic" data-pic="coldpack">
+          <p class="beat-kicker">Enthalpy and entropy together</p>
           <h2>Two different pulls</h2>
           <p>ΔH and ΔS are not the same thing. ΔH is about <strong>heat</strong>. ΔS is about <strong>randomness</strong>. A change is favoured when it gives off heat (ΔH −), and also when a system gets more random, or spread out (ΔS +).</p>
           <p>We will now look at systems and decide which direction entropy and enthalpy are "pointing", or which side is favoured. A cold pack fights. It <strong>takes in</strong> heat, which works against it, yet it still dissolves on its own. Spreading out wins.</p>
           <ul class="beat-drivers">
             <li><strong>Both favour it</strong> (ΔH −, ΔS +): it happens.</li>
             <li><strong>Both oppose it</strong> (ΔH +, ΔS −): it does not happen on its own.</li>
-            <li><strong>They fight:</strong> the winner depends on temperature. That is Part 3.</li>
+            <li><strong>They fight:</strong> the winner depends on temperature. We will get to that with ΔG.</li>
             <li><strong>Notice:</strong> step through the cold pack with the arrows under the picture. Watch which way each half of the ⇌ points.</li>
           </ul>
         </article>
 
         <article class="guide-beat" id="beat-four" data-badge="Gibbs free energy" data-view="pic" data-pic="gibbs4">
-          <p class="beat-kicker">Part 1 · Putting them together</p>
+          <p class="beat-kicker">Putting them together</p>
           <h2>Four ways the pulls can line up</h2>
           <p>Chemists combine ΔH and ΔS into one quantity, the <strong>Gibbs free energy</strong> change:</p>
           <p class="gibbs-eq">ΔG = <span class="t-h">ΔH</span> <span class="t-s">− TΔS</span></p>
@@ -238,7 +252,7 @@
         </article>
 
         <article class="guide-beat" id="beat-arrows" data-badge="Reversible reactions" data-view="vessel" data-reaction="n2o4" data-t="400" data-mix="reactants" data-counts="true">
-          <p class="beat-kicker">Part 2 · Reversible reactions</p>
+          <p class="beat-kicker">Reversible reactions</p>
           <h2>Reactions that run both ways</h2>
           <p>Many reactions are <strong>reversible</strong>. As soon as products form, some of them react back into reactants. We write this with a double arrow: ⇌.</p>
           <p>Here is N₂O₄ ⇌ 2NO₂ in a sealed vessel. N₂O₄ is colourless and NO₂ is brown. Watch the colour (what you would see in the lab), then watch the particles (what you would see if you could zoom in).</p>
@@ -251,7 +265,7 @@
         </article>
 
         <article class="guide-beat" id="beat-rates" data-badge="Rates and equilibrium" data-view="vessel" data-reaction="n2o4" data-t="400" data-mix="reactants" data-graphs="true" data-mixbtns="true">
-          <p class="beat-kicker">Part 2 · Rates and equilibrium</p>
+          <p class="beat-kicker">Rates and equilibrium</p>
           <h2>When the rates meet</h2>
           <p>At the start there is only N₂O₄, so the forward reaction is fast and the reverse is zero. As NO₂ builds up, the forward rate slows (fewer N₂O₄ left to split) and the reverse rate speeds up (more NO₂ to join).</p>
           <p>Eventually the two rates are <strong>equal</strong>. From then on, every NO₂ made is matched by one used up. The amounts stop changing even though both reactions continue. This is <strong>dynamic equilibrium</strong>.</p>
@@ -265,7 +279,7 @@
         </article>
 
         <article class="guide-beat" id="beat-around" data-badge="Equilibrium around us" data-view="pic" data-pic="scene" data-cards="soda:,ocean:,blood:">
-          <p class="beat-kicker">Part 2 · Everywhere</p>
+          <p class="beat-kicker">Everywhere</p>
           <h2>Equilibrium is all around you</h2>
           <p>A sealed soda bottle is a system at equilibrium. CO₂ gas above the drink dissolves into the liquid at the same rate as dissolved CO₂ escapes. The fizz stays put. Open the cap and the system is no longer closed, so the gas escapes faster than it returns.</p>
           <p>The same balance shows up far from the chemistry lab.</p>
@@ -279,7 +293,7 @@
         </article>
 
         <article class="guide-beat" id="beat-state" data-badge="State functions" data-view="pic" data-pic="paths">
-          <p class="beat-kicker">Part 3 · State functions</p>
+          <p class="beat-kicker">State functions</p>
           <h2>Only the start and finish matter</h2>
           <p>Climb a mountain by the steep trail or the long switchbacks. Either way your change in height is the same, because it depends only on where you started and where you finished. The distance you walked is different for each route.</p>
           <p>H, S and G are <strong>state functions</strong>. Like height, their change depends only on the start and end states, not the path. That is why Hess's law works: add up any route of steps and you get the same ΔH. Heat and work are <strong>not</strong> state functions. They depend on the path, like the distance walked.</p>
@@ -291,7 +305,7 @@
         </article>
 
         <article class="guide-beat" id="beat-gibbs" data-badge="Gibbs free energy" data-view="vessel" data-reaction="n2o4" data-t="250" data-mix="half" data-gibbs="true" data-slider="true" data-picker="n2o4,haber">
-          <p class="beat-kicker">Part 3 · Gibbs free energy</p>
+          <p class="beat-kicker">Gibbs free energy</p>
           <h2>Temperature picks the winner</h2>
           <p>Combine the two pulls into one number, <strong>Gibbs free energy</strong>:</p>
           <p class="strength-order">ΔG = ΔH − TΔS</p>
@@ -306,7 +320,7 @@
         </article>
 
         <article class="guide-beat" id="beat-limits" data-badge="Limits of ΔG" data-view="pic" data-pic="scene" data-cards="diamond:HS">
-          <p class="beat-kicker">Part 3 · Limits</p>
+          <p class="beat-kicker">Limits</p>
           <h2>What the formula leaves out</h2>
           <p>ΔG is powerful, but it is a model, and every model has limits.</p>
           <p><strong>It says nothing about speed.</strong> Diamond turning into graphite has ΔG −, so it is spontaneous at every temperature. But at room temperature it is so slow that it has never been observed: the hill between diamond and graphite is enormous. ΔG tells you which way a reaction can go. Rates (and collision theory) tell you how fast.</p>
@@ -353,12 +367,21 @@
         </div>
         <div class="g-cases" id="g-cases" hidden>
           <div class="seg g-case-seg" role="group" aria-label="Sign case" id="g-caseSeg">
-            <button type="button" class="btn" data-case="0" aria-pressed="true">ΔH − · ΔS +</button>
-            <button type="button" class="btn" data-case="1" aria-pressed="false">ΔH + · ΔS −</button>
-            <button type="button" class="btn" data-case="2" aria-pressed="false">ΔH − · ΔS −</button>
-            <button type="button" class="btn" data-case="3" aria-pressed="false">ΔH + · ΔS +</button>
+            <button type="button" class="btn g-case" data-case="0" aria-pressed="true" aria-label="Case 1: ΔH −, ΔS +"><span class="gc-num" aria-hidden="true">1</span><span class="gc-h">ΔH <b>−</b></span><span class="gc-s">ΔS <b>+</b></span></button>
+            <button type="button" class="btn g-case" data-case="1" aria-pressed="false" aria-label="Case 2: ΔH +, ΔS −"><span class="gc-num" aria-hidden="true">2</span><span class="gc-h">ΔH <b>+</b></span><span class="gc-s">ΔS <b>−</b></span></button>
+            <button type="button" class="btn g-case" data-case="2" aria-pressed="false" aria-label="Case 3: ΔH −, ΔS −"><span class="gc-num" aria-hidden="true">3</span><span class="gc-h">ΔH <b>−</b></span><span class="gc-s">ΔS <b>−</b></span></button>
+            <button type="button" class="btn g-case" data-case="3" aria-pressed="false" aria-label="Case 4: ΔH +, ΔS +"><span class="gc-num" aria-hidden="true">4</span><span class="gc-h">ΔH <b>+</b></span><span class="gc-s">ΔS <b>+</b></span></button>
           </div>
           <p class="g-step-text" id="g-caseText" aria-live="polite"></p>
+        </div>
+        <div class="g-cases" id="g-favour" hidden>
+          <div class="seg g-case-seg" role="group" aria-label="Which term and sign" id="g-favourSeg">
+            <button type="button" class="btn" data-favour="0" aria-pressed="true">ΔH −</button>
+            <button type="button" class="btn" data-favour="1" aria-pressed="false">ΔH +</button>
+            <button type="button" class="btn" data-favour="2" aria-pressed="false">ΔS +</button>
+            <button type="button" class="btn" data-favour="3" aria-pressed="false">ΔS −</button>
+          </div>
+          <p class="g-step-text" id="g-favourText" aria-live="polite"></p>
         </div>
         <div class="g-steps" id="g-steps" hidden>
           <button type="button" class="btn" id="g-prev" aria-label="Previous step">←</button>
@@ -436,7 +459,7 @@
   <script src="assets/reactions.js?v=10"></script>
   <script src="assets/vessel-engine.js?v=3"></script>
   <script src="assets/eq-charts.js?v=3"></script>
-  <script src="assets/guide-pictures.js?v=34"></script>
+  <script src="assets/guide-pictures.js?v=36"></script>
   <script src="assets/eq-scenes.js?v=22"></script>
   <script>
   (function () {
@@ -499,7 +522,7 @@
         picker: d.picker ? d.picker.split(',') : null,
       };
       $('vesselWrap').hidden = false; $('picWrap').hidden = true;
-      $('g-energySeg').hidden = true; $('g-steps').hidden = true; $('g-cases').hidden = true; $('g-scene').hidden = true;
+      $('g-energySeg').hidden = true; $('g-steps').hidden = true; $('g-cases').hidden = true; $('g-favour').hidden = true; $('g-scene').hidden = true;
       $('graphsWrap').hidden = !cfg.graphs;
       $('gibbsWrap').hidden = !cfg.gibbs;
       $('counts').hidden = !cfg.counts;
@@ -534,10 +557,16 @@
       'The ions are far more spread out than the crystal, so ΔS is <strong>+</strong>. That favours the <strong>products</strong> (→). The two pulls point opposite ways.'
     ];
     var caseIdx = 0, CASE_TEXT = [
-      '<strong>Hydrogen peroxide breaking down.</strong> Heat comes out (ΔH −) and a gas forms (ΔS +). Both terms push toward the products, so ΔG is always <strong>−</strong>.',
-      '<strong>Making ozone from oxygen.</strong> Heat goes in (ΔH +) and three gas molecules become two (ΔS −). Both terms push toward the reactants, so ΔG is always <strong>+</strong>.',
+      '<strong>Burning propane.</strong> Heat comes out (ΔH −) and six gas molecules become seven (ΔS +). Both terms push toward the products, so ΔG is always <strong>−</strong>.',
+      '<strong>Making nitrogen dioxide from nitrogen and oxygen.</strong> Heat goes in (ΔH +) and three gas molecules become two (ΔS −). Both terms push toward the reactants, so ΔG is always <strong>+</strong>.',
       '<strong>Making ammonia.</strong> Heat comes out (ΔH −), but four gas molecules become two (ΔS −). The terms push opposite ways, so the sign of ΔG depends on which term is bigger.',
       '<strong>The cold pack.</strong> Heat goes in (ΔH +), but the ions spread out (ΔS +). The terms push opposite ways. At room temperature the entropy term is bigger, which is why the pack works.'
+    ];
+    var favourIdx = 0, FAVOUR_TEXT = [
+      '<strong>ΔH −.</strong> The products have lower potential energy than the reactants. Going forward, the difference is released to the surroundings as heat. Enthalpy favours the <strong>products</strong> (→).',
+      '<strong>ΔH +.</strong> The products have higher potential energy than the reactants. Going forward, the difference must be absorbed from the surroundings as heat. Enthalpy favours the <strong>reactants</strong> (←).',
+      '<strong>ΔS +.</strong> The products are more spread out, with more ways to be arranged. Entropy favours the <strong>products</strong> (→).',
+      '<strong>ΔS −.</strong> The products are packed into order, with fewer ways to be arranged. Entropy favours the <strong>reactants</strong> (←).'
     ];
     function caseUi() {
       $('g-caseText').innerHTML = CASE_TEXT[caseIdx];
@@ -616,6 +645,12 @@
         if ($('pic').getAttribute('aria-label') !== gd) $('pic').setAttribute('aria-label', gd);
         return;
       }
+      if (kind === 'favour') {
+        var fd = EqPictures.favour($('pic'), { idx: favourIdx, t: (performance.now() - picT0) / 1000, still: reduced });
+        $('sub').textContent = '';
+        if ($('pic').getAttribute('aria-label') !== fd) $('pic').setAttribute('aria-label', fd);
+        return;
+      }
       if (kind === 'coldpack') {
         var cd = EqPictures.coldpack($('pic'), { step: coldStep, t: (performance.now() - picT0) / 1000, still: reduced });
         $('sub').textContent = '';
@@ -643,7 +678,7 @@
       if (!active || active.dataset.view !== 'pic') return;
       picPhase = (picPhase + 0.016) % 1;
       drawPic();
-      if (!reduced && (active.dataset.pic === 'intro4' || active.dataset.pic === 'beaker' || active.dataset.pic === 'energy' || active.dataset.pic === 'spread' || active.dataset.pic === 'coldpack' || active.dataset.pic === 'gibbs4' || active.dataset.pic === 'scene')) picRaf = requestAnimationFrame(picLoop);
+      if (!reduced && (active.dataset.pic === 'intro4' || active.dataset.pic === 'beaker' || active.dataset.pic === 'energy' || active.dataset.pic === 'spread' || active.dataset.pic === 'coldpack' || active.dataset.pic === 'favour' || active.dataset.pic === 'gibbs4' || active.dataset.pic === 'scene')) picRaf = requestAnimationFrame(picLoop);
     }
 
     function loadPic(b) {
@@ -655,9 +690,11 @@
       $('g-energySeg').hidden = b.dataset.pic !== 'energy';
       $('g-steps').hidden = b.dataset.pic !== 'coldpack';
       $('g-cases').hidden = b.dataset.pic !== 'gibbs4';
+      $('g-favour').hidden = b.dataset.pic !== 'favour';
       $('g-scene').hidden = b.dataset.pic !== 'scene';
       sceneId = null;                                   // a fresh scene each time the beat opens
       if (b.dataset.pic === 'gibbs4') caseUi();
+      if (b.dataset.pic === 'favour') $('g-favourText').innerHTML = FAVOUR_TEXT[favourIdx];
       if (b.dataset.pic === 'coldpack') { coldStep = 0; coldStepUi(); }
       picT0 = performance.now();
       panel.classList.remove('is-compact');
@@ -768,6 +805,11 @@
     $('g-caseSeg').addEventListener('click', function (e) {
       var b = e.target.closest('[data-case]'); if (!b) return;
       pressed($('g-caseSeg'), b); caseIdx = +b.dataset.case; picT0 = performance.now(); caseUi(); drawPic();
+    });
+    $('g-favourSeg').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-favour]'); if (!b) return;
+      pressed($('g-favourSeg'), b); favourIdx = +b.dataset.favour; picT0 = performance.now();
+      $('g-favourText').innerHTML = FAVOUR_TEXT[favourIdx]; drawPic();
     });
     [['g-prev', -1], ['g-next', 1]].forEach(function (pair) {
       $(pair[0]).addEventListener('click', function () {

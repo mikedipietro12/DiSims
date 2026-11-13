@@ -74,10 +74,7 @@
   function toyTray(ctx, w, h) {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = 'rgba(29,36,51,0.10)';
-    for (var x = 11; x < w; x += 22) {
-      for (var y = 11; y < h; y += 22) ctx.fillRect(x, y, 1.4, 1.4);
-    }
+    // No dot grid (removed 2026-11-10 at the user's request): plain white tray with a soft vignette
     var g = ctx.createRadialGradient(w * 0.5, h * 0.35, 10, w * 0.5, h * 0.5, Math.max(w, h) * 0.7);
     g.addColorStop(0, 'rgba(255,255,255,0)');
     g.addColorStop(1, 'rgba(214,222,235,0.55)');

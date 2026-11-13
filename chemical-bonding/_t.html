@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script>window.requestAnimationFrame=function(f){return setTimeout(function(){f(performance.now())},16)};window.cancelAnimationFrame=function(i){clearTimeout(i)};
+window.addEventListener('load',function(){var q=new URLSearchParams(location.search),chip=+(q.get('chip')||0);
+setTimeout(function(){var root=document.querySelector(q.get('sel'));if(chip)root.querySelectorAll('.scene-chip')[chip].click();},500);});</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chemical Bonding Guide: Lewis Structures, VSEPR &amp; Hybridization | Chemistry 11</title>
+  <meta name="description" content="Guided tour of chemical bonding: electronegativity and bond type, ionic salts, Lewis structures and formal charge, resonance, VSEPR shapes, molecular polarity and hybridization.">
+  <meta name="author" content="M DiPietro">
+  <link rel="canonical" href="https://atomicsimulations.ca/chemical-bonding/guide.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Atomic Simulations">
+  <meta property="og:title" content="Chemical Bonding Guide: Lewis Structures, VSEPR &amp; Hybridization | Chemistry 11">
+  <meta property="og:description" content="Guided tour of chemical bonding: electronegativity and bond type, ionic salts, Lewis structures and formal charge, resonance, VSEPR shapes, molecular polarity and hybridization.">
+  <meta property="og:url" content="https://atomicsimulations.ca/chemical-bonding/guide.html">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Chemical Bonding Guide: Lewis Structures, VSEPR &amp; Hybridization | Chemistry 11", "url": "https://atomicsimulations.ca/chemical-bonding/guide.html", "description": "Guided tour of chemical bonding: electronegativity and bond type, ionic salts, Lewis structures and formal charge, resonance, VSEPR shapes, molecular polarity and hybridization.", "inLanguage": "en", "isAccessibleForFree": true, "learningResourceType": "Simulation", "author": {"@type": "Person", "name": "M DiPietro"}, "isPartOf": {"@type": "WebSite", "name": "Atomic Simulations", "url": "https://atomicsimulations.ca/"}, "educationalLevel": "Grade 11", "about": "Chemistry"}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=20261113c">
+  <link rel="stylesheet" href="assets/bonding.css?v=20261113c">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+  <div class="module-wrap guide-wrap">
+    <div class="top-nav">
+      <a href="index.html" class="back-link">← Chemical Bonding</a>
+      <div class="top-nav-end">
+        <div class="mod-meta">Part 1 · Guide</div>
+        <div class="present-controls">
+          <label class="present-only" for="chapterJump"><span class="sr-only">Jump to chapter</span>
+            <select id="chapterJump"><option value="ch-a">A · From atoms to bonds</option><option value="ch-b1">B·1 · Lewis structures</option><option value="ch-b2">B·2 · Shape (VSEPR)</option><option value="ch-b3">B·3 · Polarity</option><option value="ch-c">C · Hybridization</option></select></label>
+          <span class="present-only present-progress" id="presentProgress"></span>
+          <button type="button" class="btn present-only present-step" id="presentPrev" aria-label="Previous beat">‹</button>
+          <button type="button" class="btn present-only present-step" id="presentNext" aria-label="Next beat">›</button>
+          <button type="button" class="btn present-only" id="presentText" aria-pressed="false" title="Hide or show the text (T)">Hide text</button>
+          <button type="button" class="learn-toggle" id="presentToggle" aria-pressed="false"><span class="learn-switch" aria-hidden="true"></span>Present</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="room-switch" aria-label="Chemical Bonding parts">
+      <a href="index.html" data-room="hub">Hub</a>
+      <a href="guide.html" data-room="guide" aria-current="page">Guide</a>
+      <a href="lab.html" data-room="lab">Draw Lab</a>
+    </nav>
+
+    <header class="guide-hero">
+      <div class="stub-kicker">Chemistry 11H · Chemical Bonding</div>
+      <h1>Guide</h1>
+      <p>How do atoms hold together? Start from the electrons you met in Unit 1b, see when they are shared or transferred, draw Lewis structures, then find the shapes those structures make.</p>
+      <p class="guide-hero-note">Scroll at your own pace · press P for presentation mode (the stage fills the screen; arrows or a clicker step, Esc exits)</p>
+    </header>
+
+    <nav class="guide-toc" aria-label="Chapters"><a href="#ch-a"><span>A</span> From atoms to bonds</a><a href="#ch-b1"><span>B·1</span> Lewis structures</a><a href="#ch-b2"><span>B·2</span> Shape (VSEPR)</a><a href="#ch-b3"><span>B·3</span> Polarity</a><a href="#ch-c"><span>C</span> Hybridization</a></nav>
+
+    <div class="guide-layout">
+      <div class="guide-rail">
+        <section class="guide-chapter" id="ch-a" data-chapter="A" aria-labelledby="ch-a-title">
+          <header class="chapter-head">
+            <p class="chapter-kicker">Chapter A</p>
+            <h2 id="ch-a-title">From atoms to bonds</h2>
+            <p>How electronegativity and ionization energy decide whether electrons are shared or transferred.</p>
+          </header>
+          <article class="guide-beat" id="b01-left-off" data-part="A" data-scene="dot-symbol">
+            <p class="beat-kicker"></p>
+            <h3>Where we left off</h3>
+            <p>In Unit 1b you built electron configurations from measured data. Only the outermost electrons, the valence electrons, take part in bonding.</p>
+            <p>A Lewis dot symbol keeps just those: the element symbol with one dot per valence electron, spread around four sides before any are paired.</p>
+            <p class="beat-try">Pick an element to watch its valence electrons become a dot symbol.</p>
+          </article>
+          <article class="guide-beat" id="b02-shared-pair" data-part="A" data-scene="cloud" data-mode="pair">
+            <p class="beat-kicker"></p>
+            <h3>Two atoms, one shared pair</h3>
+            <p>Two hydrogen atoms each bring one electron. Held between both nuclei, the pair attracts both of them at once. That shared pair is a covalent bond.</p>
+            <p>Both nuclei pull on it equally, so the cloud of the bond is even.</p>
+            <p class="beat-try">Watch two H atoms come together. Replay to see it again.</p>
+          </article>
+          <article class="guide-beat" id="b03-en-slider" data-part="A" data-scene="cloud" data-mode="slider">
+            <p class="beat-kicker"></p>
+            <h3>Electronegativity decides the pull</h3>
+            <p>Electronegativity (EN) is how strongly an atom pulls bonding electrons toward itself. When the two atoms differ, the shared pair shifts toward the higher-EN atom.</p>
+            <p>From here on, red marks a positive region (δ+) and yellow marks a negative region (δ−).</p>
+            <p class="beat-try">Pick two elements, or drag the ΔEN slider, and watch the shared pair shift.</p>
+          </article>
+          <article class="guide-beat" id="b04-continuum" data-part="A" data-scene="continuum">
+            <p class="beat-kicker"></p>
+            <h3>A continuum, not boxes</h3>
+            <p>Small EN differences give nonpolar covalent bonds. Larger ones give polar covalent bonds. Very large ones move the electron completely: an ionic bond.</p>
+            <p>The cut-offs are guides, not walls. Bonds slide smoothly from one type to the next.</p>
+            <p class="beat-try">Click a bond on the scale to see its cloud.</p>
+          </article>
+          <article class="guide-beat" id="b05-examples" data-part="A" data-scene="cloud" data-mode="examples">
+            <p class="beat-kicker"></p>
+            <h3>Real examples: shared</h3>
+            <p>Cl₂ shares evenly. HCl and H₂O share unevenly, so they have δ+ and δ− ends.</p>
+          </article>
+          <article class="guide-beat" id="b06-ionic" data-part="A" data-scene="draw" data-palette="Na Cl Mg O" data-fc="off" data-prompt="Give Na and Cl their valence electrons, then send Na’s electron to Cl. Then try Mg and O." data-tag="Draw">
+            <p class="beat-kicker"></p>
+            <h3>Real examples: transferred</h3>
+            <p>When a metal meets a nonmetal, the EN difference is large enough that electrons move across instead of being shared.</p>
+            <p>Drag each atom in from the tray and click to give it its valence electrons (Na one, Cl seven). Then drag sodium’s electron onto chlorine. Na ends with no valence electrons and a 1+ charge; Cl ends with eight and a 1− charge. Try Mg with O: two electrons have to move.</p>
+          </article>
+          <article class="guide-beat" id="b07-lattice" data-part="A" data-scene="lattice">
+            <p class="beat-kicker"></p>
+            <h3>From a pair to a lattice</h3>
+            <p>Ions do not pair off one to one. Each ion attracts every oppositely charged neighbour, so they stack into a repeating crystal: a lattice.</p>
+            <p>Not every salt packs the same way. How the ions stack depends on their sizes: Cs⁺ is much bigger than Na⁺, so in CsCl each ion fits 8 neighbours around it instead of 6.</p>
+            <p class="beat-try">Build each salt step by step, and compare NaCl with CsCl. Drag to turn the crystal, and click an ion to see which ions touch it.</p>
+          </article>
+          <article class="guide-beat" id="b08-salts" data-part="A" data-scene="salts" data-tag="Discuss">
+            <p class="beat-kicker"></p>
+            <h3>Salts side by side</h3>
+            <p>Melting a salt means pulling its ions apart. Compare the melting points: what changes when the ions get bigger? What changes when the charges double?</p>
+            <p>Network and molecular crystals sit on the same scale as a preview. You will meet them properly later in the course.</p>
+            <p class="beat-try">Switch between the comparisons and talk about what changes.</p>
+          </article>
+        </section>
+
+        <section class="guide-chapter" id="ch-b1" data-chapter="B·1" aria-labelledby="ch-b1-title">
+          <header class="chapter-head">
+            <p class="chapter-kicker">Chapter B·1</p>
+            <h2 id="ch-b1-title">Lewis structures</h2>
+            <p>Lewis structures help us determine how atoms in a molecule are organized, share electrons, and will start to let us understand their shape. In this section, we will learn about drawing shared electron pairs, structures, multiple bonds, formal charge, ions, resonance, and expanded octets.</p>
+          </header>
+          <article class="guide-beat" id="b09-count" data-part="B·1" data-scene="count" data-mols="ch4 h2o co2 nh4 co3">
+            <p class="beat-kicker"></p>
+            <h3>The count</h3>
+            <p>Every Lewis structure starts with one important number: the total number of valence electrons for the entire molecule. We get this number by adding all of the valence electrons for the entire structure.</p>
+            <p>From there, we can start determining how the atoms will share electrons in their structures to complete the octet (most of the time).</p>
+            <p class="beat-try">Pick a molecule: add up its valence electrons, then see where they all go in the structure.</p>
+          </article>
+          <article class="guide-beat" id="b10-single" data-part="B·1" data-scene="draw" data-set="ch4 h2o" data-fc="off" data-tag="Draw">
+            <p class="beat-kicker"></p>
+            <h3>Single bonds</h3>
+            <p>Start with the skeleton: drag the atoms in from the tray and put the least electronegative atom in the middle. Click each atom to give it its valence electrons. Then drag an electron onto a neighbour’s electron: the two are shared, and the pair becomes a bond.</p>
+            <p>Build CH₄ and H₂O on the same tray. A small number above an atom counts how many more electrons it needs to complete its octet (two for hydrogen). When the numbers are gone, every atom is satisfied.</p>
+          </article>
+          <article class="guide-beat" id="b11-practice-single" data-part="B·1" data-scene="draw" data-set="h2 hbr pcl3 sf2" data-practice data-fc="off" data-tag="Practice">
+            <p class="beat-kicker"></p>
+            <h3>Practice: single bonds</h3>
+            <p>Draw all four on the tray. Use the count to check each one, and open “Show answer” if you get stuck.</p>
+          </article>
+          <article class="guide-beat" id="b12-multiple" data-part="B·1" data-scene="draw" data-set="o2 hcn" data-fc="off" data-tag="Draw">
+            <p class="beat-kicker"></p>
+            <h3>When the count runs short</h3>
+            <p>Sometimes, in order to fulfil the octet, more than one pair of electrons needs to be shared. These are known as double or triple bonds.</p>
+            <p>Notice that from the perspective of each atom, their octet is completed.</p>
+          </article>
+          <article class="guide-beat" id="b13-formal-charge" data-part="B·1" data-scene="draw" data-set="co2 co2-alt" data-sets="co2 co2-alt | hcn hnc | ocn ocn-alt" data-no-tray data-letters data-zoom="1.6" data-fc="teach" data-prompts="Compare structure A and structure B. Hover over each atom to see its formal charge. | Same atoms, different order. Which has formal charges closest to zero? | Both cyanate drawings carry a −1 charge. Which atom should hold it?" data-tag="Draw">
+            <p class="beat-kicker"></p>
+            <h3>Formal charge</h3>
+            <p>Formal charge compares the electrons an atom started with to the electrons it has in the structure:</p>
+            <p class="beat-formula">FC = valence − nonbonding − ½(bonding)</p>
+            <p>Both CO₂ arrangements give every atom an octet. Hover over each atom to compare their formal charges. The structure with formal charges closest to zero is the better one.</p>
+            <p>When charges can't all be zero (like in an ion), the better structure puts the negative formal charge on the more electronegative atom.</p>
+            <p class="beat-try">Switch between CO₂, HCN vs HNC and the cyanate ion, OCN⁻. Hover over each atom to read its formal charge.</p>
+          </article>
+          <article class="guide-beat" id="b14-practice-multiple" data-part="B·1" data-scene="draw" data-set="c2h4 n2h2 ch2nh n2 co" data-practice data-fc="compact" data-tag="Practice">
+            <p class="beat-kicker"></p>
+            <h3>Practice: multiple bonds</h3>
+            <p>Draw all five on the tray. CO is the stretch: C has four valence electrons and O has six, yet both can reach an octet. Check the formal charges in the tally once you get there.</p>
+          </article>
+          <article class="guide-beat" id="b15-ions" data-part="B·1" data-scene="draw" data-set="nh4 co3" data-fc="compact" data-tag="Draw">
+            <p class="beat-kicker"></p>
+            <h3>Polyatomic ions</h3>
+            <p>An ion has gained or lost electrons. Build as usual, then click to add an extra electron, or use Erase to take one away. Once every atom is satisfied, the structure goes in brackets with the overall charge outside.</p>
+          </article>
+          <article class="guide-beat" id="b16-resonance" data-part="B·1" data-scene="resonance" data-mols="o3 no3 co3">
+            <p class="beat-kicker"></p>
+            <h3>Resonance</h3>
+            <p>Sometimes the double bond could sit in more than one equivalent place. Each drawing is a resonance structure. The real molecule is a blend of all of them.</p>
+            <p>Moving between the drawings, no atoms move: only electron pairs. A lone pair swings in to make a new bond, and the π pair of the old double bond moves out onto another atom. Curved arrows show where each pair goes.</p>
+            <p class="beat-try">Watch the electron pairs move from form to form, then show the hybrid: the real molecule.</p>
+          </article>
+          <article class="guide-beat" id="b17-expanded" data-part="B·1" data-scene="draw" data-set="pcl5 sf6" data-fc="compact" data-tag="Draw">
+            <p class="beat-kicker"></p>
+            <h3>Expanded octets</h3>
+            <p>Atoms from period 3 and below can hold more than eight electrons around them. Build PCl₅ and SF₆ and watch the count go past 8.</p>
+          </article>
+          <article class="guide-beat" id="b18-practice-mixed" data-part="B·1" data-scene="draw" data-set="no- cn- h3o no2 xef4" data-practice data-fc="compact" data-tag="Practice">
+            <p class="beat-kicker"></p>
+            <h3>Practice: ions and mixed</h3>
+            <p>Draw all five on the tray, mixing ions, resonance and an expanded octet.</p>
+          </article>
+        </section>
+
+        <section class="guide-chapter" id="ch-b2" data-chapter="B·2" aria-labelledby="ch-b2-title">
+          <header class="chapter-head">
+            <p class="chapter-kicker">Chapter B·2</p>
+            <h2 id="ch-b2-title">Shape (VSEPR)</h2>
+            <p>How electron domains set the shape of a molecule.</p>
+          </header>
+          <article class="guide-beat" id="b19-domains" data-part="B·2" data-scene="vsepr" data-mols="co2 bf3 ch4 pcl5 sf6">
+            <p class="beat-kicker"></p>
+            <h3>Electron domains spread out</h3>
+            <p>Electron groups around a central atom repel each other, so they spread as far apart as possible. That spread sets the shape. This is VSEPR.</p>
+            <p class="beat-try">Step through AX₂ to AX₆ (A = the central atom, X = an atom bonded to it) and watch each flat drawing lift into its 3D shape. Drag to turn it, and try Space filling.</p>
+          </article>
+          <article class="guide-beat" id="b20-lone-pairs" data-part="B·2" data-scene="vsepr" data-mols="ch4 nh3 h2o">
+            <p class="beat-kicker"></p>
+            <h3>Lone pairs bend shapes</h3>
+            <p>Lone pairs take up space too. CH₄, NH₃ and H₂O all have four domains, but each lone pair squeezes the bond angle a little more.</p>
+            <p class="beat-try">Step from CH₄ to NH₃ to H₂O and watch the angle shrink. The yellow lobes are lone pairs.</p>
+          </article>
+          <article class="guide-beat" id="b21-five-six" data-part="B·2" data-scene="vsepr" data-layout="gallery" data-mols="pcl5 sf4 clf3 xef2 sf6 brf5 xef4">
+            <p class="beat-kicker"></p>
+            <h3>Five and six domains</h3>
+            <p>Expanded octets bring five and six domains: trigonal bipyramidal and octahedral, plus the shapes left when some domains are lone pairs.</p>
+            <p class="beat-try">Click a card to see that shape in 3D. Drag to turn it.</p>
+          </article>
+          <article class="guide-beat" id="b22-practice-shape" data-part="B·2" data-scene="shape-practice" data-mols="bf3 so2 pcl3 sf4 xef2" data-tag="Practice">
+            <p class="beat-kicker"></p>
+            <h3>Practice: name the shape</h3>
+            <p>Count the domains and lone pairs, then choose the shape.</p>
+          </article>
+        </section>
+
+        <section class="guide-chapter" id="ch-b3" data-chapter="B·3" aria-labelledby="ch-b3-title">
+          <header class="chapter-head">
+            <p class="chapter-kicker">Chapter B·3</p>
+            <h2 id="ch-b3-title">Polarity</h2>
+            <p>How bond polarity and shape combine.</p>
+          </header>
+          <article class="guide-beat" id="b23-dipoles" data-part="B·3" data-scene="polarity" data-mols="co2 h2o bf3 nh3">
+            <p class="beat-kicker"></p>
+            <h3>Bond dipoles add up by shape</h3>
+            <p>Each polar bond pulls electrons one way. If the shape makes those pulls cancel, the molecule is nonpolar overall. If not, it is polar.</p>
+            <p class="beat-try">Pick a molecule: the bond dipoles appear, then join tip to tail to give the net dipole.</p>
+          </article>
+          <article class="guide-beat" id="b24-what-if" data-part="B·3" data-scene="what-if" data-tag="Draw">
+            <p class="beat-kicker"></p>
+            <h3>What if…</h3>
+            <p>Swap one Cl in CCl₄ for H. Change BF₃ into NH₃. Predict first, then check.</p>
+          </article>
+          <article class="guide-beat" id="b25-practice-polarity" data-part="B·3" data-scene="polarity-sort" data-tag="Practice">
+            <p class="beat-kicker"></p>
+            <h3>Practice: polar or not?</h3>
+            <p>Sort the molecules. Each card flips to show its dipole sum.</p>
+          </article>
+        </section>
+
+        <section class="guide-chapter" id="ch-c" data-chapter="C" aria-labelledby="ch-c-title">
+          <header class="chapter-head">
+            <p class="chapter-kicker">Chapter C</p>
+            <h2 id="ch-c-title">Hybridization</h2>
+            <p>How carbon’s s and p orbitals combine, and the angles that follow.</p>
+          </header>
+          <article class="guide-beat" id="b26-puzzle" data-part="C" data-scene="orbitals">
+            <p class="beat-kicker"></p>
+            <h3>Carbon’s puzzle</h3>
+            <p>Carbon’s ground state, 2s² 2p², has only two unpaired electrons. Yet methane has four identical C–H bonds, 109.5° apart.</p>
+            <p>Promoting an electron gives four unpaired electrons, but the orbitals still do not fit: the three 2p orbitals are 90° apart, and 2s points nowhere. Combining all four into sp³ orbitals gives four identical orbitals at 109.5°.</p>
+            <p class="beat-try">Step through: ground state, promote, check the angles, combine. Drag the model to turn it.</p>
+          </article>
+          <article class="guide-beat" id="b27-sp3" data-part="C" data-scene="hybrid" data-hyb="sp3">
+            <p class="beat-kicker"></p>
+            <h3>Ethane: sp³</h3>
+            <p>Both carbons in ethane are sp³. A bond forms where two orbitals overlap and their two electrons pair up. One sp³ orbital from each carbon overlaps head on to make the C–C σ bond. Each remaining sp³ orbital overlaps a hydrogen 1s orbital to make a C–H σ bond.</p>
+            <p class="beat-try">Step 1 shows two sp³ carbons, step 2 joins them, step 3 adds the hydrogens. Drag the model to turn it.</p>
+          </article>
+          <article class="guide-beat" id="b28-sp2" data-part="C" data-scene="hybrid" data-hyb="sp2">
+            <p class="beat-kicker"></p>
+            <h3>Ethene: sp²</h3>
+            <p>In ethene, each carbon combines 2s with two 2p orbitals: three sp² orbitals, 120° apart in a plane. The leftover p orbitals overlap side by side to make the second bond, a π bond. You drew H₂CCH₂ in practice.</p>
+            <p class="beat-try">Step through the same three steps for ethene. Look for the π bond in step 3.</p>
+          </article>
+          <article class="guide-beat" id="b29-sp" data-part="C" data-scene="hybrid" data-hyb="sp">
+            <p class="beat-kicker"></p>
+            <h3>Ethyne: sp</h3>
+            <p>In ethyne, 2s combines with one 2p: two sp orbitals, 180° apart. Two leftover p orbitals make two π bonds.</p>
+            <p class="beat-try">Step through for ethyne: two π bonds this time.</p>
+          </article>
+          <article class="guide-beat" id="b30-pattern" data-part="C" data-scene="pattern">
+            <p class="beat-kicker"></p>
+            <h3>The pattern</h3>
+            <p>Four domains: sp³, about 109.5°. Three domains: sp², about 120°. Two domains: sp, 180°.</p>
+            <p class="beat-try">Click a row to see where its orbitals come from.</p>
+          </article>
+          <article class="guide-beat" id="b31-practice-carbon" data-part="C" data-scene="label-carbons" data-mols="c3h6 c3h4 ch2nh" data-tag="Practice">
+            <p class="beat-kicker"></p>
+            <h3>Practice: label each carbon</h3>
+            <p>Label every carbon in propene, propyne and H₂CNH.</p>
+            <p class="beat-try">Click the label beside each carbon to cycle sp³ → sp² → sp, then show the answer.</p>
+          </article>
+          <article class="guide-beat" id="b32-lift" data-part="C" data-scene="lift" data-load="c2h4" data-palette="H C N O Cl" data-prompt="Draw ethene, or anything, then lift it" data-tag="Draw">
+            <p class="beat-kicker"></p>
+            <h3>Lift it into 3D</h3>
+            <p>Draw a molecule, then lift it into 3D. The Lewis drawing stays beside it.</p>
+          </article>
+          <article class="guide-beat" id="b33-which-picture" data-part="C" data-scene="which-picture">
+            <p class="beat-kicker"></p>
+            <h3>Which picture shows what?</h3>
+            <p>A Lewis structure shows every electron but flattens the shape. A 3D model shows the shape but hides the lone pairs. Use the one that answers the question.</p>
+            <p>Next: Intermolecular Forces, where these shapes and partial charges decide how molecules attract each other.</p>
+          </article>
+        </section>
+      </div>
+
+      <aside class="guide-stage-panel" aria-label="Interactive stage">
+        <div class="guide-stage-head">
+          <p class="force-badge" id="stageBadge" aria-live="polite"></p>
+          <p class="pair-formulas" id="stageWhere"></p>
+        </div>
+        <div class="guide-stage-body" id="stageBody"></div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="assets/bonding-kit.js?v=20261113c"></script>
+  <script src="assets/lewis-model.js?v=20261113c"></script>
+  <script src="assets/draw-engine.js?v=20261113c"></script>
+  <script src="assets/guide-shell.js?v=20261113c"></script>
+  <script src="assets/scenes/draw-scene.js?v=20261113c"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="assets/geometry.js?v=20261113c"></script>
+  <script src="assets/shape-view.js?v=20261113c"></script>
+  <script src="assets/turntable.js?v=20261113c"></script>
+  <script src="assets/scenes/scene-kit.js?v=20261113c"></script>
+  <script src="assets/scenes/ch-a.js?v=20261113c"></script>
+  <script src="assets/scenes/ch-b.js?v=20261113c"></script>
+  <script src="assets/scenes/ch-c.js?v=20261113c"></script>
+  <script>GuideShell.init();</script>
+</body>
+</html>

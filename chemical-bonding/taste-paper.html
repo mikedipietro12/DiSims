@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lewis Canvas Taste Pass | Chemical Bonding (dev)</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=20261113c">
+  <link rel="stylesheet" href="assets/bonding.css?v=20261113c">
+  <style>
+    .taste-wrap{max-width:1280px;margin:0 auto;padding:1.5rem 1.4rem 4rem;}
+    .taste-wrap h1{font-size:2.2rem;letter-spacing:-0.03em;margin:0.3rem 0 0.4rem;}
+    .taste-intro{max-width:62ch;color:var(--ink-soft);margin-bottom:1.6rem;}
+    .direction{margin:2.4rem 0 0;}
+    .direction-head{display:flex;align-items:baseline;gap:0.8rem;flex-wrap:wrap;margin-bottom:0.3rem;}
+    .direction-head .tag{font-family:var(--font-mono);font-weight:700;font-size:0.8rem;color:var(--accent);}
+    .direction-head h2{font-size:1.5rem;letter-spacing:-0.02em;}
+    .direction p.why{max-width:70ch;color:var(--ink-soft);margin-bottom:0.9rem;}
+    .direction ul.trade{display:flex;gap:1.2rem;flex-wrap:wrap;list-style:none;font-size:0.92rem;margin-bottom:0.9rem;}
+    .direction ul.trade li b{font-family:var(--font-mono);font-size:0.75rem;margin-right:0.3rem;}
+    .tray{
+      background:#fff;border:2px solid var(--ink);border-radius:22px;
+      box-shadow:0 10px 30px rgba(29,36,51,0.12);
+      padding:1rem;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0.8rem;
+    }
+    .chosen{display:inline-block;font-family:var(--font-mono);font-size:0.72rem;font-weight:700;background:var(--ink);color:#fff;border-radius:999px;padding:0.15rem 0.6rem;}
+    .direction.not-chosen{opacity:0.45;}
+    .tray.two{grid-template-columns:repeat(2,minmax(0,1fr));}
+    @media (max-width:760px){.tray.two{grid-template-columns:1fr;}}
+    .fc-eq{font-family:var(--font-mono);font-size:0.82rem;color:var(--ink);line-height:1.7;margin-top:0.3rem;}
+    .fc-eq b{font-family:var(--font-display);}
+    @media (max-width:980px){.tray{grid-template-columns:repeat(2,minmax(0,1fr));}}
+    @media (max-width:520px){.tray{grid-template-columns:1fr;}}
+    figure{display:flex;flex-direction:column;align-items:stretch;}
+    figure svg{width:100%;height:auto;display:block;}
+    figcaption{font-family:var(--font-mono);font-size:0.74rem;font-weight:700;color:var(--ink-soft);
+      border-top:1px solid var(--line);padding-top:0.45rem;margin-top:0.2rem;line-height:1.5;}
+    figcaption .name{display:block;color:var(--ink);font-family:var(--font-display);font-size:0.95rem;}
+    .note{font-family:var(--font-mono);font-size:0.78rem;color:var(--dim);margin-top:2.4rem;max-width:80ch;}
+    .shared{margin-top:2.6rem;padding:1rem 1.2rem;border:2px dashed var(--line-strong);border-radius:16px;max-width:80ch;}
+    .shared h2{font-size:1.15rem;margin-bottom:0.4rem;}
+    .shared li{margin-left:1.2rem;margin-bottom:0.25rem;}
+  </style>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+  <div class="taste-wrap">
+    <div class="top-nav">
+      <a href="index.html" class="back-link">← Chemical Bonding</a>
+      <div class="mod-meta">Dev · Taste pass · Lewis canvas</div>
+    </div>
+
+    <p class="stub-kicker">Task 0 · design-taste</p>
+    <h1>Paper inside the toy box</h1>
+    <p class="taste-intro">Three ways to draw Lewis structures inside the Toy Box world. Each one shows the same four test cases: CO₂ (double bonds), NH₄⁺ (brackets and charge), CO (formal charge), and an H₂O that is still missing a lone pair (how a count that is off looks). Real paper, graph-paper and dot-grid textures are out, so the "paper" is the plain white tray.</p>
+
+    <section class="direction" id="dir-a">
+      <div class="direction-head"><span class="tag">Direction A</span><h2>Ink on the tray</h2><span class="chosen">Chosen 2026-11-10</span></div>
+      <p class="why">Classic textbook Lewis: bold ink letters, ink bonds and ink dots, drawn straight on a plain white tray. It looks just like what students write on a test. <b>No colour at all</b> while drawing Lewis structures. Atom colour arrives later, with VSEPR and 3D.</p>
+      <ul class="trade"><li><b>+</b>Closest to tests and the board</li><li><b>+</b>Calm at projector scale</li><li><b>−</b>Least "toy"; atoms feel like text</li></ul>
+      <div class="tray" data-style="ink"></div>
+    </section>
+
+    <section class="direction not-chosen" id="dir-b">
+      <div class="direction-head"><span class="tag">Direction B</span><h2>Vinyl chips</h2></div>
+      <p class="why">Each atom is a small matte model-kit sphere with its symbol on it. Bonds are ink rods, and lone pairs are IMF's gold Lewis dots, so the electrons students draw here are the same ones that become IMF's lone-pair lobes.</p>
+      <ul class="trade"><li><b>+</b>Strongest IMF hand-off</li><li><b>+</b>Big, obvious touch targets</li><li><b>−</b>Gold lone pairs vs ink bonding pairs: two looks for electrons</li></ul>
+      <div class="tray" data-style="vinyl"></div>
+    </section>
+
+    <section class="direction not-chosen" id="dir-c">
+      <div class="direction-head"><span class="tag">Direction C</span><h2>Keycap tiles</h2></div>
+      <p class="why">Atoms are chunky keycap tiles, matching the Toy Box buttons, with a stripe in the atom's kit colour. Bonds are thick ink bars, and lone pairs are ink dots.</p>
+      <ul class="trade"><li><b>+</b>Most tactile and game-like</li><li><b>+</b>Chunky, obvious tap targets</li><li><b>−</b>Square tiles hide the angles that VSEPR needs later</li></ul>
+      <div class="tray" data-style="keycap"></div>
+    </section>
+
+    <section class="direction" id="fc">
+      <div class="direction-head"><span class="tag">Locked rule</span><h2>Formal charge: teaching, then practice</h2></div>
+      <p class="why">In the first formal-charge beats, the full equation is written out for every atom with the numbers filled in. From the practice beats on, only the compact pill is shown (and only when it is not zero).</p>
+      <div class="tray two" id="fcTray"></div>
+    </section>
+
+    <div class="shared">
+      <h2>Shared in every direction (proposed)</h2>
+      <ul>
+        <li><b>Formal charge</b>: a small ink-outlined pill in Space Mono (−1, +1). It is drawn only when non-zero and never uses red or yellow, because formal charge is bookkeeping, not a real δ charge.</li>
+        <li><b>Count that is off</b>: a dashed ink ring around the atom plus a mono tag (6 / 8). The sign and text carry the meaning, with no colour.</li>
+        <li><b>Ions</b>: square brackets with the overall charge outside, top right.</li>
+        <li><b>Tally</b>: one line of Space Mono under the canvas that shows its working.</li>
+      </ul>
+    </div>
+    <p class="note">Dev page, not linked from the hub. Delete before ship (or keep as an archived reference), like IMF's taste-directions.html.</p>
+  </div>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var INK = '#1d2433';
+  var KIT = {
+    H: ['#ffffff', '#d5d9e3', INK],
+    C: ['#545b6e', '#23272f', '#ffffff'],
+    N: ['#8494ff', '#4152d9', '#ffffff'],
+    O: ['#ff8a6a', '#e0503a', INK],
+  };
+  // Test cases. Angles in degrees for lone pairs; y grows downward.
+  var MOLS = [
+    { name: 'CO₂', tally: 'Placed 16 / 16 · FC O 0 · C 0 · O 0',
+      atoms: [{ el: 'O', x: 60, y: 80, lp: [90, 270] }, { el: 'C', x: 120, y: 80 }, { el: 'O', x: 180, y: 80, lp: [90, 270] }],
+      bonds: [[0, 1, 2], [1, 2, 2]] },
+    { name: 'NH₄⁺', tally: 'Valence 5 + 4 − 1 = 8 · Placed 8 / 8 · FC N +1',
+      atoms: [{ el: 'N', x: 120, y: 80, fc: '+1' }, { el: 'H', x: 120, y: 34 }, { el: 'H', x: 120, y: 126 }, { el: 'H', x: 74, y: 80 }, { el: 'H', x: 166, y: 80 }],
+      bonds: [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1]], bracket: '+' },
+    { name: 'CO', tally: 'Placed 10 / 10 · FC C −1 · O +1',
+      atoms: [{ el: 'C', x: 90, y: 80, lp: [180], fc: '−1' }, { el: 'O', x: 150, y: 80, lp: [0], fc: '+1' }],
+      bonds: [[0, 1, 3]] },
+    { name: 'H₂O (unfinished)', tally: 'Placed 6 / 8 · O has 6 / 8',
+      atoms: [{ el: 'O', x: 120, y: 74, lp: [270], off: '6 / 8' }, { el: 'H', x: 78, y: 112 }, { el: 'H', x: 162, y: 112 }],
+      bonds: [[0, 1, 1], [0, 2, 1]] },
+  ];
+
+  var STYLE = {
+    ink: { trim: 15, lpR: 23, dot: 2.7, dotFill: INK, bondW: 2.6, gap: 6 },
+    vinyl: { trim: 19, lpR: 27, dot: 3, dotFill: '#d99a00', bondW: 3.4, gap: 7 },
+    keycap: { trim: 21, lpR: 29, dot: 3, dotFill: INK, bondW: 4.2, gap: 8 },
+  };
+
+  function el(tag, attrs, parent) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+
+  function defs(svg, uid) {
+    var d = el('defs', {}, svg);
+    Object.keys(KIT).forEach(function (s) {
+      var g = el('radialGradient', { id: uid + s, cx: '35%', cy: '30%', r: '75%' }, d);
+      el('stop', { offset: '0', 'stop-color': KIT[s][0] }, g);
+      el('stop', { offset: '1', 'stop-color': KIT[s][1] }, g);
+    });
+  }
+
+  function drawBond(g, a, b, order, st) {
+    var dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy);
+    var ux = dx / L, uy = dy / L, px = -uy, py = ux;
+    for (var i = 0; i < order; i++) {
+      var off = (i - (order - 1) / 2) * st.gap;
+      el('line', {
+        x1: a.x + ux * st.trim + px * off, y1: a.y + uy * st.trim + py * off,
+        x2: b.x - ux * st.trim + px * off, y2: b.y - uy * st.trim + py * off,
+        stroke: INK, 'stroke-width': st.bondW, 'stroke-linecap': 'round',
+      }, g);
+    }
+  }
+
+  function drawAtom(g, a, style, uid) {
+    var k = KIT[a.el];
+    if (style === 'ink') {
+      var t = el('text', { x: a.x, y: a.y, 'text-anchor': 'middle', 'dominant-baseline': 'central',
+        'font-family': 'Space Grotesk, sans-serif', 'font-weight': 700, 'font-size': 26, fill: INK }, g);
+      t.textContent = a.el;
+    } else if (style === 'vinyl') {
+      el('ellipse', { cx: a.x, cy: a.y + 16, rx: 13, ry: 3.5, fill: 'rgba(29,36,51,0.12)' }, g);
+      el('circle', { cx: a.x, cy: a.y, r: 16, fill: 'url(#' + uid + a.el + ')', stroke: 'rgba(29,36,51,0.35)', 'stroke-width': 1 }, g);
+      el('circle', { cx: a.x - 5.5, cy: a.y - 6, r: 2.6, fill: 'rgba(255,255,255,0.7)' }, g);
+      var t2 = el('text', { x: a.x, y: a.y + 1, 'text-anchor': 'middle', 'dominant-baseline': 'central',
+        'font-family': 'Space Grotesk, sans-serif', 'font-weight': 700, 'font-size': 16, fill: k[2] }, g);
+      t2.textContent = a.el;
+    } else {
+      el('rect', { x: a.x - 17, y: a.y - 14, width: 34, height: 34, rx: 9, fill: INK }, g);
+      el('rect', { x: a.x - 17, y: a.y - 17, width: 34, height: 34, rx: 9, fill: '#ffffff', stroke: INK, 'stroke-width': 2 }, g);
+      el('rect', { x: a.x - 11, y: a.y + 9, width: 22, height: 4, rx: 2, fill: k[1] === '#d5d9e3' ? '#c3c9d6' : k[1] }, g);
+      var t3 = el('text', { x: a.x, y: a.y - 2, 'text-anchor': 'middle', 'dominant-baseline': 'central',
+        'font-family': 'Space Grotesk, sans-serif', 'font-weight': 700, 'font-size': 18, fill: INK }, g);
+      t3.textContent = a.el;
+    }
+  }
+
+  function drawLonePairs(g, a, st) {
+    (a.lp || []).forEach(function (deg) {
+      var r = deg * Math.PI / 180, cx = a.x + Math.cos(r) * st.lpR, cy = a.y + Math.sin(r) * st.lpR;
+      var px = -Math.sin(r) * 4.5, py = Math.cos(r) * 4.5;
+      [1, -1].forEach(function (s) {
+        el('circle', { cx: cx + px * s, cy: cy + py * s, r: st.dot, fill: st.dotFill,
+          stroke: st.dotFill === INK ? 'none' : INK, 'stroke-width': 0.7 }, g);
+      });
+    });
+  }
+
+  function pill(g, x, y, text) {
+    var w = text.length * 7.4 + 10;
+    el('rect', { x: x - w / 2, y: y - 8, width: w, height: 16, rx: 8, fill: '#ffffff', stroke: INK, 'stroke-width': 1.5 }, g);
+    var t = el('text', { x: x, y: y + 0.5, 'text-anchor': 'middle', 'dominant-baseline': 'central',
+      'font-family': 'Space Mono, monospace', 'font-weight': 700, 'font-size': 10.5, fill: INK }, g);
+    t.textContent = text;
+  }
+
+  function render(mol, style, uid) {
+    var st = STYLE[style];
+    var svg = el('svg', { viewBox: '0 0 240 160', role: 'img', 'aria-label': mol.name + ' Lewis structure, ' + mol.tally });
+    defs(svg, uid);
+    var g = el('g', {}, svg);
+    mol.bonds.forEach(function (b) { drawBond(g, mol.atoms[b[0]], mol.atoms[b[1]], b[2], st); });
+    mol.atoms.forEach(function (a) { drawLonePairs(g, a, st); });
+    mol.atoms.forEach(function (a) { drawAtom(g, a, style, uid); });
+    mol.atoms.forEach(function (a) {
+      if (a.fc) pill(g, a.x + 20, a.y - 24, a.fc);
+      if (a.off) {
+        el('circle', { cx: a.x, cy: a.y, r: st.trim + 13, fill: 'none', stroke: INK, 'stroke-width': 1.6, 'stroke-dasharray': '4 4' }, g);
+        pill(g, a.x + 46, a.y - 26, a.off);
+      }
+    });
+    if (mol.bracket) {
+      var xs = mol.atoms.map(function (a) { return a.x; }), ys = mol.atoms.map(function (a) { return a.y; });
+      var x0 = Math.min.apply(null, xs) - 26, x1 = Math.max.apply(null, xs) + 26;
+      var y0 = Math.min.apply(null, ys) - 22, y1 = Math.max.apply(null, ys) + 22;
+      var bp = { fill: 'none', stroke: INK, 'stroke-width': 2.4, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' };
+      el('path', Object.assign({ d: 'M' + (x0 + 8) + ',' + y0 + ' H' + x0 + ' V' + y1 + ' H' + (x0 + 8) }, bp), g);
+      el('path', Object.assign({ d: 'M' + (x1 - 8) + ',' + y0 + ' H' + x1 + ' V' + y1 + ' H' + (x1 - 8) }, bp), g);
+      var ch = el('text', { x: x1 + 9, y: y0 + 6, 'font-family': 'Space Mono, monospace', 'font-weight': 700, 'font-size': 16, fill: INK }, g);
+      ch.textContent = mol.bracket;
+    }
+    return svg;
+  }
+
+  document.querySelectorAll('.tray[data-style]').forEach(function (tray, ti) {
+    var style = tray.getAttribute('data-style');
+    MOLS.forEach(function (m, mi) {
+      var fig = document.createElement('figure');
+      fig.appendChild(render(m, style, 'g' + ti + '_' + mi + '_'));
+      var cap = document.createElement('figcaption');
+      cap.innerHTML = '<span class="name"></span>';
+      cap.firstChild.textContent = m.name;
+      cap.appendChild(document.createTextNode(m.tally));
+      fig.appendChild(cap);
+      tray.appendChild(fig);
+    });
+  });
+
+  // Formal charge: teaching form (full equation) vs practice form (pill only)
+  var CO = MOLS[2];
+  var fcTray = document.getElementById('fcTray');
+  [['Teaching beats (first instances)', true], ['Practice beats onward', false]].forEach(function (pair, i) {
+    var teach = pair[1];
+    var m = JSON.parse(JSON.stringify(CO));
+    if (teach) m.atoms.forEach(function (a) { delete a.fc; });
+    var fig = document.createElement('figure');
+    fig.appendChild(render(m, 'ink', 'fc' + i + '_'));
+    var cap = document.createElement('figcaption');
+    cap.innerHTML = '<span class="name"></span>';
+    cap.firstChild.textContent = 'CO · ' + pair[0];
+    if (teach) {
+      var eq = document.createElement('div');
+      eq.className = 'fc-eq';
+      eq.innerHTML = 'FC = valence − nonbonding − ½(bonding)<br>' +
+        '<b>C</b>&nbsp; FC = 4 − 2 − ½(6) = <b>−1</b><br>' +
+        '<b>O</b>&nbsp; FC = 6 − 2 − ½(6) = <b>+1</b>';
+      cap.appendChild(eq);
+    } else {
+      cap.appendChild(document.createTextNode('FC C −1 · O +1'));
+    }
+    fig.appendChild(cap);
+    fcTray.appendChild(fig);
+  });
+})();
+</script>
+</body>
+</html>

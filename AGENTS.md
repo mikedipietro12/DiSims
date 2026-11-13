@@ -12,6 +12,11 @@ with more specific build rules; those add to this file, they don't replace it.
   - Physical verbs are fine: *pulls*, *attracts*, *repels*, *shifts*, *bonds*.
 - **Atoms are spheres, not balls**, when describing space-filling or model-kit atoms.
 
+## Visual
+
+- **No dotted or dot-grid backgrounds** on stages, trays, canvases or pages (user preference, 2026-11-10).
+  Plain surfaces only.
+
 ## Hosting & search
 
 - The site is served by **GitHub Pages** at `https://atomicsimulations.ca/` (see `CNAME`). No build step.

@@ -54,7 +54,7 @@ Atoms are matte with a small gloss dot, a soft rim, and a contact shadow under e
 ## Field and chrome
 
 - Page: cool off-white field `#eef1f6` with a soft top light.
-- Stage: white tray, faint dot grid, 2px ink border, 22px radius, soft drop shadow.
+- Stage: plain white tray (no dot grid, removed 2026-11-10 by user), 2px ink border, 22px radius, soft drop shadow.
 - Controls: keycaps with a 2px ink border, 12px radius and a 3px ink drop that presses down on click. The primary button is solid ink.
 - Accent (focus rings, room numbers): periwinkle `#4152d9`. Never red or yellow.
 - Pull/push feedback is drawn in ink: dotted for a pull, dashed with arrowheads for a push. The two differ by shape, not colour.
@@ -78,4 +78,5 @@ Atoms are matte with a small gloss dot, a soft rim, and a contact shadow under e
 - Glows or additive blending (they wash out on white; clouds carry colour, not light).
 - Dark-mode "void lab" leftovers, and the Unit 1b paper or Rate Laws graph-paper looks.
 - Haloed coloured text for δ signs (use pills).
+- Dotted or dot-grid backgrounds on the stage, tray or page (user, 2026-11-10).
 - Em dashes (—), en dashes (–), or ` - ` used as punctuation in any user-facing copy. Prefer periods, commas, colons, or parentheses. Force names use a plain hyphen (`dipole-dipole`).
