@@ -176,7 +176,8 @@
       kick();
     });
     function preset(name) {
-      target = { front: { yaw: 0, tilt: 0 }, side: { yaw: Math.PI / 2, tilt: 0 }, top: { yaw: 0, tilt: 1.2 }, start: { yaw: -0.35, tilt: 0.18 } }[name] || null;
+      target = typeof name === 'object' && name ? { yaw: name.yaw || 0, tilt: Math.max(-1.2, Math.min(1.2, name.tilt || 0)) }   // or a custom { yaw, tilt }
+        : { front: { yaw: 0, tilt: 0 }, side: { yaw: Math.PI / 2, tilt: 0 }, top: { yaw: 0, tilt: 1.2 }, start: { yaw: -0.35, tilt: 0.18 } }[name] || null;
       vYaw = 0;
       kick();
     }

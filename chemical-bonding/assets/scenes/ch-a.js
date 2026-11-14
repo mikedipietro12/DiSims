@@ -380,8 +380,9 @@
       s('stop', { offset: (st[0] / MAX * 100) + '%', 'stop-color': st[1] }, lg);
     });
     s('rect', { x: X0, y: 262, width: X1 - X0, height: 44, rx: 12, fill: 'url(#cont-bands)', stroke: K.INK, 'stroke-width': 2 }, axis);
-    [['nonpolar', 0.02, 'start'], ['polar covalent', 1.1, 'middle'], ['ionic', 2.6, 'middle']].forEach(function (b) {
-      K.text(axis, X(b[1]) + (b[2] === 'start' ? 6 : 0), 284, b[0], { 'font-size': b[2] === 'start' ? 12 : 15, 'font-family': 'Space Mono, monospace', 'text-anchor': b[2] });
+    // each label centred in its band ('nonpolar' has only 0–0.4, so it is set a little smaller to clear the divider)
+    [['nonpolar', 0.2, 11], ['polar covalent', 1.1, 15], ['ionic', 2.6, 15]].forEach(function (b) {
+      K.text(axis, X(b[1]), 284, b[0], { 'font-size': b[2], 'font-family': 'Space Mono, monospace', 'text-anchor': 'middle' });
     });
     [0, 1, 2, 3].forEach(function (v) {
       s('line', { x1: X(v), y1: 306, x2: X(v), y2: 314, stroke: K.INK, 'stroke-width': 2 }, axis);

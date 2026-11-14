@@ -94,34 +94,40 @@
     K.text(svg, 190, 22, '2s + ' + (3 - H.p) + ' × 2p → ' + n + ' ' + H.label + (H.p ? ' + ' + H.p + ' p left' : ''), { 'font-size': 16, fill: '#4152d9' });
   }
 
-  /** One ethane carbon's four sp³ boxes: its own electron in each (blue ↑); the partner's electron (↓) arrives as each σ bond forms. */
-  function shareBoxes(svg, cc, ch, title) {
+  /**
+   * One carbon's orbital boxes as its bonds form: cells = [{ lab, hyb, f (0..1 partner electron arriving), tag }].
+   * Its own electron is the blue ↑; the partner atom's ↓ fades in; hybrid boxes yellow, p boxes faded blue.
+   */
+  function pairBoxes(svg, title, sub, cells) {
     K.clear(svg);
     svg.setAttribute('viewBox', '0 0 340 340');
-    var B = 44, gap = 18, x0 = 170 - (4 * B + 3 * gap) / 2, y = 132;
+    var B = 44, gap = 18, x0 = 170 - (cells.length * B + (cells.length - 1) * gap) / 2, y = 132;
     K.text(svg, 170, 22, title, { 'font-size': 15, fill: '#4152d9' });
-    K.text(svg, 170, 62, 'one carbon in ethane', { 'font-size': 13, 'font-family': 'Space Mono, monospace', fill: '#5b6474' });
+    K.text(svg, 170, 62, sub, { 'font-size': 13, 'font-family': 'Space Mono, monospace', fill: '#5b6474' });
     function arrow(x, yy, up, colour, op) {
       var y1 = yy + B - 7, y2 = yy + 7;
       if (!up) { var tmp = y1; y1 = y2; y2 = tmp; }
       var hy = y2 + (up ? 8 : -8);
       s('path', { d: 'M' + x + ' ' + y1 + ' L' + x + ' ' + y2 + ' M' + (x - 5.5) + ' ' + hy + ' L' + x + ' ' + y2 + ' L' + (x + 5.5) + ' ' + hy, stroke: colour, 'stroke-width': 2.6, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: op }, svg);
     }
-    for (var i = 0; i < 4; i++) {
-      var x = x0 + i * (B + gap), f = i === 0 ? cc : ch;
-      s('rect', { x: x, y: y, width: B, height: B, rx: 6, fill: f >= 1 ? '#ffdf80' : BOX_HYB, stroke: '#1d2433', 'stroke-width': 2 }, svg);
-      K.text(svg, x + B / 2, y + B + 16, 'sp³', { 'font-size': 14 });
+    cells.forEach(function (c, i) {
+      var x = x0 + i * (B + gap), f = c.f || 0;
+      s('rect', { x: x, y: y, width: B, height: B, rx: 6, fill: c.hyb ? (f >= 1 ? '#ffdf80' : BOX_HYB) : (f >= 1 ? '#c9d0ff' : BOX_UNH), stroke: '#1d2433', 'stroke-width': 2 }, svg);
+      K.text(svg, x + B / 2, y + B + 16, c.lab, { 'font-size': 14 });
       arrow(x + (f > 0 ? B * 0.33 : B / 2), y, true, '#4152d9', 1);
       if (f > 0) {
         arrow(x + B * 0.67, y, false, '#1d2433', f);
-        K.text(svg, x + B / 2, y - 14, i === 0 ? 'C–C' : 'C–H', { 'font-size': 12, 'font-family': 'Space Mono, monospace', fill: '#1d2433', opacity: f });
+        K.text(svg, x + B / 2, y - 14, c.tag, { 'font-size': 12, 'font-family': 'Space Mono, monospace', fill: '#1d2433', opacity: f });
       }
-    }
-    // key
+    });
     arrow(70, 236, true, '#4152d9', 1);
     s('text', { x: 92, y: 258, 'font-size': 13, 'font-family': 'Space Mono, monospace', fill: '#1d2433', 'dominant-baseline': 'central' }, svg).textContent = 'this carbon’s electron';
     arrow(70, 280, false, '#1d2433', 1);
     s('text', { x: 92, y: 302, 'font-size': 13, 'font-family': 'Space Mono, monospace', fill: '#1d2433', 'dominant-baseline': 'central' }, svg).textContent = 'the partner atom’s electron';
+  }
+  /** One ethane carbon's four sp³ boxes: its own electron in each (blue ↑); the partner's electron (↓) arrives as each σ bond forms. */
+  function shareBoxes(svg, cc, ch, title) {
+    pairBoxes(svg, title, 'one carbon in ethane', [{ lab: 'sp³', hyb: true, f: cc, tag: 'C–C' }, { lab: 'sp³', hyb: true, f: ch, tag: 'C–H' }, { lab: 'sp³', hyb: true, f: ch, tag: 'C–H' }, { lab: 'sp³', hyb: true, f: ch, tag: 'C–H' }]);
   }
   function win(t, a, b) { return Math.max(0, Math.min(1, (t - a) / (b - a))); }
   /** Remove (and free) everything a scene added to the turntable's content group. */
@@ -296,17 +302,135 @@
   // =================================================================================================
   // Beats 27–29 · sp³ / sp² / sp in 3D
   // =================================================================================================
+  // --- Highlight: tt.__focus = 'hyb' | 'unh' | null. Each orbital mesh is tagged with its kind and its normal
+  //     opacity; the highlighted kind brightens, the other fades right back. Animations set opacity through orbOp.
+  function orbTag(o, kind) {
+    o.traverse(function (m) { if (m.material) { m.userData.orb = kind; m.userData.base = m.material.opacity; } });
+    return o;
+  }
+  function orbFactor(tt, m) { var f = tt.__focus, o = m.userData.orb; return !f || !o ? 1 : o === f ? 1.35 : 0.1; }
+  function orbOp(tt, m, v) { m.userData.base = v; m.material.opacity = Math.min(0.92, v * orbFactor(tt, m)); }
+  function applyFocus(tt) {
+    if (!tt.content) return;
+    tt.content.traverse(function (m) { if (m.material && m.userData.orb) m.material.opacity = Math.min(0.92, m.userData.base * orbFactor(tt, m)); });
+    tt.render();
+  }
   function pOrbital(T, dir, op) {
     var g = new T.Group();
     g.add(Turntable.lobe(dir, 1.25, 0.42, UNH, op));
     g.add(Turntable.lobe([-dir[0], -dir[1], -dir[2]], 1.25, 0.42, UNH, op));
-    return g;
+    return orbTag(g, 'unh');
   }
   /** One hybrid orbital: a single lobe (the small back lobe is left out at this level). */
   function hybridLobe(T, dir, len) {
     var g = new T.Group(), k = (len || 1.55) / 1.55;
     g.add(Turntable.lobe(dir, 1.55 * k, 0.5 * Math.min(1, k * 1.1), HYB_Y, 0.6));
-    return g;
+    return orbTag(g, 'hyb');
+  }
+
+  /**
+   * Ethene / ethyne from two pieces (CH₂ + CH₂, CH + CH) whose C–H σ bonds are already made:
+   * st = { a (pieces close in), p (the facing hybrids' electrons pair: σ), tilt (the p orbitals lean together and
+   * overlap side by side), m (they merge into the π bond above and below the σ bond; their electrons pair there) }.
+   * Ethene is turned so its plane lies flat and the p orbital points up: the π bond really is above and below.
+   */
+  function piBuild(tt, kind) {
+    var T = tt.THREE, V = Gm.v, m = model(HYB[kind].mol);
+    function R(v) { return kind === 'sp2' ? [v[0], v[2], -v[1]] : v.slice(); }
+    var Cs = [], Hs = [];
+    m.atoms.forEach(function (a, i) { (a.el === 'C' ? Cs : Hs).push(i); });
+    var A0 = R(m.atoms[Cs[0]].p), B0 = R(m.atoms[Cs[1]].p), mid = V.mul(V.add(A0, B0), 0.5), ax = V.norm(V.sub(B0, A0)), Lcc = V.len(V.sub(B0, A0));
+    var pDirs = kind === 'sp2' ? [[0, 1, 0]] : [[0, 1, 0], [0, 0, 1]];
+    function rel(p) { return V.sub(R(p), mid); }
+    function lerp3(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+    function put(o, p) { o.position.set(p[0], p[1], p[2]); }
+    function perp(d) { return V.norm(V.cross(d, Math.abs(d[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0])); }
+    var Y = new T.Vector3(0, 1, 0);
+    function aim(mesh, d) { mesh.quaternion.setFromUnitVectors(Y, new T.Vector3(d[0], d[1], d[2]).normalize()); }
+    function glow(len, d, colour, w) {
+      var g = new T.Mesh(new T.SphereGeometry(1, 24, 16), new T.MeshStandardMaterial({ color: colour, transparent: true, opacity: 0, depthWrite: false }));
+      g.scale.set(w || 0.24, len, w || 0.24);
+      aim(g, d);
+      return g;
+    }
+    var neigh = function (i) { return m.bonds.filter(function (b) { return b.a === i || b.b === i; }).map(function (b) { return b.a === i ? b.b : b.a; }); };
+    var pieces = Cs.map(function (ci, k) {
+      var g = new T.Group();
+      tt.content.add(g);
+      var Cp = R(m.atoms[ci].p), toward = k ? V.mul(ax, -1) : ax;
+      var core = ball(T, m.atoms[ci].r * 0.82, 0x2a3142);
+      g.add(core);
+      tt.label('a' + ci, 'C', [0, 0, 0], { obj: core, cls: 'is-dark' });
+      var piece = { g: g, k: k, toward: toward, fin: rel(m.atoms[ci].p), ps: [] };
+      piece.far = V.sub(piece.fin, V.mul(toward, 1.0));
+      neigh(ci).forEach(function (j) {
+        var Pj = R(m.atoms[j].p), d = V.norm(V.sub(Pj, Cp)), L = V.len(V.sub(Pj, Cp)), isC = m.atoms[j].el === 'C';
+        var len = isC ? L * 0.64 : L * 0.8;
+        g.add(hybridLobe(T, d, len));
+        if (isC) {   // the C–C hybrid: one electron, waiting for the partner's
+          piece.cc = { e: ball(T, 0.075, BLUE), own: V.mul(d, len * 0.62) };
+          g.add(piece.cc.e);
+          return;
+        }
+        // the H, already bonded: its 1s overlaps this lobe, the pair sits in the overlap, the σ glows
+        var hc = ball(T, m.atoms[j].r * 0.82, 0xf4f6fb);
+        put(hc, V.sub(Pj, Cp));
+        g.add(hc);
+        var s1 = orbTag(ball(T, 0.46, GREY, 0.28), 'unh');   // H 1s: unhybridized too
+        put(s1, V.sub(Pj, Cp));
+        g.add(s1);
+        tt.label('a' + j, 'H', [0, 0, 0], { obj: hc });
+        var pr = V.mul(d, L * 0.7), sd = perp(d);
+        [[BLUE, 0.08], [0x1d2433, -0.08]].forEach(function (c) { var e = ball(T, 0.075, c[0]); put(e, V.add(pr, V.mul(sd, c[1]))); g.add(e); });
+        var sg = glow(L * 0.2, d, HYB_DEEP);
+        sg.material.opacity = 0.3;
+        orbTag(sg, 'hyb');
+        put(sg, pr);
+        g.add(sg);
+      });
+      // the unhybridized p orbital(s): two lobes each (faded blue) and one electron
+      pDirs.forEach(function (pd) {
+        var up = orbTag(Turntable.lobe(pd, 1.0, 0.4, UNH, 0.45), 'unh'), dn = orbTag(Turntable.lobe(V.mul(pd, -1), 1.0, 0.4, UNH, 0.45), 'unh');
+        g.add(up); g.add(dn);
+        var e = ball(T, 0.075, BLUE);
+        g.add(e);
+        piece.ps.push({ pd: pd, up: up, dn: dn, e: e });
+      });
+      return piece;
+    });
+    var sigCC = orbTag(glow(Lcc * 0.2, ax, HYB_DEEP), 'hyb'), sideCC = perp(ax);
+    tt.content.add(sigCC);
+    var pis = pDirs.map(function (pd) {
+      return [1, -1].map(function (sgn) {
+        var b = new T.Mesh(new T.SphereGeometry(1, 28, 18), new T.MeshStandardMaterial({ color: UNH_DEEP, transparent: true, opacity: 0, depthWrite: false }));
+        b.quaternion.setFromUnitVectors(new T.Vector3(1, 0, 0), new T.Vector3(ax[0], ax[1], ax[2]));
+        put(b, V.mul(pd, 0.62 * sgn));
+        orbTag(b, 'unh');   // π: made from the unhybridized p orbitals
+        tt.content.add(b);
+        return b;
+      });
+    });
+    function set(st) {
+      var a = K.ease(st.a || 0), p = K.ease(st.p || 0), tl = K.ease(st.tilt || 0), mm = K.ease(st.m || 0);
+      pieces.forEach(function (P) {
+        var pos = lerp3(P.far, P.fin, a);
+        put(P.g, pos);
+        put(P.cc.e, lerp3(P.cc.own, V.sub(V.mul(sideCC, P.k ? 0.08 : -0.08), pos), p));
+        P.ps.forEach(function (q, n) {
+          // lean toward the other carbon so the lobes meet side by side, then give way to the π cloud
+          var th = 0.42 * tl * (1 - 0.3 * mm), c = Math.cos(th), sn = Math.sin(th);
+          var du = V.add(V.mul(q.pd, c), V.mul(P.toward, sn)), dd = V.add(V.mul(q.pd, -c), V.mul(P.toward, sn));
+          aim(q.up, du); aim(q.dn, dd);
+          [q.up, q.dn].forEach(function (L2) { orbOp(tt, L2, 0.45 * (1 - mm)); L2.visible = mm < 0.999; });
+          var own = V.mul(du, 0.6), tgt = V.sub(V.add(V.mul(q.pd, 0.62), V.mul(ax, P.k ? 0.09 : -0.09)), pos);
+          put(q.e, lerp3(own, tgt, mm));
+        });
+      });
+      orbOp(tt, sigCC, 0.32 * p);
+      pis.forEach(function (pair) { pair.forEach(function (b) { var g2 = 0.6 + 0.4 * mm; b.scale.set(Lcc * 0.5 * g2, 0.3 * g2, 0.3 * g2); orbOp(tt, b, 0.42 * mm); }); });
+      tt.render();
+    }
+    return { set: set, pDirs: pDirs, Lcc: Lcc };
   }
 
   /**
@@ -434,6 +558,24 @@
     var c = K.chips(STEPS, go, { label: 'Step' });
     head.appendChild(c.el);
     var anim = null;
+    // ethene / ethyne: light up one kind of orbital (in the box, steps 2 and 3)
+    var hlBox = h('div', 'gal-space'), hlBtns = {};
+    hlBox.hidden = true;
+    if (kind !== 'sp3' && tt.content) {
+      [['hyb', 'Show hybrid'], ['unh', 'Show unhybrid']].forEach(function (b) {
+        var btn = h('button', 'btn scene-chip-step', b[1]);
+        btn.type = 'button';
+        btn.setAttribute('aria-pressed', 'false');
+        btn.addEventListener('click', function () {
+          tt.__focus = tt.__focus === b[0] ? null : b[0];
+          Object.keys(hlBtns).forEach(function (k) { hlBtns[k].setAttribute('aria-pressed', tt.__focus === k ? 'true' : 'false'); });
+          applyFocus(tt);
+        });
+        hlBtns[b[0]] = btn;
+        hlBox.appendChild(btn);
+      });
+      view.appendChild(hlBox);
+    }
 
     function clearContent() { if (tt.content) { while (tt.content.children.length) tt.content.remove(tt.content.children[0]); } tt.clearLabels(); }
     function ethaneStep(id) {
@@ -480,6 +622,11 @@
       if (anim) anim.cancel();
       tt.settle();
       if (kind === 'sp3') { ethaneStep(id); return; }
+      hlBox.hidden = id === 'sp';
+      if (id === 'sp' && tt.__focus) {   // step 1 has only unhybridized orbitals: no highlight there
+        tt.__focus = null;
+        Object.keys(hlBtns).forEach(function (k) { hlBtns[k].setAttribute('aria-pressed', 'false'); });
+      }
       if (!tt.content) { boxes(bx, kind, id === 'sp' ? 'promote' : 'hybrid', 1); return; }
       var D = hybridDirs(kind);
       if (id === 'sp' || id === 'mix') {
@@ -490,9 +637,11 @@
         var ps = [[1, 0, 0], [0, 1, 0], [0, 0, 1]].map(function (d) { return pOrbital(T, d, 0.42); });
         // the p orbitals that stay unmixed (sp², sp) line up with the leftovers
         var keep = kind === 'sp3' ? [] : kind === 'sp2' ? [2] : [1, 2];
+        orbTag(sOrb, 'unh');
         tt.content.add(sOrb);
         ps.forEach(function (p) { tt.content.add(p); });
         var hy = D.h.map(function (d) { var g = hybridLobe(T, d); g.scale.setScalar(0.001); tt.content.add(g); return g; });
+        applyFocus(tt);
         if (id === 'sp') {
           boxes(bx, kind, 'promote', 1);
           tt.label('s', '2s', [0, -0.78, 0], { cls: 'is-small' });
@@ -520,42 +669,46 @@
           (H.p ? '. ' + H.p + ' p orbital' + (H.p > 1 ? 's stay' : ' stays') + ' unmixed, at right angles to them.' : '.');
         return;
       }
-      // Build the molecule with σ and π overlap
-      boxes(bx, kind, 'hybrid', 1);
+      // Build: two pieces close in, σ forms, the p orbitals overlap side by side, then merge into the π bond
       clearContent();
-      var m = model(H.mol);
-      tt.setMolecule(m, { lones: false });
-      m.bonds.forEach(function (b) {
-        var A = m.atoms[b.a].p, B = m.atoms[b.b].p;
-        var mid = Gm.v.mul(Gm.v.add(A, B), 0.5), d = Gm.v.sub(B, A), L2 = Gm.v.len(d);
-        var sig = new T.Mesh(new T.SphereGeometry(1, 24, 16), new T.MeshStandardMaterial({ color: HYB_DEEP, transparent: true, opacity: 0.3, depthWrite: false }));
-        sig.scale.set(0.3, L2 * 0.62, 0.3);
-        sig.position.set(mid[0], mid[1], mid[2]);
-        sig.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), new T.Vector3(d[0], d[1], d[2]).normalize());
-        tt.content.add(sig);
+      tt.clear();
+      tt.setRadius(2.5);
+      // ethyne's second π lies front to back: look from a little higher so it shows below the axis, not over the atoms
+      tt.preset(kind === 'sp' ? { yaw: -0.45, tilt: 0.6 } : 'start');
+      var E = piBuild(tt, kind), np = E.pDirs.length, piece = kind === 'sp2' ? 'CH₂' : 'CH';
+      var MS = 4400, phaseNow = null;
+      var PH = [[0.28, piece + ' + ' + piece + ': the two pieces close in'], [0.46, H.label + ' + ' + H.label + ' overlap head on → σ'],
+        [0.7, 'the p orbitals overlap side by side'], [1.01, np > 1 ? 'two π bonds around the σ bond' : 'π: above and below the σ bond']];
+      function phaseLabel(t) {
+        var txt = PH.filter(function (x) { return t < x[0]; })[0][1];
+        if (txt !== phaseNow) { phaseNow = txt; tt.label('info', txt, [0, 0, 0], { cls: 'is-fixed-tl', fixed: true }); }
+      }
+      function frame(t) {
+        var st = { a: win(t, 0, 0.26), p: win(t, 0.3, 0.42), tilt: win(t, 0.48, 0.66), m: win(t, 0.72, 0.96) };
+        E.set(st);
+        phaseLabel(t);
+        return st;
+      }
+      var cells = function (st) {
+        return kind === 'sp2'
+          ? [{ lab: 'sp²', hyb: true, f: 1, tag: 'C–H' }, { lab: 'sp²', hyb: true, f: 1, tag: 'C–H' }, { lab: 'sp²', hyb: true, f: st.p, tag: 'σ' }, { lab: 'p', f: st.m, tag: 'π' }]
+          : [{ lab: 'sp', hyb: true, f: 1, tag: 'C–H' }, { lab: 'sp', hyb: true, f: st.p, tag: 'σ' }, { lab: 'p', f: st.m, tag: 'π' }, { lab: 'p', f: st.m, tag: 'π' }];
+      };
+      var TITLE = kind === 'sp2' ? 'C=C: one σ + one π' : 'C≡C: one σ + two π';
+      anim = K.tween(MS, function (t) {
+        var st = { p: win(t, 0.3, 0.42), m: win(t, 0.72, 0.96) };
+        pairBoxes(bx, TITLE, 'one carbon in ' + H.name, cells(st));
       });
-      // π: the unmixed p orbitals overlap side by side above and below the C–C axis
-      var Cs = m.atoms.map(function (a, i) { return i; }).filter(function (i) { return m.atoms[i].el === 'C'; });
-      var A0 = m.atoms[Cs[0]].p, B0 = m.atoms[Cs[1]].p, mid0 = Gm.v.mul(Gm.v.add(A0, B0), 0.5), ax = Gm.v.norm(Gm.v.sub(B0, A0));
-      var pDirs = kind === 'sp2' ? [[0, 0, 1]] : kind === 'sp' ? [[0, 1, 0], [0, 0, 1]] : [];
-      pDirs.forEach(function (pd, k) {
-        [1, -1].forEach(function (sgn) {
-          var blob = new T.Mesh(new T.SphereGeometry(1, 28, 18), new T.MeshStandardMaterial({ color: UNH_DEEP, transparent: true, opacity: 0.38, depthWrite: false }));
-          blob.scale.set(0.62, 0.32, 0.32);
-          var q = new T.Quaternion().setFromUnitVectors(new T.Vector3(1, 0, 0), new T.Vector3(ax[0], ax[1], ax[2]));
-          blob.quaternion.copy(q);
-          blob.position.set(mid0[0] + pd[0] * 0.55 * sgn, mid0[1] + pd[1] * 0.55 * sgn, mid0[2] + pd[2] * 0.55 * sgn);
-          tt.content.add(blob);
-        });
-        tt.label('pi' + k, 'π', [mid0[0] + pd[0] * 1.05, mid0[1] + pd[1] * 1.05, mid0[2] + pd[2] * 1.05], { cls: 'is-small' });
+      frame(0);
+      applyFocus(tt);
+      tt.animate(MS, frame, function () {
+        tt.label('sig', 'σ', [0, -0.3, 0.32], { cls: 'is-small is-amber' });
+        E.pDirs.forEach(function (pd, k) { tt.label('pi' + k, 'π', [pd[0] * 1.02, pd[1] * 1.02, pd[2] * 1.02], { cls: 'is-small' }); });
+        tt.label('ang', kind === 'sp2' ? 'H–C–H 120°' : 'H–C≡C 180°', [0, 0, 0], { cls: 'is-fixed-bc', fixed: true });
       });
-      tt.label('sig', 'σ', [mid0[0], mid0[1] - 0.05, mid0[2] + 0.4], { cls: 'is-small is-amber' });
-      tt.label('ang', 'H–C–H ' + H.angle + (kind === 'sp' ? ' (H–C≡C)' : ''), [0, 0, 0], { cls: 'is-fixed-tl', fixed: true });
-      tt.preset(kind === 'sp2' ? 'start' : 'start');
       foot.textContent = {
-        sp3: 'Ethane: every bond is a σ bond, made by sp³ orbitals (yellow) overlapping head on. Each carbon is tetrahedral, 109.5°.',
-        sp2: 'Ethene: the hybrid sp² orbitals (yellow) make the σ bonds, 120° in a plane. The unhybridized p orbitals (blue) overlap side by side above and below: the π bond. Double bond = σ + π.',
-        sp: 'Ethyne: the hybrid sp orbitals (yellow) make the σ bonds in a straight line (180°). Two unhybridized p orbitals (blue) make two π bonds. Triple bond = σ + 2π.',
+        sp2: 'Two CH₂ pieces close in. One sp² orbital (yellow) from each carbon overlaps the other head on, and their two electrons pair: the σ bond. Then the unhybridized p orbitals (blue), one on each carbon, lean together and overlap side by side, above and below the σ bond. They merge into the π bond, and their two electrons pair there. Double bond = σ + π.',
+        sp: 'Two CH pieces close in. One sp orbital (yellow) from each carbon overlaps the other head on: the σ bond. Each carbon still has two unhybridized p orbitals (blue) at right angles. Each pair leans together and overlaps side by side, one above and below the σ bond, one in front and behind, making two π bonds. Triple bond = σ + 2π.',
       }[kind];
     }
     go(STEPS[0].id);

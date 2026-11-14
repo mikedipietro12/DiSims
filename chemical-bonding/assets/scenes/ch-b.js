@@ -538,11 +538,68 @@
     var r = tt.__shapeOf, on = tt.isShape && tt.isShape() && r;
     tt.label('shape', on ? 'The atoms make ' + (SOLID[r.shape] || [r.shape])[0] : null, [0, 0, 0], { cls: 'is-fixed-bc', fixed: true });
   }
-  /** Put molecule id on the turntable (lifting from its Lewis layout when lift is true), then draw its angle. */
-  function showShape(tt, id, lift, done) {
-    var m = model(id), r = m.atoms[m.root];
+  /**
+   * Turn a model so its electron domains sit on the standard directions for its domain count (methane's for 4,
+   * PCl₅'s for 5, SF₆'s for 6). Shapes with the same count then line up: NH₃'s lone pair takes the place of one of
+   * methane's H atoms, H₂O's two take two. Best fit over every slot assignment; ties (equivalent slots) put lone
+   * pairs in the highest slots.
+   */
+  function alignDomains(m) {
+    var V = Gm.v, r = m.atoms[m.root], dirs = [];
+    m.bonds.forEach(function (b) { var j = b.a === m.root ? b.b : b.b === m.root ? b.a : -1; if (j >= 0) dirs.push({ v: V.norm(V.sub(m.atoms[j].p, r.p)), lone: false }); });
+    r.lones.forEach(function (d) { dirs.push({ v: V.norm(d), lone: true }); });
+    var n = dirs.length;
+    if (n < 3 || n > 6) return m;
+    var slots = Gm.domainDirs(n, 0).bonds;
+    if (!slots || slots.length !== n) return m;
+    var best = null;
+    (function perm(arr, k) {
+      if (k === n) {
+        var q = horn(dirs.map(function (d) { return d.v; }), arr.map(function (i) { return slots[i]; }));
+        var fit = 0, lift = 0;
+        dirs.forEach(function (d, i) { fit += V.dot(qrot(q, d.v), slots[arr[i]]); if (d.lone) lift += slots[arr[i]][1]; });
+        var score = fit + 0.002 * lift;
+        if (!best || score > best.score + 1e-9) best = { score: score, q: q };
+        return;
+      }
+      for (var i = k; i < n; i++) { var t = arr[k]; arr[k] = arr[i]; arr[i] = t; perm(arr, k + 1); t = arr[k]; arr[k] = arr[i]; arr[i] = t; }
+    })(slots.map(function (_, i) { return i; }), 0);
+    var c = r.p;
+    m.atoms.forEach(function (a) {
+      a.p = V.add(c, qrot(best.q, V.sub(a.p, c)));
+      a.lones = a.lones.map(function (d) { return qrot(best.q, d); });
+    });
+    return m;
+  }
+  /** Horn's method: the unit quaternion turning vectors A onto B (best fit), by power iteration on the 4×4 matrix. */
+  function horn(A, B) {
+    var S = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    A.forEach(function (a, k) { for (var i = 0; i < 3; i++) for (var j = 0; j < 3; j++) S[i][j] += a[i] * B[k][j]; });
+    var xx = S[0][0], xy = S[0][1], xz = S[0][2], yx = S[1][0], yy = S[1][1], yz = S[1][2], zx = S[2][0], zy = S[2][1], zz = S[2][2];
+    var N = [[xx + yy + zz, yz - zy, zx - xz, xy - yx], [yz - zy, xx - yy - zz, xy + yx, zx + xz],
+      [zx - xz, xy + yx, -xx + yy - zz, yz + zy], [xy - yx, zx + xz, yz + zy, -xx - yy + zz]];
+    var sh = 3 * A.length, q = [1, 0.1, 0.2, 0.3];
+    for (var it = 0; it < 120; it++) {
+      var nq = [0, 0, 0, 0];
+      for (var i = 0; i < 4; i++) { nq[i] = sh * q[i]; for (var j = 0; j < 4; j++) nq[i] += N[i][j] * q[j]; }
+      var l = Math.hypot(nq[0], nq[1], nq[2], nq[3]) || 1;
+      q = nq.map(function (v) { return v / l; });
+    }
+    return q;
+  }
+  function qrot(q, v) {
+    var w = q[0], x = q[1], y = q[2], z = q[3];
+    var tx = 2 * (y * v[2] - z * v[1]), ty = 2 * (z * v[0] - x * v[2]), tz = 2 * (x * v[1] - y * v[0]);
+    return [v[0] + w * tx + (y * tz - z * ty), v[1] + w * ty + (z * tx - x * tz), v[2] + w * tz + (x * ty - y * tx)];
+  }
+  /**
+   * Put molecule id on the turntable (lifting from its Lewis layout when lift is true), then draw its angle.
+   * keepView: leave the turntable where the student turned it (switching molecules within a scene).
+   */
+  function showShape(tt, id, lift, done, keepView) {
+    var m = alignDomains(model(id)), r = m.atoms[m.root];
     clearContent(tt);
-    tt.preset('start');
+    if (!keepView) tt.preset('start');
     tt.__shapeOf = r;
     if (tt.shapeOptions) tt.shapeOptions({ faces: !SOLID[r.shape] || SOLID[r.shape][1] });
     tt.setMolecule(m, { lones: 'inner', from: lift ? flatFrom(id) : null, ms: 1500, done: function () { arc(); if (done) done(); } });
@@ -592,12 +649,16 @@
     vt.shape.classList.add('is-next');
     c.el.appendChild(vt.shape);
     var cur = ids[0];
-    replay.addEventListener('click', function () { show(cur); });
-    function show(id) {
+    replay.addEventListener('click', function () { show(cur, true); });
+    var shownOnce = false;
+    function show(id, lift) {
       cur = id;
       c.set(id);
       DrawEngine.renderStatic(lsv, Kit.structure(id), { width: 280, height: 260, maxScale: 1 });
-      var m = showShape(tt, id, true), r = m.atoms[m.root];
+      // the first molecule (and Lift again) rises out of its Lewis drawing; switching keeps the view the student turned to
+      lift = lift || !shownOnce;
+      shownOnce = true;
+      var m = showShape(tt, id, lift, null, !lift), r = m.atoms[m.root];
       var multiple = Kit.structure(id).bonds.some(function (b) { return b.order > 1 && (b.a === m.root || b.b === m.root); });
       foot.textContent = formula(id) + ': ' + domainText(m) + ' → ' + r.shape + ', ' + angleOf(m) + '°.' +
         (multiple ? ' A double or triple bond counts as one domain.' : '') + (r.lone ? ' Lone pairs (yellow lobes) take up room, so the bonds squeeze closer.' : '') + ' Drag the model to turn it.';
@@ -605,7 +666,7 @@
       foot.appendChild(document.createTextNode(axeText(r) + ' · ' + formula(id) + ': ' + domainText(m) + ' → ' + r.shape + ', ' + angleOf(m) + '°.' +
         (multiple ? ' A double or triple bond counts as one domain.' : '') + (r.lone ? ' Lone pairs (yellow lobes) take up room, so the bonds squeeze closer.' : '') + ' Drag the model to turn it.'));
     }
-    show(cur);
+    show(cur, true);
     return { settle: function () { tt.settle(); }, destroy: function () { tt.destroy(); } };
   });
 
@@ -620,13 +681,14 @@
     foot.setAttribute('aria-live', 'polite');
     root.appendChild(foot);
     mount.appendChild(root);
-    var tt = Turntable.create(view, {});
+    var tt = Turntable.create(view, {}), galleryShown = false;
     var vt = viewToggles(tt), gbox = h('div', 'gal-space');
     gbox.appendChild(vt.space); gbox.appendChild(vt.shape);
     view.appendChild(gbox);
     function pick(id, card) {
       grid.querySelectorAll('.shape-card').forEach(function (x) { x.classList.toggle('is-on', x === card); x.setAttribute('aria-pressed', x === card ? 'true' : 'false'); });
-      var m = showShape(tt, id, false), r = m.atoms[m.root];
+      var m = showShape(tt, id, false, null, galleryShown), r = m.atoms[m.root];   // after the first card, the view stays where it was turned
+      galleryShown = true;
       foot.textContent = formula(id) + ': ' + domainText(m) + '. The domains point to the corners of a ' + r.electronGeometry + '; the atoms alone make a ' + r.shape + ' shape. Drag to turn it.';
     }
     ids.forEach(function (id, n) {
