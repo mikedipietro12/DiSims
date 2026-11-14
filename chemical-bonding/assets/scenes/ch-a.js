@@ -67,7 +67,7 @@
       var lab = K.text(F.svg, (vx0 + vx1) / 2, y + 42, 'valence', { 'font-size': 14, fill: '#4152d9', 'font-family': 'Space Mono, monospace', opacity: 0 });
       // Dot symbol
       var g = s('g', {}, F.svg);
-      var dots = K.dotSymbol(g, 320, 250, el, E.valence, 1.7);
+      var dots = K.dotSymbol(g, 320, 252, el, E.valence, 2.5);   // fills the middle band: dots stay clear of the 'valence' label and the count
       var sym = g.firstChild;
       sym.setAttribute('opacity', 0);
       var targets = dots.map(function (d) { return [+d.getAttribute('cx'), +d.getAttribute('cy')]; });
@@ -540,7 +540,7 @@
         tt.content.add(edges);
       }
       var ext = Math.max.apply(null, S.span) / 2 + 0.55;
-      tt.setRadius(step === 'row' ? ext * 0.62 : ext * 1.15);   // a long thin row can be framed tighter
+      tt.setRadius(step === 'row' ? ext * 0.62 : step === 'pair' ? ext * 0.8 : ext * 1.15);   // a long thin row, or a lone pair, can be framed tighter
       paint();
       if (animateNew && fresh.length) {
         fresh.forEach(function (m) { m.position.set(m.userData.to[0], m.userData.to[1] + 4, m.userData.to[2]); });

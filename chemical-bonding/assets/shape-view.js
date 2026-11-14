@@ -5,6 +5,7 @@
  *     model: Geometry.embed(...) result
  *     opts: { width, height, scale, from (2D lewis layout to blend from), t (0 lewis → 1 shape),
  *             lones: 'centre' | 'all' | false, angle: true | false, dipoles: 0..1 (fade in),
+ *             focus: 0..1 (after the sum: the empty panel shrinks and the molecule grows),
  *             sumRoom / sumGap (bond lengths kept below the molecule for the sum, and where its centre sits), captions: false,
  *             rot: { yaw, tilt } (turn the 3D shape about its centre; the fit then stays the same at any angle),
  *             sum: 0..1 (the pulls move to one centre point, split into parts along / across the net direction,
@@ -72,6 +73,10 @@
     // room for the electron cloud (the turn fit already has spare room; lone-pair lobes reach further)
     var pad = opts.dipoles && opts.sumBelow ? (opts.rot ? 0.8 : 1.25 + (m.atoms[m.root].lones.length ? 0.3 : 0)) : 0.9;
     var sumRoom = opts.dipoles && opts.sumBelow ? (opts.sumRoom != null ? opts.sumRoom : 3.1) : 0;
+    // focus (0 → 1, once the sum has finished): the emptied panel gives its room back and the molecule grows into it
+    var focus = opts.dipoles && opts.sumBelow && (opts.sum || 0) >= 1 ? Math.max(0, Math.min(1, opts.focus || 0)) : 0;
+    focus = focus < 0.5 ? 2 * focus * focus : 1 - Math.pow(-2 * focus + 2, 2) / 2;
+    if (focus) sumRoom += (Math.min(sumRoom, 1.0) - sumRoom) * focus;
     var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
     if (opts.rot) { x0 = C[0] - RAD; x1 = C[0] + RAD; y0 = C[1] - RAD; y1 = C[1] + RAD; }   // room for any angle
     var spanX = x1 - x0 + pad * 2, spanY = y1 - y0 + pad * 2 + sumRoom;
@@ -109,14 +114,17 @@
       var shrink = 0.55 + 0.45 * l2;          // a lobe pointing at the viewer looks shorter
       if (l2 < 1e-3) { dx = 0; dy = -1; } else { dx /= l2; dy /= l2; }
       var x0 = X(p), y0 = Y(p), px = -dy, py = dx, len = L * shrink;
-      // balloon: narrow at the atom, a round end (semicircle) at the far side
-      var cx = x0 + dx * (len - Wd), cy = y0 + dy * (len - Wd);
-      var dpath = 'M' + x0 + ' ' + y0 +
-        ' Q' + (x0 + dx * len * 0.45 + px * Wd * 0.75) + ' ' + (y0 + dy * len * 0.45 + py * Wd * 0.75) + ' ' + (cx + px * Wd) + ' ' + (cy + py * Wd) +
-        ' A' + Wd + ' ' + Wd + ' 0 0 0 ' + (cx - px * Wd) + ' ' + (cy - py * Wd) +
-        ' Q' + (x0 + dx * len * 0.45 - px * Wd * 0.75) + ' ' + (y0 + dy * len * 0.45 - py * Wd * 0.75) + ' ' + x0 + ' ' + y0 + 'Z';
-      el('path', { d: dpath, fill: 'rgba(255,194,26,0.32)', stroke: 'rgba(201,154,0,0.85)', 'stroke-width': 1.5, opacity: t }, g);
-      var s2 = 4.2;
+      // the same smooth teardrop as the 3D lobes: out along one side, back along the other
+      var A = 0.6, B = 0.45, peak = Math.pow(A / (A + B), A) * Math.pow(B / (A + B), B), N = 40, side1 = [], side2 = [];
+      for (var k = 0; k <= N; k++) {
+        var s0 = k / N, u = s0 < 0.5 ? 2 * s0 * s0 : 1 - 2 * (1 - s0) * (1 - s0);
+        var w = u <= 0 || u >= 1 ? 0 : Wd * Math.pow(u, A) * Math.pow(1 - u, B) / peak;
+        var ax = x0 + dx * len * u, ay = y0 + dy * len * u;
+        side1.push((ax + px * w).toFixed(1) + ' ' + (ay + py * w).toFixed(1));
+        side2.unshift((ax - px * w).toFixed(1) + ' ' + (ay - py * w).toFixed(1));
+      }
+      el('path', { d: 'M' + side1.join(' L') + ' L' + side2.join(' L') + 'Z', fill: 'rgba(255,194,26,0.32)', stroke: 'rgba(201,154,0,0.85)', 'stroke-width': 1.5, 'stroke-linejoin': 'round', opacity: t }, g);
+      var cx = x0 + dx * len * 0.62, cy = y0 + dy * len * 0.62, s2 = 4.2;   // the pair sits at the widest part
       el('circle', { cx: cx + px * s2, cy: cy + py * s2, r: 3.2, fill: '#c99a00', opacity: t }, g);
       el('circle', { cx: cx - px * s2, cy: cy - py * s2, r: 3.2, fill: '#c99a00', opacity: t }, g);
     }
@@ -210,7 +218,8 @@
       var fade = Math.max(0, Math.min(1, opts.dipoles));
       var sumT = Math.max(0, Math.min(1, opts.sum || 0));
       var lowY = opts.rot ? cy - y0 * S : Math.max.apply(null, P.map(function (p) { return Y(p); }));
-      var O = opts.sumBelow ? [opts.rot ? X(C) : X(P[m.root]), lowY + (opts.sumGap || 1.75) * S] : [X(P[m.root]), Y(P[m.root])];
+      var gap0 = opts.sumGap || 1.75, gap = gap0 + (Math.min(gap0, 0.95) - gap0) * focus;
+      var O = opts.sumBelow ? [opts.rot ? X(C) : X(P[m.root]), lowY + gap * S] : [X(P[m.root]), Y(P[m.root])];
       var AR = 0.9 * S, PK = 0.95;   // arrow length per unit ΔEN on the bonds; the centre panel draws them a bit smaller
       var big = opts.captions !== false && (S >= 50 || w >= 500);
       // 1 · each bond dipole, drawn beside its bond (cross at δ+, head at δ−)
@@ -278,6 +287,7 @@
           // caption just under the lowest thing the panel can draw
           var down = Math.max(0.3 * S, tot.pos * axis[1], -tot.neg * axis[1]);
           vecs.forEach(function (v) { down = Math.max(down, v.d[1], v.par * axis[1] + v.perp[1]); });
+          if (sumT >= 1) down = down + (0.3 * S - down) * focus;   // finished: only the ring (or nothing) is left in the panel
           if (cap) {
             var ct = el('text', { x: O[0], y: Math.min(h - 12, O[1] + down + 26), 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-family': 'Space Mono, monospace', 'font-size': 14, 'font-weight': 700, fill: '#5b6474' }, over);
             ct.textContent = cap;
@@ -409,11 +419,11 @@
         var lobes = W.map(function (w, i) { return { x: w.x, y: w.y, r: w.r + lp * (i === m.root ? 0.3 : 0.45) }; });
         var R0 = W[m.root];
         lones.forEach(function (dd) {
-          var lx = dd[0], ly = -dd[1], l2 = Math.hypot(lx, ly) || 1, reach = (0.62 + 0.25 * Math.min(1, l2)) * S;
-          lobes.push({ x: R0.x + lx / l2 * reach, y: R0.y + ly / l2 * reach, r: 0.3 * S + lp * 0.45 });
+          var lx = dd[0], ly = -dd[1], l2 = Math.hypot(lx, ly) || 1, reach = (0.5 + 0.2 * Math.min(1, l2)) * S;
+          lobes.push({ x: R0.x + lx / l2 * reach, y: R0.y + ly / l2 * reach, r: 0.28 * S + lp * 0.4 });
         });
         ox = f.x; oy = f.y;
-        var K = 3 / S;
+        var K = 3 / S, base = [];
         for (var i = 0; i < Nn; i++) {
           var t = i / Nn * Math.PI * 2, dx2 = ux * Math.cos(t) - uy * Math.sin(t), dy2 = ux * Math.sin(t) + uy * Math.cos(t), sum = 0;
           lobes.forEach(function (L2) {
@@ -421,10 +431,22 @@
             var reach2 = perp < L2.r ? along + Math.sqrt(L2.r * L2.r - perp * perp) : along - (perp - L2.r) * 1.5;
             sum += Math.exp(K * reach2);
           });
-          var bulb = (1 - Math.cos(t)) / 2;
-          var wob = 1 + (0.4 + 0.6 * bulb) * (0.05 * Math.sin(2 * t + tau * 1.7) + 0.035 * Math.sin(3 * t - tau * 2.3));
-          rad[i] = Math.max(0, Math.log(sum) / K) * wob * breathe;
-          tip = Math.max(tip, rad[i] * Math.cos(t)); back = Math.max(back, -rad[i] * Math.cos(t));
+          base[i] = Math.max(0, Math.log(sum) / K);
+        }
+        // smooth the outline all the way round: no necks between the pieces, so it reads as one cloud, not a cap on stems
+        for (var pass = 0; pass < 4; pass++) {
+          var sm = base.map(function (v, j) {
+            var acc = 0, wsum = 0;
+            for (var q = -4; q <= 4; q++) { var wq = 5 - Math.abs(q); acc += base[(j + q + Nn) % Nn] * wq; wsum += wq; }
+            return Math.max(v * 0.82, acc / wsum);   // never shrink much below the pieces themselves
+          });
+          base = sm;
+        }
+        for (var i3 = 0; i3 < Nn; i3++) {
+          var t5 = i3 / Nn * Math.PI * 2, bulb = (1 - Math.cos(t5)) / 2;
+          var wob = 1 + (0.4 + 0.6 * bulb) * (0.05 * Math.sin(2 * t5 + tau * 1.7) + 0.035 * Math.sin(3 * t5 - tau * 2.3));
+          rad[i3] = base[i3] * wob * breathe;
+          tip = Math.max(tip, rad[i3] * Math.cos(t5)); back = Math.max(back, -rad[i3] * Math.cos(t5));
         }
       } else {
         // teardrop: a fat bulb at the electron-rich end tapering past the poor end (an even ellipse when nonpolar)

@@ -825,12 +825,19 @@
       { ms: 500 },
       { ms: 1150 * n, run: function (t) { SV.render(sw, m, with2({ dipoles: 1, sum: t, net: true })); } },
     ], function () {
-      SV.render(sw, m, with2({ dipoles: 1, sum: 1, net: true }));
+      // then the emptied panel gives its room back: the molecule grows into it (and, with breathe, keeps moving)
+      var tEnd = performance.now();
       if (done) done();
-      if (breathe && !dead) (function loop() { if (dead) return; SV.render(sw, m, with2({ dipoles: 1, sum: 1, net: true })); raf = requestAnimationFrame(loop); })();
+      (function loop() {
+        if (dead) return;
+        var f = Math.min(1, (performance.now() - tEnd) / 900);
+        SV.render(sw, m, with2({ dipoles: 1, sum: 1, net: true, focus: settled ? 1 : f }));
+        raf = (breathe || (f < 1 && !settled)) ? requestAnimationFrame(loop) : null;
+      })();
     });
+    var settled = false;
     return {
-      settle: function () { seq.settle(); },
+      settle: function () { settled = true; seq.settle(); if (!dead && lastX.sum >= 1) SV.render(sw, m, with2({ dipoles: 1, sum: 1, net: true, focus: 1 })); },
       redraw: function () { if (!dead && !raf) SV.render(sw, m, with2(lastX)); },
       cancel: function () { dead = true; seq.cancel(); if (raf) cancelAnimationFrame(raf); },
     };
@@ -899,7 +906,7 @@
       var left = nested(F.svg, 0, 30, 320, 320), right = nested(F.svg, 400, 30, 320, 320);
       K.text(F.svg, 160, 18, formula(p.from) + ' · ' + (Gm.dipole(a).size > 0.05 ? 'polar' : 'nonpolar'), { 'font-size': 16, 'font-family': 'Space Mono, monospace' });
       if (show.last !== id) { view0(lv); view0(rv); show.last = id; }
-      drawL = function () { SV.render(left, a, { width: 320, height: 320, dipoles: 1, sum: 1, net: true, sumBelow: true, angle: false, maxScale: 70, rot: lv }); };
+      drawL = function () { SV.render(left, a, { width: 320, height: 320, dipoles: 1, sum: 1, net: true, sumBelow: true, angle: false, maxScale: 90, rot: lv, focus: 1 }); };
       drawL();
       s('path', { d: 'M335 190 L385 190 M373 178 L387 190 L373 202', stroke: '#4152d9', 'stroke-width': 3, fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, F.svg);
       K.text(F.svg, 560, 18, formula(p.to) + (st.open ? ' · ' + (Gm.dipole(b).size > 0.05 ? 'polar' : 'nonpolar') : ''), { 'font-size': 16, 'font-family': 'Space Mono, monospace' });

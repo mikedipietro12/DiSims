@@ -8,6 +8,7 @@
  *   tt.preset('front' | 'side' | 'top')
  *   tt.setShape(on) / tt.shapeOptions({ faces })   the atoms' outline as a solid (tetrahedron …), or
  *                       with faces:false the bonds traced (linear, bent, T-shaped); off with space filling
+ *   tt.showMolecule(on)  hide / show the ball-and-stick model (content stays)
  *   tt.settle(), tt.destroy()
  *   Turntable.lobe(dir, length, width, colour, opacity)  teardrop mesh along dir
  *
@@ -23,22 +24,25 @@
     catch (e) { return false; }
   }
 
+  /**
+   * The one lobe shape (also drawn flat by ShapeView): a smooth teardrop, rounded at the atom, widest a little past
+   * halfway, closing in a round end. r(u) = u^0.6 · (1 − u)^0.45, scaled so its widest point is 1; no neck, no cap.
+   */
+  var LOBE_A = 0.6, LOBE_B = 0.45, LOBE_PEAK = Math.pow(LOBE_A / (LOBE_A + LOBE_B), LOBE_A) * Math.pow(LOBE_B / (LOBE_A + LOBE_B), LOBE_B);
+  function lobeProfile(u) { return u <= 0 || u >= 1 ? 0 : Math.pow(u, LOBE_A) * Math.pow(1 - u, LOBE_B) / LOBE_PEAK; }
   function lobeGeometry(len, width) {
-    var T = global.THREE, pts = [];
-    // Balloon profile: narrow where it leaves the atom, swelling to a round end (a hemisphere cap)
-    var c = 0.58;
-    for (var i = 0; i <= 40; i++) {
-      var t = i / 40, r;
-      if (t <= c) { var u = t / c; r = width * Math.pow(u, 0.85) * (0.35 + 0.65 * u); }
-      else { var v = (t - c) / (1 - c); r = width * Math.sqrt(Math.max(0, 1 - v * v)); }
-      pts.push(new T.Vector2(Math.max(0.0001, r), t * len));
+    var T = global.THREE, pts = [], N = 72;
+    for (var i = 0; i <= N; i++) {
+      var s0 = i / N, u = s0 < 0.5 ? 2 * s0 * s0 : 1 - 2 * (1 - s0) * (1 - s0);   // more points at both ends, where the curve turns fastest
+      pts.push(new T.Vector2(Math.max(0.0001, width * lobeProfile(u)), u * len));
     }
-    return new T.LatheGeometry(pts, 32);
+    return new T.LatheGeometry(pts, 48);
   }
   /** A teardrop lobe from the origin along dir. */
   function lobe(dir, len, width, colour, opacity) {
     var T = global.THREE;
-    var mat = new T.MeshStandardMaterial({ color: colour, transparent: true, opacity: opacity == null ? 0.55 : opacity, roughness: 0.6, depthWrite: false, side: T.DoubleSide });
+    // outside only: drawing the inner faces through the see-through skin made creases
+    var mat = new T.MeshStandardMaterial({ color: colour, transparent: true, opacity: opacity == null ? 0.55 : opacity, roughness: 0.8, depthWrite: false, side: T.FrontSide });
     var mesh = new T.Mesh(lobeGeometry(len, width), mat);
     var d = new T.Vector3(dir[0], dir[1], dir[2]).normalize();
     mesh.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), d);
@@ -76,6 +80,7 @@
     pivot.add(mol);
 
     var yaw = opts.yaw || -0.35, tilt = opts.tilt || 0.18, vYaw = 0, target = null, dragging = false, radius = 2.5;
+    var spaceExtra = 0, spaceT = 0;   // space-filling spheres reach further: the view widens by this much as they grow
     var labelMap = {};
     var anims = [];
 
@@ -83,7 +88,11 @@
       var r = wrap.getBoundingClientRect(), w = Math.max(50, r.width), hh = Math.max(50, r.height);
       renderer.setSize(w, hh, false);
       camera.aspect = w / hh;
-      var fit = radius + 0.6;
+      aim();
+    }
+    /** Camera distance: the molecule's sphere (any turn) plus a slim margin, so it fills the box. */
+    function aim() {
+      var fit = radius + 0.3 + spaceExtra * spaceT;
       var dist = fit / Math.sin(camera.fov * Math.PI / 360) * (camera.aspect < 1 ? 1 / camera.aspect : 1);
       camera.position.set(0, 0, dist);
       camera.updateProjectionMatrix();
@@ -122,7 +131,7 @@
         if (Math.abs(target.yaw - yaw) + Math.abs(target.tilt - tilt) < 0.002) { yaw = target.yaw; tilt = target.tilt; target = null; } else busy = true;
       }
       render();
-      if (busy) raf = requestAnimationFrame(loop);
+      if (busy && !raf) raf = requestAnimationFrame(loop);   // a render() asked for during the step has already queued the next frame
     }
     function kick() { if (!raf) raf = requestAnimationFrame(loop); }
     function animate(ms, step, done) { anims.push({ t0: performance.now(), ms: ms, step: step, done: done }); kick(); }
@@ -220,6 +229,8 @@
     function vdwScale(a) { return (VDW[a.el] || 1.8) * 0.78 / (a.r * 0.82); }
     function applySpace(t) {   // t: 0 ball-and-stick → 1 space filling
       if (!lastMol) return;
+      spaceT = t;
+      aim();
       lastMol.atoms.forEach(function (A, i) { A.mesh.scale.setScalar(1 + (vdwScale(lastMol.m.atoms[i]) - 1) * t); A.lobes.forEach(function (g) { g.visible = t < 0.5; }); });
       lastMol.sticks.forEach(function (list) { list.forEach(function (cm) { cm.visible = t < 0.5; }); });
       content.visible = t < 0.5;
@@ -328,7 +339,7 @@
         if (lonesMode === 'all' || (lonesMode === 'inner' && deg >= 2)) {
           a.lones.forEach(function (d) {
             var g = new T.Group();
-            g.add(lobe(d, 1.05, 0.34, 0xffc21a, 0.42));   // lone pair: yellow (negative), like the δ− clouds
+            g.add(lobe(d, 1.1, 0.29, 0xffc21a, 0.42));   // lone pair: yellow (negative), like the δ− clouds
             var dn = new T.Vector3(d[0], d[1], d[2]).normalize(), perp = new T.Vector3().crossVectors(dn, Math.abs(dn.y) < 0.9 ? new T.Vector3(0, 1, 0) : new T.Vector3(1, 0, 0)).normalize();
             [-1, 1].forEach(function (sgn) {
               var e = new T.Mesh(new T.SphereGeometry(0.06, 14, 10), lpDot);
@@ -347,7 +358,13 @@
         return list;
       });
       var P = m.atoms.map(function (a) { return a.p.slice(); });
-      radius = Math.max.apply(null, P.map(function (p) { return Math.hypot(p[0], p[1], p[2]); })) + 0.6;
+      // the ball-and-stick sphere: farthest atom centre plus its ball (and a hair); space filling may need more
+      radius = Math.max.apply(null, P.map(function (p) { return Math.hypot(p[0], p[1], p[2]); })) + 0.42;
+      m.atoms.forEach(function (a, i) {   // shown lone-pair lobes reach past their atom
+        if (!atoms[i].lobes.length) return;
+        a.lones.forEach(function (d) { var l = Math.hypot(d[0], d[1], d[2]) || 1; radius = Math.max(radius, Math.hypot(P[i][0] + d[0] / l * 1.1, P[i][1] + d[1] / l * 1.1, P[i][2] + d[2] / l * 1.1) + 0.12); });
+      });
+      spaceExtra = Math.max(0, Math.max.apply(null, P.map(function (p, i) { return Math.hypot(p[0], p[1], p[2]) + (VDW[m.atoms[i].el] || 1.8) * 0.78; })) + 0.4 - radius);   // a little more room: big spheres otherwise reach the corner labels
       size();
       function place(t) {
         var e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -413,6 +430,12 @@
         return tube;
       },
       clear: function () { clearGroup(mol); clearGroup(content); clearLabels(); render(); },
+      /** Hide or show the ball-and-stick molecule (and its atom letters), leaving content in place. */
+      showMolecule: function (on) {
+        mol.visible = !!on;
+        Object.keys(labelMap).forEach(function (k) { var L = labelMap[k]; if (L.obj && L.obj.parent === mol) L.el.style.display = on ? '' : 'none'; });
+        kick();
+      },
       render: function () { kick(); },
       settle: function () { anims.forEach(function (a) { a.step(1); if (a.done) a.done(); }); anims = []; render(); },
       destroy: function () {
@@ -426,5 +449,5 @@
     };
   }
 
-  global.Turntable = { create: create, lobe: lobe, lobeGeometry: lobeGeometry };
+  global.Turntable = { create: create, lobe: lobe, lobeGeometry: lobeGeometry, lobeProfile: lobeProfile };
 })(window);
