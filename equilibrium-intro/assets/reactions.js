@@ -132,6 +132,14 @@
     { id: 'diamond', beat: 'limits', title: 'Diamond to graphite', eq: 'C(diamond) → C(graphite)', dH: '−', dS: '+',
       whyH: 'Graphite is slightly lower in energy.', whyS: 'Graphite\'s layers are a little less rigid than diamond.',
       context: 'ΔG says this should happen at any temperature. At room temperature it is so slow that it has never been observed. Heat it with no air and it does happen. ΔG tells you which way, not how fast.' },
+    { id: 'eluni', beat: 'elementary', title: 'One particle', eq: 'A → products', dH: null, dS: null,
+      context: 'A real one: N₂O₄ → 2NO₂. One N₂O₄ molecule breaks apart, so rate = k[N₂O₄]. Only the reactant side sets the rate; the 2 in front of NO₂ plays no part.' },
+    { id: 'elbi', beat: 'elementary', title: 'Two different particles', eq: 'A + B → products', dH: null, dS: null,
+      context: 'A real one: NO₂ + F₂ → NO₂F + F happens in a single collision, so rate = k[NO₂][F₂]. That is step 1 of the puzzle reaction, and it is exactly the rate law the experiment found.' },
+    { id: 'eldbl', beat: 'elementary', title: 'Two of the same', eq: '2A → products', dH: null, dS: null,
+      context: 'A real one: NO₂ + NO₂ → NO₃ + NO, so rate = k[NO₂]².' },
+    { id: 'kmag', beat: 'kmag', title: 'The size of K', eq: 'A ⇌ B', dH: null, dS: null,
+      context: 'Real ones at 25 °C: 2H₂ + O₂ ⇌ 2H₂O has K about 10⁸⁰, so hydrogen and oxygen that react end up as essentially all water. N₂ + O₂ ⇌ 2NO has K about 10⁻³⁰, so the nitrogen and oxygen in air make almost no NO. The box holds only 40 particles, so K = 1000 shows up as all B, with an A now and then.' },
   ];
 
   var byId = {};

@@ -4,21 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Equilibrium Guide: Enthalpy, Entropy &amp; Gibbs Free Energy</title>
-  <meta name="description" content="Guided intro to equilibrium: enthalpy, entropy, reactions that run both ways, equal rates, state functions and Gibbs free energy, with predict-then-reveal examples.">
+  <meta name="description" content="Guided intro to equilibrium: enthalpy, entropy, reactions that run both ways, equal rates, state functions, Gibbs free energy, and the equilibrium constant K derived from elementary steps.">
   <meta name="author" content="M DiPietro">
   <link rel="canonical" href="https://atomicsimulations.ca/equilibrium-intro/guide.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Atomic Simulations">
   <meta property="og:title" content="Equilibrium Guide: Enthalpy, Entropy &amp; Gibbs Free Energy">
-  <meta property="og:description" content="Guided intro to equilibrium: enthalpy, entropy, reactions that run both ways, equal rates, state functions and Gibbs free energy, with predict-then-reveal examples.">
+  <meta property="og:description" content="Guided intro to equilibrium: enthalpy, entropy, reactions that run both ways, equal rates, state functions, Gibbs free energy, and the equilibrium constant K derived from elementary steps.">
   <meta property="og:url" content="https://atomicsimulations.ca/equilibrium-intro/guide.html">
   <meta name="twitter:card" content="summary">
-  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Equilibrium Guide: Enthalpy, Entropy & Gibbs Free Energy", "url": "https://atomicsimulations.ca/equilibrium-intro/guide.html", "description": "Guided intro to equilibrium: enthalpy, entropy, reactions that run both ways, equal rates, state functions and Gibbs free energy, with predict-then-reveal examples.", "inLanguage": "en", "isAccessibleForFree": true, "learningResourceType": "Simulation", "author": {"@type": "Person", "name": "M DiPietro"}, "isPartOf": {"@type": "WebSite", "name": "Atomic Simulations", "url": "https://atomicsimulations.ca/"}, "educationalLevel": "Grade 12", "about": "Chemistry"}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Equilibrium Guide: Enthalpy, Entropy & Gibbs Free Energy", "url": "https://atomicsimulations.ca/equilibrium-intro/guide.html", "description": "Guided intro to equilibrium: enthalpy, entropy, reactions that run both ways, equal rates, state functions, Gibbs free energy, and the equilibrium constant K derived from elementary steps.", "inLanguage": "en", "isAccessibleForFree": true, "learningResourceType": "Simulation", "author": {"@type": "Person", "name": "M DiPietro"}, "isPartOf": {"@type": "WebSite", "name": "Atomic Simulations", "url": "https://atomicsimulations.ca/"}, "educationalLevel": "Grade 12", "about": "Chemistry"}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
-  <link rel="stylesheet" href="assets/eq-intro.css?v=18">
+  <link rel="stylesheet" href="assets/eq-intro.css?v=19">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -32,7 +32,7 @@
         <div class="learn-controls">
           <button type="button" class="btn learn-step" id="learnPrev" aria-label="Previous section">‹</button>
           <button type="button" class="btn learn-step" id="learnNext" aria-label="Next section">›</button>
-          <button type="button" class="learn-toggle" id="learnToggle" aria-pressed="false"><span class="learn-switch" aria-hidden="true"></span>Learn mode</button>
+          <button type="button" class="learn-toggle" id="learnToggle" aria-pressed="false" aria-keyshortcuts="P" title="Learn mode (press P)"><span class="learn-switch" aria-hidden="true"></span>Learn mode</button>
         </div>
       </div>
     </div>
@@ -115,6 +115,31 @@
         </div>
       </div>
 
+      <div class="briefing-part">
+        <h2><span class="briefing-num">Part 4</span> The equilibrium constant</h2>
+        <div class="briefing-columns">
+          <div class="briefing-block">
+            <h3 class="briefing-label">Learning intentions</h3>
+            <ul class="briefing-li">
+              <li>Explain why a rate law must be found by experiment, but K can be written from the balanced equation.</li>
+              <li>Write the rate law for an elementary step from its equation.</li>
+              <li>Derive the equilibrium constant, K, from equal forward and reverse rates.</li>
+              <li>Combine the K values of a reaction's steps into the K for the overall reaction.</li>
+              <li>State the law of mass action and use it to write K for any balanced equation.</li>
+              <li>Find K for a reversed equation (1/K) and for a sum of equations (multiply the K's).</li>
+              <li>Use the size of K to tell whether reactants or products are favoured at equilibrium.</li>
+            </ul>
+          </div>
+          <div class="briefing-block cc">
+            <h3 class="briefing-label">Curricular competencies</h3>
+            <ul class="briefing-cc">
+              <li><span class="cc-name">Processing and analyzing data and information</span>We will rearrange rate laws to build the expression for K.</li>
+              <li><span class="cc-name">Evaluating</span>We will see why a rate law can't be read from an overall equation, but K can.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       <div class="briefing-actions">
         <button type="button" class="btn primary" id="briefingEnter">Enter the guide →</button>
       </div>
@@ -122,9 +147,8 @@
 
     <div id="guideContent" hidden>
     <header class="guide-hero">
-      <div class="stub-kicker">Room 1 · Names on</div>
       <h1 id="guideTitle" tabindex="-1">Guide</h1>
-      <p>Some changes give off heat. Some spread things out. Many reactions run both ways at once. This guide names each idea and shows how temperature decides which way a reaction goes.</p>
+      <p>Some changes give off heat. Some spread things out. Many reactions run both ways at once. This guide names each idea, shows how temperature decides which way a reaction goes, and ends by building the equilibrium constant, K, from rates.</p>
       <p class="guide-hero-note">Scroll to move through the ideas. On example cards, make your prediction first, then press Reveal. Nothing is saved.</p>
     </header>
 
@@ -142,6 +166,13 @@
       <a href="#beat-state">State functions</a>
       <a href="#beat-gibbs">ΔG</a>
       <a href="#beat-limits">Limits</a>
+      <a href="#beat-puzzle">Rate law puzzle</a>
+      <a href="#beat-elementary">Elementary steps</a>
+      <a href="#beat-kderive">Deriving K</a>
+      <a href="#beat-overall">Overall K</a>
+      <a href="#beat-massaction">Mass action</a>
+      <a href="#beat-kmanip">Working with K</a>
+      <a href="#beat-kmag">Size of K</a>
       <a href="#beat-next">Next</a>
     </nav>
 
@@ -335,6 +366,103 @@
           <p class="beat-aside">Can you think of another reaction that "should" happen but doesn't seem to? (Paper burning in air is one.)</p>
         </article>
 
+        <article class="guide-beat" id="beat-puzzle" data-badge="Rate laws and K" data-view="pic" data-pic="kpuzzle">
+          <p class="beat-kicker">Part 4 · Rates and equilibrium</p>
+          <h2>A puzzle about rate laws</h2>
+          <p>You learned that a rate law has to be found by experiment. Take 2NO₂ + F₂ → 2NO₂F. The coefficients suggest rate = k[NO₂]²[F₂], but experiments give <strong>rate = k[NO₂][F₂]</strong>. It is first order in NO₂, not second. The coefficients don't work for kinetics.</p>
+          <p>Yet the equilibrium constant for the same reaction is K = [NO₂F]² / [NO₂]²[F₂], with every coefficient back as an exponent. Why does equilibrium get to use the coefficients when kinetics can't?</p>
+          <ul class="beat-drivers">
+            <li><strong>Step through</strong> with the arrows under the picture: test the guess, then compare it with K.</li>
+            <li><strong>The answer is about rates.</strong> The next sections build it: elementary steps, then K from equal rates, then K for a whole mechanism.</li>
+          </ul>
+          <p class="beat-aside">Kinetics asks which road you took. Equilibrium only asks where you ended up.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-elementary" data-badge="Elementary steps" data-view="pic" data-pic="scene" data-cards="eluni:,elbi:,eldbl:">
+          <p class="beat-kicker">Part 4 · Elementary steps</p>
+          <h2>One step at a time</h2>
+          <p>The route a reaction really takes is its <strong>mechanism</strong>: a series of simple steps that add up to the balanced equation.</p>
+          <p>Each step is a single event: one particle breaking apart, or two particles colliding. These are <strong>elementary steps</strong>. For an elementary step, and <strong>only</strong> for an elementary step, you can write the rate law straight from the equation. Each reactant's coefficient becomes its exponent.</p>
+          <ul class="beat-drivers">
+            <li><strong>One particle</strong> (A → products): rate = k[A].</li>
+            <li><strong>Two different particles</strong> (A + B → products): rate = k[A][B].</li>
+            <li><strong>Two of the same</strong> (2A → products): rate = k[A][A] = k[A]².</li>
+            <li><strong>Try:</strong> double the amount of A in each case. Which one makes the rate go up four times? Why?</li>
+          </ul>
+          <p class="beat-aside">Only the reactants of a step appear in its rate law. The products don't change how fast that step happens.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-kderive" data-badge="Equilibrium constant" data-view="pic" data-pic="kderive">
+          <p class="beat-kicker">Part 4 · The equilibrium constant</p>
+          <h2>Equal rates make a constant</h2>
+          <p>Back to N₂O₄ ⇌ 2NO₂. Both directions are elementary steps: one N₂O₄ breaks apart, or two NO₂ collide and join. So each direction has its own rate law, with its own rate constant: k<sub>f</sub> forward and k<sub>r</sub> reverse.</p>
+          <p>At equilibrium the forward and reverse rates are equal. Set the two rate laws equal, rearrange, and out comes the <strong>equilibrium constant</strong>, K:</p>
+          <p class="k-eq">K = <span class="k-frac"><span>[NO₂]²</span><span>[N₂O₄]</span></span></p>
+          <ul class="beat-drivers">
+            <li><strong>Step through</strong> with the arrows under the picture. Watch where each term goes.</li>
+            <li><strong>Why it's constant:</strong> k<sub>f</sub> and k<sub>r</sub> are each fixed at a given temperature, so k<sub>f</sub> ÷ k<sub>r</sub> is fixed too. That ratio is K.</li>
+            <li><strong>The pattern:</strong> products on top, reactants on the bottom, each coefficient becomes an exponent.</li>
+            <li><strong>Notice:</strong> the amounts at equilibrium depend on where you start, but this ratio of them always comes out to the same K.</li>
+            <li><strong>Temperature</strong> changes k<sub>f</sub> and k<sub>r</sub>, so it changes K.</li>
+          </ul>
+          <p class="beat-aside">K and ΔG tell the same story. K bigger than 1 (more products at equilibrium) goes with ΔG negative. K smaller than 1 goes with ΔG positive.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-overall" data-badge="Overall K" data-view="pic" data-pic="kmulti">
+          <p class="beat-kicker">Part 4 · The equilibrium constant</p>
+          <h2>Add the steps, multiply the K's</h2>
+          <p>Back to the puzzle: 2NO₂ + F₂ ⇌ 2NO₂F. It happens in two elementary steps. Step 1 is slow: NO₂ + F₂ ⇌ NO₂F + F. Step 2 is fast: NO₂ + F ⇌ NO₂F. The slow step limits the speed, which is why the measured rate law, k[NO₂][F₂], is step 1's own rate law.</p>
+          <p>Add the steps and F cancels: it is made in step 1 and used up in step 2. F is an <strong>intermediate</strong>. At equilibrium every step is at equilibrium, so each step has its own K. Multiply them, and [F] cancels in exactly the same way.</p>
+          <ul class="beat-drivers">
+            <li><strong>Adding equations</strong> means <strong>multiplying K's</strong>: K = K₁ × K₂.</li>
+            <li><strong>Whatever cancels</strong> in the equations cancels in K.</li>
+            <li><strong>What's left</strong> matches the overall equation: the two [NO₂F] make [NO₂F]², and the two [NO₂] make [NO₂]². The coefficients come back as exponents.</li>
+            <li><strong>Last step:</strong> double the equation and K is squared. The rate law doesn't change at all. A rate law and K are different kinds of things.</li>
+          </ul>
+          <p class="beat-aside">Challenge: write K for 2NO₂F ⇌ 2NO₂ + F₂, the same reaction written backwards. How does it compare with K for the forward direction?</p>
+        </article>
+
+        <article class="guide-beat" id="beat-massaction" data-badge="Law of mass action" data-view="pic" data-pic="kmass">
+          <p class="beat-kicker">Part 4 · Summary</p>
+          <h2>The law of mass action</h2>
+          <p>Part 4 comes down to one rule. For a balanced equation at equilibrium, K is the products over the reactants, each raised to the power of its coefficient. This is the <strong>law of mass action</strong>:</p>
+          <p class="k-eq">K = <span class="k-frac"><span>[C]<sup><i>c</i></sup>[D]<sup><i>d</i></sup></span><span>[A]<sup><i>a</i></sup>[B]<sup><i>b</i></sup></span></span></p>
+          <ul class="beat-drivers">
+            <li><strong>Products on top, reactants on the bottom.</strong></li>
+            <li><strong>Coefficients become exponents.</strong> This works for the overall equation, whatever the mechanism, because at equilibrium every step is at equilibrium.</li>
+            <li><strong>The value</strong> depends on the reaction and the temperature. N₂O₄ ⇌ 2NO₂ has K = 4.63 × 10⁻³ at 25 °C: much smaller than 1, so at equilibrium the mixture is mostly N₂O₄.</li>
+          </ul>
+          <p class="beat-aside">K is fixed at a given temperature. Change the temperature and K changes.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-kmanip" data-badge="Working with K" data-view="pic" data-pic="kmanip">
+          <p class="beat-kicker">Part 4 · Working with K</p>
+          <h2>Change the equation, change K</h2>
+          <p>K belongs to an equation exactly as it is written. Change the equation and K changes in a predictable way.</p>
+          <ul class="beat-drivers">
+            <li><strong>Step through</strong> with the arrows under the picture.</li>
+            <li><strong>Add equations, multiply their K's:</strong> K = K₁ × K₂. Whatever cancels in the equations cancels in K.</li>
+            <li><strong>Reverse an equation, take 1/K:</strong> products and reactants swap places, so the fraction flips over. 1 ÷ (4.63 × 10⁻³) = 216.</li>
+            <li><strong>Notice:</strong> the small K becomes a big K′. The mixture at equilibrium is the same. Written backwards, N₂O₄ is now the product, and the equation favours it.</li>
+          </ul>
+          <p class="beat-aside">You met one more on the Overall K beat: double an equation and K is squared. In general, multiply an equation by n and K is raised to the power n.</p>
+        </article>
+
+        <article class="guide-beat" id="beat-kmag" data-badge="Size of K" data-view="pic" data-pic="scene" data-cards="kmag:">
+          <p class="beat-kicker">Part 4 · The equilibrium constant</p>
+          <h2>Big K, small K</h2>
+          <p>K is products over reactants, measured at equilibrium. So the size of K tells you what the equilibrium mixture is mostly made of. Take the simplest reaction, A ⇌ B, where K is just B over A:</p>
+          <p class="k-eq">K = <span class="k-frac"><span>[B]</span><span>[A]</span></span></p>
+          <ul class="beat-drivers">
+            <li><strong>Pick a K</strong> and watch the box settle. The bar shows the amounts now. The tick shows where they end up.</li>
+            <li><strong>K bigger than 1:</strong> more products than reactants at equilibrium. The equilibrium <strong>favours products</strong>. At K = 1000 there are about 1000 B for every A, so the reaction nearly goes to completion.</li>
+            <li><strong>K smaller than 1:</strong> more reactants than products. The equilibrium <strong>favours reactants</strong>. At K = 0.001 the reaction barely goes.</li>
+            <li><strong>K = 1:</strong> equal amounts. Neither side is favoured.</li>
+            <li><strong>Start with all B</strong> and keep the same K. The box ends up at the same mix. K sets where it ends up, wherever it starts.</li>
+          </ul>
+          <p class="beat-aside">The size of K says where a reaction ends up, not how fast it gets there. A huge K can still be slow, just like diamond turning into graphite.</p>
+        </article>
+
         <article class="guide-beat guide-beat-end" id="beat-next" data-badge="Before you leave" data-view="vessel" data-reaction="custom" data-t="500" data-mix="reactants" data-gibbs="true" data-slider="true" data-signs="true">
           <p class="beat-kicker">Before you leave</p>
           <h2>What to take with you</h2>
@@ -343,8 +471,13 @@
             <li>Many reactions run both ways. At equilibrium the <strong>rates</strong> are equal, and both directions keep going.</li>
             <li>ΔG = ΔH − TΔS. Temperature decides who wins when the pulls fight.</li>
             <li>ΔG tells you which way, not how fast.</li>
+            <li>Kinetics asks which road you took. Equilibrium only asks where you ended up. At equilibrium every elementary step is balanced, so K comes from the overall coefficients even when the rate law doesn't.</li>
+            <li>For an elementary step, coefficients become exponents in the rate law. For an overall equation, you need experiments.</li>
+            <li>At equilibrium the forward and reverse rates are equal, which gives K: products over reactants, coefficients as exponents. That is the law of mass action.</li>
+            <li>Adding equations multiplies their K's. Reversing an equation gives 1/K.</li>
+            <li>K bigger than 1: products are favoured at equilibrium. K smaller than 1: reactants are favoured.</li>
           </ul>
-          <p style="margin-top:1rem">Next, open the <a href="sandbox.html">Sandbox</a> and try every reaction at different temperatures. Then open <a href="../equilibrium_simulations.html">Equilibrium Simulations</a> to push a system at equilibrium and watch it respond.</p>
+          <p style="margin-top:1rem">Next, open the <a href="sandbox.html">Sandbox</a> and try every reaction at different temperatures. Then open <a href="../equilibrium_simulations.html">Equilibrium Simulations</a> to push a system at equilibrium, watch it respond, and see K in action.</p>
         </article>
       </div>
 
@@ -456,11 +589,11 @@
   </div>
 
   <script src="../intermolecular-forces/assets/suite-chrome.js"></script>
-  <script src="assets/reactions.js?v=10"></script>
+  <script src="assets/reactions.js?v=13"></script>
   <script src="assets/vessel-engine.js?v=3"></script>
   <script src="assets/eq-charts.js?v=3"></script>
-  <script src="assets/guide-pictures.js?v=36"></script>
-  <script src="assets/eq-scenes.js?v=22"></script>
+  <script src="assets/guide-pictures.js?v=40"></script>
+  <script src="assets/eq-scenes.js?v=27"></script>
   <script>
   (function () {
     'use strict';
@@ -550,12 +683,44 @@
     // ---------- picture side ----------
     var picPhase = 0, picRaf = 0;
     var energyMode = 'exo', picT0 = performance.now();
-    var coldStep = 0, COLD_STEPS = [
+    var COLD_STEPS = [
       'A cold pack: solid ammonium nitrate (NH₄NO₃) sits in water.',
       'It dissolves. The ions spread through the water, and the thermometer drops. Which way does each energy term push the reaction?',
       'Heat flows <strong>in</strong> from the water, so ΔH is <strong>+</strong>. On its own, that favours the <strong>reactants</strong> (←).',
       'The ions are far more spread out than the crystal, so ΔS is <strong>+</strong>. That favours the <strong>products</strong> (→). The two pulls point opposite ways.'
     ];
+    var KPUZZLE_STEPS = [
+      'Guess the rate law from the coefficients: 2 for NO₂ and 1 for F₂, so <strong>rate = k[NO₂]²[F₂]</strong>. Is that right?',
+      'Test it. Doubling [F₂] doubles the rate: first order in F₂. Doubling [NO₂] <strong>only</strong> doubles it too: first order in NO₂, not second. So <strong>rate = k[NO₂][F₂]</strong>. The guess was wrong.',
+      'Now K. It keeps every coefficient as an exponent, and experiments agree with it. Same reaction, same coefficients. Why does one work and not the other? The next sections answer it.'
+    ];
+    var KDERIVE_STEPS = [
+      'N₂O₄ ⇌ 2NO₂ is really two elementary steps: the forward step and the reverse step.',
+      'In the forward step one N₂O₄ breaks apart, so <strong>forward rate = k<sub>f</sub>[N₂O₄]</strong>.',
+      'In the reverse step two NO₂ collide. The coefficient 2 becomes the exponent: <strong>reverse rate = k<sub>r</sub>[NO₂]²</strong>.',
+      'At equilibrium the two rates are equal, so the two rate laws are equal.',
+      'Divide both sides by k<sub>r</sub> and by [N₂O₄]. The rate constants end up on one side, the concentrations on the other.',
+      'A constant divided by a constant is a constant. Call it <strong>K</strong>, the equilibrium constant: products on top, reactants on the bottom, coefficients as exponents.'
+    ];
+    var KMULTI_STEPS = [
+      '2NO₂ + F₂ ⇌ 2NO₂F again. Remember the experiment: rate = k[NO₂][F₂], first order in NO₂. So this equation is <strong>not</strong> one elementary step.',
+      'It happens in two steps. Add them: F is made in step 1, then used up in step 2, so it cancels. The two NO₂ and the two NO₂F add up, leaving the overall equation.',
+      'Each step is elementary, so each has its own K, written from its own equation.',
+      'Multiply the two K expressions together.',
+      '[F] cancels top and bottom, just as F cancelled when you added the steps.',
+      'Collect what is left: [NO₂F] twice makes [NO₂F]², [NO₂] twice makes [NO₂]². That is K for the overall equation: the coefficients come back as exponents.',
+      'Double the equation and K is squared, because K is defined from the balanced equation. The rate law is still k[NO₂][F₂]: it comes from the steps, not from how you write the equation.'
+    ];
+    var KMANIP_STEPS = [
+      'Two equations add up to an overall equation. C and D are made in the first and used up in the second, so they cancel.',
+      'Each equation has its own K, written by the law of mass action: products over reactants.',
+      'Multiply K₁ by K₂. [C] and [D] cancel top and bottom, leaving exactly K. <strong>Add equations, multiply their K\'s.</strong>',
+      'Now reverse an equation. N₂O₄ ⇌ 2NO₂ has K = 4.63 × 10⁻³ at 25 °C.',
+      'Written backwards, products and reactants swap places, so the fraction flips over. <strong>Reverse an equation, take 1/K:</strong> 1 ÷ (4.63 × 10⁻³) = 216.'
+    ];
+    // Pictures stepped with the ← / → buttons under the stage
+    var STEP_TEXT = { coldpack: COLD_STEPS, kpuzzle: KPUZZLE_STEPS, kderive: KDERIVE_STEPS, kmulti: KMULTI_STEPS, kmanip: KMANIP_STEPS };
+    var stepIdx = 0, stepFrom = 0;
     var caseIdx = 0, CASE_TEXT = [
       '<strong>Burning propane.</strong> Heat comes out (ΔH −) and six gas molecules become seven (ΔS +). Both terms push toward the products, so ΔG is always <strong>−</strong>.',
       '<strong>Making nitrogen dioxide from nitrogen and oxygen.</strong> Heat goes in (ΔH +) and three gas molecules become two (ΔS −). Both terms push toward the reactants, so ΔG is always <strong>+</strong>.',
@@ -577,10 +742,12 @@
         if (on) tr.setAttribute('aria-current', 'true'); else tr.removeAttribute('aria-current');
       });
     }
-    function coldStepUi() {
-      $('g-stepText').innerHTML = '<span class="g-step-num">' + (coldStep + 1) + ' / ' + COLD_STEPS.length + '</span>' + COLD_STEPS[coldStep];
-      $('g-prev').disabled = coldStep === 0;
-      $('g-next').disabled = coldStep === COLD_STEPS.length - 1;
+    function stepList() { return active && STEP_TEXT[active.dataset.pic]; }
+    function stepUi() {
+      var list = stepList(); if (!list) return;
+      $('g-stepText').innerHTML = '<span class="g-step-num">' + (stepIdx + 1) + ' / ' + list.length + '</span>' + list[stepIdx];
+      $('g-prev').disabled = stepIdx === 0;
+      $('g-next').disabled = stepIdx === list.length - 1;
     }
     function cardList(b) {
       var spec = b.dataset.cards;
@@ -595,7 +762,7 @@
       return predictions[k] || (predictions[k] = { H: null, S: null, revealed: false });
     }
 
-    // ---------- live scenes (soda, ocean, blood, diamond) ----------
+    // ---------- live scenes (soda, ocean, blood, diamond, elementary steps, size of K) ----------
     var scene = null, sceneId = null, sceneTs = 0, sceneTextAt = 0;
     function buildSceneCtl() {
       $('g-sceneCtl').innerHTML = scene.controls.map(function (c) {
@@ -652,9 +819,15 @@
         return;
       }
       if (kind === 'coldpack') {
-        var cd = EqPictures.coldpack($('pic'), { step: coldStep, t: (performance.now() - picT0) / 1000, still: reduced });
+        var cd = EqPictures.coldpack($('pic'), { step: stepIdx, t: (performance.now() - picT0) / 1000, still: reduced });
         $('sub').textContent = '';
         if ($('pic').getAttribute('aria-label') !== cd) $('pic').setAttribute('aria-label', cd);
+        return;
+      }
+      if (kind === 'kpuzzle' || kind === 'kderive' || kind === 'kmulti' || kind === 'kmass' || kind === 'kmanip') {
+        var kd = EqPictures[kind]($('pic'), { step: stepIdx, from: stepFrom, t: (performance.now() - picT0) / 1000, still: reduced });
+        $('sub').textContent = '';
+        if ($('pic').getAttribute('aria-label') !== kd) $('pic').setAttribute('aria-label', kd);
         return;
       }
       if (kind === 'energy') {
@@ -678,7 +851,7 @@
       if (!active || active.dataset.view !== 'pic') return;
       picPhase = (picPhase + 0.016) % 1;
       drawPic();
-      if (!reduced && (active.dataset.pic === 'intro4' || active.dataset.pic === 'beaker' || active.dataset.pic === 'energy' || active.dataset.pic === 'spread' || active.dataset.pic === 'coldpack' || active.dataset.pic === 'favour' || active.dataset.pic === 'gibbs4' || active.dataset.pic === 'scene')) picRaf = requestAnimationFrame(picLoop);
+      if (!reduced && (active.dataset.pic === 'intro4' || active.dataset.pic === 'beaker' || active.dataset.pic === 'energy' || active.dataset.pic === 'spread' || active.dataset.pic === 'coldpack' || active.dataset.pic === 'favour' || active.dataset.pic === 'gibbs4' || active.dataset.pic === 'scene' || active.dataset.pic === 'kpuzzle' || active.dataset.pic === 'kderive' || active.dataset.pic === 'kmass' || active.dataset.pic === 'kmanip' || active.dataset.pic === 'kmulti')) picRaf = requestAnimationFrame(picLoop);
     }
 
     function loadPic(b) {
@@ -688,14 +861,15 @@
       $('graphsWrap').hidden = true; $('gibbsWrap').hidden = true;
       $('ctlRow').hidden = true; $('counts').hidden = true;
       $('g-energySeg').hidden = b.dataset.pic !== 'energy';
-      $('g-steps').hidden = b.dataset.pic !== 'coldpack';
+      $('g-steps').hidden = !STEP_TEXT[b.dataset.pic];
       $('g-cases').hidden = b.dataset.pic !== 'gibbs4';
       $('g-favour').hidden = b.dataset.pic !== 'favour';
       $('g-scene').hidden = b.dataset.pic !== 'scene';
       sceneId = null;                                   // a fresh scene each time the beat opens
       if (b.dataset.pic === 'gibbs4') caseUi();
       if (b.dataset.pic === 'favour') $('g-favourText').innerHTML = FAVOUR_TEXT[favourIdx];
-      if (b.dataset.pic === 'coldpack') { coldStep = 0; coldStepUi(); }
+      stepIdx = 0; stepFrom = 0;
+      if (STEP_TEXT[b.dataset.pic]) stepUi();
       picT0 = performance.now();
       panel.classList.remove('is-compact');
       drawPic();
@@ -813,8 +987,10 @@
     });
     [['g-prev', -1], ['g-next', 1]].forEach(function (pair) {
       $(pair[0]).addEventListener('click', function () {
-        coldStep = Math.max(0, Math.min(COLD_STEPS.length - 1, coldStep + pair[1]));
-        picT0 = performance.now(); coldStepUi(); drawPic();
+        var list = stepList(); if (!list) return;
+        stepFrom = stepIdx;
+        stepIdx = Math.max(0, Math.min(list.length - 1, stepIdx + pair[1]));
+        picT0 = performance.now(); stepUi(); drawPic();
       });
     });
     $('g-energySeg').addEventListener('click', function (e) {
@@ -861,7 +1037,7 @@
 
     // ---------- Learn mode (as in the IMF Guide) ----------
     // Text hidden, the stage fills the screen for live teaching; scrolling, ‹ ›, arrow keys and
-    // presentation clickers step one beat at a time; Esc leaves. The briefing is skipped.
+    // presentation clickers step one beat at a time; P switches it on or off anywhere; Esc leaves. The briefing is skipped.
     var learnToggle = $('learnToggle'), LEARN_KEY = 'eq-guide-learn';
     function learnOn() { return document.body.classList.contains('learn-mode'); }
     function scrollToBeat(el, smooth) {
@@ -906,6 +1082,10 @@
     $('learnPrev').addEventListener('click', function () { stepBeat(-1); });
     $('learnNext').addEventListener('click', function () { stepBeat(1); });
     document.addEventListener('keydown', function (e) {
+      // P switches Learn (presentation) mode on or off from anywhere, except while typing in a field
+      if ((e.key === 'p' || e.key === 'P') && !e.altKey && !e.ctrlKey && !e.metaKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) && !e.target.isContentEditable) {
+        e.preventDefault(); setLearn(!learnOn()); return;
+      }
       if (!learnOn() || e.altKey || e.ctrlKey || e.metaKey) return;
       var t = e.target.tagName, onControl = /^(BUTTON|SELECT|INPUT|TEXTAREA)$/.test(t), field = /^(SELECT|INPUT|TEXTAREA)$/.test(t);
       var k = e.key;

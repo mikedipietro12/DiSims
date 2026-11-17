@@ -5,6 +5,8 @@
  *   ocean - CO₂(g) ⇌ CO₂(aq) between the air and the sea. Cold / warm, add CO₂ to the air.
  *   diamond - C(diamond) → C(graphite): ΔG −, but a huge hill. Time-lapse clock; heat it (no air) to cross.
  *   blood - the four carbonic acid equilibria, written large and small with each breath. Regular breathing / panic attack / exercise.
+ *   eluni / elbi / eldbl - one elementary step in a box (A →, A + B →, 2A →); double A to see the rate go ×2, ×2 or ×4.
+ *   kmag - A ⇌ B with K = 0.001 … 1000: the size of K sets which side the equilibrium mix is mostly made of.
  *
  * Unlike the looping pictures, these keep state: change a condition and the particles settle
  * into a new balance, then change it back and they return. Crossings happen one particle at a
@@ -1106,7 +1108,401 @@
     };
   }
 
-  var MAKERS = { soda: soda, ocean: ocean, blood: blood, diamond: diamond };
+  /* ---------- elementary: one elementary step in a box, and why its rate law follows its coefficients ----------
+     kind 'uni' A → products · 'bi' A + B → products · 'dbl' 2A → products.
+     The amount of each reactant is held steady (each one used is topped back up), so the rate is
+     steady and two amounts can be compared. Reactions fire at a rate set by the rate law: doubling
+     A doubles it for 'uni' and 'bi', and quadruples it for 'dbl'. Each event is drawn: the chosen
+     particle breaks apart, or the chosen pair glides together, collides and leaves as product. */
+  function elementary(kind) {
+    return function (canvas, opts) {
+      var BASE = 0.8, WINDOW = 10;                             // reactions per second at the normal amounts
+      var A_COL = [EMBER, '#ffc79a'], B_COL = [TIDE, '#7fdcd8'], P_COL = ['#8a93a6', '#eef0f5'];
+      var A_TXT = '#b4561a', B_TXT = '#0d6e6c';                // darker ember / tide for text on white
+      var st = { amt: 'normal' }, parts, events, prods, rings, clock, nextAt, shown, log;
+
+      function nA() { return st.amt === 'double' ? 12 : 6; }
+      function nB() { return kind === 'bi' ? 6 : 0; }
+      function mult() { return st.amt === 'double' ? (kind === 'dbl' ? 4 : 2) : 1; }
+      function spawn(sp, a) {
+        var ang = rand(0, 6.3), v = rand(0.035, 0.06);
+        return { sp: sp, x: rand(0.06, 0.94), y: rand(0.1, 0.9), vx: Math.cos(ang) * v, vy: Math.sin(ang) * v, a: a, busy: false, out: false };
+      }
+      function live(sp) { return parts.filter(function (p) { return p.sp === sp && !p.out && !p.gone; }); }
+      function topUp() {
+        [['A', nA()], ['B', nB()]].forEach(function (q) {
+          var have = live(q[0]);
+          for (var i = have.length; i < q[1]; i++) parts.push(spawn(q[0], 0));
+          for (var j = have.length - 1; j >= 0 && have.length > q[1]; j--) if (!have[j].busy) { have[j].out = true; have.splice(j, 1); }
+        });
+      }
+      function interval() { return 1 / (BASE * mult()) * rand(0.8, 1.2); }
+      function reset() {
+        parts = []; events = []; prods = []; rings = []; clock = 0; log = []; shown = mult();
+        topUp(); parts.forEach(function (p) { p.a = 1; });
+        nextAt = 0.6;
+      }
+
+      function fire() {
+        var free = parts.filter(function (p) { return !p.busy && !p.out && !p.gone && p.a > 0.95; });
+        var As = free.filter(function (p) { return p.sp === 'A'; });
+        if (!As.length) return;
+        var a = As[Math.floor(Math.random() * As.length)];
+        if (kind === 'uni') { a.busy = true; events.push({ p: a, t: 0, dur: 0.55 }); return; }
+        var pool = kind === 'bi' ? free.filter(function (p) { return p.sp === 'B'; }) : As.filter(function (p) { return p !== a; });
+        if (!pool.length) return;
+        var b = pool.reduce(function (m, p) { return Math.hypot(p.x - a.x, (p.y - a.y) * 0.6) < Math.hypot(m.x - a.x, (m.y - a.y) * 0.6) ? p : m; });
+        a.busy = b.busy = true;
+        events.push({ p: a, q: b, t: 0, dur: 0.6, ax: a.x, ay: a.y, bx: b.x, by: b.y });
+      }
+      function finish(e) {
+        var x = e.q ? (e.p.x + e.q.x) / 2 : e.p.x, y = e.q ? (e.p.y + e.q.y) / 2 : e.p.y;
+        rings.push({ x: x, y: y, t: 0 });
+        log.push(clock);
+        e.p.gone = true; if (e.q) e.q.gone = true;
+        if (kind === 'uni') {
+          var ang = rand(0, 3.1);
+          prods.push({ x: x, y: y, vx: Math.cos(ang) * 0.14, vy: Math.sin(ang) * 0.14, t: 0, pair: false });
+          prods.push({ x: x, y: y, vx: -Math.cos(ang) * 0.14, vy: -Math.sin(ang) * 0.14, t: 0, pair: false });
+        } else prods.push({ x: x, y: y, vx: rand(-0.06, 0.06), vy: -0.05, t: 0, pair: true, rot: rand(0, 3) });
+        topUp();
+      }
+
+      function update(dt) {
+        if (!dt) return;
+        clock += dt;
+        shown += (mult() - shown) * Math.min(1, dt * 3);
+        parts.forEach(function (p) {
+          if (p.out) { p.a -= dt * 2.5; if (p.a <= 0) p.gone = true; }
+          else if (p.a < 1) p.a = Math.min(1, p.a + dt * 2);
+          if (p.busy) return;
+          p.x += p.vx * dt; p.y += p.vy * dt;
+          if (p.x < 0.04 || p.x > 0.96) { p.vx = -p.vx; p.x = clamp(p.x, 0.04, 0.96); }
+          if (p.y < 0.07 || p.y > 0.93) { p.vy = -p.vy; p.y = clamp(p.y, 0.07, 0.93); }
+        });
+        events = events.filter(function (e) {
+          e.t += dt;
+          if (e.q) {
+            var u = smooth(Math.min(1, e.t / e.dur)), mx = (e.ax + e.bx) / 2, my = (e.ay + e.by) / 2;
+            var dx = e.bx - e.ax, dy = e.by - e.ay, d = Math.hypot(dx, dy * 0.6) || 1, gap = 0.028 / d;    // stop just touching
+            e.p.x = e.ax + (mx - dx * gap - e.ax) * u; e.p.y = e.ay + (my - dy * gap - e.ay) * u;
+            e.q.x = e.bx + (mx + dx * gap - e.bx) * u; e.q.y = e.by + (my + dy * gap - e.by) * u;
+          }
+          if (e.t >= e.dur) { finish(e); return false; }
+          return true;
+        });
+        parts = parts.filter(function (p) { return !p.gone; });
+        prods.forEach(function (q) { q.t += dt; q.x += q.vx * dt; q.y += q.vy * dt; });
+        prods = prods.filter(function (q) { return q.t < 1.1; });
+        rings.forEach(function (r) { r.t += dt; });
+        rings = rings.filter(function (r) { return r.t < 0.6; });
+        while (log.length && log[0] < clock - WINDOW) log.shift();
+        if (clock >= nextAt) { fire(); nextAt = clock + interval(); }
+      }
+
+      // Text in coloured runs, centred. runs: [text, colour, { sup, size }]. Returns each run's box.
+      function runs(ctx, list, cx, y, size) {
+        var boxes = [], total = 0;
+        list.forEach(function (r) {
+          var sz = (r[2] && r[2].sup) ? size * 0.62 : size;
+          ctx.font = '700 ' + sz + 'px ' + BODY; var w = ctx.measureText(r[0]).width;
+          boxes.push({ w: w, sz: sz }); total += w;
+        });
+        var x = cx - total / 2;
+        list.forEach(function (r, i) {
+          var b = boxes[i], sup = r[2] && r[2].sup;
+          label(ctx, r[0], x, sup ? y - size * 0.36 : y, { font: BODY, size: b.sz, color: r[1], align: 'left' });
+          b.x = x; b.y = sup ? y - size * 0.36 : y; x += b.w;
+        });
+        return boxes;
+      }
+
+      // A label shrunk until it fits maxW
+      function fitLabel(ctx, text, x, y, maxW, size, o) {
+        for (; size > 7; size -= 0.5) { ctx.font = '700 ' + size + 'px ' + (o.font || U.MONO); if (ctx.measureText(text).width <= maxW) break; }
+        o.size = size; label(ctx, text, x, y, o);
+      }
+
+      function draw() {
+        var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h, dbl = st.amt === 'double';
+        var A = ['A', A_TXT], Bk = ['B', B_TXT];
+        // Step equation and its rate law
+        var eq = kind === 'uni' ? [A, [' → products', INK]] : kind === 'bi' ? [A, [' + ', INK], Bk, [' → products', INK]] : [['2', INK], A, [' → products', INK]];
+        var law = kind === 'uni' ? [['rate = k[', INK], A, [']', INK]]
+          : kind === 'bi' ? [['rate = k[', INK], A, ['][', INK], Bk, [']', INK]]
+          : [['rate = k[', INK], A, ['][', INK], A, ['] = k[', INK], A, [']', INK], ['2', INK, { sup: true }]];
+        if (kind === 'dbl') {
+          // The coefficient 2 and the exponent 2 get the same pill, drawn under the text
+          ctx.save(); ctx.globalAlpha = 0; var eb0 = runs(ctx, eq, w / 2, 22, 18), lb0 = runs(ctx, law, w / 2, 50, 16); ctx.restore();
+          [[eb0[0], 9], [lb0[lb0.length - 1], 6.5]].forEach(function (q) {
+            var b = q[0]; ctx.fillStyle = 'rgba(29,36,51,0.08)'; ctx.strokeStyle = 'rgba(29,36,51,0.55)'; ctx.lineWidth = 1.2;
+            roundBox(ctx, b.x - 3, b.y - q[1] - 1, b.w + 6, q[1] * 2 + 2, q[1]); ctx.fill(); ctx.stroke();
+          });
+        }
+        runs(ctx, eq, w / 2, 22, 18); runs(ctx, law, w / 2, 50, 16);
+        var why = !dbl ? (kind === 'dbl' ? 'one step, so the coefficient 2 becomes the exponent 2' : 'one step, so each coefficient becomes an exponent')
+          : kind === 'uni' ? 'double A:  k(2[A]) = 2 × before'
+          : kind === 'bi' ? 'double A:  k(2[A])[B] = 2 × before'
+          : 'double A:  k(2[A])(2[A]) = 4 × before';
+        fitLabel(ctx, why, w / 2, 74, w - 20, 11, { color: dbl ? INK : DIM });
+
+        // The box
+        var bx = 10, by = 88, bw = w - 20, bh = h - by - 10;
+        ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.strokeStyle = 'rgba(29,36,51,0.35)'; ctx.lineWidth = 1.5;
+        roundBox(ctx, bx, by, bw, bh, 12); ctx.fill(); ctx.stroke();
+        var r = clamp(Math.min(bw, bh) / 19, 8, 15);
+        function X(x) { return bx + r + x * (bw - 2 * r); }
+        function Y(y) { return by + r + y * (bh - 2 * r); }
+        function sphere(sp, x, y, a, s) {
+          ctx.save(); ctx.globalAlpha = a;
+          var col = sp === 'A' ? A_COL : B_COL;
+          ball(ctx, x, y, r * (s || 1), col[0], col[1]);
+          label(ctx, sp, x, y + 0.5, { size: Math.round(r * 1.1), color: '#ffffff' });
+          ctx.restore();
+        }
+        prods.forEach(function (q) {
+          var a = 1 - smooth(q.t / 1.1), px = X(q.x), py = Y(q.y);
+          ctx.save(); ctx.globalAlpha = a;
+          if (q.pair) {
+            var dx = Math.cos(q.rot) * r * 0.75, dy = Math.sin(q.rot) * r * 0.75;
+            ball(ctx, px - dx, py - dy, r * 0.85, P_COL[0], P_COL[1]); ball(ctx, px + dx, py + dy, r * 0.85, P_COL[0], P_COL[1]);
+          } else ball(ctx, px, py, r * 0.7, P_COL[0], P_COL[1]);
+          ctx.restore();
+        });
+        parts.forEach(function (p) {
+          var s = 1;
+          if (kind === 'uni' && p.busy) {                       // a breaking particle shudders and swells
+            var e = events.filter(function (ev) { return ev.p === p; })[0], u = e ? e.t / e.dur : 0;
+            s = 1 + 0.18 * u + Math.sin(u * 40) * 0.05;
+          }
+          sphere(p.sp, X(p.x), Y(p.y), Math.max(0, Math.min(1, p.a)), s);
+        });
+        rings.forEach(function (rg) { ring(ctx, X(rg.x), Y(rg.y), rg.t / 0.6, r * 1.3); });
+
+        // Rate panel: the rate law's prediction, and the reactions actually counted
+        var pw = Math.min(170, Math.max(130, bw * 0.42)), px0 = bx + bw - pw - 8, py0 = by + 8, ph = 64;
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.strokeStyle = 'rgba(29,36,51,0.25)'; ctx.lineWidth = 1;
+        roundBox(ctx, px0, py0, pw, ph, 10); ctx.fill(); ctx.stroke();
+        label(ctx, 'rate', px0 + 10, py0 + 13, { size: 10, align: 'left' });
+        label(ctx, '× ' + mult(), px0 + pw - 10, py0 + 13, { font: BODY, size: 15, color: INK, align: 'right' });
+        var tx0 = px0 + 10, tw = pw - 20, ty = py0 + 28;
+        ctx.fillStyle = 'rgba(29,36,51,0.08)'; roundBox(ctx, tx0, ty, tw, 9, 4.5); ctx.fill();
+        ctx.fillStyle = INK; roundBox(ctx, tx0, ty, Math.max(5, tw * shown / 4), 9, 4.5); ctx.fill();
+        [1, 2, 4].forEach(function (m) {
+          var mx = tx0 + tw * m / 4;
+          ctx.strokeStyle = 'rgba(29,36,51,0.45)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(mx, ty - 2); ctx.lineTo(mx, ty + 11); ctx.stroke();
+          label(ctx, '×' + m, Math.min(mx, tx0 + tw - 8), ty + 19, { size: 9, weight: '400' });
+        });
+        fitLabel(ctx, 'reactions in last ' + WINDOW + ' s: ' + log.length, px0 + 10, py0 + ph - 7, pw - 20, 9, { align: 'left', color: DIM });
+      }
+
+      function describe() {
+        var dbl = st.amt === 'double';
+        if (kind === 'uni') return dbl
+          ? 'Twice as much A means twice as many particles that can break apart, so the rate doubles. rate = k[A].'
+          : 'A → products is one elementary step: one A particle breaks apart on its own. The rate depends only on how much A there is: rate = k[A].';
+        if (kind === 'bi') return dbl
+          ? 'Twice as much A: each B collides with an A twice as often, so the rate doubles. rate = k[A][B].'
+          : 'A + B → products is one elementary step: an A and a B collide. The rate depends on both amounts: rate = k[A][B].';
+        return dbl
+          ? 'Twice as much A: there are twice as many A particles, and each one collides with another A twice as often. 2 × 2 = 4, so the rate goes up four times.'
+          : '2A → products is one elementary step: two A particles collide. [A] appears twice in the rate law: rate = k[A][A] = k[A]². The coefficient 2 becomes the exponent.';
+      }
+
+      reset();
+      return {
+        controls: [
+          { type: 'seg', key: 'amt', label: 'Amount of A', options: [['normal', 'Normal'], ['double', 'Doubled']] },
+        ],
+        get: function (k) { return st[k]; },
+        set: function (k, v) {
+          if (k !== 'amt' || v === st.amt) return;
+          st.amt = v; topUp(); log = [];
+          nextAt = Math.min(nextAt, clock + interval());
+        },
+        action: function () {},
+        stats: function () { return { mult: mult(), counted: log.length, A: live('A').length, B: live('B').length }; },
+        update: update, draw: draw, describe: describe,
+      };
+    };
+  }
+
+  /* ---------- kmag: the size of K decides which side the equilibrium mix is mostly made of ----------
+     A ⇌ B in a box of N particles, K = [B] / [A]. Each particle flips on its own (one elementary step
+     each way): A → B at k_f, B → A at k_r, with k_f / k_r = K and k_f + k_r fixed, so every K settles
+     at the same pace. Flips are random, so the mix wanders around N·K/(1+K) B and never stops.
+     Bottom: the amounts now as one split bar (tick = where they end up), and a log number line of K
+     with the reactant-favoured side in ember and the product-favoured side in tide. */
+  function kmag(canvas, opts) {
+    var N = 40, LAMBDA = 0.55, FLIP = 0.5;                  // particles · k_f + k_r per second · flip animation (s)
+    var A_COL = [EMBER, '#ffc79a'], B_COL = [TIDE, '#7fdcd8'];
+    var A_TXT = '#b4561a', B_TXT = '#0d6e6c';
+    var KS = [['0.001', '0.001'], ['0.1', '0.1'], ['1', '1'], ['10', '10'], ['1000', '1000']];
+    var st = { K: '1000', start: 'A' }, parts, rings, fwd = rateMeter(), rev = rateMeter(), clock = 0, logK = 3, shownA = N;
+
+    function K() { return +st.K; }
+    function eqA() { return N / (1 + K()); }
+    function count(sp) { return parts.filter(function (p) { return (p.to || p.sp) === sp; }).length; }   // a flip counts once it fires
+    function reset() {
+      parts = []; rings = []; fwd.clear(); rev.clear();
+      // Particles sit on a jittered grid so none overlap at the start
+      var cols = 8, rows = 5;
+      for (var i = 0; i < N; i++) {
+        var ang = rand(0, 6.3), v = rand(0.03, 0.055);
+        parts.push({ sp: st.start, x: ((i % cols) + 0.5 + rand(-0.25, 0.25)) / cols, y: (Math.floor(i / cols) + 0.5 + rand(-0.25, 0.25)) / rows,
+          vx: Math.cos(ang) * v, vy: Math.sin(ang) * v, flip: 0, to: null });
+      }
+      shownA = count('A');
+    }
+
+    function update(dt) {
+      if (!dt) return;
+      clock += dt;
+      // Each flip is a FLIP-second animation the particle can't react during, so the rates are raised
+      // to keep the mean time spent as each species at 1/k (FLIP + 1/k' = 1/k)
+      var kf = LAMBDA * K() / (1 + K()), kr = LAMBDA / (1 + K());
+      kf /= 1 - kf * FLIP; kr /= 1 - kr * FLIP;
+      logK += (Math.log10(K()) - logK) * Math.min(1, dt * 4);
+      parts.forEach(function (p) {
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        if (p.x < 0.02 || p.x > 0.98) { p.vx = -p.vx; p.x = clamp(p.x, 0.02, 0.98); }
+        if (p.y < 0.03 || p.y > 0.97) { p.vy = -p.vy; p.y = clamp(p.y, 0.03, 0.97); }
+        if (p.to) {
+          p.flip += dt / FLIP;
+          if (p.flip >= 1) { p.sp = p.to; p.to = null; p.flip = 0; rings.push({ x: p.x, y: p.y, t: 0 }); }
+          return;
+        }
+        var k = p.sp === 'A' ? kf : kr;
+        if (Math.random() < k * dt) {
+          p.to = p.sp === 'A' ? 'B' : 'A'; p.flip = 0;
+          (p.sp === 'A' ? fwd : rev).add(clock);
+        }
+      });
+      rings.forEach(function (r) { r.t += dt; });
+      rings = rings.filter(function (r) { return r.t < 0.6; });
+      shownA += (count('A') - shownA) * Math.min(1, dt * 5);
+    }
+
+    function verdict() {
+      var k = K();
+      if (k >= 1000) return ['nearly all B (products favoured)', B_TXT];
+      if (k > 1) return ['more B than A (products favoured)', B_TXT];
+      if (k === 1) return ['equal amounts of A and B', INK];
+      if (k > 0.001) return ['more A than B (reactants favoured)', A_TXT];
+      return ['nearly all A (reactants favoured)', A_TXT];
+    }
+
+    function draw() {
+      var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h;
+      var nA = count('A'), nB = N - nA;
+
+      // Equation with live half-arrows, then K
+      liveEquation(ctx, w, 20, ['A', { f: fwd.rate(clock), r: rev.rate(clock) }, 'B'], 18, N * LAMBDA / 4);
+      // K = [B] over [A] = value, as a stacked fraction (B in tide, A in ember, like the particles).
+      // The bigger side is drawn bigger: sizes follow log K on a squashed scale (the bigger term grows
+      // ×1.2 per power of ten, the smaller shrinks ×0.9, so at K = 1000 B is about 2.4× the size of A
+      // and A stays readable), gliding as the K marker glides.
+      var v = verdict(), fy = 68, fs = 15, lg = clamp(logK, -3, 3);
+      function grow(x) { return 16 * (x > 0 ? Math.pow(1.2, x) : Math.pow(0.9, -x)); }
+      var sB = grow(lg), sA = grow(-lg);
+      ctx.font = '700 ' + fs + 'px ' + BODY;
+      var wK = ctx.measureText('K = ').width, wV = ctx.measureText(' = ' + st.K).width;
+      ctx.font = '700 ' + sB + 'px ' + BODY; var wB = ctx.measureText('[B]').width;
+      ctx.font = '700 ' + sA + 'px ' + BODY; var wA = ctx.measureText('[A]').width;
+      var wF = Math.max(wB, wA) + 8, fx = w / 2 - (wK + wF + wV) / 2;
+      label(ctx, 'K = ', fx, fy, { font: BODY, size: fs, color: INK, align: 'left' });
+      label(ctx, '[B]', fx + wK + wF / 2, fy - sB * 0.62 - 2, { font: BODY, size: sB, color: B_TXT });
+      label(ctx, '[A]', fx + wK + wF / 2, fy + sA * 0.62 + 3, { font: BODY, size: sA, color: A_TXT });
+      ctx.strokeStyle = INK; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(fx + wK, fy); ctx.lineTo(fx + wK + wF, fy); ctx.stroke();
+      label(ctx, ' = ' + st.K, fx + wK + wF, fy, { font: BODY, size: fs, color: INK, align: 'left' });
+      label(ctx, 'at equilibrium: ' + v[0], w / 2, 114, { font: BODY, size: 11, color: v[1] });
+
+      // The box
+      var bx = 10, by = 126, bw = w - 20, bh = Math.max(90, h - by - 112);
+      ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.strokeStyle = 'rgba(29,36,51,0.35)'; ctx.lineWidth = 1.5;
+      roundBox(ctx, bx, by, bw, bh, 12); ctx.fill(); ctx.stroke();
+      var r = clamp(Math.min(bw / 8, bh / 5) * 0.28, 6, 13);
+      function X(x) { return bx + r + x * (bw - 2 * r); }
+      function Y(y) { return by + r + y * (bh - 2 * r); }
+      function sphere(sp, x, y, a, s) {
+        if (a <= 0.01) return;
+        ctx.save(); ctx.globalAlpha = a;
+        var col = sp === 'A' ? A_COL : B_COL;
+        ball(ctx, x, y, r * s, col[0], col[1]);
+        label(ctx, sp, x, y + 0.5, { size: Math.round(r * 1.1 * s), color: '#ffffff' });
+        ctx.restore();
+      }
+      parts.forEach(function (p) {
+        var x = X(p.x), y = Y(p.y);
+        if (!p.to) { sphere(p.sp, x, y, 1, 1); return; }
+        var u = smooth(p.flip), s = 1 + 0.25 * Math.sin(Math.PI * p.flip);   // swell while it rearranges
+        sphere(p.sp, x, y, 1 - u, s); sphere(p.to, x, y, u, s);
+      });
+      rings.forEach(function (rg) { ring(ctx, X(rg.x), Y(rg.y), rg.t / 0.6, r * 1.3); });
+
+      // Amounts now: one split bar, A from the left, B from the right; the tick is where they end up
+      var y0 = by + bh + 26, x0 = 14, tw = w - 28;
+      label(ctx, 'A  ' + nA, x0, y0 - 12, { size: 11, color: A_TXT, align: 'left' });
+      label(ctx, 'amounts now', w / 2, y0 - 12, { size: 10 });
+      label(ctx, nB + '  B', x0 + tw, y0 - 12, { size: 11, color: B_TXT, align: 'right' });
+      var split = x0 + tw * clamp(shownA / N, 0, 1);
+      ctx.save(); roundBox(ctx, x0, y0, tw, 12, 6); ctx.clip();
+      ctx.fillStyle = 'rgba(29,36,51,0.08)'; ctx.fillRect(x0, y0, tw, 12);
+      ctx.fillStyle = EMBER; ctx.fillRect(x0, y0, split - x0, 12);
+      ctx.fillStyle = TIDE; ctx.fillRect(split, y0, x0 + tw - split, 12);
+      ctx.restore();
+      var tx = x0 + tw * eqA() / N;
+      ctx.strokeStyle = INK; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(tx, y0 - 4); ctx.lineTo(tx, y0 + 16); ctx.stroke();
+
+      // Number line of K, log scale 10⁻⁴ … 10⁴
+      var ly = h - 30, lx0 = 24, lw = w - 48, LO = -4, HI = 4;
+      function LX(lg) { return lx0 + lw * (lg - LO) / (HI - LO); }
+      var mid = LX(0);
+      ctx.fillStyle = 'rgba(224,122,46,0.16)'; ctx.fillRect(lx0, ly - 7, mid - lx0, 14);
+      ctx.fillStyle = 'rgba(20,145,143,0.16)'; ctx.fillRect(mid, ly - 7, lx0 + lw - mid, 14);
+      ctx.strokeStyle = 'rgba(29,36,51,0.55)'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(lx0, ly); ctx.lineTo(lx0 + lw, ly); ctx.stroke();
+      for (var d = LO; d <= HI; d++) {
+        var big = d % 3 === 0;
+        ctx.beginPath(); ctx.moveTo(LX(d), ly - (big ? 7 : 4)); ctx.lineTo(LX(d), ly + (big ? 7 : 4)); ctx.stroke();
+      }
+      [[-3, '0.001'], [0, '1'], [3, '1000']].forEach(function (q) { label(ctx, q[1], LX(q[0]), ly + 16, { size: 9, weight: '400' }); });
+      label(ctx, '← reactants favoured', lx0, ly - 14, { size: 10, color: A_TXT, align: 'left' });
+      label(ctx, 'products favoured →', lx0 + lw, ly - 14, { size: 10, color: B_TXT, align: 'right' });
+      // Marker
+      var mx = LX(clamp(logK, LO, HI));
+      ctx.fillStyle = INK; ctx.beginPath(); ctx.moveTo(mx, ly + 1); ctx.lineTo(mx - 6, ly - 9); ctx.lineTo(mx + 6, ly - 9); ctx.closePath(); ctx.fill();
+    }
+
+    function describe() {
+      var k = K(), nA = count('A'), now = ' Now: ' + nA + ' A and ' + (N - nA) + ' B.';
+      if (k >= 1000) return 'K = 1000, much bigger than 1. At equilibrium there is about 1000 times as much B as A, so the box ends up nearly all B: products are favoured. Both reactions keep going; now and then a B turns into A and soon turns back.' + now;
+      if (k > 1) return 'K = 10, bigger than 1. At equilibrium there is about 10 times as much B as A: products are favoured.' + now;
+      if (k === 1) return 'K = 1. At equilibrium there are equal amounts of A and B: neither side is favoured.' + now;
+      if (k > 0.001) return 'K = 0.1, smaller than 1. At equilibrium there is about 10 times as much A as B: reactants are favoured.' + now;
+      return 'K = 0.001, much smaller than 1. At equilibrium there is about 1000 times as much A as B, so the reaction barely goes: reactants are favoured.' + now;
+    }
+
+    reset();
+    return {
+      controls: [
+        { type: 'seg', key: 'K', label: 'K', options: KS },
+        { type: 'seg', key: 'start', label: 'Start with', options: [['A', 'All A'], ['B', 'All B']] },
+      ],
+      get: function (k) { return st[k]; },
+      set: function (k, v) {
+        if (k === 'K' && v !== st.K) { st.K = v; fwd.clear(); rev.clear(); }
+        if (k === 'start') { st.start = v; reset(); }
+      },
+      action: function () {},
+      stats: function () { return { K: K(), A: count('A'), B: count('B'), eqA: eqA() }; },
+      update: update, draw: draw, describe: describe,
+    };
+  }
+
+  var MAKERS = { soda: soda, ocean: ocean, blood: blood, diamond: diamond,
+    eluni: elementary('uni'), elbi: elementary('bi'), eldbl: elementary('dbl'), kmag: kmag };
   global.EqScenes = {
     bottle: { hw: hw, bore: bore, glassPath: glassPath, drawGlass: drawGlass, drawFront: drawFront, cap: cap, co2: co2 },
     has: function (id) { return !!MAKERS[id]; },

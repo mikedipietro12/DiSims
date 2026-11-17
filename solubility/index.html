@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solubility &amp; Ksp Simulations | AP Chemistry</title>
+  <meta name="description" content="Solubility and Ksp for AP Chemistry: molar solubility, the solubility product, Q vs Ksp and precipitation, the common ion effect and qualitative analysis, with a guided walkthrough, a dissolving sandbox and a qualitative analysis lab.">
+  <meta name="author" content="M DiPietro">
+  <!-- In development: keep out of search until the Guide ships, then remove this and add to sitemap.xml -->
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="canonical" href="https://atomicsimulations.ca/solubility/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Atomic Simulations">
+  <meta property="og:title" content="Solubility &amp; Ksp Simulations | AP Chemistry">
+  <meta property="og:description" content="Solubility and Ksp for AP Chemistry: molar solubility, the solubility product, Q vs Ksp and precipitation, the common ion effect and qualitative analysis, with a guided walkthrough, a dissolving sandbox and a qualitative analysis lab.">
+  <meta property="og:url" content="https://atomicsimulations.ca/solubility/">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Solubility & Ksp Simulations | AP Chemistry", "url": "https://atomicsimulations.ca/solubility/", "description": "Solubility and Ksp for AP Chemistry: molar solubility, the solubility product, Q vs Ksp and precipitation, the common ion effect and qualitative analysis, with a guided walkthrough, a dissolving sandbox and a qualitative analysis lab.", "inLanguage": "en", "isAccessibleForFree": true, "learningResourceType": "Simulation", "author": {"@type": "Person", "name": "M DiPietro"}, "isPartOf": {"@type": "WebSite", "name": "Atomic Simulations", "url": "https://atomicsimulations.ca/"}, "educationalLevel": "Grade 12", "about": "Chemistry"}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
+  <link rel="stylesheet" href="../equilibrium-intro/assets/eq-intro.css?v=17">
+  <link rel="stylesheet" href="assets/sol.css?v=2">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+  <!-- shared fills for the tile animations -->
+  <svg class="hub-anim-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="eaW" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9aa3b5"/></radialGradient>
+    </defs>
+  </svg>
+
+  <div class="hub sol-hub">
+    <div class="top-nav">
+      <a href="../ap-chemistry-12/" class="back-link">← AP Chemistry 12</a>
+      <div class="mod-meta">3 Rooms · All open</div>
+    </div>
+
+    <header class="hub-header">
+      <h1>Solubility &amp; Ksp</h1>
+      <p class="suggest">Suggested order · Guide → Sandbox → Qual Lab · Jump freely anytime</p>
+    </header>
+
+    <ol class="path">
+      <li>
+        <a href="guide.html">
+          <span class="mod-num">Room 1 · Guide</span>
+          <span class="mod-title">Guide</span>
+          <span class="mod-teaser">Learn what Ksp means, how it links to molar solubility, and how to tell if a solid will form.</span>
+          <span class="mod-anim" aria-hidden="true">
+            <!-- a crystal in water: ions leave the lattice and spread out as it shrinks -->
+            <svg class="hub-anim anim-dissolve" viewBox="20 22 160 88" focusable="false">
+              <ellipse cx="100" cy="98" rx="62" ry="8" fill="var(--sol-water)" stroke="var(--sol-water-line)" stroke-width="1.4"/>
+              <g class="ds-xtal">
+                <rect x="84" y="66" width="32" height="32" rx="4" fill="var(--sol-solid)" stroke="#1d2433" stroke-width="2"/>
+                <path d="M84,82 H116 M100,66 V98" stroke="rgba(255,255,255,0.55)" stroke-width="1.4"/>
+              </g>
+              <g font-family="Space Mono, monospace" font-size="9" font-weight="700" text-anchor="middle" fill="#1d2433">
+                <g class="ds-ion" style="--dx:-56px;--dy:-30px"><circle cx="92" cy="74" r="7" fill="url(#eaW)" stroke="rgba(29,36,51,0.45)"/><text x="92" y="77">+</text></g>
+                <g class="ds-ion" style="--dx:52px;--dy:-34px;animation-delay:-0.4s"><circle cx="108" cy="74" r="7" fill="url(#eaW)" stroke="rgba(29,36,51,0.45)"/><text x="108" y="77">−</text></g>
+                <g class="ds-ion" style="--dx:-30px;--dy:-44px;animation-delay:-0.8s"><circle cx="96" cy="86" r="7" fill="url(#eaW)" stroke="rgba(29,36,51,0.45)"/><text x="96" y="89">−</text></g>
+                <g class="ds-ion" style="--dx:34px;--dy:-10px;animation-delay:-1.2s"><circle cx="106" cy="88" r="7" fill="url(#eaW)" stroke="rgba(29,36,51,0.45)"/><text x="106" y="91">+</text></g>
+                <g class="ds-ion" style="--dx:-62px;--dy:2px;animation-delay:-1.6s"><circle cx="90" cy="90" r="7" fill="url(#eaW)" stroke="rgba(29,36,51,0.45)"/><text x="90" y="93">−</text></g>
+                <g class="ds-ion" style="--dx:6px;--dy:-48px;animation-delay:-2s"><circle cx="100" cy="72" r="7" fill="url(#eaW)" stroke="rgba(29,36,51,0.45)"/><text x="100" y="75">+</text></g>
+              </g>
+            </svg>
+          </span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </a>
+      </li>
+      <li>
+        <a href="sandbox.html">
+          <span class="mod-num">Room 2 · Sandbox</span>
+          <span class="mod-title">Sandbox</span>
+          <span class="mod-teaser">Dissolve salts, saturate the water, and push the equilibrium to dissolve more or less.</span>
+          <span class="mod-anim" aria-hidden="true">
+            <!-- a saturated beaker: ions keep leaving and rejoining the solid, so the pile holds steady -->
+            <svg class="hub-anim anim-saturate" viewBox="30 14 180 100" focusable="false">
+              <path d="M66,22 V100 Q66,108 74,108 H166 Q174,108 174,100 V22" fill="var(--sol-water)" stroke="#1d2433" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M66,40 H174" stroke="var(--sol-water-line)" stroke-width="1.4"/>
+              <path d="M84,108 Q92,92 104,96 Q116,88 128,94 Q142,88 156,108 Z" fill="var(--sol-solid)" stroke="#1d2433" stroke-width="1.6" stroke-linejoin="round"/>
+              <g font-family="Space Mono, monospace" font-size="8" font-weight="700" text-anchor="middle" fill="#1d2433">
+                <g class="st-j" style="--jx:3px;--jy:-16px"><circle cx="86" cy="58" r="6" fill="url(#eaW)" stroke="rgba(29,36,51,0.45)"/><text x="86" y="61">+</text></g>
+                <g class="st-j" style="--jx:-3px;--jy:-12px"><circle cx="110" cy="52" r="6" fill="url(#eaW)" stroke="rgba(29,36,51,0.45)"/><text x="110" y="55">−</text></g>
+                <g class="st-j" style="--jx:2px;--jy:-18px"><circle cx="136" cy="62" r="6" fill="url(#eaW)" stroke="rgba(29,36,51,0.45)"/><text x="136" y="65">+</text></g>
+                <g class="st-j" style="--jx:-2px;--jy:-14px"><circle cx="158" cy="54" r="6" fill="url(#eaW)" stroke="rgba(29,36,51,0.45)"/><text x="158" y="57">−</text></g>
+                <g class="st-j" style="--jx:4px;--jy:14px"><circle cx="98" cy="76" r="6" fill="url(#eaW)" stroke="rgba(29,36,51,0.45)"/><text x="98" y="79">−</text></g>
+                <g class="st-j" style="--jx:-4px;--jy:12px"><circle cx="146" cy="78" r="6" fill="url(#eaW)" stroke="rgba(29,36,51,0.45)"/><text x="146" y="81">+</text></g>
+              </g>
+            </svg>
+          </span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </a>
+      </li>
+      <li>
+        <a href="qual-lab.html">
+          <span class="mod-num">Room 3 · Qual Lab</span>
+          <span class="mod-title">Qual Lab</span>
+          <span class="mod-teaser">Test an unknown solution, separate what forms, and work out which ions are in it.</span>
+          <span class="mod-anim" aria-hidden="true">
+            <!-- a test tube: a drop of reagent falls in, a cloudy solid forms and settles to the bottom -->
+            <svg class="hub-anim anim-qual" viewBox="40 6 160 108" focusable="false">
+              <path class="ql-drop" d="M120,10 Q125,18 120,22 Q115,18 120,10 Z" fill="var(--sol-water-line)"/>
+              <path d="M104,30 V96 Q104,110 120,110 Q136,110 136,96 V30" fill="none" stroke="#1d2433" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M106,52 V96 Q106,108 120,108 Q134,108 134,96 V52 Z" fill="var(--sol-water)"/>
+              <g class="ql-cloud" fill="var(--sol-solid)">
+                <circle cx="113" cy="66" r="2.2"/><circle cx="124" cy="62" r="1.8"/><circle cx="129" cy="72" r="2"/>
+                <circle cx="117" cy="78" r="1.8"/><circle cx="126" cy="84" r="2.2"/><circle cx="112" cy="90" r="2"/>
+              </g>
+              <path class="ql-pile" d="M107,100 Q114,94 120,96 Q127,93 133,100 Q132,108 120,108 Q108,108 107,100 Z" fill="var(--sol-solid)"/>
+              <path d="M100,30 H140" stroke="#1d2433" stroke-width="2.4" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </a>
+      </li>
+      <li>
+        <a href="../equilibrium_simulations.html">
+          <span class="mod-num">Refresher · Le Châtelier</span>
+          <span class="mod-title">Equilibrium Simulations</span>
+          <span class="mod-teaser">Need a refresher? Push a system at equilibrium and watch it shift back.</span>
+          <span class="mod-anim" aria-hidden="true">
+            <!-- same balance tile as the Intro to Equilibrium hub -->
+            <svg class="hub-anim anim-shift" viewBox="40 6 160 108" focusable="false">
+              <g class="sh-all">
+                <polygon points="120,58 106,104 134,104" fill="#e0e6ef" stroke="#7f8ea6" stroke-width="1.6" stroke-linejoin="round"/>
+                <rect x="92" y="104" width="56" height="5" rx="2.5" fill="#7f8ea6"/>
+                <g class="sh-beam">
+                  <line x1="70" y1="58" x2="170" y2="58" stroke="#1d2433" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="120" cy="58" r="3.5" fill="#1d2433"/>
+                  <path d="M70,58 L60,82 M70,58 L80,82 M170,58 L160,82 M170,58 L180,82" stroke="#7f8ea6" stroke-width="1.2"/>
+                  <path d="M54,82 Q70,92 86,82 Z" fill="#dfe5f0" stroke="#7f8ea6" stroke-width="1.4" stroke-linejoin="round"/>
+                  <path d="M154,82 Q170,92 186,82 Z" fill="#dfe5f0" stroke="#7f8ea6" stroke-width="1.4" stroke-linejoin="round"/>
+                  <rect class="sh-weight" x="72" y="66" width="14" height="14" rx="3" fill="#1d2433"/>
+                  <circle cx="62" cy="77" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/>
+                  <g class="sh-move"><circle cx="64" cy="70" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/></g>
+                  <g class="sh-move sh-move-b"><circle cx="54" cy="68" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/></g>
+                  <circle cx="170" cy="77" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/>
+                  <circle cx="181" cy="77" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/>
+                  <circle cx="176" cy="68" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/>
+                </g>
+              </g>
+            </svg>
+          </span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </a>
+      </li>
+    </ol>
+
+  </div>
+</body>
+</html>

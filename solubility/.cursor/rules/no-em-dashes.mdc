@@ -1,0 +1,41 @@
+---
+description: No em dashes (or dash-as-punctuation) in any user-facing text
+alwaysApply: true
+---
+
+# No em dashes in user-facing text
+
+Never use em dashes in student-facing or UI copy. This includes:
+
+- The em dash character `—` (U+2014)
+- The en dash `–` (U+2013) used as punctuation or in force names
+- ASCII stand-ins that act like an em dash: ` - ` (space-hyphen-space) as a clause break
+
+## Prefer instead
+
+- A period and a new sentence
+- A comma
+- A colon
+- Parentheses
+- A middot `·` for chrome separators (already used in this suite)
+
+## Examples
+
+```text
+❌ Intermolecular forces are attractions between molecules - weaker than bonds.
+✅ Intermolecular forces are attractions between molecules. They are weaker than bonds.
+
+❌ Orientation matters - turn a molecule and the pull can flip.
+✅ Orientation matters. Turn a molecule and the pull can flip.
+
+❌ Dipole–dipole / Ion–induced dipole
+✅ Dipole-dipole / Ion-induced dipole
+```
+
+## Allowed hyphens
+
+Regular ASCII hyphens `-` are fine inside compound words and force names (`dipole-dipole`, `ion-dipole`, `H-bond`) and in code/math.
+
+## Scope
+
+Applies to all user-facing strings: HTML copy, canvas/HUD labels, buttons, `pairs.js` force labels, status text, titles, TOC. Internal code comments may keep plain hyphens; still avoid `—`.

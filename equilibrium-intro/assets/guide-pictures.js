@@ -10,6 +10,11 @@
  *   favour - which side ΔH or ΔS favours: energy shelves, or ordered vs spread out
  *   coldpack - stepped cold pack story: dissolving, then ΔH ← and ΔS → on the equation's half-arrows
  *   paths  - two routes between the same start and end (state functions)
+ *   kpuzzle - stepped: a guessed rate law fails an initial-rates test, yet K uses the coefficients
+ *   kderive - stepped algebra: equal forward and reverse rates rearrange into K (N₂O₄ ⇌ 2NO₂)
+ *   kmulti - stepped algebra: a two-step mechanism's K₁ × K₂ cancels down to the overall K
+ *   kmass  - summary: the law of mass action, for N₂O₄ ⇌ 2NO₂ and for aA + bB ⇌ cC + dD
+ *   kmanip - stepped algebra: add equations → multiply K's; reverse an equation → 1/K
  *   equation - big equation for example cards
  * Pictures that would give away a prediction (beaker heat arrows) stay grey with "?" until revealed.
  */
@@ -1266,6 +1271,453 @@
     return 'Four changes side by side. ' + I4.map(function (s) { return s.desc; }).join(' ');
   }
 
+  /* ---------- algebra: equations whose terms glide into place (Part 4, the equilibrium constant) ----------
+     A small layout engine for the K beats, drawn in a virtual 460 × 330 box scaled to the canvas.
+     A step is a list of rows { y, s (size scale), at: [item index, x] (pin that item's left edge), items }.
+     Items: text { id, t, c, sup, sub, px (fixed px size, for captions), mono, strike, from }
+            fraction { frac: id, num: [...], den: [...] } · arrows { arrows: id, hi: 'f' | 'r', one: 'f' | 'r' }
+            line { line: id, len } · gap { gap: ems }.
+     Tokens keep their id from step to step, so stepping slides every term from where it was to where
+     it now sits. New tokens fade in after the slide (or fly out of the token named by `from`); tokens
+     that are gone fade out; a newly struck token gets its line drawn once everything has landed. */
+  var ALG = { W: 460, H: 330 }, INK_R = TIDE;
+  function tk(id, t, o) { var r = { id: id, t: t }; if (o) for (var q in o) r[q] = o[q]; return r; }
+  function cap(id, t, o) { var r = tk(id, t, { px: 12, wt: '500', c: DIM }); if (o) for (var q in o) r[q] = o[q]; return r; }
+  function algLayout(ctx, rows, base) {
+    var out = { tok: {}, bar: {}, arr: {} };
+    rows.forEach(function (row) {
+      var rs = base * (row.s || 1);
+      function size(it) { return it.px || rs * (it.sup || it.sub ? 0.6 : 1); }
+      function wOf(it) {
+        if (it.frac) return Math.max(seqW(it.num), seqW(it.den)) + rs * 0.4;
+        if (it.arrows) return rs * 3.3;
+        if (it.line) return it.len;
+        if (it.gap != null) return rs * it.gap;
+        ctx.font = (it.wt || '700') + ' ' + size(it) + 'px ' + (it.mono ? MONO : BODY);
+        return ctx.measureText(it.t).width + (it.sup ? rs * 0.06 : 0);
+      }
+      function seqW(items) { return items.reduce(function (a, it) { return a + wOf(it); }, 0); }
+      function place(items, x, y) {
+        items.forEach(function (it) {
+          var iw = wOf(it);
+          if (it.frac) {
+            var nw = seqW(it.num), dw = seqW(it.den), cx = x + iw / 2;
+            place(it.num, cx - nw / 2, y - rs * 0.68);
+            place(it.den, cx - dw / 2, y + rs * 0.72);
+            out.bar[it.frac] = { x: x + rs * 0.1, y: y, w: iw - rs * 0.2, lw: Math.max(1.6, rs * 0.085) };
+          } else if (it.arrows) {
+            out.arr[it.arrows] = { x: x + rs * 0.6, y: y, w: iw - rs * 1.2, hi: it.hi || null, one: it.one || null, size: rs };
+          } else if (it.line) {
+            out.bar[it.line] = { x: x, y: y, w: iw, lw: 1.6 };
+          } else if (it.gap == null) {
+            var sz = size(it);
+            out.tok[it.id] = { x: x, y: y + (it.sup ? -rs * 0.36 : it.sub ? rs * 0.3 : 0), t: it.t, c: it.c || INK, size: sz,
+              mono: !!it.mono, wt: it.wt, strike: !!it.strike, from: it.from, w: iw };
+          }
+          x += iw;
+        });
+      }
+      var x0 = (ALG.W - seqW(row.items)) / 2;
+      if (row.at) x0 = row.at[1] - seqW(row.items.slice(0, row.at[0]));
+      place(row.items, x0, row.y);
+    });
+    return out;
+  }
+  // ⇌ as forward solid ink over reverse dashed tide (the rate-graph styles); one: a single step's →
+  function eqArrows(ctx, p, alpha) {
+    if (alpha <= 0.01) return;
+    var s = p.size, x0 = p.x, x1 = p.x + p.w, off = p.one ? 0 : s * 0.2, hb = s * 0.42;
+    ctx.save(); ctx.globalAlpha = alpha; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    if (p.one !== 'r') {
+      ctx.globalAlpha = alpha * (p.hi === 'r' ? 0.3 : 1);
+      ctx.strokeStyle = INK; ctx.lineWidth = s * (p.hi === 'f' ? 0.17 : 0.1);
+      ctx.beginPath(); ctx.moveTo(x0, p.y - off); ctx.lineTo(x1, p.y - off); ctx.lineTo(x1 - hb, p.y - off - hb * (p.one ? 0.7 : 0.75));
+      if (p.one) ctx.moveTo(x1, p.y), ctx.lineTo(x1 - hb, p.y + hb * 0.7);
+      ctx.stroke();
+    }
+    if (p.one !== 'f') {
+      ctx.globalAlpha = alpha * (p.hi === 'f' ? 0.3 : 1);
+      ctx.strokeStyle = INK_R; ctx.lineWidth = s * (p.hi === 'r' ? 0.17 : 0.1);
+      // A one-way reverse step is still written left to right, in tide and dashed
+      var from = p.one ? x0 : x1, to = p.one ? x1 : x0, dir = p.one ? 1 : -1;
+      ctx.setLineDash([s * 0.28, s * 0.22]);
+      ctx.beginPath(); ctx.moveTo(from, p.y + off); ctx.lineTo(to - dir * s * 0.1, p.y + off); ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(to - dir * hb, p.y + off + hb * 0.75); ctx.lineTo(to, p.y + off);
+      if (p.one) ctx.lineTo(to - dir * hb, p.y + off - hb * 0.7);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function algDraw(canvas, rowsFrom, rowsTo, base, o) {
+    var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h;
+    var sc = Math.min(w / ALG.W, h / ALG.H);
+    ctx.save();
+    ctx.translate((w - ALG.W * sc) / 2, (h - ALG.H * sc) / 2); ctx.scale(sc, sc);
+    var A = algLayout(ctx, rowsFrom, base), B = algLayout(ctx, rowsTo, base);
+    var t = o.still ? 9 : (o.t || 0), same = rowsFrom === rowsTo;
+    var k = same ? 1 : smooth(t / 0.9), kIn = same ? smooth(t / 0.5) : smooth((t - 0.6) / 0.5), kSt = smooth((t - (same ? 0.4 : 1.05)) / 0.45);
+    function lerp(a, b, u) { return a + (b - a) * u; }
+    function tok(p, alpha, strikeK) {
+      if (alpha <= 0.01) return;
+      ctx.save(); ctx.globalAlpha = Math.min(1, alpha) * (1 - 0.55 * strikeK);
+      label(ctx, p.t, p.x, p.y, { font: p.mono ? MONO : BODY, size: p.size, color: p.c, align: 'left', weight: p.wt });
+      if (strikeK > 0) {
+        var x1 = p.x + 1, y1 = p.y + p.size * 0.36, x2 = p.x + p.w - 1, y2 = p.y - p.size * 0.36;
+        ctx.globalAlpha = Math.min(1, alpha);
+        ctx.strokeStyle = INK; ctx.lineWidth = Math.max(1.3, p.size * 0.07); ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(lerp(x1, x2, strikeK), lerp(y1, y2, strikeK)); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    function between(a, b, u) {
+      return { x: lerp(a.x, b.x, u), y: lerp(a.y, b.y, u), size: lerp(a.size, b.size, u), w: lerp(a.w, b.w, u),
+        t: u < 0.5 ? a.t : b.t, c: u < 0.5 ? a.c : b.c, mono: b.mono, wt: b.wt };
+    }
+    Object.keys(A.tok).forEach(function (id) { if (!B.tok[id]) tok(A.tok[id], 1 - smooth(k * 1.6), A.tok[id].strike ? 1 : 0); });
+    Object.keys(B.tok).forEach(function (id) {
+      var b = B.tok[id], a = A.tok[id], sk = b.strike ? (a && a.strike && !same ? 1 : kSt) : 0;
+      if (a) tok(between(a, b, k), 1, sk);
+      else if (b.from && A.tok[b.from] && !same) tok(between(A.tok[b.from], b, k), Math.min(1, 0.35 + k), sk);
+      else tok(b, kIn, sk);
+    });
+    // Fraction bars and lines: slide, grow in, or fade out
+    ctx.strokeStyle = INK; ctx.lineCap = 'round';
+    Object.keys(A.bar).forEach(function (id) {
+      if (B.bar[id]) return;
+      var p = A.bar[id]; ctx.globalAlpha = 1 - k; ctx.lineWidth = p.lw;
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + p.w, p.y); ctx.stroke();
+    });
+    Object.keys(B.bar).forEach(function (id) {
+      var b = B.bar[id], a = A.bar[id], p = a ? { x: lerp(a.x, b.x, k), y: lerp(a.y, b.y, k), w: lerp(a.w, b.w, k), lw: b.lw } : b;
+      var grow = a ? 1 : kIn;
+      ctx.globalAlpha = a ? 1 : kIn; ctx.lineWidth = p.lw;
+      ctx.beginPath(); ctx.moveTo(p.x + p.w / 2 * (1 - grow), p.y); ctx.lineTo(p.x + p.w / 2 * (1 + grow), p.y); ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+    // Reaction arrows: ⇌ is forward solid ink over reverse dashed tide (the rate-graph styles)
+    function arrows(p, alpha) { eqArrows(ctx, p, alpha); }
+    Object.keys(A.arr).forEach(function (id) { if (!B.arr[id]) arrows(A.arr[id], 1 - k); });
+    Object.keys(B.arr).forEach(function (id) {
+      var b = B.arr[id], a = A.arr[id];
+      if (a) arrows({ x: lerp(a.x, b.x, k), y: lerp(a.y, b.y, k), w: lerp(a.w, b.w, k), size: lerp(a.size, b.size, k), hi: b.hi, one: b.one }, 1);
+      else arrows(b, kIn);
+    });
+    ctx.restore();
+  }
+
+  // Draw a list of algebra rows once, without stepping (ctx already in the virtual box)
+  function algStatic(ctx, rows, base, alpha) {
+    var L = algLayout(ctx, rows, base);
+    ctx.save(); ctx.globalAlpha = alpha;
+    Object.keys(L.tok).forEach(function (id) {
+      var p = L.tok[id];
+      label(ctx, p.t, p.x, p.y, { font: p.mono ? MONO : BODY, size: p.size, color: p.c, align: 'left', weight: p.wt });
+      if (p.strike) {
+        ctx.strokeStyle = INK; ctx.lineWidth = 1.6; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(p.x + 1, p.y + p.size * 0.1); ctx.lineTo(p.x + p.w - 1, p.y - p.size * 0.1); ctx.stroke();
+      }
+    });
+    ctx.strokeStyle = INK; ctx.lineCap = 'round';
+    Object.keys(L.bar).forEach(function (id) {
+      var b = L.bar[id]; ctx.lineWidth = b.lw;
+      ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(b.x + b.w, b.y); ctx.stroke();
+    });
+    Object.keys(L.arr).forEach(function (id) { eqArrows(ctx, L.arr[id], 1); });
+    ctx.restore();
+  }
+
+  /* ---------- kpuzzle: rate laws need experiments, K doesn't (2NO₂ + F₂ → 2NO₂F) ----------
+     o.step 0–2, o.t = seconds since the step changed.
+     0 a rate law guessed from the coefficients · 1 an initial-rates table proves it wrong (rate = k[NO₂][F₂])
+     2 K, though, keeps every coefficient as an exponent. The next beats answer why. */
+  function kpuzzle(canvas, o) {
+    var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h;
+    var sc = Math.min(w / ALG.W, h / ALG.H), W = ALG.W;
+    ctx.save(); ctx.translate((w - W * sc) / 2, (h - ALG.H * sc) / 2); ctx.scale(sc, sc);
+    var step = o.step || 0, t = o.still ? 9 : (o.t || 0);
+    function at(t0, d) { return smooth((t - t0) / (d || 0.45)); }
+    function fade(a, fn) { if (a <= 0.01) return; ctx.save(); ctx.globalAlpha = a; fn(); ctx.restore(); }
+    function txt(s, x, y, size, col, o2) {
+      o2 = o2 || {};
+      var sz = size;
+      if (o2.max) for (ctx.font = (o2.wt || '700') + ' ' + sz + 'px ' + BODY; sz > 8 && ctx.measureText(s).width > o2.max; ctx.font = (o2.wt || '700') + ' ' + sz + 'px ' + BODY) sz -= 0.5;
+      label(ctx, s, x, y, { font: o2.mono ? MONO : BODY, size: sz, color: col || INK, align: o2.align || 'center', weight: o2.wt });
+    }
+    var NO2 = '[NO₂]', F2 = '[F₂]', NO2F = '[NO₂F]';
+
+    // The reaction across the top (→ while we talk about rates, ⇌ once K comes in)
+    var eqY = step === 0 ? 40 : 24, eqS = step === 0 ? 21 : 15;
+    if (step < 2) txt('2NO₂ + F₂ → 2NO₂F', W / 2, eqY, eqS);
+    else algStatic(ctx, [{ y: eqY, items: [tk('a', '2NO₂ + F₂'), { arrows: 'e' }, tk('b', '2NO₂F')] }], eqS, 1);
+
+    if (step === 0) {
+      fade(at(0.2), function () {
+        txt('a guess from the coefficients', W / 2, 104, 12, DIM, { wt: '500' });
+        algStatic(ctx, [{ y: 146, items: [tk('r', 'rate = k'), tk('n', NO2), tk('e', '2', { sup: 1 }), tk('c', F2), tk('q', '  ?', { c: DIM })] }], 24, 1);
+        txt('coefficients 2 and 1, so exponents 2 and 1?', W / 2, 190, 12, DIM, { wt: '500' });
+      });
+      fade(at(0.9), function () { txt('test it: change one amount at a time and measure the starting rate', W / 2, 262, 12, INK, { wt: '500' }); });
+    }
+
+    if (step === 1) {
+      var cx = [44, 118, 190], bx0 = 252, unit = 34, hy = 62;
+      txt('trial', cx[0], hy, 11, DIM, { wt: '500' }); txt(NO2, cx[1], hy, 13, INK); txt(F2, cx[2], hy, 13, INK);
+      txt('starting rate', bx0, hy, 11, DIM, { wt: '500', align: 'left' });
+      ctx.strokeStyle = 'rgba(29,36,51,0.25)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(20, hy + 14); ctx.lineTo(W - 20, hy + 14); ctx.stroke();
+      var rows = [[0.1, 0.1, 1, -1], [0.1, 0.2, 2, 2], [0.2, 0.1, 2, 1]];   // [NO₂], [F₂], rate ×, column changed
+      rows.forEach(function (r, i) {
+        var y = 98 + i * 36, k = at(0.3 + i * 0.8);
+        fade(k, function () {
+          txt(String(i + 1), cx[0], y, 14, INK);
+          [r[0], r[1]].forEach(function (v, j) {
+            var on = r[3] === j + 1, x = cx[j + 1];
+            if (on) { ctx.fillStyle = 'rgba(29,36,51,0.08)'; ctx.strokeStyle = INK; ctx.lineWidth = 1.4; roundBox(ctx, x - 27, y - 12, 54, 24, 12); ctx.fill(); ctx.stroke(); }
+            txt(v.toFixed(2) + ' M', x, y, 13, on ? INK : DIM, on ? null : { wt: '500' });
+          });
+          var bw = unit * r[2] * smooth((t - 0.45 - i * 0.8) / 0.6);
+          ctx.fillStyle = INK; roundBox(ctx, bx0, y - 7, Math.max(4, bw), 14, 7); ctx.fill();
+          txt('×' + r[2], bx0 + unit * r[2] + 10, y, 13, INK, { align: 'left' });
+        });
+      });
+      fade(at(1.4), function () { txt('double [F₂]: 2 times faster, so first order in F₂', W / 2, 214, 12, DIM, { wt: '500' }); });
+      fade(at(2.2), function () { txt('double [NO₂]: only 2 times faster, so first order in NO₂, not second', W / 2, 234, 12, DIM, { wt: '500', max: W - 20 }); });
+      fade(at(2.8), function () {
+        algStatic(ctx, [{ y: 280, items: [tk('r', 'rate = k'), tk('n', NO2), tk('c', F2), { gap: 1.2 }, cap('x', 'not '), tk('g', 'k[NO₂]²[F₂]', { c: DIM, strike: true, px: 14 })] }], 21, 1);
+      });
+    }
+
+    if (step === 2) {
+      var Lc = W * 0.27, Rc = W * 0.73;
+      ctx.strokeStyle = 'rgba(29,36,51,0.15)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(W / 2, 58); ctx.lineTo(W / 2, 236); ctx.stroke();
+      fade(at(0.1), function () {
+        txt('rate law', Lc, 70, 16, INK); txt('found by experiment', Lc, 92, 12, DIM, { wt: '500' });
+        algStatic(ctx, [{ y: 156, at: [0, Lc - 74], items: [tk('r', 'rate = k'), tk('n', NO2), tk('c', F2)] }], 19, 1);
+        txt('NO₂: order 1, coefficient 2', Lc, 214, 12, DIM, { wt: '500' });
+      });
+      fade(at(0.8), function () {
+        txt('equilibrium constant', Rc, 70, 16, INK); txt('written from the equation', Rc, 92, 12, DIM, { wt: '500' });
+        algStatic(ctx, [{ y: 156, at: [0, Rc - 80], items: [tk('k', 'K = '), { frac: 'f', num: [tk('a', NO2F), tk('a2', '2', { sup: 1 })], den: [tk('c', NO2), tk('c2', '2', { sup: 1 }), tk('d', F2)] }] }], 18, 1);
+        txt('every exponent = coefficient', Rc, 214, 12, DIM, { wt: '500' });
+      });
+      fade(at(1.6), function () {
+        txt('Same reaction. Why does K get to use the coefficients', W / 2, 266, 14, INK, { max: W - 20 });
+        txt('when the rate law can\'t?', W / 2, 288, 14, INK);
+      });
+    }
+
+    ctx.restore();
+    return [
+      '2NO₂ + F₂ → 2NO₂F. A rate law guessed from the coefficients would be rate = k[NO₂]²[F₂]. Is it right?',
+      'Experiment. Trial 1: both at 0.10 M. Trial 2: [F₂] doubled, the rate doubles. Trial 3: [NO₂] doubled, the rate only doubles. So rate = k[NO₂][F₂], first order in NO₂, not k[NO₂]²[F₂].',
+      'The rate law, rate = k[NO₂][F₂], is found by experiment and does not match the coefficients. The equilibrium constant, K = [NO₂F] squared over [NO₂] squared [F₂], keeps every coefficient as an exponent.'
+    ][step];
+  }
+
+  /* ---------- kderive: K from equal forward and reverse rates (N₂O₄ ⇌ 2NO₂) ----------
+     o.step 0–5, o.from = the step shown before, o.t = seconds since the step changed.
+     Forward terms in ink, reverse terms in tide, as in the rate graphs. The coefficient 2 of the
+     reverse step lifts up into the exponent; at equilibrium the two rate laws meet across one
+     equals sign; dividing slides kᵣ under k_f and [N₂O₄] under [NO₂]²; k_f / kᵣ becomes K. */
+  function kderiveRows(step) {
+    var R = { c: INK_R }, eq = { y: 34, s: 1.05, items: [tk('eL', 'N₂O₄'), { arrows: 'eA', hi: step === 1 ? 'f' : step === 2 ? 'r' : null }, tk('eC', '2'), tk('eR', 'NO₂')] };
+    var kf = [tk('kf', 'k'), tk('kfs', 'f', { sub: 1 })], kr = [tk('kr', 'k', R), tk('krs', 'r', { sub: 1, c: INK_R })];
+    var fwdStep = { y: 112, at: [2, 168], items: [cap('fl', 'forward step'), { gap: 0.7 }, tk('fN', 'N₂O₄'), { arrows: 'fA', one: 'f' }, tk('f2', '2NO₂')] };
+    var fwdRate = { y: 112, at: [2, 168], items: [cap('fl', 'forward rate'), { gap: 0.7 }, tk('feq', '= ')].concat(kf, [tk('fN', '[N₂O₄]')]) };
+    var revStep = { y: 168, at: [2, 168], items: [cap('rl', 'reverse step', { c: INK_R }), { gap: 0.7 }, tk('r2c', '2', R), tk('rN', 'NO₂', R), { arrows: 'rA', one: 'r' }, tk('r4', 'N₂O₄', R)] };
+    var revRate = { y: 168, at: [2, 168], items: [cap('rl', 'reverse rate', { c: INK_R }), { gap: 0.7 }, tk('req', '= ', R)].concat(kr, [tk('rN', '[NO₂]', R), tk('r2c', '2', { sup: 1, c: INK_R })]) };
+    if (step === 0) return [eq, fwdStep, revStep, { y: 236, items: [cap('c0', 'each one happens in a single step')] }];
+    if (step === 1) return [eq, fwdRate, revStep, { y: 236, items: [cap('c1', 'one N₂O₄ breaks apart: rate = k × [N₂O₄]')] }];
+    if (step === 2) return [eq, fwdRate, revRate, { y: 236, items: [cap('c2', 'two NO₂ collide: the coefficient 2 becomes the exponent')] }];
+    if (step === 3) return [eq, { y: 104, items: [cap('c3', 'at equilibrium: forward rate = reverse rate')] },
+      { y: 160, s: 1.3, items: kf.concat([tk('fN', '[N₂O₄]'), tk('mid', ' = ')], kr, [tk('rN', '[NO₂]', R), tk('r2c', '2', { sup: 1, c: INK_R })]) }];
+    var left = { frac: 'bL', num: kf, den: kr }, right = { frac: 'bR', num: [tk('rN', '[NO₂]', R), tk('r2c', '2', { sup: 1, c: INK_R })], den: [tk('fN', '[N₂O₄]')] };
+    if (step === 4) return [eq, { y: 96, items: [cap('c4a', 'divide both sides by '), cap('c4k', 'k', { c: INK_R }), cap('c4r', 'r', { c: INK_R, px: 9, sub: 1 }), cap('c4b', ' and by [N₂O₄]')] },
+      { y: 170, s: 1.3, items: [left, tk('mid', ' = '), right] }];
+    return [eq, { y: 96, items: [cap('c5', 'a constant ÷ a constant = a constant: K')] },
+      { y: 170, s: 1.3, items: [left, tk('mid', ' = '), tk('K', 'K'), tk('mid2', ' = '), right] },
+      { y: 258, items: [cap('c5b', 'products on top · reactants on the bottom')] },
+      { y: 280, items: [cap('c5c', 'each coefficient becomes an exponent')] }];
+  }
+  var KDERIVE_DESC = [
+    'N₂O₄ ⇌ 2NO₂ written as two elementary steps: the forward step N₂O₄ → 2NO₂ and the reverse step 2NO₂ → N₂O₄.',
+    'Forward rate = k f times the concentration of N₂O₄.',
+    'Reverse rate = k r times the concentration of NO₂ squared. The coefficient 2 has become the exponent.',
+    'At equilibrium the forward rate equals the reverse rate: k f times [N₂O₄] = k r times [NO₂] squared.',
+    'Divide both sides by k r and by [N₂O₄]: k f over k r = [NO₂] squared over [N₂O₄].',
+    'k f over k r is a constant, K. So K = [NO₂] squared over [N₂O₄]: products on top, reactants on the bottom, coefficients as exponents.'
+  ];
+  function kderive(canvas, o) {
+    var step = o.step || 0, from = o.from == null ? step : o.from;
+    var to = kderiveRows(step);
+    algDraw(canvas, from === step ? to : kderiveRows(from), to, 20, o);
+    return KDERIVE_DESC[step];
+  }
+
+  /* ---------- kmulti: the overall K from a two-step mechanism (2NO₂ + F₂ ⇌ 2NO₂F) ----------
+     Step 1 (slow) NO₂ + F₂ ⇌ NO₂F + F, step 2 (fast) NO₂ + F ⇌ NO₂F. Adding the steps cancels the
+     intermediate F; multiplying K₁ × K₂ cancels [F]. Each K term flies out of the species it came from.
+     The two [NO₂F] then merge into [NO₂F]² and the two [NO₂] into [NO₂]² (the second one's square
+     flies out of it). Last step: double the equation and K is squared; the rate law stays put. */
+  function kmultiRows(step) {
+    var small = step >= 2 && step <= 4, ms = small ? 0.72 : 1, my = small ? [24, 50] : [62, 104], ax = 236;
+    var strikeM = step === 1 || step === 4;
+    var m1 = { y: my[0], s: ms, at: [5, ax], items: [cap('m1l', 'step 1 · slow', { px: small ? 9 : 11 }), { gap: 0.8 }, tk('m1a', 'NO₂'), tk('m1p', ' + '), tk('m1b', 'F₂'),
+      { arrows: 'm1A' }, tk('m1c', 'NO₂F'), tk('m1q', ' + '), tk('m1d', 'F', { strike: strikeM })] };
+    var m2 = { y: my[1], s: ms, at: [5, ax], items: [cap('m2l', 'step 2 · fast', { px: small ? 9 : 11 }), { gap: 0.8 }, tk('m2a', 'NO₂'), tk('m2p', ' + '), tk('m2b', 'F', { strike: strikeM }),
+      { arrows: 'm2A' }, tk('m2c', 'NO₂F')] };
+    var dbl = step === 6;
+    var oy = step === 1 ? 158 : 36, os = step === 1 ? 1 : 1.12;
+    var overall = { y: oy, s: os, at: [5, ax], items: [cap('ol', step === 1 ? 'overall' : dbl ? 'doubled' : ''), { gap: 0.8 }, tk('oa', dbl ? '4NO₂' : '2NO₂'), tk('op', ' + '), tk('ob', dbl ? '2F₂' : 'F₂'),
+      { arrows: 'oA' }, tk('oc', dbl ? '4NO₂F' : '2NO₂F')] };
+    if (step === 0) return [overall,
+      { y: 104, items: [cap('c0a', 'rate law measured in the lab')] },
+      { y: 134, s: 1.1, items: [tk('rr', 'rate = k'), tk('rb', '[NO₂]'), tk('rc', '[F₂]')] },
+      { y: 186, items: [cap('c0n', 'not  '), tk('ng', 'rate = k[NO₂]²[F₂]', { c: DIM, strike: true })] },
+      { y: 246, items: [cap('c0b', 'so the overall equation is not one step')] }];
+    if (step === 1) return [m1, m2, { y: 130, at: [0, 108], items: [{ line: 'sum', len: 290 }] }, overall,
+      { y: 214, items: [cap('c1a', 'F is made in step 1, then used up in step 2: an intermediate')] },
+      { y: 236, items: [cap('c1b', 'the two NO₂ add up to 2NO₂, the two NO₂F to 2NO₂F')] }];
+    var ST = step === 4;
+    var k1n = [tk('k1n1', '[NO₂F]', { from: 'm1c' }), tk('k1n2', '[F]', { from: 'm1d', strike: ST })];
+    var k1d = [tk('k1d1', '[NO₂]', { from: 'm1a' }), tk('k1d2', '[F₂]', { from: 'm1b' })];
+    var k2n = [tk('k2n1', '[NO₂F]', { from: 'm2c' })];
+    var k2d = [tk('k2d1', '[NO₂]', { from: 'm2a' }), tk('k2d2', '[F]', { from: 'm2b', strike: ST })];
+    if (step === 2) return [m1, m2,
+      { y: 124, at: [1, 190], items: [tk('k1L', 'K₁'), tk('k1e', ' = '), { frac: 'f1', num: k1n, den: k1d }] },
+      { y: 208, at: [1, 190], items: [tk('k2L', 'K₂'), tk('k2e', ' = '), { frac: 'f2', num: k2n, den: k2d }] },
+      { y: 280, items: [cap('c2', 'each step is elementary, so each has its own K')] }];
+    if (step === 3 || step === 4) return [m1, m2,
+      { y: 150, s: 1.1, items: [tk('k1L', 'K₁'), tk('x', ' × '), tk('k2L', 'K₂'), tk('k1e', ' = '), { frac: 'f1', num: k1n.concat(k2n), den: k1d.concat(k2d) }] },
+      { y: 250, items: [cap(step === 3 ? 'c3' : 'c4', step === 3 ? 'multiply the two K expressions' : '[F] cancels, just as F cancelled when you added the steps')] }];
+    // The two [NO₂F] become [NO₂F]²; the two [NO₂] become [NO₂]² (each square flies out of the copy it replaces)
+    var sq1 = tk('sq1', dbl ? '4' : '2', { sup: 1, from: 'k2n1' }), sq2 = tk('sq2', dbl ? '4' : '2', { sup: 1, from: 'k2d1' });
+    var num = [k1n[0], sq1], den = [k1d[0], sq2, k1d[1]];
+    if (dbl) den = den.concat([tk('sqF', '2', { sup: 1 })]);
+    if (step === 5) return [overall,
+      { y: 150, s: 1.2, items: [tk('K', 'K'), tk('ke', ' = '), tk('k1L', 'K₁'), tk('x', ' × '), tk('k2L', 'K₂'), tk('k1e', ' = '), { frac: 'f1', num: num, den: den }] },
+      { y: 240, items: [cap('c5a', 'the coefficients come back as exponents')] },
+      { y: 262, items: [cap('c5b', 'K for the overall equation, straight from the balanced equation')] }];
+    return [overall,
+      { y: 116, s: 1.05, items: [tk('K', 'K'), tk('kd', 'doubled', { sub: 1, c: DIM }), tk('ke', ' = '), tk('kk', 'K²'), tk('k1e', ' = '), { frac: 'f1', num: num, den: den }] },
+      { y: 172, items: [cap('c6a', 'write the equation twice over and K is squared')] },
+      { y: 204, items: [tk('rr', 'rate = k[NO₂][F₂]', { px: 16 }), cap('c6r', '   still')] },
+      { y: 228, items: [cap('c6b', 'the rate law comes from the steps, not from how you write the equation')] },
+      { y: 270, items: [tk('road1', 'Kinetics asks which road you took.', { px: 14 })] },
+      { y: 291, items: [tk('road2', 'Equilibrium only asks where you ended up.', { px: 14 })] }];
+  }
+  var KMULTI_DESC = [
+    '2NO₂ + F₂ ⇌ 2NO₂F. The rate law measured in the lab is rate = k[NO₂][F₂], not k[NO₂] squared [F₂]. So the overall equation is not one step.',
+    'Two steps: NO₂ + F₂ ⇌ NO₂F + F (slow), then NO₂ + F ⇌ NO₂F (fast). Added together, F cancels, leaving 2NO₂ + F₂ ⇌ 2NO₂F.',
+    'Each step has its own K. K₁ = [NO₂F][F] over [NO₂][F₂]. K₂ = [NO₂F] over [NO₂][F].',
+    'K₁ times K₂ = [NO₂F][F][NO₂F] over [NO₂][F₂][NO₂][F].',
+    '[F] cancels top and bottom, just as F cancelled when the steps were added.',
+    'K = K₁ times K₂ = [NO₂F] squared over [NO₂] squared [F₂]: the coefficients come back as exponents.',
+    'Doubled, 4NO₂ + 2F₂ ⇌ 4NO₂F has K squared: [NO₂F] to the 4 over [NO₂] to the 4 [F₂] squared. The rate law is still rate = k[NO₂][F₂]. Kinetics asks which road you took. Equilibrium only asks where you ended up.'
+  ];
+  function kmulti(canvas, o) {
+    var step = o.step || 0, from = o.from == null ? step : o.from;
+    var to = kmultiRows(step);
+    algDraw(canvas, from === step ? to : kmultiRows(from), to, 17, o);
+    return KMULTI_DESC[step];
+  }
+
+  /* ---------- kmass: the law of mass action (summary) ----------
+     A real example (N₂O₄ ⇌ 2NO₂, K = 4.63 × 10⁻³ at 25 °C) above the general form aA + bB ⇌ cC + dD.
+     Coefficients and the exponents they become share a colour: reactant side ember, product side tide.
+     Fades in top to bottom; o.t = seconds since the beat opened. */
+  var RCT = '#b4561a', PRD = '#0d6e6c', ITAL = 'italic 700';
+  function kmass(canvas, o) {
+    var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h;
+    var sc = Math.min(w / ALG.W, h / ALG.H), W = ALG.W;
+    ctx.save(); ctx.translate((w - W * sc) / 2, (h - ALG.H * sc) / 2); ctx.scale(sc, sc);
+    var t = o.still ? 9 : (o.t || 0);
+    function at(t0) { return smooth((t - t0) / 0.5); }
+    var sup = function (id, t2, c) { return tk(id, t2, { sup: 1, c: c }); };
+    algStatic(ctx, [{ y: 28, items: [tk('a', 'N₂O₄(g)'), { arrows: 'e' }, tk('c', '2', { c: PRD }), tk('b', 'NO₂(g)')] }], 19, at(0.1));
+    algStatic(ctx, [{ y: 88, items: [tk('k', 'K = '), { frac: 'f', num: [tk('n', '[NO₂]'), sup('n2', '2', PRD)], den: [tk('d', '[N₂O₄]')] },
+      tk('v', ' = 4.63 × 10'), sup('ve', '−3')] }], 19, at(0.5));
+    algStatic(ctx, [{ y: 134, items: [cap('c', 'at 25 °C · K is much smaller than 1, so reactants are favoured')] }], 19, at(0.9));
+    var dv = at(1.2);
+    if (dv > 0.01) { ctx.save(); ctx.globalAlpha = dv; ctx.strokeStyle = 'rgba(29,36,51,0.18)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(40, 160); ctx.lineTo(W - 40, 160); ctx.stroke(); ctx.restore(); }
+    var cf = function (id, t2, c) { return tk(id, t2, { c: c, wt: ITAL }); };
+    algStatic(ctx, [{ y: 192, items: [cf('a', 'a', RCT), tk('A', 'A'), tk('p', ' + '), cf('b', 'b', RCT), tk('B', 'B'), { arrows: 'e' },
+      cf('c', 'c', PRD), tk('C', 'C'), tk('q', ' + '), cf('d', 'd', PRD), tk('D', 'D')] }], 20, at(1.4));
+    algStatic(ctx, [{ y: 258, at: [0, 22], items: [tk('k', 'K = '), { frac: 'f',
+      num: [tk('C', '[C]'), tk('c', 'c', { sup: 1, c: PRD, wt: ITAL }), tk('D', '[D]'), tk('d', 'd', { sup: 1, c: PRD, wt: ITAL })],
+      den: [tk('A', '[A]'), tk('a', 'a', { sup: 1, c: RCT, wt: ITAL }), tk('B', '[B]'), tk('b', 'b', { sup: 1, c: RCT, wt: ITAL })] }] }], 20, at(1.9));
+    var bx = at(2.4);
+    if (bx > 0.01) {
+      ctx.save(); ctx.globalAlpha = bx;
+      var X0 = 236, Y0 = 236, BW = 206, BH = 44;
+      ctx.fillStyle = INK; roundBox(ctx, X0 + 4, Y0 + 4, BW, BH, 8); ctx.fill();
+      ctx.fillStyle = '#ffffff'; ctx.strokeStyle = INK; ctx.lineWidth = 2; roundBox(ctx, X0, Y0, BW, BH, 8); ctx.fill(); ctx.stroke();
+      ctx.font = ITAL + ' 20px ' + BODY; ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('Law of Mass Action', X0 + BW / 2, Y0 + BH / 2 + 1);
+      ctx.restore();
+    }
+    algStatic(ctx, [{ y: 312, items: [cap('c', 'products on top · reactants on the bottom · coefficients become exponents')] }], 19, at(2.8));
+    ctx.restore();
+    return 'The law of mass action. Example: N₂O₄ ⇌ 2NO₂, K = [NO₂] squared over [N₂O₄] = 4.63 × 10 to the −3 at 25 °C, much smaller than 1, so reactants are favoured. In general, for aA + bB ⇌ cC + dD, K = [C] to the c times [D] to the d, over [A] to the a times [B] to the b: products on top, reactants on the bottom, coefficients become exponents.';
+  }
+
+  /* ---------- kmanip: changing the equation changes K ----------
+     0 two equations add up; C and D cancel · 1 each equation's K (each term flies out of its species)
+     2 K₁ × K₂: [C] and [D] cancel, leaving K, so K = K₁ × K₂ · 3 N₂O₄ ⇌ 2NO₂, K = 4.63 × 10⁻³
+     4 written backwards: the species cross over, the fraction flips, K′ = 1/K = 216. */
+  function kmanipRows(step) {
+    if (step <= 2) {
+      var sm = step >= 1, s = sm ? 0.72 : 1, y = sm ? [22, 46, 80] : [62, 112, 176], ax = sm ? 196 : 206, lx = sm ? 312 : 336, ly = sm ? 62 : 144;
+      var rows = [
+        { y: y[0], s: s, at: [3, ax], items: [tk('aA', 'A'), tk('p1', ' + '), tk('aB', 'B'), { arrows: 'a1' }, tk('aC', 'C', { strike: 1 }), tk('p2', ' + '), tk('aD', 'D', { strike: 1 })] },
+        { y: y[0], s: s, at: [0, lx], items: [tk('L1', 'K₁')] },
+        { y: y[1], s: s, at: [3, ax], items: [tk('bC', 'C', { strike: 1 }), tk('p3', ' + '), tk('bD', 'D', { strike: 1 }), { arrows: 'a2' }, tk('bE', 'E'), tk('p4', ' + '), tk('bF', 'F')] },
+        { y: y[1], s: s, at: [0, lx], items: [tk('L2', 'K₂')] },
+        { y: ly, s: s, at: [0, ax - 112 * s], items: [{ line: 'sum', len: 270 * s }] },
+        { y: y[2], s: s, at: [3, ax], items: [tk('cA', 'A'), tk('p5', ' + '), tk('cB', 'B'), { arrows: 'a3' }, tk('cE', 'E'), tk('p6', ' + '), tk('cF', 'F')] },
+        { y: y[2], s: s, at: [0, lx], items: [tk('L3', 'K')] }
+      ];
+      if (step === 0) return rows.concat([{ y: 250, items: [cap('c0', 'add the equations: C and D are made, then used up, so they cancel')] }]);
+      var kRow = { y: 248, s: 1.05, items: [tk('e3', 'K', { from: 'L3' }), tk('e3q', ' = '), { frac: 'f3', num: [tk('kE', '[E]', { from: 'cE' }), tk('kF', '[F]', { from: 'cF' })], den: [tk('kA', '[A]', { from: 'cA' }), tk('kB', '[B]', { from: 'cB' })] }] };
+      var n1 = [tk('n1C', '[C]', { from: 'aC' }), tk('n1D', '[D]', { from: 'aD' })], d1 = [tk('d1A', '[A]', { from: 'aA' }), tk('d1B', '[B]', { from: 'aB' })];
+      var n2 = [tk('n2E', '[E]', { from: 'bE' }), tk('n2F', '[F]', { from: 'bF' })], d2 = [tk('d2C', '[C]', { from: 'bC' }), tk('d2D', '[D]', { from: 'bD' })];
+      if (step === 1) return rows.concat([
+        { y: 150, at: [0, 34], items: [tk('e1', 'K₁', { from: 'L1' }), tk('e1q', ' = '), { frac: 'f1', num: n1, den: d1 }] },
+        { y: 150, at: [0, 252], items: [tk('e2', 'K₂', { from: 'L2' }), tk('e2q', ' = '), { frac: 'f2', num: n2, den: d2 }] },
+        kRow]);
+      function st(t0) { return tk(t0.id, t0.t, { from: t0.from, strike: 1 }); }
+      return rows.concat([
+        { y: 156, s: 1.05, items: [tk('e1', 'K₁'), tk('x', ' × '), tk('e2', 'K₂'), tk('e1q', ' = '),
+          { frac: 'f1', num: [st(n1[0]), st(n1[1]), n2[0], n2[1]], den: [d1[0], d1[1], st(d2[0]), st(d2[1])] }] },
+        kRow,
+        { y: 306, s: 1.1, items: [tk('r1', 'K = K₁ × K₂')] }]);
+    }
+    var fwdEq = { y: 34, items: [tk('rA', 'N₂O₄'), { arrows: 'ra' }, tk('rB', '2NO₂')] };
+    var fwdK = { y: 98, items: [tk('fK', 'K = '), { frac: 'ff', num: [tk('fn', '[NO₂]'), tk('fn2', '2', { sup: 1 })], den: [tk('fd', '[N₂O₄]')] }, tk('fv', ' = 4.63 × 10'), tk('fe', '−3', { sup: 1 })] };
+    var c3 = { y: 146, items: [cap('c3', 'at 25 °C · much smaller than 1: N₂O₄ is favoured')] };
+    if (step === 3) return [fwdEq, fwdK, c3];
+    return [fwdEq, fwdK, c3,
+      { y: 188, items: [tk('qA', '2NO₂', { from: 'rB' }), { arrows: 'qa' }, tk('qB', 'N₂O₄', { from: 'rA' })] },
+      { y: 254, items: [tk('gK', 'K′ = '), { frac: 'gf', num: [tk('gn', '[N₂O₄]', { from: 'fd' })], den: [tk('gd', '[NO₂]', { from: 'fn' }), tk('gd2', '2', { sup: 1, from: 'fn2' })] },
+        tk('gq', ' = '), { frac: 'g1', num: [tk('g1n', '1')], den: [tk('g1d', 'K')] }, tk('gv', ' = 216')] },
+      { y: 308, items: [cap('c4', 'written backwards, the fraction flips over: K′ = 1/K')] }];
+  }
+  var KMANIP_DESC = [
+    'Two equations add up: A + B ⇌ C + D with K₁, and C + D ⇌ E + F with K₂, give A + B ⇌ E + F with K. C and D cancel.',
+    'Each equation has its own K. K₁ = [C][D] over [A][B]. K₂ = [E][F] over [C][D]. K = [E][F] over [A][B].',
+    'K₁ times K₂ = [C][D][E][F] over [A][B][C][D]. [C] and [D] cancel, leaving [E][F] over [A][B], which is K. So K = K₁ × K₂.',
+    'N₂O₄ ⇌ 2NO₂ has K = [NO₂] squared over [N₂O₄] = 4.63 × 10 to the −3 at 25 °C.',
+    'Written backwards, 2NO₂ ⇌ N₂O₄ has K′ = [N₂O₄] over [NO₂] squared = 1 over K = 216. The fraction flips over.'
+  ];
+  function kmanip(canvas, o) {
+    var step = o.step || 0, from = o.from == null ? step : o.from;
+    var to = kmanipRows(step);
+    algDraw(canvas, from === step ? to : kmanipRows(from), to, 18, o);
+    return KMANIP_DESC[step];
+  }
+
   /* ---------- equation card ---------- */
   function equation(canvas, o) {
     var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h;
@@ -1275,7 +1727,7 @@
     if (o.note) label(ctx, o.note, w / 2, h * 0.72, { size: 11 });
   }
 
-  global.EqPictures = { energy: energy, beaker: beaker, spread: spread, coldpack: coldpack, favour: favour, gibbs4: gibbs4, paths: paths, equation: equation, intro4: intro4 };
+  global.EqPictures = { energy: energy, beaker: beaker, spread: spread, coldpack: coldpack, favour: favour, gibbs4: gibbs4, paths: paths, equation: equation, intro4: intro4, kpuzzle: kpuzzle, kderive: kderive, kmulti: kmulti, kmass: kmass, kmanip: kmanip };
   // Shared drawing helpers for the live scenes (eq-scenes.js)
   global.EqPictures.util = { fit: fit, ball: ball, label: label, roundBox: roundBox, arrow: arrow, mix: mix, rng: rng, smooth: smooth,
     INK: INK, DIM: DIM, FAINT: FAINT, EMBER: EMBER, TIDE: TIDE, MONO: MONO, BODY: BODY };
