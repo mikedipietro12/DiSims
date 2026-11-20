@@ -3,14 +3,16 @@
    the stage; presentation view hides the text and steps through each worked line, then Your turn and its answer,
    then the next section. Content lives in ice-data.js; components in ice-ui.js.
    Stage layout: the problem across the top; the ICE table on the left with any picture under it; the working on
-   the right. The step buttons sit in a footer at the bottom right that never moves (Your turn's Check buttons on its left). */
+   the right. The step buttons sit in a footer at the bottom right that never moves (Your turn's Check buttons on its left).
+   Full explanation: off by default (the teacher talks through each step); the switch in the stage head shows every
+   note for students working at home. Remembered in this browser. */
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
   const U = window.IceUI, D = window.IceData.SECTIONS;
   const beats = Array.from(document.querySelectorAll('.guide-beat'));
   const top = $('top'), left = $('left'), right = $('right'), grid = $('grid'), modes = $('modes');
-  const footL = $('footL'), footR = $('footR');
+  const footL = $('footL'), footR = $('footR'), stage = $('stage'), fullToggle = $('fullToggle');
   const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
   let active = null, cur = null;
 
@@ -37,6 +39,7 @@
     const sec = D[id];
     cur = { id, sec, mode };
     modes.hidden = !(sec && sec.you);
+    fullToggle.hidden = !sec;
     modes.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
     grid.className = 'ice-grid';
     if (!sec) return loadStatic(id);
@@ -62,7 +65,7 @@
     if (sec.table) { cur.table = U.table(sec.table, 'walk'); left.appendChild(cur.table.el); }
     if (sec.bulb) {
       cur.bulb = U.bulb(left, sec.bulb);
-      left.appendChild(el('p', 'ice-cap', sec.bulb.cap || 'Zoomed in, not to scale. The numbers of particles are in proportion to the concentrations.'));
+      left.appendChild(el('p', 'ice-cap ws-full', sec.bulb.cap || 'Zoomed in, not to scale. The numbers of particles are in proportion to the concentrations.'));
     }
     if (sec.gauge) { cur.gauge = U.gauge(left, sec.gauge); cur.gauge.set(null); }
     cur.steps = U.steps(right, sec.steps, { table: cur.table, bar: footR, onStep: (i, line, forward) => syncPicture(sec, sec.steps, i, line, forward) });
@@ -86,7 +89,7 @@
     top.appendChild(el('div', 'ice-card ice-problem is-you', you.problem));
     if (you.hint) top.appendChild(el('p', 'ice-hint', you.hint));
     const fillable = !!(you.table || you.boxes || you.parts); // Example A: nothing to type, worked on paper
-    right.appendChild(el('p', 'ice-howto', !fillable ? 'Work it out on paper first. Then press “Show the answer” to check it one step at a time.'
+    right.appendChild(el('p', 'ice-howto ws-full', !fillable ? 'Work it out on paper first. Then press “Show the answer” to check it one step at a time.'
       : you.parts ? 'For each mixture, type its Q value and choose which way the reaction shifts. Press “Check” to see which answers are right. Nothing is saved.'
       : 'Type each answer into its box. You can write expressions such as <b>0.80 − x</b> or <b>+2x</b>. Press “Check” to see which boxes are right. Nothing is saved.'));
     if (you.table) { cur.table = U.table(you.table, 'input'); left.appendChild(cur.table.el); }
@@ -209,6 +212,15 @@
     const b = a.closest('.guide-beat'); goToBeat(b.id); cur.focusYou = true; setMode('you');
   }));
 
+  // ---------- full explanation (notes) on or off ----------
+  const FULL_KEY = 'ice-guide-full';
+  function setFull(on) {
+    stage.classList.toggle('show-full', on);
+    fullToggle.setAttribute('aria-pressed', String(on));
+    try { localStorage.setItem(FULL_KEY, on ? '1' : '0'); } catch (e) { /* private window */ }
+  }
+  fullToggle.addEventListener('click', () => setFull(!stage.classList.contains('show-full')));
+
   // ---------- presentation view ----------
   // ‹ › / arrow keys / clicker: the next worked line, then Your turn, then its answer line by line, then the next section.
   const learnToggle = $('learnToggle'), LEARN_KEY = 'ice-guide-learn';
@@ -273,6 +285,9 @@
   const startId = q.get('beat') || location.hash.slice(1);
   const start = (startId && $(startId)) || beats[0];
   if (q.has('learn') || learnSaved) setLearn(true);
+  let fullSaved = false;
+  try { fullSaved = localStorage.getItem(FULL_KEY) === '1'; } catch (e) { /* private window */ }
+  setFull(q.has('full') || fullSaved);
   applyBeat(start);
   if (start !== beats[0] && !noScroll) start.scrollIntoView();
   if (q.has('steps') && cur.steps) for (let i = 0; i < +q.get('steps'); i++) cur.steps.next();

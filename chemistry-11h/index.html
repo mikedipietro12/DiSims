@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=19">
-  <link rel="stylesheet" href="../assets/courses.css?v=2">
+  <link rel="stylesheet" href="../assets/courses.css?v=3">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -147,16 +147,13 @@
             <!-- 2 H2 + O2: the molecules move together, then 2 H2O take their place -->
             <svg class="hub-anim anim-rxn" viewBox="20 14 200 96" focusable="false">
               <g class="rx-in">
-                <g class="rx-a"><circle cx="59" cy="44" r="7" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/><circle cx="69" cy="44" r="7" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/></g>
-                <g class="rx-b"><circle cx="59" cy="82" r="7" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/><circle cx="69" cy="82" r="7" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/></g>
-                <g class="rx-c"><circle cx="170" cy="62" r="9" fill="url(#crO)" stroke="rgba(29,36,51,0.35)"/><circle cx="182" cy="62" r="9" fill="url(#crO)" stroke="rgba(29,36,51,0.35)"/></g>
+                <g class="rx-a"><circle cx="55" cy="44" r="7" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/><circle cx="65" cy="44" r="7" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/></g>
+                <g class="rx-b"><circle cx="55" cy="82" r="7" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/><circle cx="65" cy="82" r="7" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/></g>
+                <g class="rx-c"><circle cx="174" cy="63" r="9" fill="url(#crO)" stroke="rgba(29,36,51,0.35)"/><circle cx="186" cy="63" r="9" fill="url(#crO)" stroke="rgba(29,36,51,0.35)"/></g>
               </g>
               <g class="rx-out">
-                <g class="rx-d"><circle cx="95" cy="63" r="6.5" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/><circle cx="113" cy="63" r="6.5" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/><circle cx="104" cy="56" r="9.5" fill="url(#crO)" stroke="rgba(29,36,51,0.35)"/></g>
-                <g class="rx-e"><circle cx="127" cy="77" r="6.5" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/><circle cx="145" cy="77" r="6.5" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/><circle cx="136" cy="70" r="9.5" fill="url(#crO)" stroke="rgba(29,36,51,0.35)"/></g>
-              </g>
-              <g class="rx-flash" fill="none" stroke="var(--c-warm)" stroke-width="2.4" stroke-linecap="round">
-                <path d="M120,30 V38 M120,88 V96 M92,63 H100 M140,63 H148 M100,43 L105,48 M140,43 L135,48 M100,83 L105,78 M140,83 L135,78"/>
+                <g class="rx-d"><circle cx="91" cy="65" r="6.5" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/><circle cx="109" cy="65" r="6.5" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/><circle cx="100" cy="58" r="9.5" fill="url(#crO)" stroke="rgba(29,36,51,0.35)"/></g>
+                <g class="rx-e"><circle cx="131" cy="65" r="6.5" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/><circle cx="149" cy="65" r="6.5" fill="url(#crH)" stroke="rgba(29,36,51,0.35)"/><circle cx="140" cy="58" r="9.5" fill="url(#crO)" stroke="rgba(29,36,51,0.35)"/></g>
               </g>
             </svg>
           </span>
@@ -169,7 +166,7 @@
           <span class="mod-anim" aria-hidden="true">
             <!-- a gas in a cylinder: the piston pushes down, the particles crowd together, then it rises again -->
             <svg class="hub-anim anim-gas" viewBox="40 4 160 116" focusable="false">
-              <rect x="64" y="14" width="112" height="98" rx="4" fill="#f6f8fc"/>
+              <path d="M64,8 V108 Q64,114 70,114 H170 Q176,114 176,108 V8 Z" fill="#f6f8fc"/>
               <g>
                 <g class="gs-sq" style="--d:17.6px"><g class="gs-j" style="animation-delay:-0.00s"><circle cx="78" cy="70" r="5.5" fill="url(#crCool)" stroke="rgba(29,36,51,0.35)"/></g></g>
                 <g class="gs-sq" style="--d:22.7px"><g class="gs-j" style="animation-delay:-0.37s"><circle cx="98" cy="58" r="5.5" fill="url(#crCool)" stroke="rgba(29,36,51,0.35)"/></g></g>
@@ -202,8 +199,9 @@
                 <path d="M84,46 q-5,-5 0,-10 t0,-10"/>
                 <path d="M100,42 q-5,-5 0,-10 t0,-10"/>
               </g>
-              <path d="M66,56 L72,110 H112 L118,56 Z" fill="#ffffff" stroke="#1d2433" stroke-width="2" stroke-linejoin="round"/>
-              <path class="th-sol" d="M68.2,74 L72.6,108 H111.4 L115.8,74 Z" fill="#fbe6d4"/>
+              <path d="M66,56 L72,110 H112 L118,56 Z" fill="#ffffff"/>
+              <path class="th-sol" d="M68,74 L72,110 H112 L116,74 Z" fill="#fbe6d4"/>
+              <path d="M66,56 L72,110 H112 L118,56" fill="none" stroke="#1d2433" stroke-width="2" stroke-linejoin="round"/>
               <path d="M62,56 H122" stroke="#1d2433" stroke-width="2.4" stroke-linecap="round"/>
               <rect x="150" y="12" width="16" height="84" rx="8" fill="#ffffff" stroke="#1d2433" stroke-width="2"/>
               <rect class="th-col" x="155" y="24" width="6" height="76" rx="3" fill="#e0503a"/>

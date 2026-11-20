@@ -19,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=19">
   <link rel="stylesheet" href="assets/eq-intro.css?v=20">
-  <link rel="stylesheet" href="assets/ice.css?v=2">
+  <link rel="stylesheet" href="assets/ice.css?v=5">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -167,9 +167,12 @@
       <aside class="guide-stage-panel ice-stage" id="stage" aria-label="Interactive stage">
         <div class="guide-stage-head">
           <p class="force-badge" id="badge" aria-live="polite"></p>
-          <div class="seg ice-modes" id="modes" role="group" aria-label="Example or Your turn" hidden>
-            <button type="button" class="btn" data-mode="ex" aria-pressed="true">Example</button>
-            <button type="button" class="btn" data-mode="you" aria-pressed="false">Your turn</button>
+          <div class="ice-head-end">
+            <button type="button" class="learn-toggle ice-full-toggle" id="fullToggle" aria-pressed="false" hidden><span class="learn-switch" aria-hidden="true"></span>Show full explanation</button>
+            <div class="seg ice-modes" id="modes" role="group" aria-label="Example or Your turn" hidden>
+              <button type="button" class="btn" data-mode="ex" aria-pressed="true">Example</button>
+              <button type="button" class="btn" data-mode="you" aria-pressed="false">Your turn</button>
+            </div>
           </div>
         </div>
         <div class="ice-grid" id="grid">
@@ -234,8 +237,8 @@
   <script src="../intermolecular-forces/assets/suite-chrome.js?v=2"></script>
   <script src="../assets/section-jump.js?v=1"></script>
   <script src="../solubility/assets/sol-ui.js?v=23"></script>
-  <script src="assets/ice-ui.js?v=2"></script>
-  <script src="assets/ice-data.js?v=3"></script>
-  <script src="assets/ice-guide.js?v=3"></script>
+  <script src="assets/ice-ui.js?v=3"></script>
+  <script src="assets/ice-data.js?v=4"></script>
+  <script src="assets/ice-guide.js?v=4"></script>
 </body>
 </html>

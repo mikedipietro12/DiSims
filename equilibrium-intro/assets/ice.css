@@ -15,6 +15,12 @@
 .ice-stage{height:calc(100vh - 2rem);display:flex;flex-direction:column;overflow:hidden;}
 .ice-stage .guide-stage-head{align-items:center;flex:none;}
 .ice-modes{display:flex;gap:0.4rem;}
+.ice-head-end{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem 0.7rem;margin-left:auto;}
+.ice-full-toggle[hidden],.ice-modes[hidden]{display:none;}
+/* Full explanation: notes, captions and how-to lines (.ws-full) show only when the switch is on;
+   the brief versions (.ws-brief) show when it is off, the default */
+.ice-stage:not(.show-full) .ws-full{display:none !important;}
+.ice-stage.show-full .ws-brief{display:none !important;}
 .ice-modes .btn{padding:0.3rem 0.8rem;font-size:0.9rem;min-height:0;}
 .ice-grid{flex:1;min-height:0;overflow:auto;overflow-anchor:none;display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:0.9rem;padding-right:0.2rem;}
 .ice-top,.ice-left,.ice-right{display:flex;flex-direction:column;gap:0.8rem;min-width:0;}
@@ -48,6 +54,7 @@
 .ws-line.tbl .ws-note{grid-column:2 / -1;margin:0;color:var(--ink-soft);font-size:1rem;}
 .ws-note{grid-column:3;font-size:0.92rem;color:var(--dim);margin-top:0.15rem;line-height:1.4;}
 .ws-line.whole .ws-note{grid-column:1 / -1;}
+.ws-line.tbl .ws-note.ws-brief{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums;}
 .ws-line.is-current{background:var(--accent-soft);box-shadow:inset 4px 0 0 var(--accent);}
 .ws-line.is-current .ws-note{color:var(--ink-soft);}
 .ws-bar{display:flex;align-items:center;gap:0.6rem;margin-top:0.7rem;flex-wrap:wrap;}
@@ -67,7 +74,7 @@
 
 /* ---------- ICE table ---------- */
 .ice-wrap{max-width:100%;overflow-x:auto;}
-.ice{border-collapse:collapse;font-weight:700;font-variant-numeric:tabular-nums;font-size:1.2rem;margin:0 auto;}
+.ice{border-collapse:collapse;font-weight:700;font-variant-numeric:tabular-nums;font-size:1.35rem;margin:0 auto;}
 .ice th,.ice td{padding:0.4rem 0.7rem;text-align:center;border-bottom:1.5px solid var(--line);white-space:nowrap;}
 .ice thead th{border-bottom:2px solid var(--ink);}
 .ice th.ice-unit{font-family:var(--font-mono);font-size:0.75rem;font-weight:400;color:var(--dim);text-align:left;padding-left:0.4rem;}
@@ -132,7 +139,7 @@
 
 /* ---------- bulb ---------- */
 .ice-bulb{display:flex;flex-direction:column;gap:0.35rem;min-height:0;}
-.ice-bulb-box{position:relative;width:100%;aspect-ratio:16 / 7;min-height:150px;max-height:230px;}
+.ice-bulb-box{position:relative;width:100%;aspect-ratio:16 / 5;min-height:120px;max-height:180px;}
 .ice-bulb-box canvas{position:absolute;inset:0;display:block;}
 .ice-legend{display:flex;flex-wrap:wrap;gap:0.3rem 1rem;font-weight:700;font-size:0.95rem;}
 .ice-leg{display:inline-flex;align-items:center;gap:0.35rem;}
@@ -171,7 +178,7 @@ body.learn-mode .ice-stage{height:auto;bottom:0.75rem;}
 body.learn-mode .ice-stage .guide-stage-head{display:flex;margin-bottom:0.5rem;}
 body.learn-mode .ice-stage .force-badge{font-size:1.05rem;}
 body.learn-mode .ice-grid{overflow:hidden;padding-right:0;align-content:stretch;gap:1rem 1.8rem;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"top top" "left right";}
+  grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"top top" "left right";}
 body.learn-mode .ice-grid.no-top{grid-template-rows:minmax(0,1fr);grid-template-areas:"left right";}
 body.learn-mode .ice-grid.no-left{grid-template-areas:"top top" "right right";}
 body.learn-mode .ice-grid.no-top.no-left{grid-template-rows:minmax(0,1fr);grid-template-areas:"right right";}
@@ -188,15 +195,20 @@ body.learn-mode .ice-problem{font-size:clamp(1.05rem,1.4vw,1.4rem);}
 body.learn-mode .ice-hint{font-size:clamp(1rem,1.25vw,1.25rem);}
 body.learn-mode .ice-left .ice-wrap{flex:none;}
 body.learn-mode .ice-left>*,body.learn-mode .ice-right>*{flex-shrink:0;} /* the column scrolls; nothing in it gets squashed */
-body.learn-mode .ice-bulb{flex:1 0 auto;}
-body.learn-mode .ice-bulb-box{aspect-ratio:auto;flex:1;min-height:170px;max-height:none;}
-body.learn-mode .ice{font-size:clamp(1.1rem,1.6vw,1.6rem);}
-body.learn-mode .ice.ice-n4{font-size:clamp(1rem,1.25vw,1.35rem);}
-body.learn-mode .ice.ice-n4 th,body.learn-mode .ice.ice-n4 td{padding-left:0.45rem;padding-right:0.45rem;}
+/* the table is the star: large, the full width of its column; the bulb is a small strip under it */
+body.learn-mode .ice-bulb{flex:none;}
+body.learn-mode .ice-bulb-box{aspect-ratio:auto;flex:none;height:clamp(120px,20vh,190px);min-height:0;max-height:none;}
+body.learn-mode .ice-left .ice{width:100%;}
+body.learn-mode .ice{font-size:clamp(1.3rem,2vw,2.2rem);}
+body.learn-mode .ice th,body.learn-mode .ice td{padding-top:0.55rem;padding-bottom:0.55rem;}
+body.learn-mode .ice.ice-n4{font-size:clamp(1.15rem,1.6vw,1.8rem);}
+body.learn-mode .ice.ice-n4 th,body.learn-mode .ice.ice-n4 td{padding-left:0.4rem;padding-right:0.4rem;}
+body.learn-mode .ice th.ice-unit{font-size:0.6em;}
 body.learn-mode .ws-lines{font-size:clamp(1.1rem,1.45vw,1.45rem);}
 body.learn-mode .ws-note,body.learn-mode .ws-line.tbl .ws-note{font-size:clamp(0.95rem,1.15vw,1.2rem);}
-body.learn-mode .ice-in{font-size:clamp(1rem,1.3vw,1.3rem);width:7.5rem;}
-body.learn-mode .ice-n4 .ice-in{width:6rem;}
+body.learn-mode .ws-line.tbl .ws-note.ws-brief{font-size:inherit;}
+body.learn-mode .ice-in{font-size:clamp(1.1rem,1.5vw,1.6rem);width:8rem;}
+body.learn-mode .ice-n4 .ice-in{width:6.6rem;}
 body.learn-mode .ice-static{height:100%;display:grid;align-content:center;}
 body.learn-mode .ice-static:not(.ice-summary){grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:2rem;align-items:center;}
 body.learn-mode .ice-brief-pic{height:min(50vh,420px);}
@@ -206,7 +218,7 @@ body.learn-mode .ice-summary{max-width:58rem;margin:0 auto;font-size:clamp(1.1re
 @media (max-width:1000px){
   body.learn-mode .ice-grid:not(.one-col){overflow:auto;grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-template-areas:none;align-content:start;}
   body.learn-mode .ice-grid:not(.one-col)>*{grid-area:auto;overflow:visible;min-height:auto;}
-  body.learn-mode .ice-grid:not(.one-col) .ice-bulb-box{flex:none;height:min(32vh,300px);}
+  body.learn-mode .ice-grid:not(.one-col) .ice-bulb-box{flex:none;height:min(20vh,200px);}
 }
 
 /* ---------- narrow screens: the stage sits above the text ---------- */

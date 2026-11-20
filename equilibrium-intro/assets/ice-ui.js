@@ -206,7 +206,11 @@
   //   lhs / rhs: html either side of "=" (eq: another sign); whole: one full-width line of html
   //   tag: 'I' | 'C' | 'E': a line that fills part of the ICE table; it shows as the row letter and its note
   //   show: cells this line fills ('I' = the whole row); hl: light a row or 'col0'; alt: show the other row names
+  //   brief: what shows when the full explanation is off (the default): it replaces the note, or a whole line's text.
+  //     Notes are the full explanation (.ws-full); a whole line with no brief always shows; a tag line with no brief
+  //     shows its row name (TAG_BRIEF). The stage's .show-full class picks which set is visible.
   // o: { table, onStep(index, line, forward), labels, bar (where the buttons go: a fixed footer; default under the lines) }
+  const TAG_BRIEF = { I: 'Initial', C: 'Change', E: 'I + C = E' };
   function steps(host, lines, o) {
     o = o || {};
     const L = Object.assign({ next: 'Next step', back: 'Back', all: 'Show all' }, o.labels || {});
@@ -214,10 +218,15 @@
     const ol = el('ol', 'ws-lines');
     const items = lines.map(ln => {
       const li = el('li', 'ws-line' + (ln.whole != null ? ' whole' : '') + (ln.tag ? ' tbl' : ''));
-      if (ln.whole != null) li.appendChild(el('span', 'ws-lhs', ln.whole));
+      if (ln.whole != null) {
+        if (ln.brief) li.append(el('span', 'ws-lhs ws-full', ln.whole), el('span', 'ws-lhs ws-brief', ln.brief));
+        else li.appendChild(el('span', 'ws-lhs', ln.whole));
+      }
       else if (ln.tag) li.appendChild(el('span', 'ws-tag', ln.tag));
       else li.append(el('span', 'ws-lhs', ln.lhs || ''), el('span', 'ws-eq', ln.eq || (ln.rhs != null ? '=' : '')), el('span', 'ws-rhs', ln.rhs || ''));
-      if (ln.note) li.appendChild(el('span', 'ws-note', ln.note));
+      if (ln.note) li.appendChild(el('span', 'ws-note ws-full', ln.note));
+      const brief = ln.whole != null ? null : ln.brief || (ln.tag ? TAG_BRIEF[ln.tag] : null);
+      if (brief) li.appendChild(el('span', 'ws-note ws-brief', brief));
       li.hidden = true; ol.appendChild(li);
       return li;
     });
@@ -262,7 +271,7 @@
       ol.classList.toggle('is-empty', shown === 0);
       bBack.disabled = shown === 0; bNext.disabled = shown === items.length; bAll.disabled = shown === items.length;
       count.textContent = shown + ' / ' + items.length;
-      if (announce && cur) live.textContent = plain([cur.whole, cur.tag ? cur.tag + ' row.' : '', cur.lhs, cur.rhs != null ? (cur.eq || '=') + ' ' + cur.rhs : '', cur.note].filter(Boolean).join(' '));
+      if (announce && cur) live.textContent = plain([cur.whole, cur.tag ? cur.tag + ' row.' : '', cur.lhs, cur.rhs != null ? (cur.eq || '=') + ' ' + cur.rhs : '', cur.note || cur.brief].filter(Boolean).join(' '));
       if (o.onStep) o.onStep(shown - 1, cur, !!forward);
     }
     const api = {

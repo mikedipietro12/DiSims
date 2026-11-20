@@ -9,6 +9,8 @@
      bulb: an IceUI.bulb spec (cap: its caption, if not the usual one); a step's `bulb` names the state to move to. gauge: an IceUI.gauge spec;
      a step's `gauge` sets it ({ q, label, shifted }).
      you: the Your turn problem: { problem, table, boxes, parts, steps } (steps = the answer, shown on request)
+   Each calculation fills its own cell of the table on the same step (teacher, 2026-11-20: calculation → table,
+   next calculation → table). Notes are the full explanation, hidden by default; `brief` is what shows instead.
    Calculations follow repo AGENTS.md: mole and concentration conversions are unit analysis (SolUI.ua);
    K and Q are substitution. */
 (function (global) {
@@ -37,13 +39,14 @@
       bulb: { species: ['no', 'o2', 'no2'], coef: [2, 1, 2], split: 2, volume: '2.00 L', initial: 'start',
         states: { start: { c: [0, 0, 32] }, eq: { c: [4, 2, 28], tally: [-1, 2] } } },
       steps: [
-        { tag: 'I', hl: 'I', bulb: 'start', note: '<strong>I: Initial.</strong> The concentrations at the start, before the reaction shifts' },
-        { tag: 'C', hl: 'C', bulb: 'eq', note: '<strong>C: Change.</strong> How much each concentration goes up or down as the reaction shifts' },
-        { tag: 'E', hl: 'E', note: '<strong>E: Equilibrium.</strong> The concentrations once the system has reached equilibrium' },
-        { lhs: 'I + C', rhs: 'E', hl: 'col0', note: 'Every column follows this rule. For NO: 0 + 0.250 = 0.250' },
+        { tag: 'I', hl: 'I', bulb: 'start', brief: 'Initial', note: '<strong>I: Initial.</strong> The concentrations at the start, before the reaction shifts' },
+        { tag: 'C', hl: 'C', bulb: 'eq', brief: 'Change', note: '<strong>C: Change.</strong> How much each concentration goes up or down as the reaction shifts' },
+        { tag: 'E', hl: 'E', brief: 'Equilibrium', note: '<strong>E: Equilibrium.</strong> The concentrations once the system has reached equilibrium' },
+        { lhs: 'I + C', rhs: 'E', hl: 'col0', note: 'Every column follows this rule. For NO: 0 + 0.250 = 0.250', brief: 'NO: 0 + 0.250 = 0.250' },
         { whole: '<strong>Other names:</strong> Hebden labels the same rows START, +Δ and = EQUIL', alt: true,
+          brief: '<strong>Other names:</strong> START, +Δ, = EQUIL. Also a RICE table.',
           note: 'Some textbooks add a row on top for the Reaction and call it a RICE table. They all work the same way' },
-        { whole: 'The values put into the table MUST ALWAYS HAVE UNITS OF MOLES/L', note: 'For K<sub>p</sub>, every value is a partial pressure in atm instead' }
+        { whole: 'The values put into the table MUST ALWAYS HAVE UNITS OF MOLES/L', brief: '<strong>Units:</strong> mol/L (atm for ' + Kp + ')', note: 'For K<sub>p</sub>, every value is a partial pressure in atm instead' }
       ]
     },
 
@@ -54,13 +57,15 @@
         states: { eq: { c: [15, 1, 30] } },
         cap: 'Zoomed in, not to scale. The numbers of particles are in proportion to the concentrations. They stay the same, because the bulb is already at equilibrium.' },
       steps: [
-        { whole: '<strong>Does time pass?</strong> No. The bulb is already at equilibrium, so there is nothing to keep track of. No ICE table.' },
+        { whole: '<strong>Does time pass?</strong> No. The bulb is already at equilibrium, so there is nothing to keep track of. No ICE table.',
+          brief: '<strong>Does time pass?</strong> No. No ICE table.' },
         { lhs: Kc, rhs: KNOX, note: 'First, determine the equilibrium expression' },
         { lhs: B('NO2'), rhs: conc('6.00', 'NO2', '2.0') + EQ('3.0', ML), note: 'Next, use the data to calculate the concentrations required' },
         { lhs: B('NO'), rhs: conc('3.0', 'NO', '2.0') + EQ('1.5', ML) },
         { lhs: B('O2'), rhs: conc('0.20', 'O2', '2.0') + EQ('0.10', ML) },
         { lhs: Kc, rhs: F(sq('(3.0)'), sq('(1.5)') + '(0.10)') + EQ('<strong>40</strong>'), note: 'Substitute these values into the ' + Kc + ' expression' },
-        { whole: '<strong>Note:</strong> Ignore the UNITS of ' + Kc + ' since they depend on the particular equilibrium equation.' }
+        { whole: '<strong>Note:</strong> Ignore the UNITS of ' + Kc + ' since they depend on the particular equilibrium equation.',
+          brief: '<strong>Note:</strong> no units on ' + Kc + '.' }
       ],
       you: {
         problem: '<strong>Your turn:</strong> A 4.0 L flask contains 1.60 mol of N<sub>2</sub>(g), 2.40 mol of H<sub>2</sub>(g) and 1.00 mol of NH<sub>3</sub>(g) at equilibrium. What is ' + Kc + ' for N<sub>2</sub>(g) + 3 H<sub>2</sub>(g) ⇌ 2 NH<sub>3</sub>(g)?',
@@ -82,18 +87,19 @@
       bulb: { species: ['no', 'o2', 'no2'], coef: [2, 1, 2], split: 2, volume: '2.00 L', initial: 'start',
         states: { start: { c: [0, 0, 32] }, eq: { c: [4, 2, 28], tally: [-1, 2] } } },
       steps: [
-        { whole: '<strong>Preliminary analysis:</strong> there is a distinct sense of time passing. NO<sub>2</sub> was put in a bulb, then time passed until equilibrium occurred. This means we have to tell apart the concentrations at the START and the concentrations at EQUILIBRIUM.' },
+        { whole: '<strong>Preliminary analysis:</strong> there is a distinct sense of time passing. NO<sub>2</sub> was put in a bulb, then time passed until equilibrium occurred. This means we have to tell apart the concentrations at the START and the concentrations at EQUILIBRIUM.',
+          brief: '<strong>Does time pass?</strong> Yes. ICE table.' },
         { lhs: Kc, rhs: KNOX, note: 'First, determine the equilibrium expression' },
-        { lhs: B('NO2') + '<sub>I</sub>', rhs: conc('4.00', 'NO2', '2.00') + EQ('2.00', ML), note: 'Next, calculate the concentrations which can be found straight from the data' },
-        { lhs: B('NO') + '<sub>E</sub>', rhs: conc('0.500', 'NO', '2.00') + EQ('0.250', ML) },
-        { tag: 'I', show: ['I'], note: 'We assume [NO] = [O<sub>2</sub>] = 0 at the start, since they were not put in the bulb' },
-        { tag: 'E', show: ['E0'], note: 'The one equilibrium value we know: [NO] = 0.250' },
-        { tag: 'C', show: ['C0'], bulb: 'eq', note: 'Since I + C = E, the change in [NO] must be +0.250. In the bulb, every reaction event uses 2 NO<sub>2</sub> and makes 2 NO and 1 O<sub>2</sub>' },
-        { tag: 'C', show: ['C1'], note: 'O<sub>2</sub>’s coefficient (1) is half of NO’s (2), so the change in [O<sub>2</sub>] is half: ½ × 0.250 = +0.125' },
-        { tag: 'C', show: ['C2'], note: 'NO<sub>2</sub>’s coefficient (2) equals NO’s (2), so its change is the same size. It is NEGATIVE: the reaction used up NO<sub>2</sub> to make NO and O<sub>2</sub>' },
+        { lhs: B('NO2') + '<sub>I</sub>', rhs: conc('4.00', 'NO2', '2.00') + EQ('2.00', ML), show: ['I2'], note: 'Next, calculate the concentrations which can be found straight from the data. This one is at the start, so it goes on the I row' },
+        { tag: 'I', show: ['I0', 'I1'], note: 'We assume [NO] = [O<sub>2</sub>] = 0 at the start, since they were not put in the bulb', brief: '[NO] = [O<sub>2</sub>] = 0' },
+        { lhs: B('NO') + '<sub>E</sub>', rhs: conc('0.500', 'NO', '2.00') + EQ('0.250', ML), show: ['E0'], note: 'The one equilibrium value we know, so it goes on the E row' },
+        { tag: 'C', show: ['C0'], bulb: 'eq', note: 'Since I + C = E, the change in [NO] must be +0.250. In the bulb, every reaction event uses 2 NO<sub>2</sub> and makes 2 NO and 1 O<sub>2</sub>', brief: 'NO: 0.250 − 0 = +0.250' },
+        { tag: 'C', show: ['C1'], note: 'O<sub>2</sub>’s coefficient (1) is half of NO’s (2), so the change in [O<sub>2</sub>] is half: ½ × 0.250 = +0.125', brief: 'O<sub>2</sub>: ½ × 0.250 = +0.125' },
+        { tag: 'C', show: ['C2'], note: 'NO<sub>2</sub>’s coefficient (2) equals NO’s (2), so its change is the same size. It is NEGATIVE: the reaction used up NO<sub>2</sub> to make NO and O<sub>2</sub>', brief: 'NO<sub>2</sub>: same size as NO, but −0.250' },
         { tag: 'E', show: ['E1', 'E2'], note: 'I + C = E down each column' },
         { lhs: Kc, rhs: F(sq('(1.75)'), sq('(0.250)') + '(0.125)') + EQ('<strong>392</strong>'), hl: 'E', note: 'Finally, substitute the E row into the ' + Kc + ' expression' },
-        { whole: '<strong>Notice:</strong> the C values on one side of the equation are all POSITIVE, and on the other side they are all NEGATIVE. Because the C row represents a shift, this is always true.' }
+        { whole: '<strong>Notice:</strong> the C values on one side of the equation are all POSITIVE, and on the other side they are all NEGATIVE. Because the C row represents a shift, this is always true.',
+          brief: '<strong>Notice:</strong> C row: one side +, the other side −.' }
       ],
       you: {
         problem: '<strong>Your turn:</strong> 4.00 mol of NOBr(g) is placed in a 2.00 L flask. Equilibrium is reached according to the equation 2 NOBr(g) ⇌ 2 NO(g) + Br<sub>2</sub>(g). At equilibrium, 0.500 mol of Br<sub>2</sub>(g) is found. What is the ' + Kc + ' value?',
@@ -103,12 +109,11 @@
         boxes: [{ label: Kc, ans: '0.0278' }],
         steps: [
           { lhs: Kc, rhs: F(sq(B('NO')) + B('Br2'), sq(B('NOBr'))) },
-          { lhs: B('NOBr') + '<sub>I</sub>', rhs: conc('4.00', 'NOBr', '2.00') + EQ('2.00', ML) },
-          { lhs: B('Br2') + '<sub>E</sub>', rhs: conc('0.500', 'Br2', '2.00') + EQ('0.250', ML) },
-          { tag: 'I', show: ['I'], note: 'Only NOBr was put in the flask' },
-          { tag: 'E', show: ['E2'], note: 'The one equilibrium value we know' },
-          { tag: 'C', show: ['C2'], note: 'I + C = E, so the change in [Br<sub>2</sub>] is +0.250' },
-          { tag: 'C', show: ['C0', 'C1'], note: 'NO’s coefficient (2) is twice Br<sub>2</sub>’s (1), so it goes up by 0.500. NOBr is used up, so it goes down by 0.500' },
+          { lhs: B('NOBr') + '<sub>I</sub>', rhs: conc('4.00', 'NOBr', '2.00') + EQ('2.00', ML), show: ['I0'], note: 'At the start, so it goes on the I row' },
+          { tag: 'I', show: ['I1', 'I2'], note: 'Only NOBr was put in the flask', brief: '[NO] = [Br<sub>2</sub>] = 0' },
+          { lhs: B('Br2') + '<sub>E</sub>', rhs: conc('0.500', 'Br2', '2.00') + EQ('0.250', ML), show: ['E2'], note: 'The one equilibrium value we know, so it goes on the E row' },
+          { tag: 'C', show: ['C2'], note: 'I + C = E, so the change in [Br<sub>2</sub>] is +0.250', brief: 'Br<sub>2</sub>: 0.250 − 0 = +0.250' },
+          { tag: 'C', show: ['C0', 'C1'], note: 'NO’s coefficient (2) is twice Br<sub>2</sub>’s (1), so it goes up by 0.500. NOBr is used up, so it goes down by 0.500', brief: 'NO: 2 × 0.250 = +0.500. NOBr: −0.500' },
           { tag: 'E', show: ['E0', 'E1'], note: 'I + C = E down each column' },
           { lhs: Kc, rhs: F(sq('(0.500)') + '(0.250)', sq('(1.50)')) + EQ('<strong>0.0278</strong>'), hl: 'E' }
         ]
@@ -123,10 +128,10 @@
         states: { start: { c: [0, 0, 33] }, eq: { c: [8, 4, 25], tally: [-1, 4] } } },
       steps: [
         { lhs: Kc, rhs: KNOX, note: 'First, determine the equilibrium expression' },
-        { tag: 'I', show: ['I'], note: '[NO<sub>2</sub>] at the START is unknown, so we use a variable, X. [NO] = [O<sub>2</sub>] = 0 can be assumed from the problem statement' },
-        { tag: 'E', show: ['E0'], note: 'Given: [NO] = 0.800 M at equilibrium' },
-        { tag: 'C', show: ['C0'], bulb: 'eq', note: 'I + C = E, so the change in [NO] is +0.800' },
-        { tag: 'C', show: ['C1', 'C2'], note: 'The C row must be in a 2 : 1 : 2 ratio. Some of the starting NO<sub>2</sub> reacts, so the change in [NO<sub>2</sub>] is a decrease' },
+        { tag: 'I', show: ['I'], note: '[NO<sub>2</sub>] at the START is unknown, so we use a variable, X. [NO] = [O<sub>2</sub>] = 0 can be assumed from the problem statement', brief: '[NO<sub>2</sub>] = X. [NO] = [O<sub>2</sub>] = 0' },
+        { tag: 'E', show: ['E0'], note: 'Given: [NO] = 0.800 M at equilibrium', brief: 'Given: [NO] = 0.800 M' },
+        { tag: 'C', show: ['C0'], bulb: 'eq', note: 'I + C = E, so the change in [NO] is +0.800', brief: 'NO: 0.800 − 0 = +0.800' },
+        { tag: 'C', show: ['C1', 'C2'], note: 'The C row must be in a 2 : 1 : 2 ratio. Some of the starting NO<sub>2</sub> reacts, so the change in [NO<sub>2</sub>] is a decrease', brief: '2 : 1 : 2, so O<sub>2</sub>: +0.400 and NO<sub>2</sub>: −0.800' },
         { tag: 'E', show: ['E1', 'E2'], note: 'I + C = E down each column' },
         { lhs: '24.0', rhs: F(sq('(X − 0.800)'), sq('(0.800)') + '(0.400)'), hl: 'E', note: 'Substitute the E row into the ' + Kc + ' expression' },
         { lhs: sq('(X − 0.800)'), rhs: '(24.0)(0.800)<sup>2</sup>(0.400) = 6.144', note: 'Multiply both sides by the bottom of the fraction' },
@@ -141,11 +146,10 @@
         boxes: [{ label: 'X', unit: ML, ans: '0.330' }, { label: 'Moles of NO', unit: 'mol', ans: '0.660' }],
         steps: [
           { lhs: Kc, rhs: F(sq(B('NO')), B('N2') + B('O2')) },
-          { lhs: B('N2') + '<sub>E</sub>', rhs: conc('0.300', 'N2', '2.00') + EQ('0.150', ML) },
-          { tag: 'I', show: ['I'], note: 'Only NO was put in the flask. Its starting concentration is unknown, so we use X' },
-          { tag: 'E', show: ['E0'], note: 'The one equilibrium value we know' },
-          { tag: 'C', show: ['C0'], note: 'I + C = E, so the change in [N<sub>2</sub>] is +0.150' },
-          { tag: 'C', show: ['C1', 'C2'], note: 'O<sub>2</sub> changes by the same amount as N<sub>2</sub> (1 : 1). NO’s coefficient is 2, so it goes down by 2 × 0.150 = 0.300' },
+          { tag: 'I', show: ['I'], note: 'Only NO was put in the flask. Its starting concentration is unknown, so we use X', brief: '[NO] = X. [N<sub>2</sub>] = [O<sub>2</sub>] = 0' },
+          { lhs: B('N2') + '<sub>E</sub>', rhs: conc('0.300', 'N2', '2.00') + EQ('0.150', ML), show: ['E0'], note: 'The one equilibrium value we know, so it goes on the E row' },
+          { tag: 'C', show: ['C0'], note: 'I + C = E, so the change in [N<sub>2</sub>] is +0.150', brief: 'N<sub>2</sub>: 0.150 − 0 = +0.150' },
+          { tag: 'C', show: ['C1', 'C2'], note: 'O<sub>2</sub> changes by the same amount as N<sub>2</sub> (1 : 1). NO’s coefficient is 2, so it goes down by 2 × 0.150 = 0.300', brief: 'O<sub>2</sub>: +0.150. NO: 2 × 0.150 = −0.300' },
           { tag: 'E', show: ['E1', 'E2'], note: 'I + C = E down each column' },
           { lhs: '0.0400', rhs: F(sq('(X − 0.300)'), '(0.150)(0.150)'), hl: 'E' },
           { lhs: '0.200', rhs: F('X − 0.300', '0.150'), note: 'Take the square root of both sides' },
@@ -163,7 +167,8 @@
         states: { start: { c: [20, 2, 4] }, eq: { c: [16, 0, 8], tally: [1, 2] } } },
       gauge: { k: 49, kLabel: Kc, lo: -2, hi: 3 },
       steps: [
-        { whole: '<strong>Preliminary analysis:</strong> this question is NOT asking us to find a numerical value; it is asking us for a DECISION. Decisions are often based on comparing two numbers: “Is A bigger than, less than, or equal to B?”' },
+        { whole: '<strong>Preliminary analysis:</strong> this question is NOT asking us to find a numerical value; it is asking us for a DECISION. Decisions are often based on comparing two numbers: “Is A bigger than, less than, or equal to B?”',
+          brief: '<strong>A decision, not a number:</strong> compare Q with ' + Kc + '.' },
         { lhs: 'Q', rhs: F(sq(B('NO2')), sq(B('NO')) + B('O2')), note: 'Q, the reaction quotient, has the same expression as ' + Kc + '. We fill it in with the starting concentrations' },
         { lhs: B('NO') + '<sub>I</sub>', rhs: conc('2.0', 'NO', '2.0') + EQ('1.0', ML), note: 'Calculate the starting concentrations' },
         { lhs: B('O2') + '<sub>I</sub>', rhs: conc('0.20', 'O2', '2.0') + EQ('0.10', ML) },
@@ -200,10 +205,10 @@
         states: { start: { c: [20, 20, 0, 0] }, eq: { c: [7, 7, 13, 13], tally: [1, 13] } } },
       steps: [
         { lhs: Kc, rhs: KSOX, note: 'First, write out the equilibrium expression' },
-        { lhs: B('SO2') + '<sub>I</sub>', rhs: conc('4.0', 'SO2', '5.0') + EQ('0.80', ML), note: 'Starting concentrations' },
-        { lhs: B('NO2') + '<sub>I</sub>', rhs: conc('4.0', 'NO2', '5.0') + EQ('0.80', ML) },
-        { tag: 'I', show: ['I'], note: 'SO<sub>3</sub> and NO were not put in the bulb, so they start at 0' },
-        { tag: 'C', show: ['C'], bulb: 'eq', note: 'There is nothing else to put in the table except the unknown. We let x be the CHANGE IN CONCENTRATION. The coefficients are 1 : 1 : 1 : 1, so every change is x. The products started at zero, so they must GAIN; the reactants must LOSE' },
+        { lhs: B('SO2') + '<sub>I</sub>', rhs: conc('4.0', 'SO2', '5.0') + EQ('0.80', ML), show: ['I0'], note: 'Starting concentrations go on the I row' },
+        { lhs: B('NO2') + '<sub>I</sub>', rhs: conc('4.0', 'NO2', '5.0') + EQ('0.80', ML), show: ['I1'] },
+        { tag: 'I', show: ['I2', 'I3'], note: 'SO<sub>3</sub> and NO were not put in the bulb, so they start at 0', brief: '[SO<sub>3</sub>] = [NO] = 0' },
+        { tag: 'C', show: ['C'], bulb: 'eq', brief: 'Let x be the change. 1 : 1 : 1 : 1', note: 'There is nothing else to put in the table except the unknown. We let x be the CHANGE IN CONCENTRATION. The coefficients are 1 : 1 : 1 : 1, so every change is x. The products started at zero, so they must GAIN; the reactants must LOSE' },
         { tag: 'E', show: ['E'], note: 'I + C = E down each column' },
         { lhs: '3.5', rhs: F(sq('x'), sq('(0.80 − x)')), hl: 'E', note: 'Substitute the E row into the ' + Kc + ' expression' },
         { lhs: '1.87', rhs: F('x', '0.80 − x'), note: 'This does NOT need the quadratic formula: take the square root of both sides' },
@@ -221,10 +226,10 @@
         boxes: [{ label: 'x', unit: ML, ans: '0.240' }, { label: B('HBr'), unit: ML, ans: '0.480' }, { label: B('H2') + ' = ' + B('Br2'), unit: ML, ans: '0.060' }],
         steps: [
           { lhs: Kc, rhs: F(sq(B('HBr')), B('H2') + B('Br2')) },
-          { lhs: B('H2') + '<sub>I</sub>', rhs: conc('0.600', 'H2', '2.00') + EQ('0.300', ML) },
-          { lhs: B('Br2') + '<sub>I</sub>', rhs: conc('0.600', 'Br2', '2.00') + EQ('0.300', ML) },
-          { tag: 'I', show: ['I'], note: 'No HBr was put in the flask' },
-          { tag: 'C', show: ['C'], note: 'Let x be the change in [H<sub>2</sub>]. Br<sub>2</sub> also goes down by x. HBr’s coefficient is 2, so it goes up by 2x' },
+          { lhs: B('H2') + '<sub>I</sub>', rhs: conc('0.600', 'H2', '2.00') + EQ('0.300', ML), show: ['I0'], note: 'Starting concentrations go on the I row' },
+          { lhs: B('Br2') + '<sub>I</sub>', rhs: conc('0.600', 'Br2', '2.00') + EQ('0.300', ML), show: ['I1'] },
+          { tag: 'I', show: ['I2'], note: 'No HBr was put in the flask', brief: '[HBr] = 0' },
+          { tag: 'C', show: ['C'], brief: 'Let x be the change. HBr: +2x', note: 'Let x be the change in [H<sub>2</sub>]. Br<sub>2</sub> also goes down by x. HBr’s coefficient is 2, so it goes up by 2x' },
           { tag: 'E', show: ['E'], note: 'I + C = E down each column' },
           { lhs: '64', rhs: F(sq('(2x)'), sq('(0.300 − x)')), hl: 'E' },
           { lhs: '8.0', rhs: F('2x', '0.300 − x'), note: 'Take the square root of both sides' },
@@ -244,11 +249,12 @@
       bulb: { species: ['so2', 'no2', 'so3', 'no'], coef: [1, 1, 1, 1], split: 2, volume: '1.0 L', initial: 'first',
         states: { first: { c: [3, 12, 12, 12] }, added: { c: [12, 12, 12, 12] }, eq: { c: [8, 8, 16, 16], tally: [1, 4] } } },
       steps: [
-        { whole: '<strong>Preliminary analysis:</strong> we are NOT given the value for ' + Kc + '. We ARE told the amount of each gas previously present at equilibrium. This information allows us to calculate a value for ' + Kc + '.' },
+        { whole: '<strong>Preliminary analysis:</strong> we are NOT given the value for ' + Kc + '. We ARE told the amount of each gas previously present at equilibrium. This information allows us to calculate a value for ' + Kc + '.',
+          brief: '<strong>' + Kc + ' is not given:</strong> find it from the first equilibrium.' },
         { lhs: Kc, rhs: KSOX + ' = ' + F('(4.0)(4.0)', '(1.0)(4.0)') + EQ('4.0'), note: 'First, find the value of ' + Kc + ' from the first equilibrium. The volume is 1.0 L, so each concentration has the same value as its moles' },
         { whole: 'There is no mention of the temperature changing, so ' + Kc + ' stays 4.0.' },
-        { tag: 'I', show: ['I'], bulb: 'added', note: '<strong>IMPORTANT:</strong> any ADDITION (or REMOVAL) is shown on the I row. A system at equilibrium will not shift by itself; something has to cause the shift' },
-        { tag: 'C', show: ['C'], bulb: 'eq', note: 'The system shifts to use up some of the added SO<sub>2</sub>, so the change in [SO<sub>2</sub>] is −x' },
+        { tag: 'I', show: ['I'], bulb: 'added', brief: 'Add 3.0 to [SO<sub>2</sub>]. Additions go on the I row', note: '<strong>IMPORTANT:</strong> any ADDITION (or REMOVAL) is shown on the I row. A system at equilibrium will not shift by itself; something has to cause the shift' },
+        { tag: 'C', show: ['C'], bulb: 'eq', brief: 'Let x be the change', note: 'The system shifts to use up some of the added SO<sub>2</sub>, so the change in [SO<sub>2</sub>] is −x' },
         { tag: 'E', show: ['E'], note: 'I + C = E down each column' },
         { lhs: '4.0', rhs: F(sq('(4.0 + x)'), sq('(4.0 − x)')), hl: 'E', note: 'Substitute the E row' },
         { lhs: '2.0', rhs: F('4.0 + x', '4.0 − x'), note: 'Take the square root of both sides' },
@@ -266,12 +272,11 @@
         steps: [
           { lhs: Kc, rhs: F(B('CO2') + B('NO'), B('CO') + B('NO2')) },
           { lhs: B('CO'), rhs: conc('0.40', 'CO', '2.0') + EQ('0.20', ML), note: 'The first equilibrium, as concentrations' },
-          { lhs: B('NO2'), rhs: conc('1.60', 'NO2', '2.0') + EQ('0.80', ML) },
-          { lhs: B('CO2') + ' = ' + B('NO'), rhs: F('2.40 mol', '2.0 L') + EQ('1.20', ML) },
+          { lhs: B('NO2'), rhs: conc('1.60', 'NO2', '2.0') + EQ('0.80', ML), show: ['I1'], note: 'Nothing is added to NO<sub>2</sub>, so this also goes on the I row' },
+          { lhs: B('CO2') + ' = ' + B('NO'), rhs: F('2.40 mol', '2.0 L') + EQ('1.20', ML), show: ['I2', 'I3'] },
           { lhs: Kc, rhs: F('(1.20)(1.20)', '(0.20)(0.80)') + EQ('9.0'), note: 'First, find ' + Kc + ' from the first equilibrium' },
-          { lhs: 'Added CO', rhs: conc('1.20', 'CO', '2.0') + EQ('0.60', ML), note: 'The CO we add, as a concentration' },
-          { tag: 'I', show: ['I'], note: 'The addition goes on the I row' },
-          { tag: 'C', show: ['C'], note: 'The system shifts to use up some of the added CO, so the change in [CO] is −x' },
+          { lhs: 'Added CO', rhs: conc('1.20', 'CO', '2.0') + EQ('0.60', ML), show: ['I0'], note: 'The CO we add, as a concentration. The addition goes on the I row', brief: 'I row: 0.20 + 0.60' },
+          { tag: 'C', show: ['C'], brief: 'Let x be the change', note: 'The system shifts to use up some of the added CO, so the change in [CO] is −x' },
           { tag: 'E', show: ['E'], note: 'I + C = E down each column' },
           { lhs: '9.0', rhs: F(sq('(1.20 + x)'), sq('(0.80 − x)')), hl: 'E' },
           { lhs: '3.0', rhs: F('1.20 + x', '0.80 − x'), note: 'Take the square root of both sides' },
@@ -293,8 +298,8 @@
         cap: 'Zoomed in, not to scale. The flask is sealed and the temperature stays the same, so each particle adds the same pressure: 0.05 atm.' },
       steps: [
         { lhs: Kp, rhs: F(sq('(' + P('NO2') + ')'), P('N2O4')), note: Kp + ' uses partial pressures in place of concentrations' },
-        { tag: 'I', show: ['I'], note: 'N<sub>2</sub>O<sub>4</sub> starts at 1.00 atm. There is no NO<sub>2</sub> yet' },
-        { tag: 'C', show: ['C'], bulb: 'eq', note: 'Let x be the drop in the pressure of N<sub>2</sub>O<sub>4</sub>. NO<sub>2</sub>’s coefficient is 2, so its pressure goes up by 2x' },
+        { tag: 'I', show: ['I'], note: 'N<sub>2</sub>O<sub>4</sub> starts at 1.00 atm. There is no NO<sub>2</sub> yet', brief: P('N2O4') + ' = 1.00 atm. ' + P('NO2') + ' = 0' },
+        { tag: 'C', show: ['C'], bulb: 'eq', brief: 'Let x be the change. NO<sub>2</sub>: +2x', note: 'Let x be the drop in the pressure of N<sub>2</sub>O<sub>4</sub>. NO<sub>2</sub>’s coefficient is 2, so its pressure goes up by 2x' },
         { tag: 'E', show: ['E'], note: 'I + C = E down each column' },
         { lhs: 'P<sub>total</sub>', rhs: '(1.00 − x) + 2x = 1.00 + x', hl: 'E', note: 'The total pressure is the sum of the partial pressures in the E row' },
         { lhs: '1.40', rhs: '1.00 + x', note: 'The problem gives the total pressure at equilibrium' },
@@ -310,8 +315,8 @@
         boxes: [{ label: 'x', unit: 'atm', ans: '0.50' }, { label: Kp, ans: '0.167', tol: 0.03 }],
         steps: [
           { lhs: Kp, rhs: F('(' + P('CO') + ')(' + P('Cl2') + ')', P('COCl2')) },
-          { tag: 'I', show: ['I'], note: 'Only COCl<sub>2</sub> is in the flask at the start' },
-          { tag: 'C', show: ['C'], note: 'Let x be the drop in the pressure of COCl<sub>2</sub>. CO and Cl<sub>2</sub> each go up by x (1 : 1 : 1)' },
+          { tag: 'I', show: ['I'], note: 'Only COCl<sub>2</sub> is in the flask at the start', brief: P('COCl2') + ' = 2.00 atm. ' + P('CO') + ' = ' + P('Cl2') + ' = 0' },
+          { tag: 'C', show: ['C'], brief: 'Let x be the change. 1 : 1 : 1', note: 'Let x be the drop in the pressure of COCl<sub>2</sub>. CO and Cl<sub>2</sub> each go up by x (1 : 1 : 1)' },
           { tag: 'E', show: ['E'], note: 'I + C = E down each column' },
           { lhs: 'P<sub>total</sub>', rhs: '(2.00 − x) + x + x = 2.00 + x', hl: 'E', note: 'Add up the E row' },
           { lhs: '2.50', rhs: '2.00 + x' },

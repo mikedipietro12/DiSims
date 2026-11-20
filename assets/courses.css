@@ -123,18 +123,17 @@
 .path a.is-soon .mod-go{color:var(--dim);border-color:rgba(29,36,51,0.35);}
 .path a.is-soon:hover .mod-go{background:none;}
 
-/* ---------- Stoichiometry: 2 H2 + O2 move together, then 2 H2O take their place ---------- */
+/* ---------- Stoichiometry: 2 H2 + O2 move together and fade as 2 H2O fade in ---------- */
 .anim-rxn .rx-a{animation:rx-a 6s ease-in-out infinite !important;}
 .anim-rxn .rx-b{animation:rx-b 6s ease-in-out infinite !important;}
 .anim-rxn .rx-c{animation:rx-c 6s ease-in-out infinite !important;}
 .anim-rxn .rx-in{animation:rx-in 6s infinite !important;}
 .anim-rxn .rx-out{animation:rx-out 6s infinite !important;}
-.anim-rxn .rx-flash{transform-origin:120px 63px;animation:ht-flash 6s ease-out infinite !important;}
-@keyframes rx-a{0%,8%{transform:translate(0,0)}40%,100%{transform:translate(36px,12px)}}
-@keyframes rx-b{0%,8%{transform:translate(0,0)}40%,100%{transform:translate(36px,-12px)}}
-@keyframes rx-c{0%,8%{transform:translate(0,0)}40%,100%{transform:translate(-40px,0)}}
-@keyframes rx-in{0%,42%{opacity:1}48%,94%{opacity:0}100%{opacity:1}}
-@keyframes rx-out{0%,44%{opacity:0}50%,88%{opacity:1}94%,100%{opacity:0}}
+@keyframes rx-a{0%,8%{transform:translate(0,0)}40%,100%{transform:translate(28px,6px)}}
+@keyframes rx-b{0%,8%{transform:translate(0,0)}40%,100%{transform:translate(28px,-6px)}}
+@keyframes rx-c{0%,8%{transform:translate(0,0)}40%,100%{transform:translate(-32px,0)}}
+@keyframes rx-in{0%,40%{opacity:1}50%,94%{opacity:0}100%{opacity:1}}
+@keyframes rx-out{0%,42%{opacity:0}52%,88%{opacity:1}94%,100%{opacity:0}}
 
 /* ---------- Gas Chemistry: the piston pushes down and the particles crowd toward the bottom ---------- */
 .anim-gas .gs-piston{animation:gs-piston 7s ease-in-out infinite !important;}
