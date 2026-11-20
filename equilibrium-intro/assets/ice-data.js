@@ -6,7 +6,7 @@
 
    section: { problem, table, bulb, gauge, steps, you }
      problem: html of the problem card. table: an IceUI.table spec. steps: IceUI.steps lines.
-     bulb: an IceUI.bulb spec; a step's `bulb` names the state to move to. gauge: an IceUI.gauge spec;
+     bulb: an IceUI.bulb spec (cap: its caption, if not the usual one); a step's `bulb` names the state to move to. gauge: an IceUI.gauge spec;
      a step's `gauge` sets it ({ q, label, shifted }).
      you: the Your turn problem: { problem, table, boxes, parts, steps } (steps = the answer, shown on request)
    Calculations follow repo AGENTS.md: mole and concentration conversions are unit analysis (SolUI.ua);
@@ -34,9 +34,11 @@
     'ice-intro': {
       table: Object.assign({}, NOX, { preshown: true, alt: { I: 'START', C: '+Δ', E: '= EQUIL' },
         rows: { I: ['0', '0', '2.00'], C: ['+0.250', '+0.125', '−0.250'], E: ['0.250', '0.125', '1.75'] } }),
+      bulb: { species: ['no', 'o2', 'no2'], coef: [2, 1, 2], split: 2, volume: '2.00 L', initial: 'start',
+        states: { start: { c: [0, 0, 32] }, eq: { c: [4, 2, 28], tally: [-1, 2] } } },
       steps: [
-        { tag: 'I', hl: 'I', note: '<strong>I: Initial.</strong> The concentrations at the start, before the reaction shifts' },
-        { tag: 'C', hl: 'C', note: '<strong>C: Change.</strong> How much each concentration goes up or down as the reaction shifts' },
+        { tag: 'I', hl: 'I', bulb: 'start', note: '<strong>I: Initial.</strong> The concentrations at the start, before the reaction shifts' },
+        { tag: 'C', hl: 'C', bulb: 'eq', note: '<strong>C: Change.</strong> How much each concentration goes up or down as the reaction shifts' },
         { tag: 'E', hl: 'E', note: '<strong>E: Equilibrium.</strong> The concentrations once the system has reached equilibrium' },
         { lhs: 'I + C', rhs: 'E', hl: 'col0', note: 'Every column follows this rule. For NO: 0 + 0.250 = 0.250' },
         { whole: '<strong>Other names:</strong> Hebden labels the same rows START, +Δ and = EQUIL', alt: true,
@@ -48,6 +50,9 @@
     // ---------- 2. Example A: nothing changes, so no table ----------
     'ex-a': {
       problem: '<strong>Example A:</strong> A 2.0 L bulb contains 6.00 mol of NO<sub>2</sub>(g), 3.0 mol of NO(g) and 0.20 mol of O<sub>2</sub>(g) at equilibrium. What is ' + Kc + ' for 2 NO(g) + O<sub>2</sub>(g) ⇌ 2 NO<sub>2</sub>(g)?',
+      bulb: { species: ['no', 'o2', 'no2'], coef: [2, 1, 2], split: 2, volume: '2.0 L', initial: 'eq',
+        states: { eq: { c: [15, 1, 30] } },
+        cap: 'Zoomed in, not to scale. The numbers of particles are in proportion to the concentrations. They stay the same, because the bulb is already at equilibrium.' },
       steps: [
         { whole: '<strong>Does time pass?</strong> No. The bulb is already at equilibrium, so there is nothing to keep track of. No ICE table.' },
         { lhs: Kc, rhs: KNOX, note: 'First, determine the equilibrium expression' },
@@ -60,10 +65,6 @@
       you: {
         problem: '<strong>Your turn:</strong> A 4.0 L flask contains 1.60 mol of N<sub>2</sub>(g), 2.40 mol of H<sub>2</sub>(g) and 1.00 mol of NH<sub>3</sub>(g) at equilibrium. What is ' + Kc + ' for N<sub>2</sub>(g) + 3 H<sub>2</sub>(g) ⇌ 2 NH<sub>3</sub>(g)?',
         hint: 'No ICE table for this one: nothing changes.',
-        boxes: [
-          { label: B('N2'), unit: ML, ans: '0.400' }, { label: B('H2'), unit: ML, ans: '0.600' },
-          { label: B('NH3'), unit: ML, ans: '0.250' }, { label: Kc, ans: '0.723' }
-        ],
         steps: [
           { lhs: Kc, rhs: F(sq(B('NH3')), B('N2') + B('H2') + '<sup>3</sup>'), note: 'The coefficient 3 becomes a power' },
           { lhs: B('N2'), rhs: conc('1.60', 'N2', '4.0') + EQ('0.400', ML) },
@@ -118,11 +119,13 @@
     'ex-c': {
       problem: '<strong>Example C:</strong> A certain amount of NO<sub>2</sub>(g) was introduced into a 5.00 L bulb. When equilibrium was attained according to the equation 2 NO(g) + O<sub>2</sub>(g) ⇌ 2 NO<sub>2</sub>(g), the concentration of NO(g) was 0.800 M. If ' + Kc + ' has a value of 24.0, how many moles of NO<sub>2</sub> were originally put into the bulb?',
       table: Object.assign({}, NOX, { rows: { I: ['0', '0', 'X'], C: ['+0.800', '+0.400', '−0.800'], E: ['0.800', '0.400', 'X − 0.800'] } }),
+      bulb: { species: ['no', 'o2', 'no2'], coef: [2, 1, 2], split: 2, volume: '5.00 L', initial: 'start',
+        states: { start: { c: [0, 0, 33] }, eq: { c: [8, 4, 25], tally: [-1, 4] } } },
       steps: [
         { lhs: Kc, rhs: KNOX, note: 'First, determine the equilibrium expression' },
         { tag: 'I', show: ['I'], note: '[NO<sub>2</sub>] at the START is unknown, so we use a variable, X. [NO] = [O<sub>2</sub>] = 0 can be assumed from the problem statement' },
         { tag: 'E', show: ['E0'], note: 'Given: [NO] = 0.800 M at equilibrium' },
-        { tag: 'C', show: ['C0'], note: 'I + C = E, so the change in [NO] is +0.800' },
+        { tag: 'C', show: ['C0'], bulb: 'eq', note: 'I + C = E, so the change in [NO] is +0.800' },
         { tag: 'C', show: ['C1', 'C2'], note: 'The C row must be in a 2 : 1 : 2 ratio. Some of the starting NO<sub>2</sub> reacts, so the change in [NO<sub>2</sub>] is a decrease' },
         { tag: 'E', show: ['E1', 'E2'], note: 'I + C = E down each column' },
         { lhs: '24.0', rhs: F(sq('(X − 0.800)'), sq('(0.800)') + '(0.400)'), hl: 'E', note: 'Substitute the E row into the ' + Kc + ' expression' },
@@ -193,12 +196,14 @@
     'ex-e': {
       problem: '<strong>Example E:</strong> ' + Kc + ' = 3.5 for SO<sub>2</sub>(g) + NO<sub>2</sub>(g) ⇌ SO<sub>3</sub>(g) + NO(g). If 4.0 mol of SO<sub>2</sub>(g) and 4.0 mol of NO<sub>2</sub>(g) are placed in a 5.0 L bulb and allowed to come to equilibrium, what concentration of all species will exist at equilibrium?',
       table: Object.assign({}, SOX, { rows: { I: ['0.80', '0.80', '0', '0'], C: ['−x', '−x', '+x', '+x'], E: ['0.80 − x', '0.80 − x', 'x', 'x'] } }),
+      bulb: { species: ['so2', 'no2', 'so3', 'no'], coef: [1, 1, 1, 1], split: 2, volume: '5.0 L', initial: 'start',
+        states: { start: { c: [20, 20, 0, 0] }, eq: { c: [7, 7, 13, 13], tally: [1, 13] } } },
       steps: [
         { lhs: Kc, rhs: KSOX, note: 'First, write out the equilibrium expression' },
         { lhs: B('SO2') + '<sub>I</sub>', rhs: conc('4.0', 'SO2', '5.0') + EQ('0.80', ML), note: 'Starting concentrations' },
         { lhs: B('NO2') + '<sub>I</sub>', rhs: conc('4.0', 'NO2', '5.0') + EQ('0.80', ML) },
         { tag: 'I', show: ['I'], note: 'SO<sub>3</sub> and NO were not put in the bulb, so they start at 0' },
-        { tag: 'C', show: ['C'], note: 'There is nothing else to put in the table except the unknown. We let x be the CHANGE IN CONCENTRATION. The coefficients are 1 : 1 : 1 : 1, so every change is x. The products started at zero, so they must GAIN; the reactants must LOSE' },
+        { tag: 'C', show: ['C'], bulb: 'eq', note: 'There is nothing else to put in the table except the unknown. We let x be the CHANGE IN CONCENTRATION. The coefficients are 1 : 1 : 1 : 1, so every change is x. The products started at zero, so they must GAIN; the reactants must LOSE' },
         { tag: 'E', show: ['E'], note: 'I + C = E down each column' },
         { lhs: '3.5', rhs: F(sq('x'), sq('(0.80 − x)')), hl: 'E', note: 'Substitute the E row into the ' + Kc + ' expression' },
         { lhs: '1.87', rhs: F('x', '0.80 − x'), note: 'This does NOT need the quadratic formula: take the square root of both sides' },
@@ -283,10 +288,13 @@
       problem: '<strong>Example G:</strong> N<sub>2</sub>O<sub>4</sub>(g) is placed in an empty flask at a pressure of 1.00 atm. At equilibrium, the total pressure in the flask is 1.40 atm. What is ' + Kp + ' for N<sub>2</sub>O<sub>4</sub>(g) ⇌ 2 NO<sub>2</sub>(g)?',
       table: { unit: 'atm', split: 1, species: ['N<sub>2</sub>O<sub>4</sub>(g)', '2 NO<sub>2</sub>(g)'],
         rows: { I: ['1.00', '0'], C: ['−x', '+2x'], E: ['1.00 − x', '2x'] } },
+      bulb: { species: ['n2o4', 'no2'], coef: [1, 2], split: 1, pressure: 0.05, initial: 'start',
+        states: { start: { c: [20, 0] }, eq: { c: [12, 16], tally: [1, 8] } },
+        cap: 'Zoomed in, not to scale. The flask is sealed and the temperature stays the same, so each particle adds the same pressure: 0.05 atm.' },
       steps: [
         { lhs: Kp, rhs: F(sq('(' + P('NO2') + ')'), P('N2O4')), note: Kp + ' uses partial pressures in place of concentrations' },
         { tag: 'I', show: ['I'], note: 'N<sub>2</sub>O<sub>4</sub> starts at 1.00 atm. There is no NO<sub>2</sub> yet' },
-        { tag: 'C', show: ['C'], note: 'Let x be the drop in the pressure of N<sub>2</sub>O<sub>4</sub>. NO<sub>2</sub>’s coefficient is 2, so its pressure goes up by 2x' },
+        { tag: 'C', show: ['C'], bulb: 'eq', note: 'Let x be the drop in the pressure of N<sub>2</sub>O<sub>4</sub>. NO<sub>2</sub>’s coefficient is 2, so its pressure goes up by 2x' },
         { tag: 'E', show: ['E'], note: 'I + C = E down each column' },
         { lhs: 'P<sub>total</sub>', rhs: '(1.00 − x) + 2x = 1.00 + x', hl: 'E', note: 'The total pressure is the sum of the partial pressures in the E row' },
         { lhs: '1.40', rhs: '1.00 + x', note: 'The problem gives the total pressure at equilibrium' },

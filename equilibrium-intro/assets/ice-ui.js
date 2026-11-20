@@ -206,7 +206,7 @@
   //   lhs / rhs: html either side of "=" (eq: another sign); whole: one full-width line of html
   //   tag: 'I' | 'C' | 'E': a line that fills part of the ICE table; it shows as the row letter and its note
   //   show: cells this line fills ('I' = the whole row); hl: light a row or 'col0'; alt: show the other row names
-  // o: { table, onStep(index, line, forward), labels }
+  // o: { table, onStep(index, line, forward), labels, bar (where the buttons go: a fixed footer; default under the lines) }
   function steps(host, lines, o) {
     o = o || {};
     const L = Object.assign({ next: 'Next step', back: 'Back', all: 'Show all' }, o.labels || {});
@@ -226,10 +226,11 @@
     const bBack = el('button', 'btn btn-sm', L.back); bBack.type = 'button';
     const bAll = el('button', 'btn btn-sm', L.all); bAll.type = 'button';
     const count = el('span', 'ws-count'); count.setAttribute('aria-hidden', 'true');
-    bar.append(bNext, bBack, bAll, count);
+    bar.append(count, bAll, bBack, bNext); // Next step sits at the far right
     const live = el('p', 'sr-only'); live.setAttribute('aria-live', 'polite');
-    root.append(ol, bar, live);
+    root.append(ol, live);
     host.appendChild(root);
+    (o.bar || root).appendChild(bar);
 
     const expand = keys => {
       const out = [];
@@ -246,12 +247,17 @@
         const alt = lines.slice(0, shown).some(ln => ln.alt);
         o.table.render(all, new Set(cur ? expand(cur.show) : []), cur ? cur.hl || (cur.tag && cur.tag.length === 1 && !cur.show ? cur.tag : null) : null, alt);
       }
-      // the newest line stays in view when the list scrolls (presentation view)
+      // the newest line stays in view inside whichever box scrolls (the column, or the whole stage).
+      // Never the page: scrolling the page would change the section.
       const curLi = shown > 0 ? items[shown - 1] : null;
-      if (curLi && ol.scrollHeight > ol.clientHeight) {
-        const bottom = curLi.offsetTop + curLi.offsetHeight;
-        if (bottom > ol.scrollTop + ol.clientHeight) ol.scrollTop = bottom - ol.clientHeight + 8;
-        else if (curLi.offsetTop < ol.scrollTop) ol.scrollTop = curLi.offsetTop - 8;
+      if (curLi) {
+        let sc = ol;
+        while (sc && sc !== document.body && !(sc.scrollHeight > sc.clientHeight + 1 && /auto|scroll/.test(getComputedStyle(sc).overflowY))) sc = sc.parentElement;
+        if (sc && sc !== document.body && sc !== document.documentElement) {
+          const r = curLi.getBoundingClientRect(), b = sc.getBoundingClientRect();
+          if (r.bottom > b.bottom - 8) sc.scrollTop += r.bottom - b.bottom + 8;
+          else if (r.top < b.top + 8) sc.scrollTop -= b.top + 8 - r.top;
+        }
       }
       ol.classList.toggle('is-empty', shown === 0);
       bBack.disabled = shown === 0; bNext.disabled = shown === items.length; bAll.disabled = shown === items.length;
@@ -286,12 +292,15 @@
     o2:  { html: 'O<sub>2</sub>', color: '#e0503a', atoms: [{ el: 'O', x: -0.55, y: 0, r: 0.95 }, { el: 'O', x: 0.55, y: 0, r: 0.95 }] },
     no2: { html: 'NO<sub>2</sub>', color: '#8b5a2b', atoms: [{ el: 'Nb', x: 0, y: 0, r: 1 }, { el: 'Ob', x: -1.15, y: 0.75, r: 0.95 }, { el: 'Ob', x: 1.15, y: 0.75, r: 0.95 }] },
     so2: { html: 'SO<sub>2</sub>', color: '#a8861a', atoms: [{ el: 'S', x: 0, y: 0, r: 1.1 }, { el: 'O', x: -1.2, y: 0.78, r: 0.92 }, { el: 'O', x: 1.2, y: 0.78, r: 0.92 }] },
+    n2o4: { html: 'N<sub>2</sub>O<sub>4</sub>', color: '#4152d9', atoms: [{ el: 'N', x: -0.62, y: 0, r: 1 }, { el: 'N', x: 0.62, y: 0, r: 1 },
+      { el: 'O', x: -1.45, y: -0.9, r: 0.92 }, { el: 'O', x: -1.45, y: 0.9, r: 0.92 }, { el: 'O', x: 1.45, y: -0.9, r: 0.92 }, { el: 'O', x: 1.45, y: 0.9, r: 0.92 }] }, // colourless, so model-kit colours
     so3: { html: 'SO<sub>3</sub>', color: '#5b6474', atoms: [{ el: 'O', x: 0, y: -1.32, r: 0.92 }, { el: 'S', x: 0, y: 0, r: 1.1 }, { el: 'O', x: -1.18, y: 0.72, r: 0.92 }, { el: 'O', x: 1.18, y: 0.72, r: 0.92 }] }
   };
 
   // ---------- bulb ----------
   // spec: { species: ['no', 'o2', 'no2'], coef: [2, 1, 2], split, volume: '2.00 L', initial,
-  //         states: { name: { c: [counts], tally: [direction, events] } } }
+  //         states: { name: { c: [counts], tally: [direction, events] } },
+  //         pressure: atm per particle (optional: the corner shows the total pressure, live, in place of the volume) }
   function bulb(host, spec) {
     const wrap = el('div', 'ice-bulb');
     const box = el('div', 'ice-bulb-box');
@@ -326,7 +335,7 @@
     function syncLegend() { const c = counts(); legendItems.forEach((b, j) => { b.textContent = c[j]; }); }
     function syncTally() {
       tally.innerHTML = tallyN ? 'Reaction events: ' + eqText(tallyDir) + ' &nbsp;×&nbsp;<b>' + tallyN + '</b>' : '';
-      cv.setAttribute('aria-label', 'A sealed ' + spec.volume + ' bulb with ' + counts().map((c, j) => c + ' ' + plain(SP[j].html)).join(', ') + ' particles.' + (tallyN ? ' ' + plain(tally.innerHTML) : ''));
+      cv.setAttribute('aria-label', 'A sealed ' + (spec.volume ? spec.volume + ' bulb' : 'flask') + ' with ' + counts().map((c, j) => c + ' ' + plain(SP[j].html)).join(', ') + ' particles.' + (tallyN ? ' ' + plain(tally.innerHTML) : ''));
     }
     function snap(name) {
       flush();
@@ -436,7 +445,10 @@
       g.fillStyle = '#f3f6fb'; g.strokeStyle = '#1d2433'; g.lineWidth = 2.5;
       g.beginPath(); g.roundRect(x0, y0, w, h, rad); g.fill(); g.stroke();
       g.font = '700 13px "Space Mono", monospace'; g.fillStyle = '#5b6474'; g.textAlign = 'right'; g.textBaseline = 'top';
-      g.fillText(spec.volume, x0 + w - 12, y0 + 9);
+      if (spec.pressure) { // particles mid-reaction still count until the new ones appear, so the reading never dips
+        const nP = alive().length + (active && !active.made ? active.picked.length : 0);
+        g.fillText('Total pressure: ' + (nP * spec.pressure).toFixed(2) + ' atm', x0 + w - 12, y0 + 9);
+      } else if (spec.volume) g.fillText(spec.volume, x0 + w - 12, y0 + 9);
       const u = Math.max(3.2, Math.min(7.5, Math.sqrt(w * h / (parts.length + 6)) / 6.2));
       g.save(); g.beginPath(); g.roundRect(x0, y0, w, h, rad); g.clip();
       parts.forEach(p => {

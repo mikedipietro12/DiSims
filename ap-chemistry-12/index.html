@@ -19,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=19">
   <link rel="stylesheet" href="../equilibrium-intro/assets/eq-intro.css?v=20">
-  <link rel="stylesheet" href="../assets/courses.css?v=1">
+  <link rel="stylesheet" href="../assets/courses.css?v=2">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -40,22 +40,22 @@
   <div class="hub course-hub">
     <div class="top-nav">
       <a href="../index.html" class="back-link">← All courses</a>
-      <div class="mod-meta">9 Sims</div>
+      <div class="mod-meta">5 Units</div>
     </div>
 
     <header class="hub-header">
       <h1>AP Chemistry 12</h1>
-      <p class="subtitle">Kinetics, spectroscopy, equilibrium, and acids &amp; bases.</p>
+      <p class="subtitle">Kinetics, equilibrium, solubility, acids &amp; bases, and electrochemistry.</p>
     </header>
 
     <ol class="path">
       <li>
-        <a href="../collision_theory.html">
-          <span class="mod-title">Collision Theory</span>
-          <span class="mod-teaser">A quick, interactive demo of collision theory.</span>
+        <a href="kinetics.html">
+          <span class="mod-title">Unit 1 - Kinetics</span>
           <span class="mod-anim" aria-hidden="true">
             <!-- two molecules meet head on, a flash marks the hit, then they bounce apart -->
             <svg class="hub-anim anim-hit" viewBox="20 14 200 96" focusable="false">
+
               <g class="ht-flash" fill="none" stroke="var(--c-warm)" stroke-width="2.4" stroke-linecap="round">
                 <path d="M120,40 V48 M120,76 V84 M98,62 H106 M134,62 H142 M105,47 L110,52 M135,47 L130,52 M105,77 L110,72 M135,77 L130,72"/>
               </g>
@@ -73,128 +73,8 @@
         </a>
       </li>
       <li>
-        <a href="../Maxwell-Boltzman.html">
-          <span class="mod-title">Maxwell–Boltzmann</span>
-          <span class="mod-teaser">A visual exploration of Maxwell–Boltzmann distributions.</span>
-          <span class="mod-anim" aria-hidden="true">
-            <!-- the cool curve draws, then the warmer, flatter curve, then the area past Ea fills in -->
-            <svg class="hub-anim anim-mb" viewBox="24 8 196 108" focusable="false">
-              <path class="mb-tail" d="M160,100 V88.6 C176,94 194,98.6 210,99.4 V100 Z" fill="var(--c-warm)" fill-opacity="0.45"/>
-              <path d="M160,100 V36" stroke="#1d2433" stroke-width="1.5" stroke-dasharray="4 4"/>
-              <text x="160" y="30" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="13" fill="#1d2433" text-anchor="middle">E<tspan font-size="9" dy="3">a</tspan></text>
-              <path class="mb-cool" pathLength="100" d="M40,100 C58,100 66,24 84,24 C102,24 112,86 150,96 C170,99.5 190,100 210,100" fill="none" stroke="#1d2433" stroke-width="2.6" stroke-linecap="round"/>
-              <path class="mb-warm" pathLength="100" d="M40,100 C66,100 82,52 106,52 C130,52 142,80 166,90 C182,96 196,99 210,99.4" fill="none" stroke="var(--c-warm)" stroke-width="2.6" stroke-linecap="round"/>
-              <path d="M40,18 V100 H212" fill="none" stroke="#1d2433" stroke-width="2" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span class="mod-go" aria-hidden="true">Open →</span>
-        </a>
-      </li>
-      <li>
-        <a href="../beers_law.html">
-          <span class="mod-title">Beer's Law</span>
-          <span class="mod-teaser">How absorbance changes with concentration, path length, and wavelength.</span>
-          <span class="mod-anim" aria-hidden="true">
-            <!-- light passes through a cuvette; the solution darkens and less light comes out -->
-            <svg class="hub-anim anim-beer" viewBox="20 18 200 88" focusable="false">
-              <path d="M52,62 H100" stroke="#f6cf57" stroke-width="10" stroke-linecap="round"/>
-              <path class="br-ray" d="M54,62 H98" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>
-              <g class="br-out">
-                <path d="M140,62 H186" stroke="#f6cf57" stroke-width="10" stroke-linecap="round"/>
-                <path class="br-ray" d="M142,62 H184" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round"/>
-              </g>
-              <circle cx="42" cy="62" r="11" fill="#ffe08a" stroke="#1d2433" stroke-width="2"/>
-              <rect x="102" y="40" width="36" height="58" rx="2" class="br-sol" fill="#2f86c9" fill-opacity="0.15"/>
-              <rect x="100" y="28" width="40" height="72" rx="4" fill="none" stroke="#1d2433" stroke-width="2"/>
-              <path d="M102,40 H138" stroke="rgba(47,134,201,0.6)" stroke-width="1.4"/>
-              <rect x="190" y="46" width="16" height="32" rx="4" fill="#1d2433"/>
-            </svg>
-          </span>
-          <span class="mod-go" aria-hidden="true">Open →</span>
-        </a>
-      </li>
-      <li>
-        <a href="../rate-laws/">
-          <span class="mod-title">Rate Laws</span>
-          <span class="mod-teaser">Initial rates and graphing: two paths to the same rate law.</span>
-          <span class="mod-anim" aria-hidden="true">
-            <!-- [A] falls over time; a tangent shows the rate at one moment -->
-            <svg class="hub-anim anim-rate" viewBox="20 8 200 108" focusable="false">
-              <g font-family="Space Grotesk, sans-serif" font-weight="700" font-size="12" fill="#1d2433">
-                <text x="46" y="18">[A]</text>
-                <text x="210" y="114" text-anchor="end">time</text>
-              </g>
-              <path class="rt-curve" pathLength="100" d="M44,24 C70,70 110,92 208,98" fill="none" stroke="#1d2433" stroke-width="2.6" stroke-linecap="round"/>
-              <g class="rt-tan">
-                <path d="M46,34.8 L96,83.1" stroke="var(--accent)" stroke-width="2.2" stroke-dasharray="5 4" stroke-linecap="round"/>
-                <circle cx="66.8" cy="54.1" r="4" fill="var(--accent)"/>
-              </g>
-              <path d="M40,18 V100 H212" fill="none" stroke="#1d2433" stroke-width="2" stroke-linejoin="round"/>
-            </svg>
-          </span>
-          <span class="mod-go" aria-hidden="true">Open →</span>
-        </a>
-      </li>
-      <li>
         <a href="../equilibrium-intro/">
-          <span class="mod-title">Intro to Equilibrium</span>
-          <span class="mod-teaser">Enthalpy, entropy, reactions that run both ways, and Gibbs free energy.</span>
-          <span class="mod-anim" aria-hidden="true">
-            <!-- ice cube: heat flows in and it melts into a puddle; heat flows out and it freezes again -->
-            <svg class="hub-anim anim-melt" viewBox="20 22 160 88" focusable="false">
-              <ellipse class="mt-pool" cx="100" cy="94" rx="46" ry="12" fill="rgba(150,200,236,0.5)" stroke="rgba(79,140,190,0.55)" stroke-width="1.4"/>
-              <!-- drawn like the Guide's canvas cube: a wider rim outline, then each face stroked in its own colour so the corners round -->
-              <g class="mt-cube" stroke-linejoin="round">
-                <polygon points="100,44 122.5,57 122.5,83 100,96 77.5,83 77.5,57" fill="none" stroke="#5f9fcf" stroke-width="5.9"/>
-                <polygon points="77.5,83 100,96 100,70 77.5,57" fill="#c6e3f7" stroke="#c6e3f7" stroke-width="4.7" paint-order="stroke"/>
-                <polygon points="122.5,83 100,96 100,70 122.5,57" fill="#9ccbec" stroke="#9ccbec" stroke-width="4.7" paint-order="stroke"/>
-                <polygon points="100,44 122.5,57 100,70 77.5,57" fill="#eef8fe" stroke="#eef8fe" stroke-width="4.7" paint-order="stroke"/>
-                <path d="M100,96 L100,70 M77.5,57 L100,70 L122.5,57" stroke="rgba(70,130,180,0.55)" stroke-width="1.3" fill="none"/>
-                <path d="M82,64.8 L82,77.8 M96.6,52.5 L105.6,52.5" stroke="rgba(255,255,255,0.9)" stroke-width="2.4" stroke-linecap="round" fill="none"/>
-              </g>
-              <g class="mt-in" fill="none" stroke="var(--eq-dh)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M30,64 q4,-5 8,0 t8,0 t8,0 m-5,-5 l5,5 l-5,5"/>
-                <path d="M146,64 q4,5 8,0 t8,0 t8,0 m-24,-5 l-5,5 l5,5" transform="translate(4 0)"/>
-                <path d="M100,24 q5,4 0,8 t0,8 m-5,-4 l5,5 l5,-5"/>
-              </g>
-              <g class="mt-out" fill="none" stroke="var(--eq-dh)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M56,64 q-4,-5 -8,0 t-8,0 t-8,0 m5,-5 l-5,5 l5,5"/>
-                <path d="M144,64 q4,-5 8,0 t8,0 t8,0 m-5,-5 l5,5 l-5,5"/>
-                <path d="M100,42 q5,-4 0,-8 t0,-8 m-5,4 l5,-5 l5,5"/>
-              </g>
-            </svg>
-          </span>
-          <span class="mod-go" aria-hidden="true">Open →</span>
-        </a>
-      </li>
-      <li>
-        <a href="../equilibrium-intro/ice-tables.html">
-          <span class="mod-title">ICE Tables</span>
-          <span class="mod-teaser">Worked examples and practice for filling in ICE tables, with K<sub>c</sub> and K<sub>p</sub>.</span>
-          <span class="mod-anim" aria-hidden="true">
-            <!-- an ICE table for N2O4 ⇌ 2 NO2 fills in one row at a time: I, then C, then E -->
-            <svg class="hub-anim anim-ice" viewBox="20 8 200 104" focusable="false">
-              <rect class="ic-hl" x="32" y="38" width="176" height="22" rx="4" fill="#e7eaff"/>
-              <g font-family="Space Grotesk, sans-serif" font-weight="700" fill="#1d2433" text-anchor="middle" font-size="13">
-                <text x="96" y="31">N₂O₄</text><text x="140" y="31">⇌</text><text x="180" y="31">2 NO₂</text>
-                <g text-anchor="start"><text x="38" y="54">I</text><text x="37" y="76">C</text><text x="37" y="98">E</text></g>
-              </g>
-              <path d="M30,37 H210" stroke="#1d2433" stroke-width="2.2"/>
-              <path d="M30,60 H210 M30,82 H210" stroke="rgba(29,36,51,0.18)" stroke-width="1.4"/>
-              <g font-family="Space Mono, monospace" font-weight="700" font-size="12" fill="#1d2433" text-anchor="middle">
-                <g class="ic-r ic-1"><text x="96" y="54">1.00</text><text x="180" y="54">0</text></g>
-                <g class="ic-r ic-2"><text x="96" y="76">−x</text><text x="180" y="76">+2x</text></g>
-                <g class="ic-r ic-3"><text x="96" y="98">1.00 − x</text><text x="180" y="98">2x</text></g>
-              </g>
-            </svg>
-          </span>
-          <span class="mod-go" aria-hidden="true">Open →</span>
-        </a>
-      </li>
-      <li>
-        <a href="../equilibrium_simulations.html">
-          <span class="mod-title">Equilibrium Simulations</span>
-          <span class="mod-teaser">A collection of equilibrium-themed simulations.</span>
+          <span class="mod-title">Unit 2 - Equilibrium</span>
           <span class="mod-anim" aria-hidden="true">
             <!-- a balance: a weight lands on one side, particles shift to the other, and it levels again -->
             <svg class="hub-anim anim-shift" viewBox="40 6 160 108" focusable="false">
@@ -223,8 +103,7 @@
       </li>
       <li>
         <a href="../solubility/">
-          <span class="mod-title">Solubility &amp; Ksp</span>
-          <span class="mod-teaser">Molar solubility, Ksp, Q vs Ksp, the common ion effect and qualitative analysis.</span>
+          <span class="mod-title">Unit 3 - Solubility</span>
           <span class="mod-anim" aria-hidden="true">
             <!-- the dissolving equilibrium: ions leave the crystal (forward arrow), then rejoin it (reverse arrow) -->
             <svg class="hub-anim anim-eq" viewBox="12 0 176 116" focusable="false" aria-hidden="true">
@@ -266,9 +145,8 @@
         </a>
       </li>
       <li>
-        <a href="../Titration%20Simulator%20(1).html">
-          <span class="mod-title">Titration Simulator</span>
-          <span class="mod-teaser">A polished, interactive titration experience.</span>
+        <a href="acids-bases.html">
+          <span class="mod-title">Unit 4 - Acids and Bases</span>
           <span class="mod-anim" aria-hidden="true">
             <!-- drops fall from the burette, and the flask turns pink at the endpoint -->
             <svg class="hub-anim anim-titr" viewBox="56 0 128 120" focusable="false">
@@ -285,6 +163,31 @@
             </svg>
           </span>
           <span class="mod-go" aria-hidden="true">Open →</span>
+        </a>
+      </li>
+      <li>
+        <a class="is-soon" aria-disabled="true">
+          <span class="mod-title">Unit 5 - Electrochemistry</span>
+          <span class="mod-anim" aria-hidden="true">
+            <!-- a galvanic cell: electrons flow along the wire from the zinc electrode to the copper electrode -->
+            <svg class="hub-anim anim-cell" viewBox="40 4 160 110" focusable="false">
+              <path class="ce-e" d="M78,44 V18 H162 V44" fill="none" stroke="#1d2433" stroke-width="5" stroke-linecap="round"/>
+              <path d="M78,44 V18 H162 V44" fill="none" stroke="#1d2433" stroke-width="1.6" stroke-opacity="0.35"/>
+              <circle cx="120" cy="18" r="10" fill="#ffffff" stroke="#1d2433" stroke-width="2"/>
+              <text x="120" y="22.5" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="12" fill="#1d2433" text-anchor="middle">V</text>
+              <path d="M54,64 V100 Q54,108 62,108 H96 Q104,108 104,100 V64 Z" fill="var(--sol-water)"/>
+              <path d="M136,64 V100 Q136,108 144,108 H178 Q186,108 186,100 V64 Z" fill="#a9cdf0"/>
+              <path d="M96,82 V46 Q96,38 104,38 H136 Q144,38 144,46 V82" fill="none" stroke="#1d2433" stroke-width="12" stroke-linejoin="round"/>
+              <path d="M96,82 V46 Q96,38 104,38 H136 Q144,38 144,46 V82" fill="none" stroke="#efe6cf" stroke-width="8.4" stroke-linejoin="round"/>
+              <rect x="72" y="40" width="12" height="58" rx="2" fill="#b8bfcb" stroke="#1d2433" stroke-width="1.6"/>
+              <rect x="156" y="40" width="12" height="58" rx="2" fill="#d08a52" stroke="#1d2433" stroke-width="1.6"/>
+              <path d="M52,52 V100 Q52,110 62,110 H96 Q106,110 106,100 V52 M134,52 V100 Q134,110 144,110 H178 Q188,110 188,100 V52" fill="none" stroke="#1d2433" stroke-width="2" stroke-linejoin="round"/>
+              <g font-family="Space Grotesk, sans-serif" font-weight="700" font-size="11" fill="#1d2433" text-anchor="middle">
+                <text x="62" y="42">Zn</text><text x="178" y="42">Cu</text>
+              </g>
+            </svg>
+          </span>
+          <span class="mod-go" aria-hidden="true">Coming soon</span>
         </a>
       </li>
     </ol>

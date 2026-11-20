@@ -1,20 +1,29 @@
 /* ICE Tables page controller: scroll tracking, the stage for each section, Example / Your turn, presentation view.
    Same reading model as the Solubility and Intro to Equilibrium Guides: the section nearest the reading line drives
    the stage; presentation view hides the text and steps through each worked line, then Your turn and its answer,
-   then the next section. Content lives in ice-data.js; components in ice-ui.js. */
+   then the next section. Content lives in ice-data.js; components in ice-ui.js.
+   Stage layout: the problem across the top; the ICE table on the left with any picture under it; the working on
+   the right. The step buttons sit in a footer at the bottom right that never moves (Your turn's Check buttons on its left). */
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
   const U = window.IceUI, D = window.IceData.SECTIONS;
   const beats = Array.from(document.querySelectorAll('.guide-beat'));
-  const left = $('left'), right = $('right'), grid = $('grid'), modes = $('modes');
+  const top = $('top'), left = $('left'), right = $('right'), grid = $('grid'), modes = $('modes');
+  const footL = $('footL'), footR = $('footR');
   const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
   let active = null, cur = null;
 
   // ---------- one section on the stage ----------
   function clear() {
     if (cur && cur.bulb) cur.bulb.destroy();
-    left.innerHTML = ''; right.innerHTML = '';
+    top.innerHTML = ''; left.innerHTML = ''; right.innerHTML = ''; footL.innerHTML = ''; footR.innerHTML = '';
+    grid.scrollTop = 0;
+  }
+  // which parts of the stage are in use, so presentation view drops an empty row or column
+  function markGrid() {
+    grid.classList.toggle('no-top', !top.childElementCount);
+    grid.classList.toggle('no-left', !left.childElementCount);
   }
   function applyBeat(b) {
     if (!b || b === active) return;
@@ -32,6 +41,7 @@
     grid.className = 'ice-grid';
     if (!sec) return loadStatic(id);
     if (mode === 'you') loadYou(sec.you); else loadExample(sec);
+    markGrid();
   }
   function setMode(mode, allSteps) {
     if (!cur || cur.mode === mode) return;
@@ -48,15 +58,14 @@
   }
 
   function loadExample(sec) {
-    if (sec.problem) left.appendChild(el('div', 'ice-card ice-problem', sec.problem));
+    if (sec.problem) top.appendChild(el('div', 'ice-card ice-problem', sec.problem));
+    if (sec.table) { cur.table = U.table(sec.table, 'walk'); left.appendChild(cur.table.el); }
     if (sec.bulb) {
       cur.bulb = U.bulb(left, sec.bulb);
-      left.appendChild(el('p', 'ice-cap', 'Zoomed in, not to scale. The numbers of particles are in proportion to the concentrations.'));
+      left.appendChild(el('p', 'ice-cap', sec.bulb.cap || 'Zoomed in, not to scale. The numbers of particles are in proportion to the concentrations.'));
     }
     if (sec.gauge) { cur.gauge = U.gauge(left, sec.gauge); cur.gauge.set(null); }
-    if (!left.childElementCount) grid.classList.add('table-only');
-    if (sec.table) { cur.table = U.table(sec.table, 'walk'); left.appendChild(cur.table.el); }
-    cur.steps = U.steps(right, sec.steps, { table: cur.table, onStep: (i, line, forward) => syncPicture(sec, sec.steps, i, line, forward) });
+    cur.steps = U.steps(right, sec.steps, { table: cur.table, bar: footR, onStep: (i, line, forward) => syncPicture(sec, sec.steps, i, line, forward) });
   }
   // the bulb and gauge follow the newest step that names a state for them
   function syncPicture(sec, lines, i, line, forward) {
@@ -74,23 +83,27 @@
 
   // ---------- Your turn ----------
   function loadYou(you) {
-    left.appendChild(el('div', 'ice-card ice-problem is-you', you.problem));
-    if (you.hint) left.appendChild(el('p', 'ice-hint', you.hint));
-    left.appendChild(el('p', 'ice-howto', you.parts ? 'For each mixture, type its Q value and choose which way the reaction shifts. Press “Check” to see which answers are right. Nothing is saved.'
+    top.appendChild(el('div', 'ice-card ice-problem is-you', you.problem));
+    if (you.hint) top.appendChild(el('p', 'ice-hint', you.hint));
+    const fillable = !!(you.table || you.boxes || you.parts); // Example A: nothing to type, worked on paper
+    right.appendChild(el('p', 'ice-howto', !fillable ? 'Work it out on paper first. Then press “Show the answer” to check it one step at a time.'
+      : you.parts ? 'For each mixture, type its Q value and choose which way the reaction shifts. Press “Check” to see which answers are right. Nothing is saved.'
       : 'Type each answer into its box. You can write expressions such as <b>0.80 − x</b> or <b>+2x</b>. Press “Check” to see which boxes are right. Nothing is saved.'));
     if (you.table) { cur.table = U.table(you.table, 'input'); left.appendChild(cur.table.el); }
     const work = el('div', 'ice-work');
     if (you.boxes) { cur.boxes = U.boxes(you.boxes); work.appendChild(cur.boxes.el); }
     if (you.parts) { cur.parts = parts(you.parts); work.appendChild(cur.parts.el); }
     if (work.childElementCount) right.appendChild(work);
-    const bar = el('div', 'ice-bar');
+    const bar = el('div', 'ice-bar'); // in the footer, so it stays put
     const bCheck = el('button', 'btn primary', 'Check'); bCheck.type = 'button';
-    const bShow = el('button', 'btn', 'Show the answer'); bShow.type = 'button';
+    const bShow = el('button', fillable ? 'btn' : 'btn primary', 'Show the answer'); bShow.type = 'button';
     const bAgain = el('button', 'btn btn-sm', 'Start over'); bAgain.type = 'button';
-    bar.append(bCheck, bShow, bAgain);
+    if (fillable) bar.append(bCheck, bShow, bAgain); else bar.append(bShow);
     const fb = el('p', 'ice-feedback'); fb.setAttribute('aria-live', 'polite');
     const ans = el('div', 'ice-answer'); ans.hidden = true;
-    right.append(bar, fb, ans);
+    footL.appendChild(bar);
+    if (fillable) right.appendChild(fb);
+    right.appendChild(ans);
     cur.ansHost = ans; cur.bShow = bShow;
     bCheck.addEventListener('click', () => {
       const r = { right: 0, wrong: 0, blank: 0 };
@@ -110,7 +123,7 @@
     if (!cur.ans) {
       cur.ansHost.hidden = false;
       cur.ansHost.appendChild(el('p', 'ice-answer-head', 'The answer, one step at a time'));
-      cur.ans = U.steps(cur.ansHost, you.steps, { table: cur.table, onStep: i => {
+      cur.ans = U.steps(cur.ansHost, you.steps, { table: cur.table, bar: footR, onStep: i => {
         const done = i === you.steps.length - 1;
         if (cur.boxes) cur.boxes.showAnswers(done);
         if (cur.parts) cur.parts.showAnswers(done);
@@ -266,7 +279,7 @@
   if (q.get('mode') === 'you') setMode('you');
   if (q.has('fill') && cur.table) { // type a mix of right and wrong answers, then Check
     Object.values(cur.table.cells).forEach((c, i) => { if (c.inp) c.inp.value = i % 4 === 3 ? '9' : c.ans.replace(/<[^>]+>/g, ''); });
-    right.querySelector('.ice-bar .btn.primary').click();
+    footL.querySelector('.ice-bar .btn.primary').click();
   }
   if (q.has('answer')) for (let i = 0; i < +q.get('answer'); i++) showAnswer();
   window.__ice = { cur: () => cur }; // dev hook for headless checks

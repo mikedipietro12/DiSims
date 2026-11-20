@@ -58,10 +58,10 @@
 .anim-hit .ht-r{animation:ht-r 4s ease-in-out infinite !important;}
 .anim-hit .ht-flash{transform-origin:120px 62px;animation:ht-flash 4s ease-out infinite !important;}
 .anim-hit .ht-spin{transform-box:fill-box;transform-origin:center;animation:ht-spin 4s ease-in-out infinite !important;}
-@keyframes ht-l{0%{transform:translateX(0)}42%{transform:translateX(30px)}48%{transform:translateX(30px)}90%,100%{transform:translateX(0)}}
-@keyframes ht-r{0%{transform:translateX(0)}42%{transform:translateX(-30px)}48%{transform:translateX(-30px)}90%,100%{transform:translateX(0)}}
+@keyframes ht-l{0%{transform:translateX(0)}42%{transform:translateX(27px)}48%{transform:translateX(27px)}90%,100%{transform:translateX(0)}}
+@keyframes ht-r{0%{transform:translateX(0)}42%{transform:translateX(-27px)}48%{transform:translateX(-27px)}90%,100%{transform:translateX(0)}}
 @keyframes ht-flash{0%,40%{opacity:0;transform:scale(0.4)}46%{opacity:1;transform:scale(1)}60%,100%{opacity:0;transform:scale(1.3)}}
-@keyframes ht-spin{0%,42%{transform:rotate(0)}90%,100%{transform:rotate(-50deg)}}
+@keyframes ht-spin{0%,48%{transform:rotate(0)}90%,100%{transform:rotate(-50deg)}}
 
 /* ---------- Maxwell–Boltzmann: the cool curve draws, then the warm one, then the tail past Ea fills ---------- */
 .anim-mb .mb-cool{stroke-dasharray:100;animation:mb-cool 9s ease-in-out infinite !important;}
@@ -106,3 +106,50 @@
 .anim-tide .td-wave.w2{animation-duration:3.4s !important;}
 @keyframes td-level{0%,100%{transform:translateY(16px)}50%{transform:translateY(-16px)}}
 @keyframes td-wave{from{transform:translateX(0)}to{transform:translateX(-40px)}}
+
+/* ---------- Electrochemistry: electrons move along the wire from zinc to copper ---------- */
+.anim-cell .ce-e{stroke-dasharray:0 12;animation:ce-e 0.9s linear infinite !important;}
+@keyframes ce-e{to{stroke-dashoffset:-12}}
+
+/* four sims in a unit: four across on a laptop (the 860px rule above takes tablets to two) */
+.course-hub .path.path-four{grid-template-columns:repeat(4,minmax(0,1fr));}
+.course-hub .path.path-four .mod-title{font-size:1.4rem;}
+@media (max-width:1180px){.course-hub .path.path-four{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media (max-width:520px){.course-hub .path.path-four{grid-template-columns:1fr;}}
+
+/* a unit that isn't built yet: same tile, but it doesn't open or press */
+.path a.is-soon{cursor:default;}
+.path a.is-soon:hover,.path a.is-soon:active{transform:none;box-shadow:0 4px 0 var(--ink);}
+.path a.is-soon .mod-go{color:var(--dim);border-color:rgba(29,36,51,0.35);}
+.path a.is-soon:hover .mod-go{background:none;}
+
+/* ---------- Stoichiometry: 2 H2 + O2 move together, then 2 H2O take their place ---------- */
+.anim-rxn .rx-a{animation:rx-a 6s ease-in-out infinite !important;}
+.anim-rxn .rx-b{animation:rx-b 6s ease-in-out infinite !important;}
+.anim-rxn .rx-c{animation:rx-c 6s ease-in-out infinite !important;}
+.anim-rxn .rx-in{animation:rx-in 6s infinite !important;}
+.anim-rxn .rx-out{animation:rx-out 6s infinite !important;}
+.anim-rxn .rx-flash{transform-origin:120px 63px;animation:ht-flash 6s ease-out infinite !important;}
+@keyframes rx-a{0%,8%{transform:translate(0,0)}40%,100%{transform:translate(36px,12px)}}
+@keyframes rx-b{0%,8%{transform:translate(0,0)}40%,100%{transform:translate(36px,-12px)}}
+@keyframes rx-c{0%,8%{transform:translate(0,0)}40%,100%{transform:translate(-40px,0)}}
+@keyframes rx-in{0%,42%{opacity:1}48%,94%{opacity:0}100%{opacity:1}}
+@keyframes rx-out{0%,44%{opacity:0}50%,88%{opacity:1}94%,100%{opacity:0}}
+
+/* ---------- Gas Chemistry: the piston pushes down and the particles crowd toward the bottom ---------- */
+.anim-gas .gs-piston{animation:gs-piston 7s ease-in-out infinite !important;}
+.anim-gas .gs-sq{animation:gs-sq 7s ease-in-out infinite !important;}
+.anim-gas .gs-j{animation:gs-j 0.5s ease-in-out infinite alternate !important;}
+.anim-gas .gs-sq:nth-of-type(2n) .gs-j{animation-duration:0.65s !important;}
+.anim-gas .gs-sq:nth-of-type(3n) .gs-j{animation-duration:0.42s !important;}
+@keyframes gs-piston{0%,12%{transform:translateY(0)}45%,62%{transform:translateY(26px)}92%,100%{transform:translateY(0)}}
+@keyframes gs-sq{0%,12%{transform:translateY(0)}45%,62%{transform:translateY(var(--d))}92%,100%{transform:translateY(0)}}
+@keyframes gs-j{from{transform:translate(-2.5px,2px)}to{transform:translate(2.5px,-2px)}}
+
+/* ---------- Thermochemistry: heat comes off the cup and the thermometer climbs ---------- */
+.anim-thermo .th-col{transform-box:fill-box;transform-origin:50% 100%;animation:th-col 8s ease-in-out infinite !important;}
+.anim-thermo .th-heat{animation:th-heat 8s ease-in-out infinite !important;}
+.anim-thermo .th-sol{animation:th-sol 8s ease-in-out infinite !important;}
+@keyframes th-col{0%,10%{transform:scaleY(0.3)}60%,85%{transform:scaleY(1)}100%{transform:scaleY(0.3)}}
+@keyframes th-heat{0%,10%{opacity:0;transform:translateY(4px)}30%,80%{opacity:1;transform:translateY(0)}95%,100%{opacity:0}}
+@keyframes th-sol{0%,10%{fill:#fbe6d4}60%,85%{fill:#f6c39c}100%{fill:#fbe6d4}}

@@ -116,6 +116,7 @@ _Last updated: 2026-11-20 (ICE Tables page added)_
 | 2026-11-20 | user | Rows labelled I C E; opening section shows Hebden's START / +Δ / = EQUIL and RICE | Same labels as Solubility; students meet Hebden's names too |
 | 2026-11-20 | user | Kc and Kp (AP): Hebden's K_eq printed as Kc; Example G adds Kp with partial pressures | Kp is part of the AP course |
 | 2026-11-20 | user | Hebden wording allowed for problems and rules; practice problems are new; Q46 left out | Hebden Q50 to Q60 used as reference only |
+| 2026-11-20 | user + Claude | ICE stage layout: problem card across the top; ICE table on the left with its picture under it; working on the right. Step buttons (and Your turn's Check / Show / Start over) in a fixed footer, bottom right, that never moves. Bulbs added to the intro (Example B's), A (already at equilibrium, no shift), C, E and G (N₂O₄ ⇌ 2 NO₂, live "Total pressure" reading at 0.05 atm per particle) | User: two-column split didn't use the screen; buttons jumped as lines appeared. Tablet portrait (≤ 1000 px) stacks into one scrolling column |
 
 ## Open Questions
 See `DISCOVERY.md`.

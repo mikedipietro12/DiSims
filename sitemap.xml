@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://atomicsimulations.ca/</loc><lastmod>2026-11-13</lastmod></url>
-  <url><loc>https://atomicsimulations.ca/ap-chemistry-12/</loc><lastmod>2026-10-30</lastmod></url>
+  <url><loc>https://atomicsimulations.ca/ap-chemistry-12/</loc><lastmod>2026-11-20</lastmod></url>
+  <url><loc>https://atomicsimulations.ca/ap-chemistry-12/kinetics.html</loc><lastmod>2026-11-20</lastmod></url>
+  <url><loc>https://atomicsimulations.ca/ap-chemistry-12/acids-bases.html</loc><lastmod>2026-11-20</lastmod></url>
   <url><loc>https://atomicsimulations.ca/chemistry-11h/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://atomicsimulations.ca/other/</loc><lastmod>2026-10-30</lastmod></url>
   <url><loc>https://atomicsimulations.ca/Maxwell-Boltzman.html</loc><lastmod>2026-10-30</lastmod></url>
