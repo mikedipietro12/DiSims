@@ -16,14 +16,45 @@
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "CollectionPage", "name": "Chemistry 11 Honours Simulations | Atomic Simulations", "url": "https://atomicsimulations.ca/chemistry-11h/", "description": "Interactive Chemistry 11 Honours simulations: an atomic structure suite built from ionization energy and PES data, a chemical bonding guide, and an intermolecular forces suite.", "inLanguage": "en", "isPartOf": {"@type": "WebSite", "name": "Atomic Simulations", "url": "https://atomicsimulations.ca/"}}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/home.css?v=4" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=19">
+  <link rel="stylesheet" href="../assets/courses.css?v=1">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 </head>
 <body>
-  <div class="hub">
+  <!-- shared fills for the tile animations -->
+  <svg class="hub-anim-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="crW" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#9aa3b5"/></radialGradient>
+      <radialGradient id="crWarm" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#f6b27e"/><stop offset="1" stop-color="#d0631c"/></radialGradient>
+      <radialGradient id="crCool" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#6fd0cc"/><stop offset="1" stop-color="#0f7775"/></radialGradient>
+      <radialGradient id="crP" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ff9aa9"/><stop offset="1" stop-color="#d23a52"/></radialGradient>
+      <radialGradient id="crN" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#f1f3f7"/><stop offset="1" stop-color="#9aa3b5"/></radialGradient>
+      <radialGradient id="cbH" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d5d9e3"/></radialGradient>
+      <radialGradient id="cbCl" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#bce673"/><stop offset="1" stop-color="#69a42b"/></radialGradient>
+      <linearGradient id="cbCloudHCl" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stop-color="#e8264f" stop-opacity="0.38"/>
+        <stop offset="0.35" stop-color="#e8264f" stop-opacity="0.14"/>
+        <stop offset="0.6" stop-color="#ffc21a" stop-opacity="0.3"/>
+        <stop offset="1" stop-color="#ffc21a" stop-opacity="0.6"/>
+      </linearGradient>
+      <radialGradient id="haH" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d5d9e3"/></radialGradient>
+      <radialGradient id="haC" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#545b6e"/><stop offset="1" stop-color="#23272f"/></radialGradient>
+      <radialGradient id="haCloudN"><stop offset="0.55" stop-color="#8f9cc4" stop-opacity="0.3"/><stop offset="1" stop-color="#8f9cc4" stop-opacity="0.06"/></radialGradient>
+      <g id="haMethane">
+        <circle r="32" fill="url(#haCloudN)"/>
+        <circle cx="0" cy="-17" r="10" fill="url(#haH)" stroke="rgba(29,36,51,0.35)"/>
+        <circle cx="-15" cy="9" r="10" fill="url(#haH)" stroke="rgba(29,36,51,0.35)"/>
+        <circle cx="15" cy="9" r="10" fill="url(#haH)" stroke="rgba(29,36,51,0.35)"/>
+        <circle r="14" fill="url(#haC)"/>
+        <circle cx="5" cy="5" r="9" fill="url(#haH)" stroke="rgba(29,36,51,0.35)"/>
+      </g>
+    </defs>
+  </svg>
+
+  <div class="hub course-hub">
     <div class="top-nav">
       <a href="../index.html" class="back-link">← All courses</a>
       <div class="mod-meta">3 Suites</div>
@@ -31,35 +62,79 @@
 
     <header class="hub-header">
       <h1>Chemistry 11H</h1>
-      <p class="subtitle">Honours chemistry — atomic structure and more as units come online.</p>
+      <p class="subtitle">Honours chemistry: atomic structure and more as units come online.</p>
     </header>
 
     <ol class="path">
       <li>
         <a href="../Unit%201b/index.html">
-          <div class="mod-head">
-            <span class="mod-go" aria-hidden="true">Open →</span>
-          </div>
           <span class="mod-title">Atomic Structure</span>
           <span class="mod-teaser">Nine instruments. Build the atom from what you measure.</span>
+          <span class="mod-anim" aria-hidden="true">
+            <!-- a nucleus of protons and neutrons, with electrons moving in two shells -->
+            <svg class="hub-anim anim-atom" viewBox="40 6 160 112" focusable="false">
+              <circle cx="120" cy="62" r="28" fill="none" stroke="rgba(29,36,51,0.22)" stroke-width="1.4"/>
+              <circle cx="120" cy="62" r="50" fill="none" stroke="rgba(29,36,51,0.22)" stroke-width="1.4"/>
+              <g class="at-nuc">
+                <circle cx="120" cy="62" r="5.4" fill="url(#crP)" stroke="rgba(29,36,51,0.35)"/>
+                <circle cx="129" cy="62" r="5.4" fill="url(#crN)" stroke="rgba(29,36,51,0.35)"/>
+                <circle cx="124.5" cy="69.8" r="5.4" fill="url(#crP)" stroke="rgba(29,36,51,0.35)"/>
+                <circle cx="115.5" cy="69.8" r="5.4" fill="url(#crN)" stroke="rgba(29,36,51,0.35)"/>
+                <circle cx="111" cy="62" r="5.4" fill="url(#crP)" stroke="rgba(29,36,51,0.35)"/>
+                <circle cx="115.5" cy="54.2" r="5.4" fill="url(#crN)" stroke="rgba(29,36,51,0.35)"/>
+                <circle cx="124.5" cy="54.2" r="5.4" fill="url(#crP)" stroke="rgba(29,36,51,0.35)"/>
+                <circle cx="124.5" cy="64.6" r="5.4" fill="url(#crN)" stroke="rgba(29,36,51,0.35)"/>
+                <circle cx="115.5" cy="64.6" r="5.4" fill="url(#crP)" stroke="rgba(29,36,51,0.35)"/>
+                <circle cx="120" cy="56.8" r="5.4" fill="url(#crN)" stroke="rgba(29,36,51,0.35)"/>
+                <circle cx="129" cy="58" r="5.4" fill="url(#crP)" stroke="rgba(29,36,51,0.35)"/>
+                <circle cx="111" cy="58" r="5.4" fill="url(#crN)" stroke="rgba(29,36,51,0.35)"/>
+              </g>
+              <g class="at-s1" fill="#1d2433">
+                <circle cx="148" cy="62" r="3.6"/><circle cx="92" cy="62" r="3.6"/>
+              </g>
+              <g class="at-s2" fill="#1d2433">
+                <circle cx="120" cy="12" r="3.6"/><circle cx="170" cy="62" r="3.6"/><circle cx="120" cy="112" r="3.6"/><circle cx="70" cy="62" r="3.6"/>
+              </g>
+            </svg>
+          </span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
         </a>
       </li>
       <li>
         <a href="../chemical-bonding/">
-          <div class="mod-head">
-            <span class="mod-go" aria-hidden="true">Open →</span>
-          </div>
           <span class="mod-title">Chemical Bonding</span>
           <span class="mod-teaser">From electronegativity to Lewis structures, shapes and hybridization. Draw your own molecules.</span>
+          <span class="mod-anim" aria-hidden="true">
+            <!-- H-Cl: the shared pair slides toward Cl, the cloud tints, δ signs appear -->
+            <svg class="hub-anim anim-bond" viewBox="30 10 180 104" focusable="false">
+              <path class="bd-cloud" d="M71,72 C71,58 82,49 96,49 C106,49 110,40 134,37 C156,37 169,52 169,72 C169,92 156,107 134,107 C110,104 106,95 96,95 C82,95 71,86 71,72 Z" fill="url(#cbCloudHCl)"/>
+              <circle cx="134" cy="72" r="26" fill="url(#cbCl)" stroke="rgba(29,36,51,0.35)"/>
+              <circle cx="94" cy="72" r="15" fill="url(#cbH)" stroke="rgba(29,36,51,0.35)"/>
+              <g class="bd-pair">
+                <circle cx="104" cy="66" r="3.2" fill="#1d2433"/>
+                <circle cx="104" cy="78" r="3.2" fill="#1d2433"/>
+              </g>
+              <g class="bd-delta" font-family="Space Mono, monospace" font-size="13" font-weight="700" fill="#1d2433" text-anchor="middle">
+                <text x="92" y="40">&#948;+</text>
+                <text x="134" y="28">&#948;&#8722;</text>
+              </g>
+            </svg>
+          </span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
         </a>
       </li>
       <li>
         <a href="../intermolecular-forces/">
-          <div class="mod-head">
-            <span class="mod-go" aria-hidden="true">Open →</span>
-          </div>
           <span class="mod-title">Intermolecular Forces</span>
-          <span class="mod-teaser">Guide, sandbox, and heat — a pre-load on forces between molecules.</span>
+          <span class="mod-teaser">Walk through the forces between molecules, try them in the sandbox, then heat them in the lab.</span>
+          <span class="mod-anim" aria-hidden="true">
+            <!-- two CH4 drift together, touch clouds, drift apart -->
+            <svg class="hub-anim anim-sandbox" viewBox="10 32 220 80" focusable="false">
+              <g class="sa-left"><g transform="translate(58 72)"><g class="sa-spin"><use href="#haMethane"/></g></g></g>
+              <g class="sa-right"><g transform="translate(182 72) scale(-1 1)"><g class="sa-spin sa-spin-b"><use href="#haMethane"/></g></g></g>
+            </svg>
+          </span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
         </a>
       </li>
     </ol>

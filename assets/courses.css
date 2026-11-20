@@ -1,0 +1,108 @@
+/* Course pages (front page, AP Chemistry 12, Chemistry 11H, Other).
+   Built on the IMF "Toy Box" suite.css so they match the unit hubs: same tiles, same looping pictures.
+   Pictures copied from a unit hub keep that hub's class names; each note says where the original lives.
+   Like the Solubility hub, these always run (user preference, 2026-11-10: no reduced-motion still frames),
+   so each animation is !important to win over suite.css's prefers-reduced-motion rule. */
+
+:root{
+  --sol-cat:#f06a84;
+  --sol-cat-line:#b3263f;
+  --sol-an:#ffd257;
+  --sol-an-line:#b38a10;
+  --sol-water:#e3f1fb;
+  --sol-water-line:#7fb3d9;
+  --c-warm:#e07a2e;
+  --c-cool:#14918f;
+  --c-acid:#c2347a;
+  --c-base:#5b5fd6;
+}
+
+.course-hub .path .mod-title{font-size:1.6rem;}
+.course-hub .hub-header .subtitle{margin-top:0.2rem;}
+/* tablet portrait: two tiles across instead of suite.css's single column, so a nine-sim course stays short */
+@media (max-width:860px){
+  .course-hub .path{grid-template-columns:repeat(2,minmax(0,1fr));gap:0.9rem;}
+  .course-hub .path .mod-title{font-size:1.35rem;}
+  .course-hub .path .mod-anim{height:130px;}
+  .course-hub .path .mod-go{margin-top:auto;}
+}
+@media (max-width:520px){
+  .course-hub .path{grid-template-columns:1fr;}
+}
+
+/* ---------- copied from solubility/assets/sol.css: AgCl(s) ⇌ Ag⁺ + Cl⁻ ---------- */
+.anim-eq .eq-fwd{animation:eq-fwd 7s ease-in-out infinite !important;}
+.anim-eq .eq-rev{animation:eq-rev 7s ease-in-out infinite !important;}
+@keyframes eq-fwd{0%,4%{opacity:0.22}12%,38%{opacity:1}48%,100%{opacity:0.22}}
+@keyframes eq-rev{0%,50%{opacity:0.22}60%,86%{opacity:1}96%,100%{opacity:0.22}}
+.anim-eq .eq-m{animation:eq-m 7s ease-in-out infinite !important;}
+@keyframes eq-m{0%,6%{transform:translate(0,0)}36%,56%{transform:translate(var(--x),var(--y))}88%,100%{transform:translate(0,0)}}
+.anim-eq .eq-m.cat circle{animation:eq-cat 7s ease-in-out infinite !important;}
+.anim-eq .eq-m.an circle{animation:eq-an 7s ease-in-out infinite !important;}
+@keyframes eq-cat{0%,8%{fill:#fbfbf8;stroke:#1d2433}22%,74%{fill:#f06a84;stroke:#b3263f}86%,100%{fill:#fbfbf8;stroke:#1d2433}}
+@keyframes eq-an{0%,8%{fill:#fbfbf8;stroke:#1d2433}22%,74%{fill:#ffd257;stroke:#b38a10}86%,100%{fill:#fbfbf8;stroke:#1d2433}}
+.anim-eq .eq-bob{animation:eq-bob 3.4s ease-in-out infinite !important;}
+.anim-eq .eq-bob.b2{animation:eq-bob 4.2s ease-in-out -1.4s infinite !important;}
+@keyframes eq-bob{0%,100%{transform:translate(0,0)}50%{transform:translate(3px,-3px)}}
+
+/* ---------- copied from chemical-bonding/assets/bonding.css: H-Cl, the shared pair shifts toward Cl ---------- */
+.anim-bond .bd-pair{animation:bd-pair 7s ease-in-out infinite !important;}
+.anim-bond .bd-cloud{animation:bd-cloud 7s ease-in-out infinite !important;}
+.anim-bond .bd-delta{animation:bd-delta 7s ease-in-out infinite !important;}
+@keyframes bd-pair{0%,18%{transform:translateX(0)}45%,80%{transform:translateX(16px)}100%{transform:translateX(0)}}
+@keyframes bd-cloud{0%,18%{opacity:0}45%,80%{opacity:1}100%{opacity:0}}
+@keyframes bd-delta{0%,30%{opacity:0}50%,80%{opacity:1}100%{opacity:0}}
+
+/* ---------- Collision Theory: two molecules meet head on, a flash at the hit, then they bounce apart ---------- */
+.anim-hit .ht-l{animation:ht-l 4s ease-in-out infinite !important;}
+.anim-hit .ht-r{animation:ht-r 4s ease-in-out infinite !important;}
+.anim-hit .ht-flash{transform-origin:120px 62px;animation:ht-flash 4s ease-out infinite !important;}
+.anim-hit .ht-spin{transform-box:fill-box;transform-origin:center;animation:ht-spin 4s ease-in-out infinite !important;}
+@keyframes ht-l{0%{transform:translateX(0)}42%{transform:translateX(30px)}48%{transform:translateX(30px)}90%,100%{transform:translateX(0)}}
+@keyframes ht-r{0%{transform:translateX(0)}42%{transform:translateX(-30px)}48%{transform:translateX(-30px)}90%,100%{transform:translateX(0)}}
+@keyframes ht-flash{0%,40%{opacity:0;transform:scale(0.4)}46%{opacity:1;transform:scale(1)}60%,100%{opacity:0;transform:scale(1.3)}}
+@keyframes ht-spin{0%,42%{transform:rotate(0)}90%,100%{transform:rotate(-50deg)}}
+
+/* ---------- Maxwell–Boltzmann: the cool curve draws, then the warm one, then the tail past Ea fills ---------- */
+.anim-mb .mb-cool{stroke-dasharray:100;animation:mb-cool 9s ease-in-out infinite !important;}
+.anim-mb .mb-warm{stroke-dasharray:100;animation:mb-warm 9s ease-in-out infinite !important;}
+.anim-mb .mb-tail{animation:mb-tail 9s ease-in-out infinite !important;}
+@keyframes mb-cool{0%{stroke-dashoffset:100;opacity:1}22%,90%{stroke-dashoffset:0;opacity:1}97%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes mb-warm{0%,28%{stroke-dashoffset:100;opacity:1}52%,90%{stroke-dashoffset:0;opacity:1}97%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes mb-tail{0%,56%{opacity:0}66%,90%{opacity:1}97%,100%{opacity:0}}
+
+/* ---------- Beer's law: the solution darkens, so less light comes out the other side ---------- */
+.anim-beer .br-sol{animation:br-sol 8s ease-in-out infinite !important;}
+.anim-beer .br-out{animation:br-out 8s ease-in-out infinite !important;}
+.anim-beer .br-ray{stroke-dasharray:5 7;animation:br-ray 0.8s linear infinite !important;}
+@keyframes br-sol{0%,10%{fill-opacity:0.15}50%,70%{fill-opacity:0.85}95%,100%{fill-opacity:0.15}}
+@keyframes br-out{0%,10%{opacity:1}50%,70%{opacity:0.15}95%,100%{opacity:1}}
+@keyframes br-ray{to{stroke-dashoffset:-12}}
+
+/* ---------- Rate Laws: [A] falls over time, then a tangent shows the rate at one point ---------- */
+.anim-rate .rt-curve{stroke-dasharray:100;animation:rt-curve 8s ease-in-out infinite !important;}
+.anim-rate .rt-tan{animation:rt-tan 8s ease-in-out infinite !important;}
+@keyframes rt-curve{0%{stroke-dashoffset:100;opacity:1}35%,90%{stroke-dashoffset:0;opacity:1}97%,100%{stroke-dashoffset:0;opacity:0}}
+@keyframes rt-tan{0%,40%{opacity:0}50%,90%{opacity:1}97%,100%{opacity:0}}
+
+/* ---------- Titration: drops fall from the burette, then the flask turns pink at the endpoint ---------- */
+.anim-titr .ti-drop{animation:ti-drop 1.25s ease-in infinite !important;}
+.anim-titr .ti-sol{animation:ti-sol 10s ease-in-out infinite !important;}
+.anim-titr .ti-flash{animation:ti-flash 1.25s ease-out infinite !important;}
+@keyframes ti-drop{0%{transform:translateY(0);opacity:0}10%{opacity:1}80%{transform:translateY(30px);opacity:1}82%,100%{transform:translateY(30px);opacity:0}}
+@keyframes ti-sol{0%,55%{fill:#eaf3fb}66%,88%{fill:#f6b8d2}96%,100%{fill:#eaf3fb}}
+@keyframes ti-flash{0%,78%{opacity:0}84%{opacity:0.9}100%{opacity:0}}
+
+/* ---------- Atomic Structure: a nucleus with electrons moving in two shells ---------- */
+.anim-atom .at-s1{transform-origin:120px 62px;animation:at-spin 5s linear infinite !important;}
+.anim-atom .at-s2{transform-origin:120px 62px;animation:at-spin 9s linear infinite reverse !important;}
+.anim-atom .at-nuc{transform-origin:120px 62px;animation:at-nuc 2.4s ease-in-out infinite !important;}
+@keyframes at-spin{to{transform:rotate(360deg)}}
+@keyframes at-nuc{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+/* ---------- BC Tide: the water rises up the post and falls again while the waves roll ---------- */
+.anim-tide .td-level{animation:td-level 8s ease-in-out infinite !important;}
+.anim-tide .td-wave{animation:td-wave 2.6s linear infinite !important;}
+.anim-tide .td-wave.w2{animation-duration:3.4s !important;}
+@keyframes td-level{0%,100%{transform:translateY(16px)}50%{transform:translateY(-16px)}}
+@keyframes td-wave{from{transform:translateX(0)}to{transform:translateX(-40px)}}
