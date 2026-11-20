@@ -135,7 +135,7 @@ select:focus-visible{
 .path a:active{transform:translateY(4px);box-shadow:0 0 0 var(--ink);}
 .mod-head{
   display:flex;
-  justify-content:space-between;
+  justify-content:flex-end;
   align-items:baseline;
   gap:1rem;
   margin-bottom:0.25rem;
@@ -632,6 +632,31 @@ body.learn-mode .guide-stage-panel{
   }
 }
 body.learn-mode .guide-stage-head{display:none;}
+/* Presentation view: the section title is a menu of every section (assets/section-jump.js) */
+body.learn-mode .guide-stage-head.has-jump{display:flex;}
+body.learn-mode .jump-badge{
+  display:inline-flex;align-items:center;gap:0.5rem;cursor:pointer;user-select:none;
+  padding:0.3rem 0.75rem;border:2px solid var(--line-strong);border-radius:999px;background:var(--tray);
+  box-shadow:0 2px 0 var(--ink);
+}
+body.learn-mode .jump-badge::after{content:"▾";font-size:0.9em;color:var(--dim);}
+body.learn-mode .jump-badge:hover{background:var(--accent-soft);}
+body.learn-mode .jump-badge:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
+body.learn-mode .jump-badge[aria-expanded="true"]{background:var(--accent-soft);}
+.jump-menu{
+  position:fixed;z-index:60;min-width:16rem;max-width:min(30rem,calc(100vw - 16px));overflow:auto;
+  padding:0.4rem;background:var(--tray);border:2px solid var(--line-strong);border-radius:var(--radius);
+  box-shadow:0 4px 0 var(--ink),0 12px 30px rgba(29,36,51,0.18);
+}
+.jump-group{margin:0.55rem 0.5rem 0.2rem;font-size:0.82rem;font-weight:700;color:var(--dim);}
+.jump-group:first-child{margin-top:0.2rem;}
+.jump-item{
+  display:block;width:100%;text-align:left;font:inherit;font-size:0.98rem;line-height:1.3;color:var(--ink);
+  padding:0.4rem 0.6rem;border:0;border-radius:8px;background:none;cursor:pointer;
+}
+.jump-item:hover,.jump-item:focus-visible{background:var(--accent-soft);outline:none;}
+.jump-item.is-current{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent);font-weight:700;}
+.jump-item sub,.jump-item sup{line-height:0;}
 body.learn-mode .guide-stage-panel .hud-quiet{visibility:hidden;}
 
 @media (max-width:860px){

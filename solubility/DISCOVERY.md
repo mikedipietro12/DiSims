@@ -22,7 +22,7 @@
 - Use **other examples** for solubility and the common ion effect. A light nod that "this matters inside the body too" is fine; no explanation.
 
 ### Existing work to reuse or stay consistent with
-- `equilibrium_simulations.html` already has a **PbI₂ Ksp scene** (Ksp = 9.8e-9 at 25 °C, ΔH_soln ≈ +70 kJ/mol, solubility rises ~6× from 25 °C to 100 °C; dissolving/growing runs on the crystal surface at Q/Ksp). Any PbI₂ numbers here must match it.
+- `equilibrium_simulations.html` already has a **PbI₂ Ksp scene** (Ksp now 8.5e-9 at 25 °C to match the Data Booklet, was 9.8e-9; ΔH_soln ≈ +70 kJ/mol, solubility rises ~6× from 25 °C to 100 °C; dissolving/growing runs on the crystal surface at Q/Ksp). Any PbI₂ numbers here must match it.
 - `equilibrium-intro/` introduced **K symbolically** from elementary steps (Part 4). Ksp should read as "the same K, for a solid dissolving".
 
 ### Wiring done (2026-11-16, user request ahead of the brief)
@@ -98,16 +98,17 @@ Curricular Competencies
 - [x] Course: AP Chemistry 12, after Le Châtelier
 - [x] LI / competencies provided (4 blocks above)
 - [x] **Posture (user, 2026-11-16): as before.** The Guide is the core of the teacher's lessons. **Presentation view** (the IMF / equilibrium-intro learn mode: toggle, ‹ › steppers, arrow keys / clickers step beats, Esc leaves) lets the teacher walk the sims as a lesson; the **explanation copy beside each beat** lets students go back over it on their own time. Same no gates, no scores posture
-- [x] Guide structure (family pattern): "Before you begin" briefing listing each Part's learning intentions beside its competencies, then **Parts 1 to 4 matching the four blocks**, so each lesson starts at its Part. _Assumed from "as before", confirm at brief_
+- [x] **Guide structure (user, 2026-11-17):** four Parts, one per curriculum block (the 11H refresher opens Part 1). **Each Part opens with its own "Before you begin" card** listing that block's learning intentions and competencies; it is the first slide of that lesson in presentation view. No single briefing at the top, just a contents list
 - [ ] Prior knowledge: assume K, Q, Le Châtelier and ICE tables are solid (from equilibrium-intro + Le Châtelier sim). _Confirm at brief_
 - [x] **11H review = quick refresher (user, 2026-11-16).** Part 1 is a few beats: M = n/V and M₁V₁ = M₂V₂ (one worked example each) · solubility rules table with "soluble or not?" predict-then-reveal chips · "insoluble" really means "slightly soluble", which becomes Part 2's opening question (how much?)
 
 ### 2. Scope of the chemistry
-- [x] **Numbers this time (user, 2026-11-16):** yes, unlike equilibrium-intro. **Guide** shows worked steps (g/L ↔ mol/L ↔ [ions] ↔ Ksp, the x² / 4x³ / 27x⁴ patterns). **Sandbox and Qual Lab** show real live values (concentrations, Ksp, Q) without walking through the maths. Guide teaches, other rooms stay quiet
-- [ ] Salt menu (draft): AgCl (1:1) · PbI₂ (1:2, shared with Le Châtelier sim) · CaF₂ (1:2, fluoride) · Ag₂CrO₄ (2:1, coloured, qual) · Mg(OH)₂ (pH link) · maybe CaCO₃ / BaSO₄. **No CaC₂O₄** (kidney stones stay out)
+- [x] **Numbers this time (user, 2026-11-16):** yes, unlike equilibrium-intro. **Guide** shows worked steps (g/L ↔ mol/L ↔ [ions] ↔ Ksp, the x² / 4x³ patterns; 27x⁴ dropped, user 2026-11-17). **Sandbox and Qual Lab** show real live values (concentrations, Ksp, Q) without walking through the maths. Guide teaches, other rooms stay quiet
+- [x] **Numbers source (user, 2026-11-17): BC Chemistry 12 Data Booklet only** (`../docs/reference/chem12-data-booklet.md`); salts not in it are dropped
+- [x] Salt menu: AgCl (1:1) · PbI₂ (1:2, shared with Le Châtelier sim) · Ag₂CrO₄ (2:1, coloured) · Mg(OH)₂ (pH link) · maybe CaCO₃. **No CaC₂O₄** (kidney stones stay out)
 - [x] **Factors (user, 2026-11-16): all three.** Sandbox lets students change:
   - **Common ion:** KI into saturated PbI₂ (more yellow solid, matches Le Châtelier sim) · NaCl into AgCl
-  - **pH:** acid dissolves Mg(OH)₂ (antacid / stomach acid) · CaCO₃ (limestone caves, shells in a more acidic ocean) · fluoride and tooth enamel
+  - **pH:** acid dissolves Mg(OH)₂ (antacid / stomach acid) · CaCO₃ (limestone caves, shells in a more acidic ocean). _Tooth enamel dropped in brief draft: hydroxyapatite is a calcium phosphate, too close to kidney-stone chemistry_
   - **Temperature:** PbI₂'s real rise in solubility on heating (same numbers as `equilibrium_simulations.html`)
 - [ ] Complex ions (e.g. AgCl dissolving in NH₃): out unless asked
 - [ ] Ksp "comparison trap" (smaller Ksp ≠ less soluble when formulas differ): include as an E moment?
@@ -117,8 +118,9 @@ Curricular Competencies
 - [x] **3.1 Rooms:** Guide + Sandbox + **Qual Lab** (user, 2026-11-16). Guide names the idea of qualitative analysis; the Qual Lab is where students test unknowns, add reagents, separate precipitates and deduce ions
 - [x] **3.1b Qual Lab shape (user, 2026-11-17): follow a scheme** (flowchart). Students add a reagent, see whether a solid forms, separate, and branch. No open bench.
   - **Must NOT copy the real class lab.** The real lab uses **Ag⁺, Ba²⁺, Fe³⁺**: the sim uses a different ion set (and ideally different reagents), so the method transfers but the answers don't.
-  - [ ] Ion set + reagents (draft: Pb²⁺ / Ni²⁺ / Sr²⁺ · KI → yellow PbI₂ · then NaOH → green Ni(OH)₂ · then Na₂CO₃ → white SrCO₃). No oxalate or phosphate
-  - [ ] Unknowns: any mix of the three (7 combinations + blank)? Final "which ions?" pick with a reveal, nothing saved?
+  - [x] Ion set + reagents (revised 2026-11-17 to booklet-only salts): **Pb²⁺ / Sr²⁺ / Mg²⁺** · KI → yellow PbI₂ · then Na₂SO₄ → white SrSO₄ · then NaOH → white Mg(OH)₂. (Was Pb / Ni / Sr; Ni(OH)₂ is not in the booklet.) No oxalate, phosphate or calcium
+  - [x] Unknowns: random mix of the three (7 combinations + blank). Final "which ions?" pick with a reveal, nothing saved (user OK, 2026-11-17)
+  - [x] Sandbox keeps AgCl + NaCl as a common-ion example (no objection raised); Qual Lab has no silver
 - [ ] 3.2 Sandbox core: beaker of water + salt scoop; dissolve to saturation; live [ion] readout, Q vs Ksp gauge; add a common-ion salt; precipitate on mixing two solutions?
 - [ ] 3.3 Micro + macro together (ions in a zoom window beside the beaker), as in equilibrium-intro?
 - [ ] 3.4 Lab tie-ins: Ksp lab ("technologies": conductivity? mass of residue?), Q vs Ksp lab (Kidney Stones Lab is separate, not mirrored). Should the sim mirror any lab procedure, or stay independent so it doesn't spoil the labs?

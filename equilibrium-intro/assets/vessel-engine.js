@@ -303,8 +303,6 @@
     function paintTray() {
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, cw, ch);
-      ctx.fillStyle = 'rgba(29,36,51,0.10)';
-      for (var x = 11; x < cw; x += 22) for (var y = 11; y < ch; y += 22) ctx.fillRect(x, y, 1.4, 1.4);
       // Macro cue: NO2 is brown, so the gas tints as products build up
       if (rxn.id === 'n2o4') {
         ctx.fillStyle = 'rgba(154,91,46,' + (0.22 * xi).toFixed(3) + ')';

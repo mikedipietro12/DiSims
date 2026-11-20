@@ -178,7 +178,7 @@ body::before{
 .mod-head{
   display:flex;
   align-items:baseline;
-  justify-content:space-between;
+  justify-content:flex-end;
   gap:0.8rem;
 }
 .mod-num{

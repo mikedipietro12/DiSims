@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Engine Check · Solubility &amp; Ksp</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../intermolecular-forces/assets/suite.css?v=15">
+  <link rel="stylesheet" href="../assets/sol.css?v=9">
+  <style>
+/* Dev-only harness for Task 4: the real engine with a rough stage. Not the Sandbox design. */
+.dev-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1rem;margin-top:1rem;}
+.dev-card{background:var(--tray);border:2px solid var(--line-strong);border-radius:var(--radius-lg);box-shadow:var(--key-drop);padding:1rem;}
+.dev-card canvas{display:block;width:100%;height:auto;}
+.dev-controls{display:flex;flex-wrap:wrap;gap:0.6rem 0.8rem;align-items:end;margin-top:0.8rem;}
+.dev-controls .field{display:flex;flex-direction:column;gap:0.25rem;}
+.dev-controls label,.dev-controls .field-label{font-weight:700;font-size:0.9rem;}
+.dev-controls select{font:inherit;padding:0.45rem 0.5rem;border:2px solid var(--line-strong);border-radius:8px;background:#fff;}
+@media (max-width:900px){.dev-grid{grid-template-columns:minmax(0,1fr);}}
+  </style>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+  <div class="module-wrap">
+    <div class="top-nav">
+      <a href="../index.html" class="back-link">← Solubility &amp; Ksp</a>
+      <div class="mod-meta">Engine check · dev only</div>
+    </div>
+    <h1 style="font-size:2rem;margin:0 0 0.3rem;">Engine check</h1>
+    <p style="color:var(--dim);max-width:60rem;margin:0;">The real dissolving engine with Data Booklet values, on a rough stage. Layout and styling come later (Tasks 5 and 8). Tap the stage to settle instantly.</p>
+
+    <div class="dev-controls">
+      <div class="field"><label for="salt">Salt</label><select id="salt"></select></div>
+      <button type="button" class="btn" id="scoop">Add a scoop</button>
+      <span id="commonBtns"></span>
+      <button type="button" class="btn" id="acid">Add acid (HNO₃)</button>
+      <div class="field"><label for="temp">Temperature · <output id="tOut">25 °C</output></label><input type="range" id="temp" min="0" max="100" step="1" value="25"></div>
+      <button type="button" class="btn" id="reset">Start over</button>
+    </div>
+
+    <div class="dev-grid">
+      <div class="dev-card"><canvas id="stage" width="900" height="530" aria-label="Beaker and particle view"></canvas></div>
+      <div class="dev-card">
+        <div id="gauge"></div>
+        <div id="read" style="margin-top:1rem;"></div>
+        <p id="live" class="sr-only" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+<script src="../assets/salts.js?v=1"></script>
+<script src="../assets/sol-engine.js?v=1"></script>
+<script src="../assets/sol-draw.js?v=6"></script>
+<script src="../assets/sol-ui.js?v=5"></script>
+<script src="../assets/sol-scene.js?v=1"></script>
+<script>
+(function () {
+  const D = SolData, E = SolEngine;
+  const V = 0.100;
+  const scene = SolScene.create({ salt: 'PbI2', volume: V });
+  let lastLive = '';
+  const saltId = () => scene.saltId;
+
+  // ---------- controls ----------
+  const sel = document.getElementById('salt');
+  D.SANDBOX_SALTS.forEach(id => { const o = document.createElement('option'); o.value = id; o.textContent = D.SALTS[id].formula + ' · ' + D.SALTS[id].name; sel.appendChild(o); });
+  sel.value = scene.saltId;
+  function buildCommon() {
+    const host = document.getElementById('commonBtns'); host.innerHTML = '';
+    D.SALTS[saltId()].commonIons.forEach(k => {
+      const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'btn';
+      btn.textContent = 'Add ' + D.REAGENTS[k].formula;
+      btn.addEventListener('click', () => scene.addReagent(k, 2 * scene.scoopMol() * 20));
+      host.appendChild(btn); host.appendChild(document.createTextNode(' '));
+    });
+    const t = document.getElementById('temp'); t.disabled = !D.SALTS[saltId()].dHsoln;
+    t.title = t.disabled ? 'No temperature data for this salt' : '';
+  }
+  function reset() {
+    if (!D.SALTS[saltId()].dHsoln) document.getElementById('temp').value = 25;
+    scene.reset(); buildCommon(); updateT();
+  }
+  function updateT() { const c = +document.getElementById('temp').value; document.getElementById('tOut').textContent = c + ' °C'; scene.setTemperature(273.15 + c); }
+  sel.addEventListener('change', () => { scene.saltId = sel.value; reset(); });
+  document.getElementById('scoop').addEventListener('click', () => scene.scoop());
+  document.getElementById('acid').addEventListener('click', () => scene.acid());
+  document.getElementById('temp').addEventListener('input', updateT);
+  document.getElementById('reset').addEventListener('click', reset);
+  // a tap settles everything instantly: the numbers, any acid events, and the zoom
+  document.getElementById('stage').addEventListener('click', () => scene.settle());
+
+  const cv = document.getElementById('stage'), g = cv.getContext('2d');
+  function draw() { g.clearRect(0, 0, cv.width, cv.height); scene.draw(g, { beaker: { x: 70, y: 70, w: 270, h: 380 }, win: { x: 640, y: 255, r: 225 } }); }
+
+  // ---------- readouts (shared SolUI components) ----------
+  let read = null, gauge = null, uiSalt = null;
+  function readouts() {
+    if (uiSalt !== saltId()) { // rebuilt when the salt changes
+      document.getElementById('read').innerHTML = ''; document.getElementById('gauge').innerHTML = '';
+      read = SolUI.saltReadout(document.getElementById('read'), D, saltId());
+      gauge = SolUI.qvkForSalt(document.getElementById('gauge'), D, saltId());
+      uiSalt = saltId();
+    }
+    const all = scene.state();
+    read.update(all, scene.beaker.T);
+    gauge.updateFrom(all, saltId());
+    const live = scene.beaker.summary(saltId());
+    if (live && live !== lastLive && scene.beaker.isSettled()) { document.getElementById('live').textContent = live; lastLive = live; }
+  }
+
+  reset();
+  // dev hooks: #demo(-KI)(-settle), #salt=X, -warm, -ppt, -acidN (see design-state)
+  const h = location.hash;
+  const run = n => { for (let i = 0; i < n; i++) { scene.step(1 / 60); draw(); } };
+  if (/demo/.test(h)) { scene.scoop(3); if (/KI/.test(h)) scene.addReagent('KI', 0.002); if (/settle/.test(h)) scene.settle(); }
+  if (/salt=(\w+)/.test(h)) { scene.saltId = h.match(/salt=(\w+)/)[1]; sel.value = scene.saltId; reset(); scene.scoop(3); scene.settle(); }
+  if (/warm/.test(h)) run(600);
+  if (/ppt/.test(h)) { scene.addReagent('KI', 0.0004); run(70); }
+  if (/acid/.test(h)) { const nF = +((h.match(/acid(\d+)/) || [])[1] || 90); scene.acid(); run(nF); }
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    scene.step(dt); draw(); readouts();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

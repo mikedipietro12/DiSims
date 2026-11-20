@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
+  <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=19">
   <link rel="stylesheet" href="assets/eq-intro.css?v=19">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
@@ -41,16 +41,16 @@
       <a href="index.html" data-room="hub">Hub</a>
       <a href="guide.html" data-room="guide">Guide</a>
       <a href="sandbox.html" data-room="sandbox">Sandbox</a>
+      <a href="ice-tables.html" data-room="ice">ICE Tables</a>
     </nav>
 
     <!-- Briefing: intentions and competencies before the Guide (same pattern as Unit 1b) -->
     <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
-      <div class="stub-kicker">Before you begin</div>
-      <h1 id="briefingTitle">Intro to Equilibrium</h1>
+      <h1 id="briefingTitle">Before you begin: Intro to Equilibrium</h1>
       <p class="briefing-lead">Read what this guide is aiming for. Then enter the guide and work through it.</p>
 
       <div class="briefing-part">
-        <h2><span class="briefing-num">Part 1</span> Enthalpy and entropy</h2>
+        <h2>Part 1: Enthalpy and entropy</h2>
         <div class="briefing-columns">
           <div class="briefing-block">
             <h3 class="briefing-label">Learning intentions</h3>
@@ -71,7 +71,7 @@
       </div>
 
       <div class="briefing-part">
-        <h2><span class="briefing-num">Part 2</span> Equilibrium</h2>
+        <h2>Part 2: Equilibrium</h2>
         <div class="briefing-columns">
           <div class="briefing-block">
             <h3 class="briefing-label">Learning intentions</h3>
@@ -95,7 +95,7 @@
       </div>
 
       <div class="briefing-part">
-        <h2><span class="briefing-num">Part 3</span> Gibbs free energy</h2>
+        <h2>Part 3: Gibbs free energy</h2>
         <div class="briefing-columns">
           <div class="briefing-block">
             <h3 class="briefing-label">Learning intentions</h3>
@@ -116,7 +116,7 @@
       </div>
 
       <div class="briefing-part">
-        <h2><span class="briefing-num">Part 4</span> The equilibrium constant</h2>
+        <h2>Part 4: The equilibrium constant</h2>
         <div class="briefing-columns">
           <div class="briefing-block">
             <h3 class="briefing-label">Learning intentions</h3>
@@ -127,6 +127,7 @@
               <li>Combine the K values of a reaction's steps into the K for the overall reaction.</li>
               <li>State the law of mass action and use it to write K for any balanced equation.</li>
               <li>Find K for a reversed equation (1/K) and for a sum of equations (multiply the K's).</li>
+              <li>Write K for reactions with solids or pure liquids, leaving them out of K.</li>
               <li>Use the size of K to tell whether reactants or products are favoured at equilibrium.</li>
             </ul>
           </div>
@@ -172,6 +173,7 @@
       <a href="#beat-overall">Overall K</a>
       <a href="#beat-massaction">Mass action</a>
       <a href="#beat-kmanip">Working with K</a>
+      <a href="#beat-kpure">Solids and liquids</a>
       <a href="#beat-kmag">Size of K</a>
       <a href="#beat-next">Next</a>
     </nav>
@@ -180,7 +182,6 @@
       <div class="guide-rail">
 
         <article class="guide-beat" id="beat-start" data-badge="Completion or equilibrium" data-view="pic" data-pic="intro4">
-          <p class="beat-kicker">Start here</p>
           <h2>All the way, or stuck partway?</h2>
           <p>Up until this point in chemistry, we've assumed that all reactions go to <strong>completion</strong>, favouring the products. We've thought of reversible reactions only as physical changes.</p>
           <p>In this lesson, we'll start to discover the energetic forces that cause some systems to react fully, and others to get stuck in <strong>equilibrium</strong>.</p>
@@ -191,7 +192,6 @@
         </article>
 
         <article class="guide-beat" id="beat-hill" data-badge="Enthalpy" data-view="pic" data-pic="energy">
-          <p class="beat-kicker">Enthalpy</p>
           <h2>Up the hill, then down</h2>
           <p>You already know this one. <strong>Enthalpy</strong> (H) is the heat stored in a system. <strong>ΔH</strong> is how much it changes.</p>
           <p>A <strong>potential energy diagram</strong> follows a reaction from left to right. To react, particles must collide hard enough to climb to the top of the hill, the <strong>activated complex</strong>. Past the top, they slide down to the products.</p>
@@ -204,7 +204,6 @@
         </article>
 
         <article class="guide-beat" id="beat-heat" data-badge="Enthalpy" data-view="pic" data-pic="beaker" data-cards="naoh:H,melt:H">
-          <p class="beat-kicker">Enthalpy</p>
           <h2>Where does the heat go?</h2>
           <p>Now we need to think about actual systems, and the flow of heat energy into or out of the system.</p>
           <p>The sign tells us part of the story, but combined with our understanding of the PE diagrams, we can get a full picture of what is going on.</p>
@@ -219,7 +218,6 @@
         </article>
 
         <article class="guide-beat" id="beat-spread" data-badge="Entropy" data-view="pic" data-pic="spread" data-cards="dye:,melt:HS,freeze:HS,ammonia:HS,hotpack:HS">
-          <p class="beat-kicker">Entropy</p>
           <h2>Let's talk about randomness</h2>
           <p>One of the ways we can talk about <strong>entropy</strong> is thinking about randomness. Or, things "spreading out". Think about dropping food colouring into water. It spreads out until the colour is even. It never gathers itself back into the drop. <strong>Entropy</strong> (S) measures how spread out, or random, a system's particles and energy are. The more random ways the particles can be arranged, the higher the entropy.</p>
           <p><strong>ΔS</strong> is the change. Spreading out makes ΔS <strong>positive</strong>. Getting more ordered or more crowded makes ΔS <strong>negative</strong>.</p>
@@ -233,7 +231,6 @@
         </article>
 
         <article class="guide-beat" id="beat-favour" data-badge="Enthalpy and entropy" data-view="pic" data-pic="favour">
-          <p class="beat-kicker">Enthalpy and entropy</p>
           <h2>Which side is favoured?</h2>
           <p>Every reaction is written with reactants on the left and products on the right. When we say ΔH or ΔS <strong>favours the products</strong>, we mean that, on its own, it pushes the reaction <strong>forward</strong> (→). <strong>Favours the reactants</strong> means it pushes the reaction in <strong>reverse</strong> (←).</p>
           <p>Each term has its own rule for which side it favours.</p>
@@ -246,7 +243,6 @@
         </article>
 
         <article class="guide-beat" id="beat-pulls"data-badge="Enthalpy and entropy" data-view="pic" data-pic="coldpack">
-          <p class="beat-kicker">Enthalpy and entropy together</p>
           <h2>Two different pulls</h2>
           <p>ΔH and ΔS are not the same thing. ΔH is about <strong>heat</strong>. ΔS is about <strong>randomness</strong>. A change is favoured when it gives off heat (ΔH −), and also when a system gets more random, or spread out (ΔS +).</p>
           <p>We will now look at systems and decide which direction entropy and enthalpy are "pointing", or which side is favoured. A cold pack fights. It <strong>takes in</strong> heat, which works against it, yet it still dissolves on its own. Spreading out wins.</p>
@@ -259,7 +255,6 @@
         </article>
 
         <article class="guide-beat" id="beat-four" data-badge="Gibbs free energy" data-view="pic" data-pic="gibbs4">
-          <p class="beat-kicker">Putting them together</p>
           <h2>Four ways the pulls can line up</h2>
           <p>Chemists combine ΔH and ΔS into one quantity, the <strong>Gibbs free energy</strong> change:</p>
           <p class="gibbs-eq">ΔG = <span class="t-h">ΔH</span> <span class="t-s">− TΔS</span></p>
@@ -283,7 +278,6 @@
         </article>
 
         <article class="guide-beat" id="beat-arrows" data-badge="Reversible reactions" data-view="vessel" data-reaction="n2o4" data-t="400" data-mix="reactants" data-counts="true">
-          <p class="beat-kicker">Reversible reactions</p>
           <h2>Reactions that run both ways</h2>
           <p>Many reactions are <strong>reversible</strong>. As soon as products form, some of them react back into reactants. We write this with a double arrow: ⇌.</p>
           <p>Here is N₂O₄ ⇌ 2NO₂ in a sealed vessel. N₂O₄ is colourless and NO₂ is brown. Watch the colour (what you would see in the lab), then watch the particles (what you would see if you could zoom in).</p>
@@ -296,7 +290,6 @@
         </article>
 
         <article class="guide-beat" id="beat-rates" data-badge="Rates and equilibrium" data-view="vessel" data-reaction="n2o4" data-t="400" data-mix="reactants" data-graphs="true" data-mixbtns="true">
-          <p class="beat-kicker">Rates and equilibrium</p>
           <h2>When the rates meet</h2>
           <p>At the start there is only N₂O₄, so the forward reaction is fast and the reverse is zero. As NO₂ builds up, the forward rate slows (fewer N₂O₄ left to split) and the reverse rate speeds up (more NO₂ to join).</p>
           <p>Eventually the two rates are <strong>equal</strong>. From then on, every NO₂ made is matched by one used up. The amounts stop changing even though both reactions continue. This is <strong>dynamic equilibrium</strong>.</p>
@@ -310,7 +303,6 @@
         </article>
 
         <article class="guide-beat" id="beat-around" data-badge="Equilibrium around us" data-view="pic" data-pic="scene" data-cards="soda:,ocean:,blood:">
-          <p class="beat-kicker">Everywhere</p>
           <h2>Equilibrium is all around you</h2>
           <p>A sealed soda bottle is a system at equilibrium. CO₂ gas above the drink dissolves into the liquid at the same rate as dissolved CO₂ escapes. The fizz stays put. Open the cap and the system is no longer closed, so the gas escapes faster than it returns.</p>
           <p>The same balance shows up far from the chemistry lab.</p>
@@ -324,7 +316,6 @@
         </article>
 
         <article class="guide-beat" id="beat-state" data-badge="State functions" data-view="pic" data-pic="paths">
-          <p class="beat-kicker">State functions</p>
           <h2>Only the start and finish matter</h2>
           <p>Climb a mountain by the steep trail or the long switchbacks. Either way your change in height is the same, because it depends only on where you started and where you finished. The distance you walked is different for each route.</p>
           <p>H, S and G are <strong>state functions</strong>. Like height, their change depends only on the start and end states, not the path. That is why Hess's law works: add up any route of steps and you get the same ΔH. Heat and work are <strong>not</strong> state functions. They depend on the path, like the distance walked.</p>
@@ -336,7 +327,6 @@
         </article>
 
         <article class="guide-beat" id="beat-gibbs" data-badge="Gibbs free energy" data-view="vessel" data-reaction="n2o4" data-t="250" data-mix="half" data-gibbs="true" data-slider="true" data-picker="n2o4,haber">
-          <p class="beat-kicker">Gibbs free energy</p>
           <h2>Temperature picks the winner</h2>
           <p>Combine the two pulls into one number, <strong>Gibbs free energy</strong>:</p>
           <p class="strength-order">ΔG = ΔH − TΔS</p>
@@ -351,7 +341,6 @@
         </article>
 
         <article class="guide-beat" id="beat-limits" data-badge="Limits of ΔG" data-view="pic" data-pic="scene" data-cards="diamond:HS">
-          <p class="beat-kicker">Limits</p>
           <h2>What the formula leaves out</h2>
           <p>ΔG is powerful, but it is a model, and every model has limits.</p>
           <p><strong>It says nothing about speed.</strong> Diamond turning into graphite has ΔG −, so it is spontaneous at every temperature. But at room temperature it is so slow that it has never been observed: the hill between diamond and graphite is enormous. ΔG tells you which way a reaction can go. Rates (and collision theory) tell you how fast.</p>
@@ -367,7 +356,6 @@
         </article>
 
         <article class="guide-beat" id="beat-puzzle" data-badge="Rate laws and K" data-view="pic" data-pic="kpuzzle">
-          <p class="beat-kicker">Part 4 · Rates and equilibrium</p>
           <h2>A puzzle about rate laws</h2>
           <p>You learned that a rate law has to be found by experiment. Take 2NO₂ + F₂ → 2NO₂F. The coefficients suggest rate = k[NO₂]²[F₂], but experiments give <strong>rate = k[NO₂][F₂]</strong>. It is first order in NO₂, not second. The coefficients don't work for kinetics.</p>
           <p>Yet the equilibrium constant for the same reaction is K = [NO₂F]² / [NO₂]²[F₂], with every coefficient back as an exponent. Why does equilibrium get to use the coefficients when kinetics can't?</p>
@@ -379,7 +367,6 @@
         </article>
 
         <article class="guide-beat" id="beat-elementary" data-badge="Elementary steps" data-view="pic" data-pic="scene" data-cards="eluni:,elbi:,eldbl:">
-          <p class="beat-kicker">Part 4 · Elementary steps</p>
           <h2>One step at a time</h2>
           <p>The route a reaction really takes is its <strong>mechanism</strong>: a series of simple steps that add up to the balanced equation.</p>
           <p>Each step is a single event: one particle breaking apart, or two particles colliding. These are <strong>elementary steps</strong>. For an elementary step, and <strong>only</strong> for an elementary step, you can write the rate law straight from the equation. Each reactant's coefficient becomes its exponent.</p>
@@ -393,7 +380,6 @@
         </article>
 
         <article class="guide-beat" id="beat-kderive" data-badge="Equilibrium constant" data-view="pic" data-pic="kderive">
-          <p class="beat-kicker">Part 4 · The equilibrium constant</p>
           <h2>Equal rates make a constant</h2>
           <p>Back to N₂O₄ ⇌ 2NO₂. Both directions are elementary steps: one N₂O₄ breaks apart, or two NO₂ collide and join. So each direction has its own rate law, with its own rate constant: k<sub>f</sub> forward and k<sub>r</sub> reverse.</p>
           <p>At equilibrium the forward and reverse rates are equal. Set the two rate laws equal, rearrange, and out comes the <strong>equilibrium constant</strong>, K:</p>
@@ -409,7 +395,6 @@
         </article>
 
         <article class="guide-beat" id="beat-overall" data-badge="Overall K" data-view="pic" data-pic="kmulti">
-          <p class="beat-kicker">Part 4 · The equilibrium constant</p>
           <h2>Add the steps, multiply the K's</h2>
           <p>Back to the puzzle: 2NO₂ + F₂ ⇌ 2NO₂F. It happens in two elementary steps. Step 1 is slow: NO₂ + F₂ ⇌ NO₂F + F. Step 2 is fast: NO₂ + F ⇌ NO₂F. The slow step limits the speed, which is why the measured rate law, k[NO₂][F₂], is step 1's own rate law.</p>
           <p>Add the steps and F cancels: it is made in step 1 and used up in step 2. F is an <strong>intermediate</strong>. At equilibrium every step is at equilibrium, so each step has its own K. Multiply them, and [F] cancels in exactly the same way.</p>
@@ -423,7 +408,6 @@
         </article>
 
         <article class="guide-beat" id="beat-massaction" data-badge="Law of mass action" data-view="pic" data-pic="kmass">
-          <p class="beat-kicker">Part 4 · Summary</p>
           <h2>The law of mass action</h2>
           <p>Part 4 comes down to one rule. For a balanced equation at equilibrium, K is the products over the reactants, each raised to the power of its coefficient. This is the <strong>law of mass action</strong>:</p>
           <p class="k-eq">K = <span class="k-frac"><span>[C]<sup><i>c</i></sup>[D]<sup><i>d</i></sup></span><span>[A]<sup><i>a</i></sup>[B]<sup><i>b</i></sup></span></span></p>
@@ -436,7 +420,6 @@
         </article>
 
         <article class="guide-beat" id="beat-kmanip" data-badge="Working with K" data-view="pic" data-pic="kmanip">
-          <p class="beat-kicker">Part 4 · Working with K</p>
           <h2>Change the equation, change K</h2>
           <p>K belongs to an equation exactly as it is written. Change the equation and K changes in a predictable way.</p>
           <ul class="beat-drivers">
@@ -448,8 +431,20 @@
           <p class="beat-aside">You met one more on the Overall K beat: double an equation and K is squared. In general, multiply an equation by n and K is raised to the power n.</p>
         </article>
 
+        <article class="guide-beat" id="beat-kpure" data-badge="Special considerations" data-view="pic" data-pic="kpure">
+          <h2>Leave out solids and pure liquids</h2>
+          <p>So far, every substance in our equations has been a gas. Many reactions also have a solid or a liquid in them, so we need one more rule before we write K.</p>
+          <ul class="beat-drivers">
+            <li><strong>The rule:</strong> solids (s) and pure liquids (l) are left out of K. Gases (g) and dissolved substances (aq) stay in.</li>
+            <li><strong>Why:</strong> a pure solid's concentration is set by how tightly its particles are packed, so it never changes. Add more CaCO₃ and you add more litres of it too. A number that never changes is folded into K.</li>
+            <li><strong>Pure liquids:</strong> the same idea. That includes water when it is the solvent. It is about 55.5 mol/L, and the reaction barely changes that.</li>
+            <li><strong>Check the phase, not the formula:</strong> H₂O(l) is left out, but H₂O(g) stays in. As a gas, its concentration changes as it reacts, like any other gas.</li>
+          </ul>
+          <p>In the simulation, click the arrows under the picture to watch each one drop out of K.</p>
+          <p class="beat-aside">The solids still have to be there. With no CaCO₃ or no CaO in the container, there is no equilibrium. They just don't appear in K.</p>
+        </article>
+
         <article class="guide-beat" id="beat-kmag" data-badge="Size of K" data-view="pic" data-pic="scene" data-cards="kmag:">
-          <p class="beat-kicker">Part 4 · The equilibrium constant</p>
           <h2>Big K, small K</h2>
           <p>K is products over reactants, measured at equilibrium. So the size of K tells you what the equilibrium mixture is mostly made of. Take the simplest reaction, A ⇌ B, where K is just B over A:</p>
           <p class="k-eq">K = <span class="k-frac"><span>[B]</span><span>[A]</span></span></p>
@@ -464,7 +459,6 @@
         </article>
 
         <article class="guide-beat guide-beat-end" id="beat-next" data-badge="Before you leave" data-view="vessel" data-reaction="custom" data-t="500" data-mix="reactants" data-gibbs="true" data-slider="true" data-signs="true">
-          <p class="beat-kicker">Before you leave</p>
           <h2>What to take with you</h2>
           <ul class="beat-drivers">
             <li>ΔH is heat flow. ΔS is spreading out. They are different pulls.</li>
@@ -475,6 +469,7 @@
             <li>For an elementary step, coefficients become exponents in the rate law. For an overall equation, you need experiments.</li>
             <li>At equilibrium the forward and reverse rates are equal, which gives K: products over reactants, coefficients as exponents. That is the law of mass action.</li>
             <li>Adding equations multiplies their K's. Reversing an equation gives 1/K.</li>
+            <li>Solids (s) and pure liquids (l) are left out of K. Gases (g) and dissolved substances (aq) stay in.</li>
             <li>K bigger than 1: products are favoured at equilibrium. K smaller than 1: reactants are favoured.</li>
           </ul>
           <p style="margin-top:1rem">Next, open the <a href="sandbox.html">Sandbox</a> and try every reaction at different temperatures. Then open <a href="../equilibrium_simulations.html">Equilibrium Simulations</a> to push a system at equilibrium, watch it respond, and see K in action.</p>
@@ -589,6 +584,7 @@
   </div>
 
   <script src="../intermolecular-forces/assets/suite-chrome.js"></script>
+  <script src="../assets/section-jump.js?v=1"></script>
   <script src="assets/reactions.js?v=13"></script>
   <script src="assets/vessel-engine.js?v=3"></script>
   <script src="assets/eq-charts.js?v=3"></script>
@@ -718,8 +714,15 @@
       'Now reverse an equation. N₂O₄ ⇌ 2NO₂ has K = 4.63 × 10⁻³ at 25 °C.',
       'Written backwards, products and reactants swap places, so the fraction flips over. <strong>Reverse an equation, take 1/K:</strong> 1 ÷ (4.63 × 10⁻³) = 216.'
     ];
+    var KPURE_STEPS = [
+      'Heat limestone, CaCO₃, and it breaks down into lime, CaO, and carbon dioxide. Written by the law of mass action as it is, K would have all three.',
+      'CaCO₃ and CaO are pure solids. Their concentrations never change, so they are left out. <strong>K = [CO₂]</strong>: only the gas is left.',
+      'The same goes for a pure liquid. Here water is the solvent, H₂O(l), so [H₂O] is left out too.',
+      'Careful: the rule is about the phase, not the substance. As a gas, H₂O(g) stays in K like any other gas.',
+      'A solid dissolving in water: the solid is left out, so only the ions are left. <strong>In K: (g) and (aq). Left out: (s) and (l).</strong>'
+    ];
     // Pictures stepped with the ← / → buttons under the stage
-    var STEP_TEXT = { coldpack: COLD_STEPS, kpuzzle: KPUZZLE_STEPS, kderive: KDERIVE_STEPS, kmulti: KMULTI_STEPS, kmanip: KMANIP_STEPS };
+    var STEP_TEXT = { coldpack: COLD_STEPS, kpuzzle: KPUZZLE_STEPS, kderive: KDERIVE_STEPS, kmulti: KMULTI_STEPS, kmanip: KMANIP_STEPS, kpure: KPURE_STEPS };
     var stepIdx = 0, stepFrom = 0;
     var caseIdx = 0, CASE_TEXT = [
       '<strong>Burning propane.</strong> Heat comes out (ΔH −) and six gas molecules become seven (ΔS +). Both terms push toward the products, so ΔG is always <strong>−</strong>.',
@@ -824,7 +827,7 @@
         if ($('pic').getAttribute('aria-label') !== cd) $('pic').setAttribute('aria-label', cd);
         return;
       }
-      if (kind === 'kpuzzle' || kind === 'kderive' || kind === 'kmulti' || kind === 'kmass' || kind === 'kmanip') {
+      if (kind === 'kpuzzle' || kind === 'kderive' || kind === 'kmulti' || kind === 'kmass' || kind === 'kmanip' || kind === 'kpure') {
         var kd = EqPictures[kind]($('pic'), { step: stepIdx, from: stepFrom, t: (performance.now() - picT0) / 1000, still: reduced });
         $('sub').textContent = '';
         if ($('pic').getAttribute('aria-label') !== kd) $('pic').setAttribute('aria-label', kd);
@@ -851,7 +854,7 @@
       if (!active || active.dataset.view !== 'pic') return;
       picPhase = (picPhase + 0.016) % 1;
       drawPic();
-      if (!reduced && (active.dataset.pic === 'intro4' || active.dataset.pic === 'beaker' || active.dataset.pic === 'energy' || active.dataset.pic === 'spread' || active.dataset.pic === 'coldpack' || active.dataset.pic === 'favour' || active.dataset.pic === 'gibbs4' || active.dataset.pic === 'scene' || active.dataset.pic === 'kpuzzle' || active.dataset.pic === 'kderive' || active.dataset.pic === 'kmass' || active.dataset.pic === 'kmanip' || active.dataset.pic === 'kmulti')) picRaf = requestAnimationFrame(picLoop);
+      if (!reduced && (active.dataset.pic === 'intro4' || active.dataset.pic === 'beaker' || active.dataset.pic === 'energy' || active.dataset.pic === 'spread' || active.dataset.pic === 'coldpack' || active.dataset.pic === 'favour' || active.dataset.pic === 'gibbs4' || active.dataset.pic === 'scene' || active.dataset.pic === 'kpuzzle' || active.dataset.pic === 'kderive' || active.dataset.pic === 'kmass' || active.dataset.pic === 'kmanip' || active.dataset.pic === 'kpure' || active.dataset.pic === 'kmulti')) picRaf = requestAnimationFrame(picLoop);
     }
 
     function loadPic(b) {
@@ -1051,6 +1054,12 @@
       goToBeat(beats[i].id);
       scrollToBeat(beats[i], true);
     }
+    // In learn mode the stage title is a menu of every section, for skipping straight to one
+    SectionJump.attach({
+      badge: $('badge'), beats: beats,
+      current: function () { return active; },
+      go: function (el) { goToBeat(el.id); scrollToBeat(el, true); }
+    });
     // The stage's controls change from beat to beat, so size the canvas to whatever space is left
     var fitting = false;
     function fitLearnStage() {

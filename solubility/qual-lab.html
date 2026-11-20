@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
-  <link rel="stylesheet" href="assets/sol.css?v=2">
+  <link rel="stylesheet" href="assets/sol.css?v=56">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -37,12 +37,52 @@
       <a href="sandbox.html" data-room="sandbox">Sandbox</a>
       <a href="qual-lab.html" data-room="lab">Qual Lab</a>
     </nav>
-    <h1>Qual Lab</h1>
-    <section class="sol-stub">
-      <h2>Being built</h2>
-      <p>This room is on its way. You will be able to test an unknown solution, add reagents one at a time, separate what forms, and decide which ions are present.</p>
+    <h1 class="sr-only">Qual Lab</h1>
+
+    <section class="ql" aria-label="Qual Lab">
+      <div class="ql-top">
+        <p class="ql-lead">Your unknown is a colourless solution. It may contain any mix of Pb<sup>2+</sup>, Sr<sup>2+</sup> and Mg<sup>2+</sup>, or none of them. Follow the scheme, record what you see, then decide.</p>
+        <button type="button" class="btn" id="newUnknown">New unknown</button>
+      </div>
+
+      <div class="ql-grid">
+        <nav class="ql-scheme" aria-label="The scheme">
+          <h2>The scheme</h2>
+          <ol id="scheme"></ol>
+        </nav>
+
+        <div class="ql-bench">
+          <div class="ql-canvas"><canvas id="cv" role="img" aria-label="A test tube of the unknown solution."></canvas></div>
+          <p class="ql-obs" id="obs" aria-live="polite"></p>
+          <details class="ql-numbers" id="numbers" hidden>
+            <summary>Show the numbers behind it</summary>
+            <div id="checks"></div>
+          </details>
+        </div>
+
+        <section class="ql-book" aria-label="Notebook">
+          <h2>Notebook</h2>
+          <table class="ql-table">
+            <thead><tr><th scope="col">Step</th><th scope="col">Observation</th><th scope="col">Conclusion</th></tr></thead>
+            <tbody id="book"><tr class="ql-empty"><td colspan="3">Nothing recorded yet.</td></tr></tbody>
+          </table>
+          <div class="ql-final" id="final" hidden>
+            <h3>Which ions are in your unknown?</h3>
+            <div class="ql-picks" id="picks" role="group" aria-label="Choose all the ions you found"></div>
+            <div class="sbx-row"><button type="button" class="btn primary" id="reveal">Reveal</button></div>
+            <p class="ql-result" id="result" aria-live="polite"></p>
+          </div>
+        </section>
+      </div>
     </section>
   </div>
   <script src="../intermolecular-forces/assets/suite-chrome.js?v=1"></script>
+  <script src="assets/salts.js?v=5"></script>
+  <script src="assets/sol-engine.js?v=20"></script>
+  <script src="assets/sol-draw.js?v=7"></script>
+  <script src="assets/sol-ui.js?v=23"></script>
+  <script src="assets/sol-pictures.js?v=39"></script>
+  <script src="assets/sol-qual.js?v=1"></script>
+  <script src="assets/qual-lab.js?v=1"></script>
 </body>
 </html>

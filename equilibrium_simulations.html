@@ -183,6 +183,8 @@
 .ice-table td.ice-added{background:var(--delta-pos);color:#ffffff;padding:0.2rem 0.15rem;}
 .ice-add{display:block;font-size:0.72rem;line-height:1.15;}
 .ice-add-note{color:#b3123a;font-weight:700;}
+.ice-table td.ice-removed{background:var(--delta-neg);color:var(--ink);padding:0.2rem 0.15rem;}
+.ice-rem-note{color:var(--ink);font-weight:700;}
 .ice-x{display:block;font-size:0.7rem;color:var(--dim);line-height:1.1;}
 .ice-table tr.ice-e td{background:var(--accent-soft);}
 .ice-table tr.ice-e.at-eq td{background:#dff3e8;}
@@ -235,7 +237,7 @@
     <div class="sandbox-layout">
       <div class="sandbox-lead">
         <h1>Equilibrium</h1>
-        <p id="leadText">A sealed vessel of gas at equilibrium. Heat it, squeeze it or add more gas, and watch Q settle back toward K.</p>
+        <p id="leadText">A sealed vessel of gas at equilibrium. Heat it, squeeze it, or add or remove gas, and watch Q settle back toward K.</p>
         <!-- Hidden until Intro to Equilibrium ships
         <p class="lead-intro">New to equilibrium? Start with <a href="equilibrium-intro/index.html">Intro to Equilibrium</a>.</p>
         -->
@@ -267,6 +269,14 @@
             <button type="button" class="btn" id="inj-no2" title="Add NO₂ dose">+ NO₂</button>
             <button type="button" class="btn" id="inj-n2o4" title="Add N₂O₄ dose">+ N₂O₄</button>
             <button type="button" class="btn" id="inj-3" hidden title="Add dose">+ NH₃</button>
+          </div>
+        </div>
+        <div class="field eq-add">
+          <label id="remLbl">Remove gas</label>
+          <div class="btn-row" role="group" aria-labelledby="remLbl">
+            <button type="button" class="btn" id="rem-1" title="Remove some NO₂">− NO₂</button>
+            <button type="button" class="btn" id="rem-2" title="Remove some N₂O₄">− N₂O₄</button>
+            <button type="button" class="btn" id="rem-3" hidden title="Remove some">− NH₃</button>
           </div>
         </div>
         <div class="btn-row">
@@ -463,6 +473,11 @@
     zRest: 0.8,
     // Depth: the back wall is drawn at perspBack × the front size; far molecules fade by depthAlpha.
     perspBack: 0.62,
+    // The vessel is a glass cylinder seen slightly from above: its round ends are drawn
+    // as ellipses vesselTilt × as tall as they are wide; depth (z) runs into the screen.
+    vesselTilt: 0.2,
+    // a full beaker (the most water) still leaves this much of the glass above the water line
+    waterHead: 0.86,
     depthAlpha: 0.32,
     // Keep molecules drifting in and out of the page: mean |vz| (depth units/s) at T0.
     thermoZ: 0.32,
@@ -529,6 +544,7 @@
   const injNO2 = document.getElementById('inj-no2');
   const injN2O4 = document.getElementById('inj-n2o4');
   const inj3 = document.getElementById('inj-3');
+  const remBtns = [1, 2, 3].map((k) => document.getElementById('rem-' + k));
   const btnReset = document.getElementById('btn-reset');
   const rxnSelect = document.getElementById('rxn-select');
   const kCountList = document.getElementById('k-countList');
@@ -682,6 +698,32 @@
   function addDose(id, mol) {
     setN(id, getN(id) + mol);
     iceAdded[id] = (iceAdded[id] || 0) + mol;
+  }
+
+  // a remove button: the same dose as its add button, but never more than half of
+  // what's there, so the species never runs out. Kept as a negative dose for the ICE table.
+  function removeDose(id, mol) {
+    const take = Math.min(mol, 0.5 * getN(id));
+    if (!(take > 0)) return 0;
+    setN(id, getN(id) - take);
+    iceAdded[id] = (iceAdded[id] || 0) - take;
+    return take;
+  }
+
+  // What each remove button takes out, per reaction: [species, dose (mol), label, title].
+  // PbI2(s) has no remove button: taking out some solid doesn't shift the equilibrium.
+  function removeSlots() {
+    const id = activeRxn().id;
+    if (id === 'ammonia') return [['n2', CFG.doseN2, 'N₂'], ['h2', CFG.doseH2, 'H₂'], ['nh3', CFG.doseNH3, 'NH₃']];
+    if (id === 'hi') return [['h2', CFG.doseHIH2, 'H₂'], ['i2', CFG.doseHII2, 'I₂'], ['hi', CFG.doseHI, 'HI']];
+    if (id === 'pbi2') {
+      return [
+        ['i', CFG.doseKI, 'I⁻', 'Remove some I⁻ (silver nitrate takes it out as solid AgI)'],
+        ['pb', CFG.dosePb, 'Pb²⁺', 'Remove some Pb²⁺ (sodium sulfate takes it out as solid PbSO₄)'],
+        null,
+      ];
+    }
+    return [['no2', CFG.doseNO2, 'NO₂'], ['n2o4', CFG.doseN2O4, 'N₂O₄'], null];
   }
 
   function initNearEquilibrium_NO2() {
@@ -838,6 +880,14 @@
       injN2O4.title = 'Add N₂O₄ dose';
       if (inj3) inj3.hidden = true;
     }
+    removeSlots().forEach((slot, k) => {
+      const btn = remBtns[k];
+      if (!btn) return;
+      btn.hidden = !slot;
+      if (!slot) return;
+      btn.textContent = '− ' + slot[2];
+      btn.title = slot[3] || `Remove some ${slot[2]}`;
+    });
   }
 
   // Per-reaction slider range labels for the temperature field.
@@ -846,10 +896,11 @@
     el('tMaxLbl').textContent = slT.max + ' K';
     const solid = activeRxn().id === 'pbi2';
     el('leadText').textContent = solid
-      ? 'A beaker of water with a lead(II) iodide crystal. Heat to dissolve it, cool to grow gold crystals back, or add a common ion.'
-      : 'A sealed vessel of gas at equilibrium. Heat it, squeeze it or add more gas, and watch Q settle back toward K.';
+      ? 'A beaker of water with a lead(II) iodide crystal. Heat to dissolve it, cool to grow gold crystals back, or add or remove an ion.'
+      : 'A sealed vessel of gas at equilibrium. Heat it, squeeze it, or add or remove gas, and watch Q settle back toward K.';
     el('gPresLabel').textContent = solid ? 'Undissolved PbI₂' : 'Pressure';
     el('addLbl').textContent = solid ? 'Add' : 'Add gas';
+    el('remLbl').textContent = solid ? 'Remove' : 'Remove gas';
     el('vLbl').textContent = solid ? 'Water' : 'Volume';
     el('gCountLabel').textContent = solid ? 'Particles shown' : 'Molecules shown';
   }
@@ -912,9 +963,9 @@
   }
 
   function Ksp_PbI2(TK) {
-    // Ksp = 9.8e-9 at 25 °C; ΔH(solution) ≈ +70 kJ/mol, which gives the real ~6× rise in
-    // solubility from 25 °C to 100 °C (about 0.6 → 4 g/L).
-    return 9.8e-9 * Math.exp(-(70e3 / CFG.R) * (1 / TK - 1 / 298.15));
+    // Ksp = 8.5e-9 at 25 °C (BC Chemistry 12 Data Booklet, shared with solubility/); ΔH(solution)
+    // ≈ +70 kJ/mol, which gives the real ~6× rise in solubility from 25 °C to 100 °C (about 0.6 → 3.9 g/L).
+    return 8.5e-9 * Math.exp(-(70e3 / CFG.R) * (1 / TK - 1 / 298));
   }
 
   function Kc(TK) {
@@ -928,32 +979,52 @@
   }
 
   function vesselGeom(cssW, cssH, scale) {
-    // A square-cornered glass vessel resting on the stage floor. scale runs 0.72 → 1.27 with
-    // volume: the largest vessel fills the stage, the smallest is 62% as wide and tall.
+    // A glass cylinder standing on the bench, seen slightly from above. scale runs 0.72 → 1.27
+    // with volume: the largest vessel nearly fills the stage, the smallest is 62% as big.
     // The PbI2 beaker stays full size: its water line moves instead.
+    // cx, cy, rw, rh describe the molecules' space (x across, y down); the round ends add
+    // ry = rw × vesselTilt above the top and below the bottom.
     if (activeRxn().id === 'pbi2') scale = 1.27;
     const vNorm = (scale - 0.72) / 0.55;
-    // the margin closes up as volume grows, so the largest vessel is the stage frame itself
-    const pad = 14 * (1 - vNorm);
+    const pad = 12 + 14 * (1 - vNorm);
     const f = 0.62 + 0.38 * vNorm;
-    const rw = Math.max(40, (cssW * 0.5 - pad) * f);
-    const rh = Math.max(40, (cssH * 0.5 - pad) * f);
+    const lid = 22; // room for the sealed vessel's lid
+    const rw = Math.max(40, (cssW * 0.5 - pad) * 0.62 * f);
+    const ry = rw * CFG.vesselTilt;
+    const rh = Math.max(40, ((cssH - 2 * pad - lid) * f - 2 * ry) / 2);
     const cx = cssW * 0.5;
-    const cy = cssH - pad - rh;
+    const cy = cssH - pad - ry - rh;
     const cornerR = 0;
-    return { cx, cy, rw, rh, cornerR };
+    return { cx, cy, rw, rh, ry, cornerR };
   }
 
   function innerAABB(g) {
     const inset = Math.max(CFG.spritePad, g.cornerR * 0.85);
     // ions stay below the water line
-    const top = activeRxn().id === 'pbi2' ? g.cy + g.rh - 2 * g.rh * waterLevel : g.cy - g.rh;
+    const top = activeRxn().id === 'pbi2' ? g.cy + g.rh - 2 * g.rh * waterLevel * CFG.waterHead : g.cy - g.rh;
     return {
       minX: g.cx - g.rw + inset,
       maxX: g.cx + g.rw - inset,
       minY: top + inset,
       maxY: g.cy + g.rh - inset,
     };
+  }
+
+  // Keep a molecule inside the cylinder's round cross-section (x across, z into the screen),
+  // bouncing off the curved wall.
+  function roundClamp(s, b, wr, zr) {
+    const hx = (b.maxX - b.minX) / 2, mx = (b.maxX + b.minX) / 2;
+    if (hx <= 0) return;
+    const u = (s.x - mx) / hx, rr = Math.hypot(u, s.z);
+    if (rr <= 1) return;
+    const nu = u / rr, nz = s.z / rr;
+    s.x = mx + nu * hx;
+    s.z = nz;
+    const vn = (s.vx / hx) * nu + s.vz * nz; // outward speed in the round cross-section
+    if (vn > 0) {
+      s.vx -= (1 + wr) * vn * nu * hx;
+      s.vz -= (1 + zr) * vn * nz;
+    }
   }
 
   function clampSpritesToVessel(cssW, cssH, scale) {
@@ -968,6 +1039,7 @@
       else if (s.y > b.maxY) { s.y = b.maxY; s.vy = -Math.abs(s.vy) * CFG.wallRest - 4; s.ph += (Math.random() - 0.5) * CFG.rotBounceKick; }
       if (s.z < -1) { s.z = -1; s.vz = Math.abs(s.vz) * CFG.zRest; }
       else if (s.z > 1) { s.z = 1; s.vz = -Math.abs(s.vz) * CFG.zRest; }
+      roundClamp(s, b, CFG.wallRest, CFG.zRest);
     }
   }
 
@@ -1320,6 +1392,15 @@
         cr.y = floorY;
       }
       cr.x = b.minX + cr.fx * (b.maxX - b.minX);
+      {
+        // the whole crystal stays inside the round floor of the beaker
+        const hx = (b.maxX - b.minX) / 2, mx = (b.maxX + b.minX) / 2;
+        const half = ((cr.w / 2 + 1) * XTAL.cellW) / hx;
+        const zr = Math.min(0.95, Math.abs(cr.z) + 2 * XTAL.depthZ);
+        const lim = Math.max(0, Math.sqrt(1 - zr * zr) - half);
+        const u = (cr.x - mx) / hx;
+        if (Math.abs(u) > lim) cr.x = mx + Math.sign(u) * lim * hx;
+      }
     }
     const lo = parseFloat(slT.min);
     const hi = parseFloat(slT.max);
@@ -1683,6 +1764,7 @@
       else if (s.y > b.maxY) { s.y = b.maxY; s.vy *= -wr; s.ph += (Math.random() - 0.5) * CFG.rotBounceKick; }
       if (s.z < -1) { s.z = -1; s.vz *= -CFG.zRest; }
       else if (s.z > 1) { s.z = 1; s.vz *= -CFG.zRest; }
+      roundClamp(s, b, wr, CFG.zRest);
 
       s.vx += (Math.random() - 0.5) * amp * tScale * dt;
       s.vy += (Math.random() - 0.5) * amp * tScale * dt;
@@ -2558,17 +2640,11 @@
     }
   }
 
-  // Dotted studio tray: the IMF suite's stage background.
+  // The bench: a plain surface (no dot grid, per AGENTS.md), lighter at the back.
   function paintTray(ctx, w, h) {
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = 'rgba(29,36,51,0.10)';
-    for (let x = 11; x < w; x += 22) {
-      for (let y = 11; y < h; y += 22) ctx.fillRect(x, y, 1.4, 1.4);
-    }
-    const g = ctx.createRadialGradient(w * 0.5, h * 0.35, 10, w * 0.5, h * 0.5, Math.max(w, h) * 0.7);
-    g.addColorStop(0, 'rgba(255,255,255,0)');
-    g.addColorStop(1, 'rgba(214,222,235,0.55)');
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(1, '#e9edf4');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
   }
@@ -2632,23 +2708,19 @@
   // molecules fading out, then a caption.
   function drawWater(proj, x0, y0, w, h) {
     const y1 = y0 + h;
-    const ys = y1 - h * waterLevel;
+    const ys = y1 - h * waterLevel * CFG.waterHead;
     const wh = y1 - ys;
-    // water line on the front glass and the back wall
-    const fl = proj(x0, ys, 1), fr = proj(x0 + w, ys, 1);
-    const bl = proj(x0, ys, -1), br = proj(x0 + w, ys, -1);
+    // the water surface: a round disc seen slightly from above, darker along the front (meniscus)
+    const cxw = x0 + w / 2, rxw = w / 2 - 2, ryw = Math.max(1, (w / 2) * CFG.vesselTilt - 1);
     ctxS.save();
-    ctxS.lineWidth = 1.5;
-    ctxS.strokeStyle = 'rgba(60,120,195,0.22)';
-    ctxS.beginPath(); ctxS.moveTo(bl.x, bl.y); ctxS.lineTo(br.x, br.y); ctxS.stroke();
-    ctxS.beginPath(); ctxS.moveTo(bl.x, bl.y); ctxS.lineTo(fl.x, fl.y);
-    ctxS.moveTo(br.x, br.y); ctxS.lineTo(fr.x, fr.y); ctxS.stroke();
-    ctxS.strokeStyle = 'rgba(60,120,195,0.55)';
-    ctxS.lineWidth = 2;
-    ctxS.beginPath(); ctxS.moveTo(fl.x, fl.y); ctxS.lineTo(fr.x, fr.y); ctxS.stroke();
+    ctxS.beginPath(); ctxS.ellipse(cxw, ys, rxw, ryw, 0, 0, Math.PI * 2);
+    ctxS.fillStyle = 'rgba(255,255,255,0.28)'; ctxS.fill();
+    ctxS.lineWidth = 1.5; ctxS.strokeStyle = 'rgba(60,120,195,0.35)'; ctxS.stroke();
+    ctxS.beginPath(); ctxS.ellipse(cxw, ys, rxw, ryw, 0, 0.06, Math.PI - 0.06);
+    ctxS.strokeStyle = 'rgba(60,120,195,0.6)'; ctxS.lineWidth = 2; ctxS.stroke();
     // vapour leaving the surface as the water evaporates
     for (const v of vapour) {
-      const yv = y1 - h * v.lv - v.rise;
+      const yv = y1 - h * v.lv * CFG.waterHead - v.rise;
       const q = proj(x0 + 16 + v.u * (w - 32) + Math.sin(flowT * 3 + v.ph) * 4, yv, v.z);
       const t = v.age / v.life;
       ctxS.fillStyle = `rgba(90,140,205,${(0.28 * (1 - t) * Math.min(1, v.age * 6)).toFixed(3)})`;
@@ -2728,106 +2800,80 @@
     const h = rh * 2;
     const y1 = y0 + h;
 
-    // Perspective: the front glass is z = +1 (full size); the back wall (z = −1) is
-    // scaled by perspBack toward a vanishing point at the middle of the vessel.
-    const vpx = cx;
-    const vpy = cy;
-    const pb = CFG.perspBack;
-    function persp(z) {
-      return pb + (1 - pb) * (z + 1) * 0.5;
-    }
+    // A glass cylinder on the bench, seen slightly from above. Depth (z) runs into the
+    // screen: the front (z = +1) sits lower and the back (z = −1) higher by ry, and far
+    // molecules are drawn smaller and fainter. Molecules stay inside the round cross-section.
+    const ry = rw * CFG.vesselTilt;
+    const isBeaker = activeRxn().id === 'pbi2';
+    const pb = 0.76; // size of a molecule at the back wall
     function proj(x, y, z) {
-      const p = persp(z);
-      return { x: vpx + (x - vpx) * p, y: vpy + (y - vpy) * p, p };
+      return { x, y: y + z * ry, p: pb + (1 - pb) * (z + 1) * 0.5 };
     }
-    // outline of the vessel at depth scale p
-    function shell(p) {
+    const x1 = x0 + w;
+    function silhouette() {
       ctxS.beginPath();
-      ctxS.rect(vpx - rw * p, vpy - rh * p, w * p, h * p);
-    }
-    function quad(pts, fill) {
-      ctxS.beginPath();
-      ctxS.moveTo(pts[0], pts[1]);
-      for (let i = 2; i < pts.length; i += 2) ctxS.lineTo(pts[i], pts[i + 1]);
+      ctxS.ellipse(cx, y0, rw, ry, 0, Math.PI, Math.PI * 2);
+      ctxS.lineTo(x1, y1);
+      ctxS.ellipse(cx, y1, rw, ry, 0, 0, Math.PI);
       ctxS.closePath();
-      ctxS.fillStyle = fill;
-      ctxS.fill();
     }
 
-    // soft shadow where the vessel sits on the tray
-    const sh = ctxS.createRadialGradient(cx, y1, 0, cx, y1, rw * 1.05);
-    sh.addColorStop(0, 'rgba(29,36,51,0.18)');
+    // shadow on the bench
+    const sh = ctxS.createRadialGradient(cx, y1 + ry * 0.4, 0, cx, y1 + ry * 0.4, rw * 1.2);
+    sh.addColorStop(0, 'rgba(29,36,51,0.20)');
     sh.addColorStop(1, 'rgba(29,36,51,0)');
     ctxS.fillStyle = sh;
     ctxS.beginPath();
-    ctxS.ellipse(cx, y1 + 2, rw * 1.05, 10, 0, 0, Math.PI * 2);
+    ctxS.ellipse(cx, y1 + ry * 0.45, rw * 1.2, ry * 1.4, 0, 0, Math.PI * 2);
+    ctxS.fill();
+
+    // the glass body, a little darker at the curved edges
+    silhouette();
+    const body = ctxS.createLinearGradient(x0, 0, x1, 0);
+    body.addColorStop(0, 'rgba(214,224,238,0.75)');
+    body.addColorStop(0.5, 'rgba(248,250,253,0.7)');
+    body.addColorStop(1, 'rgba(206,218,234,0.8)');
+    ctxS.fillStyle = body;
     ctxS.fill();
 
     ctxS.save();
-    shell(1);
+    silhouette();
     ctxS.clip();
-    ctxS.fillStyle = 'rgba(244,246,250,0.9)';
-    ctxS.fillRect(x0, y0, w, h);
+    // the inside floor
+    ctxS.beginPath();
+    ctxS.ellipse(cx, y1, rw - 3, ry - 2, 0, 0, Math.PI * 2);
+    ctxS.fillStyle = 'rgba(29,36,51,0.07)';
+    ctxS.fill();
+    // the back of the rim, seen through the glass
+    ctxS.beginPath();
+    ctxS.ellipse(cx, y0, rw - 1, ry - 1, 0, Math.PI, Math.PI * 2);
+    ctxS.strokeStyle = 'rgba(29,36,51,0.3)';
+    ctxS.lineWidth = 1.5;
+    ctxS.stroke();
 
-    // gas, tinted brown by NO2 (N2O4 is colourless)
-    // water: a light blue tint (its molecules are drawn only for the opening seconds)
-    if (activeRxn().id === 'pbi2') {
-      const ys = y1 - h * waterLevel;
-      const ysb = vpy + (ys - vpy) * pb;
-      ctxS.fillStyle = 'rgba(110,170,235,0.13)';
-      ctxS.fillRect(x0, ys, w, y1 - ys);
-      // the surface, receding to the back wall
-      quad([x0, ys, x0 + w, ys, vpx + rw * pb, ysb, vpx - rw * pb, ysb], 'rgba(110,170,235,0.10)');
+    // water: fills the beaker up to its line
+    if (isBeaker) {
+      const ys = y1 - h * waterLevel * CFG.waterHead;
+      ctxS.beginPath();
+      ctxS.ellipse(cx, ys, rw - 2, ry - 1, 0, Math.PI, Math.PI * 2);
+      ctxS.lineTo(x1 - 2, y1);
+      ctxS.ellipse(cx, y1, rw - 2, ry - 1, 0, 0, Math.PI);
+      ctxS.closePath();
+      ctxS.fillStyle = 'rgba(110,170,235,0.16)';
+      ctxS.fill();
     }
     // iodine vapour tints the gas violet in proportion to [I2] (H2 and HI are colourless)
     if (activeRxn().id === 'hi' && V_L > 0) {
       const tint = 0.32 * (1 - Math.exp(-(getN('i2') / V_L) / 0.015));
       ctxS.fillStyle = `rgba(122,62,190,${tint.toFixed(3)})`;
-      ctxS.fillRect(x0, y0, w, h);
+      ctxS.fillRect(x0, y0 - ry, w, h + 2 * ry);
     }
+    // NO2 tints the gas brown (N2O4 is colourless)
     if (activeRxn().id === 'no2' && V_L > 0) {
       const tint = 0.3 * (1 - Math.exp(-(getN('no2') / V_L) / 0.05));
       ctxS.fillStyle = `rgba(154,91,46,${tint.toFixed(3)})`;
-      ctxS.fillRect(x0, y0, w, h);
+      ctxS.fillRect(x0, y0 - ry, w, h + 2 * ry);
     }
-
-    // Box interior: floor, side walls and ceiling recede to the back wall, each
-    // shading darker toward the back.
-    const x1 = x0 + w;
-    const bx0 = vpx - rw * pb;
-    const bx1 = vpx + rw * pb;
-    const by0 = vpy - rh * pb;
-    const by1 = vpy + rh * pb;
-    const floorG = ctxS.createLinearGradient(0, y1, 0, by1);
-    floorG.addColorStop(0, 'rgba(29,36,51,0.03)');
-    floorG.addColorStop(1, 'rgba(29,36,51,0.10)');
-    quad([x0, y1, x1, y1, bx1, by1, bx0, by1], floorG);
-    const ceilG = ctxS.createLinearGradient(0, y0, 0, by0);
-    ceilG.addColorStop(0, 'rgba(29,36,51,0.01)');
-    ceilG.addColorStop(1, 'rgba(29,36,51,0.05)');
-    quad([x0, y0, x1, y0, bx1, by0, bx0, by0], ceilG);
-    const leftG = ctxS.createLinearGradient(x0, 0, bx0, 0);
-    leftG.addColorStop(0, 'rgba(29,36,51,0.01)');
-    leftG.addColorStop(1, 'rgba(29,36,51,0.06)');
-    quad([x0, y0, bx0, by0, bx0, by1, x0, y1], leftG);
-    const rightG = ctxS.createLinearGradient(x1, 0, bx1, 0);
-    rightG.addColorStop(0, 'rgba(29,36,51,0.01)');
-    rightG.addColorStop(1, 'rgba(29,36,51,0.06)');
-    quad([x1, y0, bx1, by0, bx1, by1, x1, y1], rightG);
-    // back wall and receding edges
-    shell(pb);
-    ctxS.fillStyle = 'rgba(255,255,255,0.45)';
-    ctxS.fill();
-    ctxS.strokeStyle = 'rgba(29,36,51,0.2)';
-    ctxS.lineWidth = 1.5;
-    ctxS.stroke();
-    ctxS.beginPath();
-    ctxS.moveTo(x0, y0); ctxS.lineTo(bx0, by0);
-    ctxS.moveTo(x1, y0); ctxS.lineTo(bx1, by0);
-    ctxS.moveTo(x0, y1); ctxS.lineTo(bx0, by1);
-    ctxS.moveTo(x1, y1); ctxS.lineTo(bx1, by1);
-    ctxS.strokeStyle = 'rgba(29,36,51,0.14)';
-    ctxS.stroke();
 
     const drawList = sprites.slice();
     drawList.sort((a, b) => (a.z - b.z) || (a.y - b.y));
@@ -2888,18 +2934,124 @@
       ctxS.restore();
     }
 
-    // front glass: a soft inner rim
-    ctxS.lineWidth = 10;
-    ctxS.strokeStyle = 'rgba(255,255,255,0.28)';
-    shell(1);
-    ctxS.stroke();
+    // glass highlights and curved-edge shading, over the contents
+    const hl = (x, ww, a) => {
+      const gr = ctxS.createLinearGradient(x, 0, x + ww, 0);
+      gr.addColorStop(0, 'rgba(255,255,255,0)');
+      gr.addColorStop(0.5, `rgba(255,255,255,${a})`);
+      gr.addColorStop(1, 'rgba(255,255,255,0)');
+      ctxS.fillStyle = gr;
+      ctxS.fillRect(x, y0 - ry, ww, h + 2 * ry);
+    };
+    hl(cx - rw * 0.8, rw * 0.14, 0.7);
+    hl(cx - rw * 0.6, rw * 0.04, 0.45);
+    hl(cx + rw * 0.72, rw * 0.1, 0.35);
+    const eg = ctxS.createLinearGradient(x0, 0, x1, 0);
+    eg.addColorStop(0, 'rgba(29,36,51,0.10)');
+    eg.addColorStop(0.06, 'rgba(29,36,51,0)');
+    eg.addColorStop(0.94, 'rgba(29,36,51,0)');
+    eg.addColorStop(1, 'rgba(29,36,51,0.12)');
+    ctxS.fillStyle = eg;
+    ctxS.fillRect(x0, y0 - ry, w, h + 2 * ry);
     ctxS.restore();
 
-    // glass outline
+    // litre marks on the beaker's front face, following its curve
+    if (isBeaker) {
+      for (let L = 0.5; L <= 4; L += 0.5) {
+        const lv = CFG.waterLevelMin + (1 - CFG.waterLevelMin) * (L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
+        const yy = y1 - h * lv * CFG.waterHead;
+        const major = L % 1 === 0;
+        const a0 = Math.PI * 0.62, a1 = a0 + (major ? 34 : 18) / rw;
+        ctxS.beginPath();
+        ctxS.ellipse(cx, yy, rw, ry, 0, a0, a1);
+        ctxS.strokeStyle = 'rgba(29,36,51,0.5)';
+        ctxS.lineWidth = major ? 1.8 : 1.2;
+        ctxS.stroke();
+        if (major) {
+          ctxS.font = '700 12px "Space Mono", monospace';
+          ctxS.fillStyle = 'rgba(29,36,51,0.65)';
+          ctxS.textAlign = 'left';
+          ctxS.textBaseline = 'middle';
+          ctxS.fillText(L + ' L', cx + rw * Math.cos(a1 + 0.03) + 5, yy + ry * Math.sin(a1 + 0.03));
+        }
+      }
+    }
+
+    // front walls and base
     ctxS.strokeStyle = INK;
     ctxS.lineWidth = 2.5;
-    shell(1);
+    ctxS.lineJoin = 'round';
+    ctxS.beginPath();
+    ctxS.moveTo(x0, y0);
+    ctxS.lineTo(x0, y1);
+    ctxS.ellipse(cx, y1, rw, ry, 0, Math.PI, 0, true);
+    ctxS.lineTo(x1, y0);
     ctxS.stroke();
+    ctxS.beginPath();
+    ctxS.ellipse(cx, y1 - 4, rw - 3, ry - 1, 0, 0.15, Math.PI - 0.15);
+    ctxS.strokeStyle = 'rgba(29,36,51,0.18)';
+    ctxS.lineWidth = 3;
+    ctxS.stroke();
+
+    if (isBeaker) {
+      // open rim, with the glass's thickness, and a pour spout
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0, rw, ry, 0, 0, Math.PI * 2);
+      ctxS.strokeStyle = INK;
+      ctxS.lineWidth = 2.5;
+      ctxS.stroke();
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0 + 1, rw - 5, ry - 2.5, 0, 0, Math.PI * 2);
+      ctxS.strokeStyle = 'rgba(29,36,51,0.3)';
+      ctxS.lineWidth = 1.2;
+      ctxS.stroke();
+      ctxS.beginPath();
+      ctxS.moveTo(x0 + 2, y0 - ry * 0.55);
+      ctxS.quadraticCurveTo(x0 - 13, y0 - ry * 0.5, x0 - 15, y0 - 2);
+      ctxS.quadraticCurveTo(x0 - 9, y0 + 4, x0 + 1, y0 + ry * 0.45);
+      ctxS.fillStyle = 'rgba(240,245,251,0.95)';
+      ctxS.fill();
+      ctxS.strokeStyle = INK;
+      ctxS.lineWidth = 2.2;
+      ctxS.stroke();
+    } else {
+      // sealed: a ground-glass lid resting on the rim, with a knob
+      const lt = 9; // lid thickness
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0, rw + 6, ry + 1.5, 0, 0, Math.PI);
+      ctxS.lineTo(x0 - 6, y0 - lt);
+      ctxS.ellipse(cx, y0 - lt, rw + 6, ry + 1.5, 0, Math.PI, 0, true);
+      ctxS.closePath();
+      ctxS.fillStyle = 'rgba(226,233,243,0.95)';
+      ctxS.fill();
+      ctxS.strokeStyle = INK;
+      ctxS.lineWidth = 2.2;
+      ctxS.stroke();
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0 - lt, rw + 6, ry + 1.5, 0, 0, Math.PI * 2);
+      const lg = ctxS.createLinearGradient(x0, 0, x1, 0);
+      lg.addColorStop(0, 'rgba(236,241,248,0.97)');
+      lg.addColorStop(0.35, 'rgba(255,255,255,0.97)');
+      lg.addColorStop(1, 'rgba(222,229,240,0.97)');
+      ctxS.fillStyle = lg;
+      ctxS.fill();
+      ctxS.stroke();
+      // knob
+      const kw = Math.max(14, rw * 0.09), kh = 14;
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0 - lt, kw, kw * CFG.vesselTilt * 1.6, 0, 0, Math.PI);
+      ctxS.lineTo(cx - kw * 0.75, y0 - lt - kh);
+      ctxS.ellipse(cx, y0 - lt - kh, kw * 0.75, kw * 0.75 * CFG.vesselTilt * 1.6, 0, Math.PI, 0, true);
+      ctxS.closePath();
+      ctxS.fillStyle = '#eef2f8';
+      ctxS.fill();
+      ctxS.stroke();
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0 - lt - kh, kw * 0.75, kw * 0.75 * CFG.vesselTilt * 1.6, 0, 0, Math.PI * 2);
+      ctxS.fillStyle = '#ffffff';
+      ctxS.fill();
+      ctxS.stroke();
+    }
   }
 
   // Round the axis top up to 4 tidy steps (1, 2, 2.5 or 5 × 10ⁿ).
@@ -3251,7 +3403,7 @@
     if (m && m.kind === kind && clock - m.tEnd < 1) {
       m.label = label;
       m.tEnd = clock;
-      if (kind.startsWith('add')) m.n++;
+      if (kind.startsWith('add') || kind.startsWith('rem')) m.n++;
       return;
     }
     markers.push({ t: clock, tEnd: clock, kind, label, n: 1 });
@@ -3609,11 +3761,15 @@
     // x stays positive, as students write it: a shift back flips the signs in the C row
     const dir = x < 0 ? -1 : 1;
     const added = [];
+    const removed = [];
     for (const sp of iceDissolved()) {
       // what's left of the added gas: the dose, less what the shift has used up since
       const dose = iceAdded[sp] || 0;
       const left = Math.max(0, Math.min(dose, dose + rxn.nu[sp] * iceXi));
       iceLiveCells.I[sp].classList.toggle('ice-added', dose > 0);
+      iceLiveCells.I[sp].classList.toggle('ice-removed', dose < 0);
+      // a removal is already taken out of I: the note just says how much
+      if (dose < 0) removed.push(`${ICE_TXT[sp]} ${fmt(iceUnit(-dose))}`);
       if (dose > 0) {
         added.push(`${ICE_TXT[sp]} +${fmt(iceUnit(dose))}, ${fmt(iceUnit(left))} not used up yet`);
         setCell(iceLiveCells.I[sp], `${fmt(I[sp])}<span class="ice-add">+${fmt(iceUnit(left))}</span>`);
@@ -3634,7 +3790,8 @@
     else if (allGone) state = 'All the solid has dissolved, so Q stays below K<sub>sp</sub>: no equilibrium.';
     else state = `<b>Still shifting ${q < k ? 'forward →' : 'back ←'}</b>: C keeps changing until Q = K.`;
     const xTxt = x === 0 ? 'x = 0' : `x = ${fmt(Math.abs(x))} ${unit}, ${x > 0 ? 'toward products' : 'back toward reactants'}`;
-    const addTxt = added.length ? `<br><span class="ice-add-note">Added ${added.join('; ')}.</span>` : '';
+    let addTxt = added.length ? `<br><span class="ice-add-note">Added ${added.join('; ')}.</span>` : '';
+    if (removed.length) addTxt += `<br><span class="ice-rem-note">Removed ${removed.join('; ')} (already taken out of I).</span>`;
     setCell(el('iceLiveNote'), `I is the mix ${after}. ${xTxt}.${addTxt}<br>${state}`);
   }
 
@@ -3993,6 +4150,20 @@
       clampSpritesToVessel(sR.width, sR.height, scale);
     });
   }
+  remBtns.forEach((btn, k) => {
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const slot = removeSlots()[k];
+      if (!slot) return;
+      mark('rem-' + (k + 1), 'Removed ' + slot[2]);
+      removeDose(slot[0], slot[1]);
+      const sR = sim.getBoundingClientRect();
+      const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
+      const scale = 0.72 + 0.55 * vNorm;
+      kickSprites(0.35);
+      clampSpritesToVessel(sR.width, sR.height, scale);
+    });
+  });
   btnReset.addEventListener('click', () => {
     resetForReaction();
   });

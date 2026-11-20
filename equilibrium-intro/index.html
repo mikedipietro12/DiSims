@@ -18,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
-  <link rel="stylesheet" href="assets/eq-intro.css?v=17">
+  <link rel="stylesheet" href="assets/eq-intro.css?v=20">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -34,18 +34,17 @@
   <div class="hub">
     <div class="top-nav">
       <a href="../ap-chemistry-12/" class="back-link">← AP Chemistry 12</a>
-      <div class="mod-meta">2 Rooms · All open</div>
+      <div class="mod-meta">3 Rooms · All open</div>
     </div>
 
     <header class="hub-header">
-      <h1>Intro to Equilibrium</h1>
-      <p class="suggest">Suggested order · Guide → Sandbox → Equilibrium Simulations · Jump freely anytime</p>
+      <h1>Unit 2 - Equilibrium</h1>
+      <p class="suggest">Suggested order · Guide → Sandbox → Equilibrium Simulations → ICE Tables · Jump freely anytime</p>
     </header>
 
-    <ol class="path">
+    <ol class="path path-4">
       <li>
         <a href="guide.html">
-          <span class="mod-num">Room 1 · Guide</span>
           <span class="mod-title">Guide</span>
           <span class="mod-teaser">Learn about entropy, enthalpy, Gibbs free energy, and where K comes from.</span>
           <span class="mod-anim" aria-hidden="true">
@@ -78,7 +77,6 @@
       </li>
       <li>
         <a href="sandbox.html">
-          <span class="mod-num">Room 2 · Sandbox</span>
           <span class="mod-title">Sandbox</span>
           <span class="mod-teaser">Play with entropy, enthalpy and see how reactions reach equilibrium.</span>
           <span class="mod-anim" aria-hidden="true">
@@ -106,7 +104,6 @@
       </li>
       <li>
         <a href="../equilibrium_simulations.html">
-          <span class="mod-num">Next · Le Châtelier</span>
           <span class="mod-title">Equilibrium Simulations</span>
           <span class="mod-teaser">Ready for more? Push a system at equilibrium and watch it shift back.</span>
           <span class="mod-anim" aria-hidden="true">
@@ -129,6 +126,30 @@
                   <circle cx="181" cy="77" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/>
                   <circle cx="176" cy="68" r="5.5" fill="url(#eaW)" stroke="rgba(29,36,51,0.35)"/>
                 </g>
+              </g>
+            </svg>
+          </span>
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </a>
+      </li>
+      <li>
+        <a href="ice-tables.html">
+          <span class="mod-title">ICE Tables</span>
+          <span class="mod-teaser">Fill in ICE tables step by step to calculate K<sub>c</sub>, K<sub>p</sub> and equilibrium concentrations.</span>
+          <span class="mod-anim" aria-hidden="true">
+            <!-- an ICE table for N2O4 ⇌ 2 NO2 fills in one row at a time: I, then C, then E -->
+            <svg class="hub-anim anim-ice" viewBox="20 8 200 104" focusable="false">
+              <rect class="ic-hl" x="32" y="38" width="176" height="22" rx="4" fill="#e7eaff"/>
+              <g font-family="Space Grotesk, sans-serif" font-weight="700" fill="#1d2433" text-anchor="middle" font-size="13">
+                <text x="96" y="31">N₂O₄</text><text x="140" y="31">⇌</text><text x="180" y="31">2 NO₂</text>
+                <g text-anchor="start"><text x="38" y="54">I</text><text x="37" y="76">C</text><text x="37" y="98">E</text></g>
+              </g>
+              <path d="M30,37 H210" stroke="#1d2433" stroke-width="2.2"/>
+              <path d="M30,60 H210 M30,82 H210" stroke="rgba(29,36,51,0.18)" stroke-width="1.4"/>
+              <g font-family="Space Mono, monospace" font-weight="700" font-size="12" fill="#1d2433" text-anchor="middle">
+                <g class="ic-r ic-1"><text x="96" y="54">1.00</text><text x="180" y="54">0</text></g>
+                <g class="ic-r ic-2"><text x="96" y="76">−x</text><text x="180" y="76">+2x</text></g>
+                <g class="ic-r ic-3"><text x="96" y="98">1.00 − x</text><text x="180" y="98">2x</text></g>
               </g>
             </svg>
           </span>

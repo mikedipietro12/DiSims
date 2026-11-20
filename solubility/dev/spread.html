@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ion Spread Check · Solubility &amp; Ksp</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>body{margin:16px;background:#fff;color:#1d2433;font:15px/1.5 system-ui,sans-serif}pre{font:13px/1.6 ui-monospace,monospace;white-space:pre-wrap}iframe{border:1px solid #ccd;width:1280px;height:720px;max-width:100%}</style>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+<h1>Ion spread check</h1>
+<p>Runs every live beaker in the Guide for 12 s, then samples where the dissolved ions sit in the zoom window for 30 s.
+Only ions inside the window are counted (ions also drift past its edge, out of view). Height 0 is the solid, 1 the top of the window. A row is healthy when its mean height is at or above the even-spread
+mean and its bottom-quarter share is at or below the even-spread share (the window is round, so even is not 0.5).
+Serve the repo (e.g. <code>python3 -m http.server</code>) or open with file access allowed.</p>
+<pre id=o>Running…</pre>
+<iframe id=f title="Guide under test"></iframe>
+<script>
+// each case: guide query, seconds to run before sampling, then 10 s of samples
+const CASES = [
+ ['p1-saturated scoop x6', 'beat=p1-saturated&learn=1&press=Add a scoop', 0, 6],
+ ['p1-ksp', 'beat=p1-ksp&learn=1', 0, 0],
+ ['p1-agcl E', 'beat=p1-agcl&learn=1&steps=4', 0, 0],
+ ['p1-pbi2 E', 'beat=p1-pbi2&learn=1&steps=4', 0, 0],
+ ['p1-try scoop x8', 'beat=p1-try&learn=1&press=Add a scoop', 0, 8],
+ ['p2-q scoop x4', 'beat=p2-q&learn=1&press=Add a scoop', 0, 4],
+ ['p2-dilute reacted', 'beat=p2-dilute&learn=1&steps=6&pour=1', 0, 0],
+ ['p2-predict agcl', 'beat=p2-predict&learn=1&steps=8&pour=1', 0, 0],
+ ['p2-predict m1', 'beat=p2-predict&learn=1&tab=1&mix=now', 0, 0],
+ ['p2-predict m4', 'beat=p2-predict&learn=1&tab=4&mix=now', 0, 0],
+ ['p2-equilibrium', 'beat=p2-equilibrium&learn=1&mix=now', 0, 0],
+ ['p3-common KI', 'beat=p3-common&learn=1&steps=7', 0, 0],
+ ['p3-acid', 'beat=p3-acid&learn=1&press=Add acid', 0, 0],
+ ['p3-temp 100', 'beat=p3-temp&learn=1&temp=100', 0, 0],
+];
+const out = [];
+function run(i) {
+  if (i >= CASES.length) { o.textContent = out.join('\n'); document.title = 'Ion Spread Check (done)'; return; }
+  const [name, qs, , extra] = CASES[i];
+  f.onload = () => setTimeout(() => {
+    const w = f.contentWindow, c = w.__solGuide.cur();
+    for (let k = 1; k < (extra || 0); k++) { const b = Array.from(w.document.querySelectorAll('#btns button')).find(b => b.textContent.startsWith('Add a scoop')); if (b) b.click(); }
+    const sc = c.scenes[0]; if (!sc) { out.push(name + ': no scene'); return run(i + 1); }
+    const cx = document.createElement('canvas').getContext('2d'), tick = () => { sc.step(1 / 60); sc.draw(cx, { win: { x: 300, y: 300, r: 215 } }); };
+    for (let k = 0; k < 60 * 12; k++) tick();
+    const hs = [];
+    for (let s = 0; s < 60; s++) { for (let k = 0; k < 30; k++) tick();
+      const v = sc._view(), topW = v.cam.fy - (v.WR / v.cam.k - 22), floor = Math.min(v.top, v.cam.fy + v.WR / v.cam.k);
+      sc.sprites.filter(p => p.ion && !p.leaving && !p.taken && !p.visitor && !(p.solid > 0.5) && Math.hypot(p.x - v.cam.fx, p.y - v.cam.fy) < v.WR / v.cam.k).forEach(p => hs.push((floor - p.y) / (floor - topW))); }
+    const v = sc._view(), Rw = v.WR / v.cam.k - 22, topW = v.cam.fy - Rw, floor = Math.min(v.top, v.cam.fy + v.WR / v.cam.k), bs = [];
+    for (let k = 0; k < 4000; k++) { const x = v.cam.fx + (Math.random() * 2 - 1) * Rw, y = topW + Math.random() * 2 * Rw; if (Math.hypot(x - v.cam.fx, y - v.cam.fy) < Rw && y < floor) bs.push((floor - y) / (floor - topW)); }
+    const bm = bs.reduce((a, b) => a + b, 0) / bs.length, bl = bs.filter(h => h < 0.25).length / bs.length;
+    const m = hs.reduce((a, b) => a + b, 0) / (hs.length || 1), low = hs.filter(h => h < 0.25).length / (hs.length || 1);
+    out.push(name.padEnd(22) + ' ions in view=' + (hs.length / 60).toFixed(1) + '  mean height=' + m.toFixed(2) + '  bottom quarter=' + low.toFixed(2) + '   (even spread: ' + bm.toFixed(2) + ' / ' + bl.toFixed(2) + ')');
+    run(i + 1);
+  }, 400);
+  f.src = '../guide.html?' + qs.replace(/ /g, '%20');
+}
+run(0);
+</script>
+</body>
+</html>

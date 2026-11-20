@@ -846,6 +846,10 @@ body::before{
 @media(max-width:720px){
   .t3-cat-grid{grid-template-columns:1fr 1fr;}
 }
+/* Step / act labels sit under the title as a plain progress note (no eyebrow above headings: AGENTS.md) */
+.task-kicker,.mod-tag{text-transform:none;letter-spacing:normal;font-weight:500;font-size:0.9rem;color:var(--dim);margin:0.3rem 0 0.7rem;}
+.task-kicker::before,.mod-tag::before{display:none;}
+.task-kicker .step{letter-spacing:normal;}
 </style>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
@@ -860,8 +864,7 @@ body::before{
 
   <!-- Briefing — read intentions & competencies before the sim -->
   <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
-    <div class="briefing-kicker"><span>Before you begin</span></div>
-    <h1 id="briefingTitle">Nucleus &amp; Isotopes</h1>
+    <h1 id="briefingTitle">Before you begin: Nucleus &amp; Isotopes</h1>
     <p class="briefing-lead">Read what this module is aiming for. Then open the instrument and work through it.</p>
     <div class="briefing-columns">
       <div class="briefing-block">
@@ -880,11 +883,9 @@ body::before{
 
   <div id="moduleStage" hidden>
   <div class="task-card">
-    <div class="task-kicker">
-      <span class="step" id="taskStep">Build · 1 of 3</span>
-    </div>
     <h1 class="task-title"><span class="task-lead" id="promptLead">Your task: </span><span id="prompt">Build He-4</span></h1>
     <div class="task-sub" id="promptSub">Click protons, neutrons, and electrons to build a neutral Helium-4 atom.</div>
+    <div class="task-kicker"><span class="step" id="taskStep">Build · 1 of 3</span></div>
   </div>
 
   <div class="tier-bar" id="tierBar"></div>
@@ -3581,7 +3582,6 @@ function buildSummary() {
 
   document.getElementById('summaryGrid').innerHTML = `
     <div class="summary-card">
-      <div class="summary-kicker">Build</div>
       <h3>You Built Three Nuclei</h3>
       <ul>
         <li><span class="result">He-4</span> — 2 protons, 2 neutrons, 2 electrons</li>
@@ -3590,7 +3590,6 @@ function buildSummary() {
       </ul>
     </div>
     <div class="summary-card identify">
-      <div class="summary-kicker">Identify</div>
       <h3>You Named Three <strong>Isotopes</strong></h3>
       <ul>
         <li><span class="result">Li-7</span> — Z = 3, A = 7</li>
@@ -3599,7 +3598,6 @@ function buildSummary() {
       </ul>
     </div>
     <div class="summary-card aam">
-      <div class="summary-kicker">Average atomic mass</div>
       <h3>A <strong>Weighted Average</strong> Follows the Majority</h3>
       <ul>
         <li><span class="result">Tokens:</span> an equal mix sits in the middle; more of one mass pulls the average toward it.</li>

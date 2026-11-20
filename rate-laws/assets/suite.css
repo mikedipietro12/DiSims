@@ -602,3 +602,7 @@ svg.plot{display:block;width:100%;height:auto;}
   .module-footer,#stuckBtn,.help-panel{display:none;}
   body{background:#fff;color:#000;}
 }
+
+/* Step / act labels sit under the title as a plain progress note (no eyebrow above headings: AGENTS.md) */
+.task-kicker,.mod-tag{text-transform:none;letter-spacing:normal;font-weight:500;font-size:0.9rem;color:var(--dim);margin:0.3rem 0 0.7rem;}
+.task-kicker::before,.mod-tag::before{display:none;}

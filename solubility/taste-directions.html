@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Taste Directions · Solubility &amp; Ksp</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../intermolecular-forces/assets/suite.css?v=15">
+  <style>
+/* Dev-only comparison page (not linked from the hub). Three directions for ion colours,
+   water and solids, and the Q vs Ksp gauge. Precipitate colours are real and fixed in all three. */
+.dirs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:1.2rem;}
+.dir{background:var(--tray);border:2px solid var(--line-strong);border-radius:var(--radius-lg);box-shadow:var(--key-drop);padding:1.1rem 1.1rem 1.3rem;}
+.dir h2{font-size:1.35rem;letter-spacing:-0.02em;margin:0 0 0.25rem;}
+.dir .why{font-size:0.9rem;color:var(--dim);margin:0 0 0.4rem;min-height:4.2em;line-height:1.45;}
+.dir .risk{font-size:0.85rem;color:var(--ink-soft);margin:0 0 0.6rem;line-height:1.45;}
+.dir h3{font-size:1rem;margin:1rem 0 0.4rem;}
+.panel{background:#fff;border:1.5px solid var(--line);border-radius:var(--radius);padding:0.4rem;}
+.panel svg{display:block;width:100%;height:auto;}
+.swatches{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:0.2rem;}
+.swatches svg{width:100%;height:auto;max-width:48px;}
+.gauges{display:grid;gap:0.4rem;}
+.tubes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0.2rem;}
+.tubes figure{margin:0;text-align:center;}
+.tubes figcaption{font-size:0.72rem;color:var(--dim);line-height:1.25;margin-top:0.15rem;}
+.lead{color:var(--dim);max-width:62rem;line-height:1.55;}
+@media (max-width:1100px){.dirs{grid-template-columns:1fr;max-width:40rem;}}
+  </style>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+  <div class="module-wrap">
+    <div class="top-nav">
+      <a href="index.html" class="back-link">← Solubility &amp; Ksp</a>
+      <div class="mod-meta">Taste pass · dev only</div>
+    </div>
+    <h1 style="font-size:2.2rem;letter-spacing:-0.03em;margin-bottom:0.4rem;">Three directions</h1>
+    <p class="lead">Same scenes in each: a saturated PbI₂ beaker with its zoomed particle window, the ion set, the Q vs Ksp gauge in its three states, and the real precipitate colours. Precipitates keep their real colours in every direction. Every ion carries its symbol and charge, so none of them relies on colour alone.</p>
+    <div class="dirs" id="dirs"></div>
+
+    <h1 style="font-size:2.2rem;letter-spacing:-0.03em;margin:2.4rem 0 0.4rem;">Round 2: solid colours, acids and bases</h1>
+    <p class="lead">Direction A is locked. Two follow-ups. First, ions in a solid now take the crystal's real colour and switch to rose or amber once dissolved; for PbI₂ the amber iodide barely changes, so a slightly more orange amber is shown beside it. Second, acids and bases need their own colours site-wide: H⁺ (and H₃O⁺) and OH⁻ never use the plain cation or anion colours.</p>
+    <div class="dirs" id="dirs2"></div>
+    <h2 style="font-size:1.35rem;margin:1.6rem 0 0.4rem;">Anion amber against yellow PbI₂</h2>
+    <div class="panel" id="amber" style="max-width:62rem;"></div>
+  </div>
+<script>
+(function () {
+  const INK = '#1d2433', DIM = '#5b6474';
+  const WATER = '#e3f1fb', WATER_LINE = '#7fb3d9';
+
+  // Real precipitate colours (fixed in every direction)
+  const SOLIDS = [
+    { f: 'PbI₂', c: '#f2c230', name: 'yellow' },
+    { f: 'Ni(OH)₂', c: '#7cc47f', name: 'green' },
+    { f: 'Ag₂CrO₄', c: '#a4452c', name: 'red-brown' },
+    { f: 'SrCO₃', c: '#ffffff', name: 'white' },
+    { f: 'AgCl', c: '#fbfbf8', name: 'white' },
+    { f: 'Mg(OH)₂', c: '#f6f6f2', name: 'white' }
+  ];
+
+  // Ion set: symbol, charge text, sign, radius (rough ionic size, for drawing only)
+  const IONS = [
+    { s: 'Pb', q: '2+', sign: 1, r: 15 }, { s: 'I', q: '−', sign: -1, r: 17 },
+    { s: 'Ag', q: '+', sign: 1, r: 14 }, { s: 'Cl', q: '−', sign: -1, r: 15 },
+    { s: 'Ni', q: '2+', sign: 1, r: 11 }, { s: 'OH', q: '−', sign: -1, r: 12 },
+    { s: 'Sr', q: '2+', sign: 1, r: 14 }, { s: 'CO₃', q: '2−', sign: -1, r: 15 }
+  ];
+
+  const ELEMENT = { Pb: '#5f7593', I: '#8a55c0', Ag: '#b5bdc9', Cl: '#3f9e52', Ni: '#3f9f93', OH: '#e06a5a', Sr: '#d68a4e', 'CO₃': '#4f5a6b' };
+
+  const DIRS = [
+    {
+      name: 'A · Charge colours',
+      why: 'Extends the suite rule that red means + and yellow means −. Every cation is rose, every anion is amber, and the symbol tells you which ion it is.',
+      risk: 'Watch: amber anions sit close to yellow PbI₂. The solid is a crystal shape, never a sphere, to keep them apart.',
+      ion: i => i.sign > 0 ? { fill: '#f06a84', text: '#fff', stroke: '#b3263f' } : { fill: '#ffd257', text: INK, stroke: '#b38a10' },
+      zoneLo: '#e3f1fb', zoneHi: '#fdeccf', marker: INK
+    },
+    {
+      name: 'B · Element colours',
+      why: 'Each ion gets its own colour, like a model kit: lead slate, iodide violet, silver grey, chloride green. Swapping salts changes the whole picture.',
+      risk: 'Watch: eight new colours to learn, and none of them says + or −. The charge has to come from the label and the size.',
+      ion: i => ({ fill: ELEMENT[i.s], text: ['Ag'].includes(i.s) ? INK : '#fff', stroke: 'rgba(29,36,51,0.45)' }),
+      zoneLo: '#e3f1fb', zoneHi: '#eceef3', marker: '#8a55c0'
+    },
+    {
+      name: 'C · Ink and outline',
+      why: 'Ions stay quiet: cations solid ink, anions white with an ink outline. The only colour in the scene comes from the real solids.',
+      risk: 'Watch: the particle window is calmer but less lively, and white anions on pale water need a strong outline.',
+      ion: i => i.sign > 0 ? { fill: '#3d4658', text: '#fff', stroke: INK } : { fill: '#ffffff', text: INK, stroke: INK },
+      zoneLo: '#ffffff', zoneHi: '#ffffff', marker: INK, hatch: true
+    }
+  ];
+
+  function ionSVG(d, i, cx, cy, scale) {
+    const st = d.ion(i), r = i.r * (scale || 1);
+    const fs = Math.max(8, r * (i.s.length > 2 ? 0.62 : 0.78));
+    return `<g><circle cx="${cx}" cy="${cy}" r="${r}" fill="${st.fill}" stroke="${st.stroke}" stroke-width="1.6"/>
+      <text x="${cx}" y="${cy + fs * 0.34}" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="${fs}" fill="${st.text}">${i.s}</text>
+      <text x="${cx + r * 0.72}" y="${cy - r * 0.62}" text-anchor="middle" font-family="Space Mono, monospace" font-weight="700" font-size="${Math.max(8, r * 0.62)}" fill="${INK}" stroke="#fff" stroke-width="2.5" paint-order="stroke">${i.q}</text></g>`;
+  }
+
+  function crystal(x, y, w, h, c) {
+    // a faceted pile, so a solid never looks like an ion
+    return `<path d="M${x},${y + h} L${x + w * 0.12},${y + h * 0.45} L${x + w * 0.3},${y + h * 0.2} L${x + w * 0.46},${y + h * 0.38} L${x + w * 0.62},${y} L${x + w * 0.8},${y + h * 0.32} L${x + w},${y + h} Z" fill="${c}" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M${x + w * 0.3},${y + h * 0.2} L${x + w * 0.36},${y + h} M${x + w * 0.62},${y} L${x + w * 0.58},${y + h}" stroke="rgba(29,36,51,0.25)" stroke-width="1.2"/>`;
+  }
+
+  function beaker(d) {
+    const Pb = IONS[0], I = IONS[1];
+    // representative window: exact 1 Pb : 2 I ratio
+    const pos = [[296, 42, Pb], [258, 62, I], [334, 60, I], [316, 112, Pb], [276, 134, I], [348, 106, I], [244, 100, Pb], [222, 72, I], [292, 82, I]];
+    let ions = pos.map(p => ionSVG(d, p[2], p[0], p[1], 0.95)).join('');
+    return `<svg viewBox="0 0 400 180" role="img" aria-label="Saturated lead(II) iodide: yellow solid at the bottom, lead and iodide ions in the water, two iodide for every lead">
+      <path d="M20,18 V158 Q20,168 30,168 H130 Q140,168 140,158 V18" fill="${WATER}" stroke="${INK}" stroke-width="2"/>
+      <path d="M20,40 H140" stroke="${WATER_LINE}" stroke-width="1.5"/>
+      ${crystal(38, 136, 84, 32, '#f2c230')}
+      <circle cx="96" cy="100" r="9" fill="none" stroke="${INK}" stroke-width="1.5"/>
+      <path d="M105,97 L216,40 M103,105 L216,140" stroke="${DIM}" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <circle cx="288" cy="90" r="80" fill="${WATER}" stroke="${INK}" stroke-width="2"/>
+      ${ions}
+      <text x="80" y="178" text-anchor="middle" font-family="Space Mono, monospace" font-size="10" fill="${DIM}">beaker</text>
+    </svg>`;
+  }
+
+  function swatches(d) {
+    return IONS.map(i => `<svg viewBox="0 0 44 44" role="img" aria-label="${i.s} ${i.q}">${ionSVG(d, i, 20, 24, 1)}</svg>`).join('');
+  }
+
+  function gauge(d, state) {
+    // log scale, Ksp in the middle; Q marker left / on / right
+    const W = 380, H = 58, x0 = 16, x1 = W - 16, mid = (x0 + x1) / 2, y = 26;
+    const qx = state === '<' ? x0 + 46 : state === '=' ? mid : x1 - 46;
+    const words = state === '<' ? 'Q < Ksp · more can dissolve' : state === '=' ? 'Q = Ksp · saturated' : 'Q > Ksp · a solid forms';
+    const hatch = d.hatch ? `<defs><pattern id="hz" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#fff"/><line x1="0" y1="0" x2="0" y2="6" stroke="${INK}" stroke-width="1.2" opacity="0.35"/></pattern></defs>` : '';
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${words}">${hatch}
+      <rect x="${x0}" y="${y - 9}" width="${mid - x0}" height="18" rx="9" fill="${d.zoneLo}" stroke="${INK}" stroke-width="1.5"/>
+      <rect x="${mid}" y="${y - 9}" width="${x1 - mid}" height="18" rx="9" fill="${d.hatch ? 'url(#hz)' : d.zoneHi}" stroke="${INK}" stroke-width="1.5"/>
+      <line x1="${mid}" x2="${mid}" y1="${y - 15}" y2="${y + 15}" stroke="${INK}" stroke-width="2.5"/>
+      <text x="${mid}" y="${y - 18}" text-anchor="middle" font-family="Space Mono, monospace" font-weight="700" font-size="11" fill="${INK}">Ksp</text>
+      <path d="M${qx},${y + 4} l-8,13 h16 z" fill="${d.marker}" stroke="#fff" stroke-width="1.5"/>
+      <text x="${qx}" y="${y - 2}" text-anchor="middle" font-family="Space Mono, monospace" font-weight="700" font-size="12" fill="${INK}" stroke="#fff" stroke-width="3" paint-order="stroke">Q</text>
+      <text x="${W / 2}" y="${H - 2}" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="12.5" fill="${INK}">${words}</text>
+    </svg>`;
+  }
+
+  function tubes() {
+    return SOLIDS.map(s => `<figure><svg viewBox="0 0 40 92" role="img" aria-label="${s.f}, ${s.name} solid">
+      <path d="M10,4 V74 Q10,88 20,88 Q30,88 30,74 V4" fill="${WATER}" stroke="${INK}" stroke-width="1.8"/>
+      <path d="M11.5,66 Q16,60 20,63 Q25,59 28.5,66 V74 Q28.5,86 20,86 Q11.5,86 11.5,74 Z" fill="${s.c}" stroke="${INK}" stroke-width="1.3"/>
+      <path d="M6,4 H34" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <figcaption>${s.f}<br>${s.name}</figcaption></figure>`).join('');
+  }
+
+  // ---------- Round 2 ----------
+  const ACIDBASE = [
+    { name: '1 · Litmus', why: 'Acid red, base blue, like litmus paper. The most familiar, but the acid red sits close to the rose cations.', acid: { fill: '#e8483c', line: '#a8261c', text: '#fff' }, base: { fill: '#3b82e0', line: '#1d5bb0', text: '#fff' } },
+    { name: '2 · Indicator ends', why: 'Magenta acid and violet-blue base, like the two ends of a universal indicator. Clear of rose and amber, still reads as a pair.', acid: { fill: '#c2347a', line: '#86164f', text: '#fff' }, base: { fill: '#5b5fd6', line: '#3438a3', text: '#fff' } },
+    { name: '3 · Cool pair', why: 'Teal acid and blue base. Furthest from every other colour on screen, but has no everyday meaning to lean on.', acid: { fill: '#14918f', line: '#0b5f5e', text: '#fff' }, base: { fill: '#2f6fd0', line: '#1b4a92', text: '#fff' } }
+  ];
+  function sphere(cx, cy, r, st, sym, q) {
+    const id = 'g' + Math.random().toString(36).slice(2, 8);
+    return `<defs><radialGradient id="${id}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity="0.75"/><stop offset="0.55" stop-color="${st.fill}"/><stop offset="1" stop-color="${st.fill}"/></radialGradient></defs>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="${st.fill}" stroke="${st.line}" stroke-width="1.8"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#${id})" opacity="0.6"/>
+      <text x="${cx}" y="${cy + r * 0.3}" text-anchor="middle" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="${r * (sym.length > 2 ? 0.6 : 0.8)}" fill="${st.text}">${sym}</text>
+      ${q ? `<text x="${cx + r * 0.8}" y="${cy - r * 0.62}" text-anchor="middle" font-family="Space Mono, monospace" font-weight="700" font-size="${Math.max(10, r * 0.6)}" fill="${INK}" stroke="#fff" stroke-width="3" paint-order="stroke">${q}</text>` : ''}`;
+  }
+  const CAT = { fill: '#f06a84', line: '#b3263f', text: '#fff' }, AN = { fill: '#ffd257', line: '#b38a10', text: INK };
+  const host2 = document.getElementById('dirs2');
+  ACIDBASE.forEach(d => {
+    const el = document.createElement('section'); el.className = 'dir';
+    const row = [[CAT, 'Mg', '2+'], [d.base, 'OH', '−'], [d.acid, 'H', '+'], [d.acid, 'H₃O', '+'], [AN, 'NO₃', '−'], [CAT, 'Na', '+']];
+    el.innerHTML = `<h2>${d.name}</h2><p class="why">${d.why}</p>
+      <h3>Beside the ion colours</h3>
+      <div class="panel"><svg viewBox="0 0 400 70" role="img" aria-label="${d.name}">${row.map((r, i) => sphere(34 + i * 66, 38, 22, r[0], r[1], r[2])).join('')}</svg></div>
+      <h3>Acid meets Mg(OH)₂</h3>
+      <div class="panel"><svg viewBox="0 0 400 120" role="img" aria-label="acid ions near hydroxide ions in water">
+        <rect x="0" y="0" width="400" height="120" fill="${WATER}"/>
+        ${sphere(60, 40, 18, d.acid, 'H', '+')}${sphere(130, 80, 18, d.base, 'OH', '−')}${sphere(200, 36, 18, CAT, 'Mg', '2+')}${sphere(260, 86, 18, d.base, 'OH', '−')}${sphere(330, 46, 18, d.acid, 'H₃O', '+')}${sphere(366, 96, 15, AN, 'NO₃', '−')}
+      </svg></div>`;
+    host2.appendChild(el);
+  });
+  // amber vs PbI2 yellow
+  (function () {
+    const Y = { fill: '#f2c230', line: '#8a6a0e', text: INK };
+    const pairs = [['Amber now', AN], ['Warmer amber', { fill: '#ffb547', line: '#b36b00', text: INK }]];
+    let svg = '<svg viewBox="0 0 800 120" role="img" aria-label="iodide in the PbI2 crystal next to dissolved iodide in two amber options">';
+    pairs.forEach(([label, st], k) => {
+      const x0 = 20 + k * 380;
+      for (let i = 0; i < 4; i++) svg += sphere(x0 + 22 + i * 40, 78, 17, i % 3 === 0 ? { fill: '#f2c230', line: '#8a6a0e', text: INK } : Y, i % 3 === 0 ? 'Pb' : 'I', '');
+      svg += `<path d="M${x0 + 182},70 h40 m-8,-6 l8,6 l-8,6" stroke="${INK}" stroke-width="2" fill="none"/>`;
+      svg += sphere(x0 + 262, 70, 20, st, 'I', '−') + sphere(x0 + 318, 70, 18, CAT, 'Pb', '2+');
+      svg += `<text x="${x0 + 90}" y="24" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="14" fill="${INK}">in the crystal</text><text x="${x0 + 290}" y="24" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="14" fill="${INK}">${label}</text>`;
+    });
+    document.getElementById('amber').innerHTML = svg + '</svg>';
+  })();
+
+  const host = document.getElementById('dirs');
+  DIRS.forEach(d => {
+    const el = document.createElement('section');
+    el.className = 'dir';
+    el.innerHTML = `<h2>${d.name}</h2><p class="why">${d.why}</p><p class="risk">${d.risk}</p>
+      <h3>Saturated PbI₂</h3><div class="panel">${beaker(d)}</div>
+      <h3>Ion set</h3><div class="swatches">${swatches(d)}</div>
+      <h3>Q vs Ksp gauge</h3><div class="panel gauges">${gauge(d, '<')}${gauge(d, '=')}${gauge(d, '>')}</div>
+      <h3>Precipitates (real colours)</h3><div class="panel tubes">${tubes()}</div>`;
+    host.appendChild(el);
+  });
+})();
+</script>
+</body>
+</html>

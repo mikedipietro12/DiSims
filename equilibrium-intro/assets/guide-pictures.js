@@ -15,6 +15,7 @@
  *   kmulti - stepped algebra: a two-step mechanism's K₁ × K₂ cancels down to the overall K
  *   kmass  - summary: the law of mass action, for N₂O₄ ⇌ 2NO₂ and for aA + bB ⇌ cC + dD
  *   kmanip - stepped algebra: add equations → multiply K's; reverse an equation → 1/K
+ *   kpure  - stepped algebra: solids and pure liquids are left out of K; gases and (aq) stay in
  *   equation - big equation for example cards
  * Pictures that would give away a prediction (beaker heat arrows) stay grey with "?" until revealed.
  */
@@ -38,10 +39,8 @@
     var w = cw / k, h = ch / k;
     var ctx = canvas.getContext('2d');
     ctx.setTransform(dpr * k, 0, 0, dpr * k, 0, 0);
-    // Studio tray, as in the vessel
+    // Plain white tray, as in the vessel (no dot grid: repo rule)
     ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = 'rgba(29,36,51,0.10)';
-    for (var x = 11; x < w; x += 22) for (var y = 11; y < h; y += 22) ctx.fillRect(x, y, 1.4, 1.4);
     return { ctx: ctx, w: w, h: h };
   }
 
@@ -1718,6 +1717,63 @@
     return KMANIP_DESC[step];
   }
 
+  /* ---------- kpure: solids and pure liquids are left out of K ----------
+     0 CaCO₃(s) ⇌ CaO(s) + CO₂(g) and K written by mass action as it is · 1 the two solids are struck,
+     leaving K = [CO₂] (flies out of [CO₂]) · 2 NH₃(aq) + H₂O(l): solvent water struck · 3 2H₂ + O₂ ⇌ 2H₂O(g):
+     water as a gas stays in · 4 AgCl(s) ⇌ Ag⁺ + Cl⁻: K = [Ag⁺][Cl⁻] (Ksp later), with the in / out summary. */
+  function kpureRows(step) {
+    var sq = function (id) { return tk(id, '2', { sup: 1 }); };
+    if (step <= 1) {
+      var S = step === 1 ? 1 : 0;
+      return [
+        { y: 40, items: [tk('a', 'CaCO₃(s)'), { arrows: 'e' }, tk('b', 'CaO(s)'), tk('p', ' + '), tk('c', 'CO₂(g)')] },
+        { y: 124, items: [tk('k', 'K = '), { frac: 'f', num: [tk('kb', '[CaO]', { from: 'b', strike: S }), tk('kc', '[CO₂]', { from: 'c' })], den: [tk('ka', '[CaCO₃]', { from: 'a', strike: S })] }] }
+      ].concat(step === 0 ? [
+        { y: 214, items: [cap('c0a', 'the law of mass action, as it is')] },
+        { y: 236, items: [cap('c0b', 'but two of these are pure solids')] }
+      ] : [
+        { y: 204, s: 1.25, items: [tk('k2', 'K = '), tk('k2c', '[CO₂]', { from: 'kc' })] },
+        { y: 262, items: [cap('c1a', 'a pure solid\'s concentration never changes, so it is left out')] },
+        { y: 284, items: [cap('c1b', 'only the gas is left')] }
+      ]);
+    }
+    if (step === 2) return [
+      { y: 40, s: 0.92, items: [tk('na', 'NH₃(aq)'), tk('np', ' + '), tk('nw', 'H₂O(l)'), { arrows: 'ne' }, tk('nb', 'NH₄⁺(aq)'), tk('nq', ' + '), tk('nc', 'OH⁻(aq)')] },
+      { y: 120, items: [tk('k', 'K = '), { frac: 'f', num: [tk('kb', '[NH₄⁺]', { from: 'nb' }), tk('kc', '[OH⁻]', { from: 'nc' })], den: [tk('ka', '[NH₃]', { from: 'na' }), tk('kw', '[H₂O]', { from: 'nw', strike: 1 })] }] },
+      { y: 204, s: 1.15, items: [tk('k2', 'K = '), { frac: 'f2', num: [tk('k2b', '[NH₄⁺]', { from: 'kb' }), tk('k2c', '[OH⁻]', { from: 'kc' })], den: [tk('k2a', '[NH₃]', { from: 'ka' })] }] },
+      { y: 270, items: [cap('c2a', 'water is the solvent, a pure liquid, so it is left out')] },
+      { y: 292, items: [cap('c2b', 'about 55.5 mol/L, and the reaction barely changes it')] }
+    ];
+    if (step === 3) return [
+      { y: 40, items: [tk('ha', '2H₂(g)'), tk('hp', ' + '), tk('hb', 'O₂(g)'), { arrows: 'he' }, tk('hw', '2H₂O(g)')] },
+      { y: 136, s: 1.15, items: [tk('k', 'K = '), { frac: 'f', num: [tk('kw', '[H₂O]', { from: 'hw' }), sq('kw2')], den: [tk('ka', '[H₂]', { from: 'ha' }), sq('ka2'), tk('kb', '[O₂]', { from: 'hb' })] }] },
+      { y: 222, items: [cap('c3a', 'here water is a gas, so it stays in K')] },
+      { y: 262, items: [tk('l1', 'H₂O(l): left out', { px: 15, c: DIM }), { gap: 1.6 }, tk('l2', 'H₂O(g): stays in', { px: 15 })] },
+      { y: 292, items: [cap('c3b', 'check the phase, not the formula')] }
+    ];
+    return [
+      { y: 40, items: [tk('sa', 'AgCl(s)'), { arrows: 'se' }, tk('sb', 'Ag⁺(aq)'), tk('sp', ' + '), tk('sc', 'Cl⁻(aq)')] },
+      { y: 112, s: 1.2, items: [tk('k', 'K = '), tk('kb', '[Ag⁺]', { from: 'sb' }), tk('kc', '[Cl⁻]', { from: 'sc' })] },
+      { y: 156, items: [cap('c4a', 'the solid is left out: only the ions are left')] },
+      { y: 178, items: [cap('c4b', 'we will see this K again as K'), cap('c4s', 'sp', { px: 9, sub: 1 }), cap('c4c', ' in the solubility unit')] },
+      { y: 236, items: [tk('in', 'in K:  (g)  and  (aq)', { px: 17 })] },
+      { y: 270, items: [tk('out', 'left out:  (s)  and  (l)', { px: 17, c: DIM })] }
+    ];
+  }
+  var KPURE_DESC = [
+    'CaCO₃(s) ⇌ CaO(s) + CO₂(g). Written by the law of mass action as it is, K = [CaO][CO₂] over [CaCO₃]. Two of these are pure solids.',
+    '[CaO] and [CaCO₃] are crossed out: a pure solid\'s concentration never changes, so it is left out. K = [CO₂].',
+    'NH₃(aq) + H₂O(l) ⇌ NH₄⁺(aq) + OH⁻(aq). Water is the solvent, a pure liquid, so [H₂O] is crossed out. K = [NH₄⁺][OH⁻] over [NH₃].',
+    '2H₂(g) + O₂(g) ⇌ 2H₂O(g). Here water is a gas, so it stays in: K = [H₂O] squared over [H₂] squared [O₂]. H₂O(l) is left out, H₂O(g) stays in.',
+    'AgCl(s) ⇌ Ag⁺(aq) + Cl⁻(aq). The solid is left out: K = [Ag⁺][Cl⁻]. In K: gases and aqueous species. Left out: solids and pure liquids.'
+  ];
+  function kpure(canvas, o) {
+    var step = o.step || 0, from = o.from == null ? step : o.from;
+    var to = kpureRows(step);
+    algDraw(canvas, from === step ? to : kpureRows(from), to, 18, o);
+    return KPURE_DESC[step];
+  }
+
   /* ---------- equation card ---------- */
   function equation(canvas, o) {
     var f = fit(canvas), ctx = f.ctx, w = f.w, h = f.h;
@@ -1727,7 +1783,7 @@
     if (o.note) label(ctx, o.note, w / 2, h * 0.72, { size: 11 });
   }
 
-  global.EqPictures = { energy: energy, beaker: beaker, spread: spread, coldpack: coldpack, favour: favour, gibbs4: gibbs4, paths: paths, equation: equation, intro4: intro4, kpuzzle: kpuzzle, kderive: kderive, kmulti: kmulti, kmass: kmass, kmanip: kmanip };
+  global.EqPictures = { energy: energy, beaker: beaker, spread: spread, coldpack: coldpack, favour: favour, gibbs4: gibbs4, paths: paths, equation: equation, intro4: intro4, kpuzzle: kpuzzle, kderive: kderive, kmulti: kmulti, kmass: kmass, kmanip: kmanip, kpure: kpure };
   // Shared drawing helpers for the live scenes (eq-scenes.js)
   global.EqPictures.util = { fit: fit, ball: ball, label: label, roundBox: roundBox, arrow: arrow, mix: mix, rng: rng, smooth: smooth,
     INK: INK, DIM: DIM, FAINT: FAINT, EMBER: EMBER, TIDE: TIDE, MONO: MONO, BODY: BODY };

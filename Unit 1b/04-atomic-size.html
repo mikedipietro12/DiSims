@@ -818,6 +818,10 @@ body.is-e-dragging .atom-svg .e-grabbable{cursor:grabbing;}
   .briefing h1,.briefing h2,.briefing li,.debrief h2,.debrief li,.debrief-kicker,.briefing-cc .cc-name,.debrief-cc .cc-name,.debrief-tag{color:#000;}
   #stuckBtn,.module-footer{display:none;}
 }
+/* Step / act labels sit under the title as a plain progress note (no eyebrow above headings: AGENTS.md) */
+.task-kicker,.mod-tag{text-transform:none;letter-spacing:normal;font-weight:500;font-size:0.9rem;color:var(--dim);margin:0.3rem 0 0.7rem;}
+.task-kicker::before,.mod-tag::before{display:none;}
+.task-kicker .step{letter-spacing:normal;}
 </style>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
@@ -832,8 +836,7 @@ body.is-e-dragging .atom-svg .e-grabbable{cursor:grabbing;}
 
   <!-- Briefing -->
   <section class="briefing" id="briefing" aria-labelledby="briefingTitle">
-    <div class="briefing-kicker"><span>Before you begin</span></div>
-    <h1 id="briefingTitle">Atomic Size</h1>
+    <h1 id="briefingTitle">Before you begin: Atomic Size</h1>
     <p class="briefing-lead">Read what this module is aiming for. Then open the instrument and work through it.</p>
     <div class="briefing-columns">
       <div class="briefing-block">
@@ -852,8 +855,8 @@ body.is-e-dragging .atom-svg .e-grabbable{cursor:grabbing;}
 
   <div id="moduleStage" hidden>
   <header>
-    <div class="mod-tag" id="actTag">Act 1</div>
     <h1 class="task-title" id="actTitle">Atomic radius</h1>
+    <div class="mod-tag" id="actTag">Act 1</div>
     <p class="framing" id="actFrame" hidden></p>
   </header>
 

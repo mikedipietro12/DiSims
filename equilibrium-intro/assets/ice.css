@@ -1,0 +1,201 @@
+/* ICE Tables page: additions on top of suite.css (Toy Box) and eq-intro.css.
+   The worked-step, ICE-table and unit-analysis rules follow the Solubility Guide (solubility/assets/sol.css),
+   so a calculation looks the same in both units. */
+
+:root{
+  --ice-right:#1f8a5b; --ice-right-soft:#e3f6ec;
+  --ice-wrong:#c8233f; --ice-wrong-soft:#fde7eb;
+}
+
+/* ---------- layout: text on the left, a wider stage on the right ---------- */
+.ice-guide .guide-layout{grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr);}
+.ice-guide .guide-beat p{max-width:36rem;}
+.ice-stage{max-height:calc(100vh - 2rem);overflow:auto;}
+.ice-stage .guide-stage-head{align-items:center;}
+.ice-modes{display:flex;gap:0.4rem;}
+.ice-modes .btn{padding:0.3rem 0.8rem;font-size:0.9rem;min-height:0;}
+.ice-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:0.9rem;}
+.ice-left,.ice-right{display:flex;flex-direction:column;gap:0.8rem;min-width:0;}
+.ice-left:empty,.ice-right:empty{display:none;}
+
+/* ---------- problem card ---------- */
+.ice-card{border:2px solid var(--line-strong);border-radius:var(--radius);padding:0.8rem 0.95rem;background:var(--tray);line-height:1.5;}
+.ice-problem{background:#f6f7fd;border-left-width:6px;border-left-color:var(--accent);}
+.ice-problem.is-you{border-left-color:var(--eq-a,#e07a2e);background:#fff8f1;}
+.ice-hint{margin:0;font-weight:700;color:var(--ink);}
+.ice-howto{margin:0;font-size:0.9rem;color:var(--dim);}
+.ice-cap{margin:-0.3rem 0 0;font-family:var(--font-mono);font-size:0.72rem;color:var(--dim);}
+
+/* ---------- worked steps (as the Solubility Guide) ---------- */
+.ws-lines{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:max-content max-content minmax(0,1fr);
+  column-gap:0.5rem;row-gap:0.2rem;font-size:1.08rem;}
+.ws-line{display:grid;grid-template-columns:subgrid;grid-column:1 / -1;align-items:center;padding:0.4rem 0.7rem;border-radius:10px;}
+.ws-line[hidden]{display:none;}
+.ws-lhs{text-align:right;font-weight:700;white-space:nowrap;}
+.ws-eq{color:var(--dim);font-weight:700;}
+.ws-rhs{font-weight:700;font-variant-numeric:tabular-nums;}
+.ws-line.whole .ws-lhs{grid-column:1 / -1;text-align:left;white-space:normal;font-weight:400;line-height:1.45;}
+.ws-line.tbl .ws-tag{grid-column:1;justify-self:end;display:inline-grid;place-items:center;min-width:1.7rem;height:1.7rem;padding:0 0.3rem;
+  border:2px solid var(--line-strong);border-radius:7px;background:var(--accent-soft);font-weight:700;font-size:0.95rem;}
+.ws-line.tbl .ws-note{grid-column:2 / -1;margin:0;color:var(--ink-soft);font-size:1rem;}
+.ws-note{grid-column:3;font-size:0.92rem;color:var(--dim);margin-top:0.15rem;line-height:1.4;}
+.ws-line.whole .ws-note{grid-column:1 / -1;}
+.ws-line.is-current{background:var(--accent-soft);box-shadow:inset 4px 0 0 var(--accent);}
+.ws-line.is-current .ws-note{color:var(--ink-soft);}
+.ws-bar{display:flex;align-items:center;gap:0.6rem;margin-top:0.7rem;flex-wrap:wrap;}
+.ws-bar .btn.ws-next{padding:0.3rem 0.8rem;font-size:0.85rem;min-height:0;box-shadow:0 2px 0 var(--ink);}
+.ws-bar .btn.ws-next:active{transform:translateY(2px);box-shadow:0 0 0 var(--ink);}
+.ws-bar .btn-sm{padding:0.25rem 0.65rem;font-size:0.82rem;min-height:0;}
+.ws-count{margin-left:auto;font-family:var(--font-mono);font-size:0.85rem;color:var(--dim);}
+.ws-lines.is-empty::before{content:"Each step appears here as we go.";grid-column:1 / -1;color:var(--dim);font-size:0.95rem;padding:0.4rem 0.7rem;}
+
+/* unit analysis: stacked fractions, cancelled units struck through (SolUI.ua) */
+.ua-frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0.15em 0.1em;line-height:1.25;font-size:0.9em;}
+.ua-num{padding:0 0.3em 0.12em;border-bottom:2px solid currentColor;white-space:nowrap;}
+.ua-den{padding:0.12em 0.3em 0;white-space:nowrap;}
+.ua-op{margin:0 0.1em;}
+.ua-step{white-space:nowrap;}
+.ua-x{text-decoration:line-through;text-decoration-color:var(--accent);text-decoration-thickness:2px;}
+
+/* ---------- ICE table ---------- */
+.ice-wrap{max-width:100%;overflow-x:auto;}
+.ice{border-collapse:collapse;font-weight:700;font-variant-numeric:tabular-nums;font-size:1.2rem;margin:0 auto;}
+.ice th,.ice td{padding:0.4rem 0.7rem;text-align:center;border-bottom:1.5px solid var(--line);white-space:nowrap;}
+.ice thead th{border-bottom:2px solid var(--ink);}
+.ice th.ice-unit{font-family:var(--font-mono);font-size:0.75rem;font-weight:400;color:var(--dim);text-align:left;padding-left:0.4rem;}
+.ice .ice-key{text-align:left;padding-left:0.6rem;color:var(--ink);}
+.ice .ice-alt{display:none;margin-left:0.5rem;font-family:var(--font-mono);font-size:0.72em;color:var(--accent);}
+.ice-wrap.show-alt .ice-alt{display:inline;}
+.ice .ice-op{padding:0.4rem 0.1rem;color:var(--dim);}
+.ice td.is-blank .ice-val{visibility:hidden;}
+.ice td.is-new{background:#fff1c7;}
+.ice tr.is-current>*{background:var(--accent-soft);}
+.ice tr.is-current>:first-child{box-shadow:inset 4px 0 0 var(--accent);}
+.ice .is-col{background:var(--accent-soft);}
+@media (prefers-reduced-motion:no-preference){ .ice td.is-new .ice-val{animation:ice-pop 0.35s ease-out;} }
+@keyframes ice-pop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* Your turn: each cell is a text box until it is checked, shown, or filled by the answer */
+.ice-input td.ice-cell{padding:0.25rem 0.3rem;position:relative;}
+.ice-n4 .ice-in{width:5.6rem;}
+.ice-input td.ice-cell .ice-val{display:none;}
+.ice-input td.ice-cell.is-revealed .ice-val{display:inline;}
+.ice-in{width:6.6rem;max-width:100%;font:inherit;font-size:1rem;font-weight:700;text-align:center;padding:0.35rem 0.3rem;
+  border:2px solid var(--line-strong);border-radius:8px;background:#ffffff;color:var(--ink);}
+.ice-in:focus{outline:3px solid var(--accent);outline-offset:1px;}
+.ice-input td.is-right .ice-in{border-color:var(--ice-right);background:var(--ice-right-soft);}
+.ice-input td.is-wrong .ice-in{border-color:var(--ice-wrong);background:var(--ice-wrong-soft);}
+.ice-input td.is-revealed{color:var(--ink);}
+.ice-input td.is-revealed.is-right{color:var(--ice-right);}
+.ice-input td.is-given{color:var(--dim);}
+.ice-show{display:block;margin:0.2rem auto 0;padding:0.05rem 0.5rem;font:inherit;font-size:0.72rem;font-weight:700;color:var(--ice-wrong);
+  background:none;border:1.5px solid var(--ice-wrong);border-radius:999px;cursor:pointer;}
+.ice-show:hover{background:var(--ice-wrong-soft);}
+
+/* answer boxes under the table */
+.ice-work{display:flex;flex-direction:column;gap:0.8rem;}
+.ice-boxes{display:flex;flex-wrap:wrap;gap:0.5rem 1.2rem;justify-content:center;}
+.ice-box{display:inline-flex;align-items:center;gap:0.4rem;font-weight:700;padding:0.2rem 0.4rem;border-radius:10px;}
+.ice-box-eq{color:var(--dim);}
+.ice-box-unit{font-family:var(--font-mono);font-size:0.8rem;font-weight:400;color:var(--dim);}
+.ice-box-ans{color:var(--ice-right);margin-left:0.3rem;}
+.ice-box.is-right .ice-in{border-color:var(--ice-right);background:var(--ice-right-soft);}
+.ice-box.is-wrong .ice-in{border-color:var(--ice-wrong);background:var(--ice-wrong-soft);}
+.ice-bar{display:flex;flex-wrap:wrap;gap:0.55rem;align-items:center;justify-content:center;}
+.ice-bar .btn{padding:0.35rem 0.9rem;font-size:0.92rem;min-height:0;}
+.ice-bar .btn-sm{font-size:0.82rem;}
+.ice-feedback{margin:0;min-height:1.4em;text-align:center;font-weight:700;color:var(--ink-soft);}
+.ice-feedback.is-good{color:var(--ice-right);}
+.ice-feedback.is-bad{color:var(--ice-wrong);}
+.ice-answer{border-top:2px dashed var(--line);padding-top:0.7rem;}
+.ice-answer[hidden]{display:none;}
+.ice-answer-head{margin:0 0 0.3rem;font-weight:700;}
+
+/* Example D's Your turn: a Q box and a shift choice per mixture */
+.ice-parts{display:flex;flex-direction:column;gap:0.7rem;}
+.ice-part{border:1.5px solid var(--line);border-radius:var(--radius);padding:0.55rem 0.7rem;}
+.ice-part-lab{margin:0 0 0.35rem;}
+.ice-part .ice-box{margin-right:0.6rem;}
+.ice-shift{display:inline-flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.3rem;}
+.ice-shift .btn{padding:0.25rem 0.6rem;font-size:0.82rem;min-height:0;}
+.ice-shift .btn.is-right{background:var(--ice-right);border-color:var(--ice-right);color:#fff;}
+.ice-shift .btn.is-wrong{background:var(--ice-wrong);border-color:var(--ice-wrong);color:#fff;}
+.ice-shift .btn.is-answer{outline:3px solid var(--ice-right);outline-offset:2px;}
+
+/* ---------- bulb ---------- */
+.ice-bulb{display:flex;flex-direction:column;gap:0.35rem;min-height:0;}
+.ice-bulb-box{position:relative;width:100%;aspect-ratio:16 / 7;min-height:150px;max-height:230px;}
+.ice-bulb-box canvas{position:absolute;inset:0;display:block;}
+.ice-legend{display:flex;flex-wrap:wrap;gap:0.3rem 1rem;font-weight:700;font-size:0.95rem;}
+.ice-leg{display:inline-flex;align-items:center;gap:0.35rem;}
+.ice-leg i{width:0.8rem;height:0.8rem;border-radius:50%;border:1.5px solid var(--ink);display:inline-block;}
+.ice-leg b{font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+.ice-leg sub,.ice-tally sub{font-size:0.72em;line-height:0;}
+.ice-tally{margin:0;min-height:1.4em;font-size:0.92rem;color:var(--ink-soft);}
+
+/* ---------- Q vs K gauge ---------- */
+.ice-gauge{padding:0.2rem 0.4rem 0;}
+.ig-cap{margin:0 0 2.6rem;font-family:var(--font-mono);font-size:0.72rem;color:var(--dim);}
+.ig-track{position:relative;height:6px;margin:0 1.6rem 3.6rem;border-radius:3px;background:linear-gradient(90deg,#e3f1fb,#fdeccf);border:1.5px solid var(--line-strong);}
+.ig-tick{position:absolute;top:-4px;width:2px;height:12px;margin-left:-1px;background:var(--line-strong);}
+.ig-tick span{position:absolute;top:15px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:0.68rem;color:var(--dim);}
+/* K: a fixed post through the line, named underneath. Q: a pointer above the line that slides to K */
+.ig-k{position:absolute;top:-12px;width:3px;height:28px;margin-left:-1.5px;background:var(--ink);border-radius:2px;}
+.ig-k span{position:absolute;top:44px;left:50%;transform:translateX(-50%);white-space:nowrap;font-weight:700;font-size:0.92rem;}
+.ig-q{position:absolute;bottom:12px;width:0;height:0;margin-left:-8px;border-left:8px solid transparent;border-right:8px solid transparent;border-top:12px solid var(--accent);}
+.ig-q span{position:absolute;bottom:14px;left:0;transform:translateX(-50%);white-space:nowrap;font-weight:700;font-size:0.92rem;color:var(--accent);}
+.ig-q[hidden]{display:none;}
+@media (prefers-reduced-motion:no-preference){ .ig-q{transition:left 1.6s ease-in-out;} }
+.ig-status{margin:0;font-weight:700;text-align:center;min-height:1.4em;}
+
+/* ---------- Before we begin and the summary ---------- */
+.ice-static h2{font-size:clamp(1.4rem,2.4vw,2rem);margin:0 0 0.6rem;}
+.ice-brief-pic{position:relative;height:190px;}
+.ice-brief-pic svg.hub-anim{position:absolute;inset:0;width:100%;height:100%;}
+.ice-brief-text{display:none;}
+.ice-brief-text ul{margin:0;padding-left:1.2rem;line-height:1.6;}
+.ice-summary ol{margin:0;padding-left:1.4rem;display:flex;flex-direction:column;gap:0.45rem;line-height:1.45;}
+
+/* ---------- presentation view: text hidden, the stage fills the screen ---------- */
+body.learn-mode .ice-stage{max-height:none;bottom:0.75rem;overflow:hidden;display:flex;flex-direction:column;}
+body.learn-mode .ice-stage .guide-stage-head{display:flex;margin-bottom:0.5rem;}
+body.learn-mode .ice-stage .force-badge{font-size:1.05rem;}
+body.learn-mode .ice-grid{flex:1;min-height:0;grid-template-columns:minmax(0,0.9fr) minmax(0,1.25fr);gap:1.4rem;}
+body.learn-mode .ice-grid.one-col{grid-template-columns:minmax(0,1fr);}
+body.learn-mode .ice-left,body.learn-mode .ice-right{overflow:auto;overflow-anchor:none;min-height:0;padding-right:0.3rem;}
+/* the worked steps fill the right column: the list scrolls (newest line kept in view), the buttons stay put */
+body.learn-mode .ice-right>.ws{flex:1;min-height:0;display:flex;flex-direction:column;}
+body.learn-mode .ice-right>.ws>.ws-lines{flex:0 1 auto;min-height:0;overflow:auto;align-content:start;}
+body.learn-mode .ice-right>.ws>.ws-bar{flex:none;}
+body.learn-mode .ice-answer{flex:1;min-height:0;display:flex;flex-direction:column;}
+body.learn-mode .ice-answer .ws{flex:1;min-height:0;display:flex;flex-direction:column;}
+body.learn-mode .ice-answer .ws-lines{flex:0 1 auto;min-height:0;overflow:auto;align-content:start;}
+body.learn-mode .ice-left:empty+.ice-right{grid-column:1 / -1;}
+body.learn-mode .ice-problem{font-size:clamp(1.05rem,1.45vw,1.4rem);}
+body.learn-mode .ice-bulb{flex:1;}
+body.learn-mode .ice-bulb-box{aspect-ratio:auto;flex:1;min-height:180px;max-height:none;}
+body.learn-mode .ice{font-size:clamp(1.1rem,1.6vw,1.6rem);}
+body.learn-mode .ice.ice-n4{font-size:clamp(1rem,1.3vw,1.35rem);}
+body.learn-mode .ice.ice-n4 th,body.learn-mode .ice.ice-n4 td{padding-left:0.45rem;padding-right:0.45rem;}
+body.learn-mode .ice-grid.table-only .ice-left{justify-content:center;}
+body.learn-mode .ice-grid.table-only .ice{font-size:clamp(1.2rem,1.9vw,2rem);}
+body.learn-mode .ws-lines{font-size:clamp(1.1rem,1.45vw,1.45rem);}
+body.learn-mode .ws-note,body.learn-mode .ws-line.tbl .ws-note{font-size:clamp(0.95rem,1.15vw,1.2rem);}
+body.learn-mode .ice-in{font-size:clamp(1rem,1.3vw,1.3rem);width:7.5rem;}
+body.learn-mode .ice-static{height:100%;display:grid;align-content:center;}
+body.learn-mode .ice-static:not(.ice-summary){grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:2rem;align-items:center;}
+body.learn-mode .ice-brief-pic{height:min(50vh,420px);}
+body.learn-mode .ice-brief-text{display:block;font-size:clamp(1.05rem,1.5vw,1.45rem);}
+body.learn-mode .ice-summary{max-width:58rem;margin:0 auto;font-size:clamp(1.1rem,1.7vw,1.6rem);}
+
+/* ---------- narrow screens: the stage sits above the text ---------- */
+@media (max-width:860px){
+  .ice-guide .guide-layout{grid-template-columns:minmax(0,1fr);}
+  .ice-stage{max-height:none;overflow:visible;}
+  .ws-lines{font-size:1rem;column-gap:0.4rem;}
+  .ws-line{padding:0.35rem 0.5rem;}
+  .ws-rhs{overflow-wrap:anywhere;}
+  .ice{font-size:1.05rem;}
+  .ice th,.ice td{padding:0.35rem 0.4rem;}
+  .ice-in{width:5.4rem;font-size:0.95rem;}
+}
