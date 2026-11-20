@@ -16,7 +16,11 @@
 .ice-stage .guide-stage-head{align-items:center;flex:none;}
 .ice-modes{display:flex;gap:0.4rem;}
 .ice-head-end{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem 0.7rem;margin-left:auto;}
-.ice-full-toggle[hidden],.ice-modes[hidden]{display:none;}
+.ice-modes[hidden]{display:none;}
+/* the full-explanation checkbox: small, at the bottom left of the footer */
+.ice-full{display:inline-flex;align-items:center;gap:0.35rem;font-size:0.8rem;color:var(--dim);cursor:pointer;user-select:none;white-space:nowrap;}
+.ice-full input{width:0.95rem;height:0.95rem;margin:0;accent-color:var(--accent);cursor:pointer;}
+.ice-full[hidden]{display:none;}
 /* Full explanation: notes, captions and how-to lines (.ws-full) show only when the switch is on;
    the brief versions (.ws-brief) show when it is off, the default */
 .ice-stage:not(.show-full) .ws-full{display:none !important;}

@@ -4,7 +4,7 @@
    then the next section. Content lives in ice-data.js; components in ice-ui.js.
    Stage layout: the problem across the top; the ICE table on the left with any picture under it; the working on
    the right. The step buttons sit in a footer at the bottom right that never moves (Your turn's Check buttons on its left).
-   Full explanation: off by default (the teacher talks through each step); the switch in the stage head shows every
+   Full explanation: off by default (the teacher talks through each step); the checkbox at the bottom left shows every
    note for students working at home. Remembered in this browser. */
 (function () {
   'use strict';
@@ -12,7 +12,7 @@
   const U = window.IceUI, D = window.IceData.SECTIONS;
   const beats = Array.from(document.querySelectorAll('.guide-beat'));
   const top = $('top'), left = $('left'), right = $('right'), grid = $('grid'), modes = $('modes');
-  const footL = $('footL'), footR = $('footR'), stage = $('stage'), fullToggle = $('fullToggle');
+  const footL = $('footL'), footR = $('footR'), stage = $('stage'), fullToggle = $('fullToggle'), fullWrap = $('fullWrap');
   const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
   let active = null, cur = null;
 
@@ -39,7 +39,7 @@
     const sec = D[id];
     cur = { id, sec, mode };
     modes.hidden = !(sec && sec.you);
-    fullToggle.hidden = !sec;
+    fullWrap.hidden = !sec;
     modes.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
     grid.className = 'ice-grid';
     if (!sec) return loadStatic(id);
@@ -216,10 +216,10 @@
   const FULL_KEY = 'ice-guide-full';
   function setFull(on) {
     stage.classList.toggle('show-full', on);
-    fullToggle.setAttribute('aria-pressed', String(on));
+    fullToggle.checked = on;
     try { localStorage.setItem(FULL_KEY, on ? '1' : '0'); } catch (e) { /* private window */ }
   }
-  fullToggle.addEventListener('click', () => setFull(!stage.classList.contains('show-full')));
+  fullToggle.addEventListener('change', () => setFull(fullToggle.checked));
 
   // ---------- presentation view ----------
   // ‹ › / arrow keys / clicker: the next worked line, then Your turn, then its answer line by line, then the next section.
