@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atomic Structure Simulations | Chemistry 11 Unit 1b</title>
+<meta name="description" content="Atomic structure simulation suite for Chemistry 11: isotopes, Coulomb&#x27;s law, ionization energy, the shell model, PES, electron configurations and electronegativity.">
+<meta name="author" content="M DiPietro">
+<link rel="canonical" href="https://atomicsimulations.ca/chemistry-11h/atomic-structure/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Atomic Simulations">
+<meta property="og:title" content="Atomic Structure Simulations | Chemistry 11 Unit 1b">
+<meta property="og:description" content="Atomic structure simulation suite for Chemistry 11: isotopes, Coulomb&#x27;s law, ionization energy, the shell model, PES, electron configurations and electronegativity.">
+<meta property="og:url" content="https://atomicsimulations.ca/chemistry-11h/atomic-structure/">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Atomic Structure Simulations | Chemistry 11 Unit 1b", "url": "https://atomicsimulations.ca/chemistry-11h/atomic-structure/", "description": "Atomic structure simulation suite for Chemistry 11: isotopes, Coulomb's law, ionization energy, the shell model, PES, electron configurations and electronegativity.", "inLanguage": "en", "isAccessibleForFree": true, "learningResourceType": "Simulation", "author": {"@type": "Person", "name": "M DiPietro"}, "isPartOf": {"@type": "WebSite", "name": "Atomic Simulations", "url": "https://atomicsimulations.ca/"}, "educationalLevel": "Grade 11", "about": "Chemistry"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#e6e1cf;
+  --paper-2:#d8d2bc;
+  --paper-3:#c9c2a8;
+  --void:#050505;
+  --void-2:#0c0c0c;
+  --panel:#efe9d4;
+  --panel-edge:#1a1810;
+  --grid:#cfc8ae;
+  --phosphor:#5c6b28;
+  --ember:#a85a32;
+  --signal:#1a6aa3;
+  --ink:#16140e;
+  --ink-soft:#33301f;
+  --dim:#55513f;
+  --faint:#6f6b59;
+  --proton:#a85a32;
+  --neutron:#7e8c45;
+  --electron:#c4a35a;
+  --success:#4f5a28;
+  --error:#a85a32;
+  --neon:#c4a35a;
+  --olive:#7e8c45;
+  --olive-deep:#4f5a28;
+  --mustard:#c4a35a;
+  --plate:#050505;
+  --plate-ink:#e8e6d9;
+
+  --font-display:'Archivo Black',Helvetica,sans-serif;
+  --font-body:Barlow,Helvetica,Univers,'Helvetica Neue',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+
+  /* micro-label scale — mono, uppercase, tracked */
+  --label-xs:0.72rem;
+  --label-sm:0.78rem;
+  --label-md:0.85rem;
+  --track-wide:0.13em;
+  --track-tight:0.08em;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;-webkit-text-size-adjust:100%;}
+body{
+  background-color:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:1.0625rem;
+  min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+/* every mono micro-label shares one recipe */
+.mono-label,
+.back-link,.unit-tag,.progress,.mod-num,.mod-go,.colophon{
+  font-family:var(--font-mono);
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"zero" 1;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  z-index:9999;
+  pointer-events:none;
+  opacity:0.14;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:256px 256px;
+}
+
+.hub{max-width:920px;margin:0 auto;padding:1.35rem 1.35rem 3.5rem;position:relative;z-index:1;}
+
+.top-nav{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+  border-bottom:1px solid var(--ink);padding-bottom:0.7rem;margin-bottom:2.1rem;
+}
+.back-link{
+  font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color 0.2s;
+}
+.back-link:hover{color:var(--olive-deep);}
+.back-link:focus-visible{outline:2px solid var(--olive-deep);outline-offset:3px;}
+.progress{
+  font-size:var(--label-xs);font-weight:600;letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--ink);
+}
+.progress .count{color:var(--olive-deep);}
+
+/* ── header ───────────────────────────────────────── */
+.hub-header{margin-bottom:2.2rem;}
+.unit-tag{
+  display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--olive-deep);margin-bottom:0.7rem;
+}
+/* anchor bar ties the eyebrow to the headline below it */
+.unit-tag::before{
+  content:'';
+  width:1.6rem;height:0.28rem;
+  background:var(--olive-deep);
+  flex:none;
+  transform:translateY(-0.12em);
+}
+.hub-header h1{
+  font-family:var(--font-display);
+  font-size:clamp(2.15rem,5.4vw,3.15rem);
+  font-weight:400;
+  letter-spacing:-0.025em;
+  line-height:0.98;
+  color:var(--ink);
+  margin-bottom:0.7rem;
+}
+.hub-header .subtitle{
+  font-size:1.15rem;
+  line-height:1.5;
+  color:var(--ink-soft);
+  max-width:52ch;
+  text-wrap:pretty;
+}
+
+/* ── the ordered path ─────────────────────────────── */
+.path{
+  list-style:none;
+  position:relative;
+  border-top:1px solid var(--ink);
+  border-bottom:1px solid var(--ink);
+}
+/* vertical connector rule down the gutter */
+.path::before{
+  content:'';
+  position:absolute;
+  left:6px;top:0;bottom:0;
+  width:1px;
+  background:var(--ink);
+  opacity:0.45;
+}
+.path li{position:relative;}
+.path li + li{border-top:1px solid var(--ink);}
+
+/* node marker on the path — square, printed, never glowing */
+.path li::before{
+  content:'';
+  position:absolute;
+  left:0;top:50%;
+  transform:translateY(-50%);
+  width:13px;height:13px;
+  background:var(--paper);
+  border:1px solid var(--ink);
+  z-index:1;
+  transition:background 0.25s;
+}
+.path li.visited::before{background:var(--olive-deep);}
+
+.path li a{
+  display:block;
+  text-decoration:none;
+  color:inherit;
+  padding:1.15rem 1.1rem 1.2rem 2.35rem;
+  transition:background 0.15s;
+}
+.path li a:hover{background:rgba(126,140,69,0.16);}
+.path li a:focus-visible{outline:2px solid var(--olive-deep);outline-offset:-2px;}
+
+.mod-head{display:flex;align-items:baseline;justify-content:flex-end;gap:0.8rem;}
+.mod-num{
+  display:block;
+  font-size:var(--label-xs);font-weight:600;letter-spacing:var(--track-wide);
+  text-transform:uppercase;color:var(--dim);margin-bottom:0.3rem;
+}
+.path li.visited .mod-num{color:var(--olive-deep);}
+.mod-go{
+  font-size:var(--label-xs);font-weight:600;color:var(--faint);
+  opacity:0;transition:opacity 0.15s,color 0.15s;flex:none;
+}
+.path li a:hover .mod-go,
+.path li a:focus-visible .mod-go{opacity:1;color:var(--olive-deep);}
+.mod-title{
+  display:block;
+  font-family:var(--font-display);
+  font-size:1.25rem;
+  font-weight:400;
+  letter-spacing:-0.02em;
+  line-height:1.15;
+  color:var(--ink);
+  margin-bottom:0.3rem;
+}
+.mod-teaser{
+  display:block;
+  font-size:1rem;
+  line-height:1.5;
+  color:var(--ink-soft);
+  max-width:60ch;
+  text-wrap:pretty;
+}
+
+.colophon{
+  margin-top:1.5rem;
+  font-size:var(--label-xs);font-weight:500;letter-spacing:var(--track-tight);
+  text-transform:uppercase;color:var(--faint);
+}
+
+@media(max-width:560px){
+  .hub{padding:1.1rem 1rem 3rem;}
+  .path li a{padding:1rem 0.35rem 1.05rem 2.1rem;}
+  .mod-go{display:none;}
+}
+@media(prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important;}
+}
+@media print{
+  body::before{display:none;}
+  body{background:#fff;color:#000;}
+  .path li a,.hub-header h1,.mod-title,.mod-teaser{color:#000;}
+  .back-link,.mod-go{display:none;}
+}
+</style>
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+</head>
+<body>
+<div class="hub">
+  <div class="top-nav">
+    <a href="../" class="back-link">← Chemistry 11H</a>
+    <div class="progress" id="progress">Visited <span class="count" id="progressCount">0</span> / 9</div>
+  </div>
+
+  <header class="hub-header">
+    <h1>Atomic Structure</h1>
+    <p class="subtitle">Nine instruments. Build the atom from what you measure.</p>
+  </header>
+
+  <ol class="path" id="modulePath">
+    <li data-module="01">
+      <a href="01-nucleus-isotopes.html">
+        <div class="mod-head">
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Nucleus &amp; Isotopes</span>
+        <span class="mod-teaser">The core building blocks.</span>
+      </a>
+    </li>
+    <li data-module="02">
+      <a href="02-coulomb-ionization.html">
+        <div class="mod-head">
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Coulomb &amp; Ionization</span>
+        <span class="mod-teaser">Energy of attraction.</span>
+      </a>
+    </li>
+    <li data-module="03">
+      <a href="03-shell-core-charge.html">
+        <div class="mod-head">
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Shell Model &amp; Core Charge</span>
+        <span class="mod-teaser">Using IE to find patterns.</span>
+      </a>
+    </li>
+    <li data-module="04">
+      <a href="04-atomic-size.html">
+        <div class="mod-head">
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Atomic Size</span>
+        <span class="mod-teaser">Relative size.</span>
+      </a>
+    </li>
+    <li data-module="05">
+      <a href="05-light-energy.html">
+        <div class="mod-head">
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Light &amp; Energy</span>
+        <span class="mod-teaser">Electrons…Particles &amp; Waves?</span>
+      </a>
+    </li>
+    <li data-module="06">
+      <a href="06-photoelectron-spectroscopy.html">
+        <div class="mod-head">
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Photoelectron Spectroscopy</span>
+        <span class="mod-teaser">The tools that draw the atom's fingerprint.</span>
+      </a>
+    </li>
+    <li data-module="07">
+      <a href="07-electron-configurations.html">
+        <div class="mod-head">
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Electron Configurations</span>
+        <span class="mod-teaser">PES peaks → written configurations.</span>
+      </a>
+    </li>
+    <li data-module="08">
+      <a href="08-electron-diagrams-spin.html">
+        <div class="mod-head">
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Electron Configuration Diagrams, Quantum Numbers, and Spin</span>
+        <span class="mod-teaser">Orbital boxes · Aufbau · Hund · Pauli.</span>
+      </a>
+    </li>
+    <li data-module="09">
+      <a href="09-electron-affinity-electronegativity.html">
+        <div class="mod-head">
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Electron Affinity &amp; Electronegativity</span>
+        <span class="mod-teaser">Atomic behaviors.</span>
+      </a>
+    </li>
+    <li data-module="10">
+      <a href="10-summary.html">
+        <div class="mod-head">
+          <span class="mod-go" aria-hidden="true">Open →</span>
+        </div>
+        <span class="mod-title">Summary</span>
+      </a>
+    </li>
+  </ol>
+
+  <p class="colophon">Worked in order — 06 · 07 · 08 build on each other. Revisit any of them freely.</p>
+</div>
+
+<script>
+(function(){
+  const KEY = 'unit1b_visited';
+  let visited = {};
+  try { visited = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){}
+
+  const items = document.querySelectorAll('#modulePath li');
+  const countEl = document.getElementById('progressCount');
+
+  function paint(){
+    let n = 0;
+    items.forEach(li => {
+      if(visited[li.dataset.module]){ li.classList.add('visited'); n++; }
+    });
+    countEl.textContent = n;
+  }
+
+  items.forEach(li => {
+    li.querySelector('a').addEventListener('click', () => {
+      visited[li.dataset.module] = true;
+      try { localStorage.setItem(KEY, JSON.stringify(visited)); } catch(e){}
+    });
+  });
+
+  paint();
+})();
+</script>
+</body>
+</html>

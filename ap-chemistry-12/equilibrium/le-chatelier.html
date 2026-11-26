@@ -1,0 +1,4237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Le Châtelier's Principle Equilibrium Simulation | AP Chemistry</title>
+  <meta name="description" content="Le Châtelier&#x27;s principle simulation. Heat, squeeze or add gas to a sealed vessel at equilibrium and watch Q settle back toward K for four reaction systems.">
+  <meta name="author" content="M DiPietro">
+  <link rel="canonical" href="https://atomicsimulations.ca/ap-chemistry-12/equilibrium/le-chatelier.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Atomic Simulations">
+  <meta property="og:title" content="Le Châtelier&#x27;s Principle Equilibrium Simulation | AP Chemistry">
+  <meta property="og:description" content="Le Châtelier&#x27;s principle simulation. Heat, squeeze or add gas to a sealed vessel at equilibrium and watch Q settle back toward K for four reaction systems.">
+  <meta property="og:url" content="https://atomicsimulations.ca/ap-chemistry-12/equilibrium/le-chatelier.html">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Le Châtelier's Principle Equilibrium Simulation | AP Chemistry", "url": "https://atomicsimulations.ca/ap-chemistry-12/equilibrium/le-chatelier.html", "description": "Le Châtelier's principle simulation. Heat, squeeze or add gas to a sealed vessel at equilibrium and watch Q settle back toward K for four reaction systems.", "inLanguage": "en", "isAccessibleForFree": true, "learningResourceType": "Simulation", "author": {"@type": "Person", "name": "M DiPietro"}, "isPartOf": {"@type": "WebSite", "name": "Atomic Simulations", "url": "https://atomicsimulations.ca/"}, "educationalLevel": "Grade 12", "about": "Chemistry"}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/suite.css?v=11">
+  <style>
+/* Equilibrium page: borrows the IMF "Toy Box" suite (sealed vessel + gauges) and adds
+   its own range fields, chart legend and K card. Species colours match chart lines. */
+:root{
+  --chem-no2:#9a5b2e;
+  --chem-nh3:#24835a;
+  --chem-i2:#7a3fc4;
+  --chem-pb:#3d6fb6;
+  --chem-pbi2:#a07a00;
+}
+.chemNO2{color:var(--chem-no2);}
+.chemN2O4{color:var(--ink);}
+.chemN2{color:var(--accent);}
+.chemH2{color:var(--dim);}
+.chemNH3{color:var(--chem-nh3);}
+.chemI2{color:var(--chem-i2);}
+.chemHI{color:var(--ink);}
+.chemPb{color:var(--chem-pb);}
+.chemI{color:var(--chem-i2);}
+.chemPbI2{color:var(--chem-pbi2);}
+
+.eq-controls{flex-wrap:wrap;gap:0.75rem 0.8rem;}
+.eq-controls .field{min-width:0;}
+.eq-controls select{font-size:0.88rem;padding:0.5rem 0.6rem;min-width:14.5rem;}
+.eq-range{min-width:8.5rem;flex:1 1 8.5rem;max-width:15rem;}
+.eq-range output{color:var(--ink);}
+.eq-range input[type="range"]{width:100%;accent-color:var(--ink);height:2.2rem;}
+.eq-range input[type="range"]:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
+.eq-range-ends{
+  display:flex;justify-content:space-between;
+  font-family:var(--font-mono);font-size:0.7rem;color:var(--dim);margin-top:-0.3rem;
+}
+.eq-controls .btn{padding:0.55rem 0.75rem;font-size:0.88rem;}
+.eq-controls .btn-row{gap:0.45rem;}
+
+.eq-wrap{max-width:1320px;padding-top:1rem;}
+.eq-wrap .top-nav{margin-bottom:0.8rem;padding-bottom:0.6rem;}
+.eq-wrap .sandbox-layout{gap:0.85rem;}
+.eq-wrap .sandbox-lead h1{font-size:clamp(1.9rem,3.4vw,2.5rem);margin:0 0 0.3rem;}
+.eq-wrap .sandbox-lead p{max-width:none;}
+.eq-wrap .sandbox-lead .lead-intro{font-size:0.92rem;margin-top:0.25rem;}
+.eq-wrap .sandbox-lead .lead-intro a{color:var(--accent);font-weight:700;}
+
+/* Slim gauge strip above the stage */
+.eq-gauges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.75rem;}
+.gauge.mini{padding:0.45rem 0.8rem 0.55rem;display:flex;flex-direction:column;justify-content:center;}
+.gauge.mini .gauge-label{font-size:0.66rem;margin-bottom:0.1rem;}
+.gauge.mini .gauge-read{font-size:1.4rem;}
+.gauge.mini .gauge-read small{font-size:0.8rem;}
+.gauge.mini .gauge-sub{font-size:0.75rem;min-height:0;}
+.mini-body{display:flex;align-items:baseline;gap:0.3rem 0.7rem;flex-wrap:wrap;}
+.mini-body.pres{align-items:center;flex-wrap:nowrap;}
+.gauge.mini .thermo{height:6px;margin-top:0.35rem;}
+.dial.dial-mini{width:68px;max-width:none;margin:0;flex:none;}
+.dial-mini text{display:none;}
+.count-list{display:flex;flex-wrap:wrap;gap:0.2rem 1.4rem;}
+.count-row{
+  display:flex;gap:0.6rem;align-items:baseline;
+  font-family:var(--font-mono);font-weight:700;font-size:1.1rem;font-variant-numeric:tabular-nums;
+}
+.count-row .val{color:var(--ink);}
+
+/* Stage beside the graph and K card */
+.eq-main{display:grid;grid-template-columns:minmax(0,1fr) 24rem;gap:1rem;align-items:stretch;}
+/* Stage height follows the window so the whole vessel fits on screen; it also stretches
+   to match the side column. The canvas fills it (resize() tracks its size). */
+.eq-main .heat-stage{position:relative;min-height:clamp(380px,calc(100vh - 350px),660px);}
+.eq-main .heat-stage canvas{position:absolute;inset:0;height:100%;}
+.eq-side{display:flex;flex-direction:column;gap:1rem;min-width:0;}
+.curve-head{
+  display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;
+  gap:0.3rem 1rem;margin-bottom:0.35rem;
+}
+.curve-head .gauge-label{margin-bottom:0;}
+.legend{display:flex;flex-wrap:wrap;gap:0.4rem 0.9rem;font-family:var(--font-mono);font-size:0.75rem;font-weight:700;color:var(--ink-soft);}
+.leg-item{display:inline-flex;align-items:center;gap:0.4rem;}
+.leg-swatch{width:16px;height:4px;border-radius:2px;}
+.eq-curve{display:flex;flex-direction:column;flex:1 1 auto;}
+.chart-box{position:relative;flex:1 1 auto;min-height:140px;}
+.eq-side .heat-curve{padding:0.6rem 0.9rem 0.7rem;}
+.eq-curve .chart-box canvas{position:absolute;inset:0;width:100%;height:100%;}
+.eq-curve{cursor:pointer;transition:background 0.12s;}
+.eq-curve:hover{background:#f7f8fc;}
+.expand-hint{font-family:var(--font-mono);font-size:0.68rem;font-weight:700;color:var(--dim);}
+.eq-curve:hover .expand-hint{color:var(--ink);}
+/* The graph opened up: pause the run, zoom the time axis, read off any moment */
+.chart-modal{
+  position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+  padding:clamp(12px,3vw,40px);background:rgba(29,36,51,0.38);
+}
+.chart-modal[hidden]{display:none;}
+.chart-card{
+  width:min(1200px,100%);height:min(780px,100%);display:flex;flex-direction:column;gap:0.7rem;
+  background:var(--tray);border:2px solid var(--line-strong);border-radius:var(--radius-lg);
+  box-shadow:0 24px 60px -20px rgba(29,36,51,0.5);padding:1rem 1.2rem 1.1rem;
+}
+.chart-card .curve-head{margin:0;align-items:center;}
+.chart-card .legend{font-size:0.85rem;margin-left:auto;}
+.chart-card .btn-close{padding:0.3rem 0.7rem;font-size:1.1rem;line-height:1;}
+.big-tools{display:flex;flex-wrap:wrap;align-items:center;gap:0.6rem 1.4rem;}
+.big-tools .btn{min-width:6.5rem;}
+.big-zoom{display:flex;align-items:center;gap:0.7rem;flex:1 1 18rem;max-width:30rem;font-family:var(--font-mono);font-size:0.8rem;font-weight:700;color:var(--dim);}
+.big-zoom input{flex:1;accent-color:var(--ink);height:2rem;}
+.big-zoom output{color:var(--ink);min-width:6.5rem;}
+.big-hint{font-family:var(--font-mono);font-size:0.72rem;color:var(--dim);}
+.chart-box.big{flex:1 1 auto;min-height:0;}
+.chart-box.big canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none;}
+.chart-box.big.can-pan canvas{cursor:grab;}
+.chart-box.big.panning canvas{cursor:grabbing;}
+.count-row sub,.legend sub{font-size:0.72em;line-height:0;vertical-align:-0.25em;}
+.count-row sup,.legend sup{font-size:0.72em;line-height:0;vertical-align:0.45em;}
+
+.k-rows{display:flex;flex-direction:column;gap:0.15rem;margin-top:0.25rem;}
+.k-row{display:flex;justify-content:space-between;align-items:baseline;gap:0.8rem;}
+.k-row .k-name{font-family:var(--font-mono);font-size:0.85rem;font-weight:700;color:var(--dim);}
+.k-row .k-val{font-family:var(--font-mono);font-size:1.1rem;font-weight:700;font-variant-numeric:tabular-nums;}
+.k-status{font-weight:700;margin-top:0.3rem;min-height:1.55em;}
+.k-eqn{
+  margin-top:0.4rem;padding:0.5rem 0.6rem;
+  border-radius:var(--radius);background:var(--field);
+}
+/* Fixed row heights: the emphasis sizes change every frame, and the stage stretches with
+   this column, so a growing glyph must never change the layout. */
+.eqnRow{display:flex;align-items:baseline;justify-content:center;gap:0.55rem;font-variant-numeric:tabular-nums;height:2.4rem;}
+.eqnLbl{font-family:var(--font-mono);font-size:0.85rem;font-weight:700;color:var(--dim);}
+.eqnBig{font-weight:700;letter-spacing:-0.01em;}
+.eqnOp{color:var(--dim);font-size:1.1rem;}
+.eqnPow{font-size:0.7em;vertical-align:super;}
+.k-eqn sup{font-size:0.62em;line-height:0;}
+.eqnBig.products{font-size:var(--prodSize,20px);}
+.eqnBig.reactants{font-size:var(--reactSize,20px);}
+.eqnSmall{margin-top:0.35rem;height:2.9rem;display:flex;align-items:center;justify-content:center;gap:0.3em;white-space:nowrap;color:var(--ink-soft);line-height:1.3;}
+.eqnSmall .rxnReactants{font-size:var(--rxnReactSize,16px);font-weight:700;}
+.eqnSmall .rxnProducts{font-size:var(--rxnProdSize,16px);font-weight:700;}
+.eqnSmall .rxnArrowWrap{display:inline-flex;align-items:center;gap:3px;padding:0 6px;color:var(--ink);}
+.eqnSmall .rxnFwd{font-size:var(--fwdSize,16px);font-weight:700;}
+.eqnSmall .rxnRev{font-size:var(--revSize,16px);font-weight:700;}
+.eqnSmall .rxnHeat{font-size:var(--heatSize,14px);font-weight:700;color:var(--dim);}
+
+/* ICE table: opens from the K card in place of the graph, with a wider side column */
+.eq-main.ice-open{grid-template-columns:minmax(0,1fr) 28rem;}
+.eq-curve[hidden],.ice-card[hidden],.ice-pane[hidden]{display:none;}
+.k-head{display:flex;justify-content:space-between;align-items:center;gap:0.6rem;}
+.k-head .gauge-label{margin:0;}
+.btn.btn-sm{padding:0.3rem 0.65rem;font-size:0.8rem;min-height:0;box-shadow:0 2px 0 var(--ink);}
+.btn.btn-sm:active,.btn.btn-sm[aria-pressed="true"]{transform:translateY(2px);box-shadow:0 0 0 var(--ink);}
+.ice-card{display:flex;flex-direction:column;gap:0.5rem;}
+.ice-card .curve-head{align-items:center;margin:0;}
+.ice-modes{display:flex;gap:0.4rem;margin-left:auto;}
+.ice-card .btn-close{padding:0.15rem 0.55rem;font-size:1rem;line-height:1;}
+.ice-pane{display:flex;flex-direction:column;gap:0.5rem;}
+.ice-units{font-family:var(--font-mono);font-size:0.72rem;font-weight:700;color:var(--dim);}
+.ice-table{width:100%;border-collapse:separate;border-spacing:4px;table-layout:fixed;margin:-4px;width:calc(100% + 8px);
+  font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+.ice-table th{font-size:0.95rem;font-weight:700;padding:0.15rem;text-align:center;}
+.ice-table th sub,.ice-table th sup{font-size:0.72em;line-height:0;}
+.ice-table .ice-row{width:2.7rem;font-size:1rem;color:var(--ink);}
+.ice-table td{
+  background:var(--field);border-radius:8px;text-align:center;padding:0.3rem 0.15rem;
+  font-weight:700;font-size:0.9rem;height:2.5rem;white-space:nowrap;overflow:hidden;
+}
+.ice-table td.ice-solid,.ice-table tr.ice-e td.ice-solid{background:transparent;border:2px dashed var(--line);color:var(--dim);}
+.ice-table td.ice-added{background:var(--delta-pos);color:#ffffff;padding:0.2rem 0.15rem;}
+.ice-add{display:block;font-size:0.72rem;line-height:1.15;}
+.ice-add-note{color:#b3123a;font-weight:700;}
+.ice-table td.ice-removed{background:var(--delta-neg);color:var(--ink);padding:0.2rem 0.15rem;}
+.ice-rem-note{color:var(--ink);font-weight:700;}
+.ice-x{display:block;font-size:0.7rem;color:var(--dim);line-height:1.1;}
+.ice-table tr.ice-e td{background:var(--accent-soft);}
+.ice-table tr.ice-e.at-eq td{background:#dff3e8;}
+.ice-table tr.ice-e.at-eq th{color:var(--chem-nh3);}
+.ice-note{font-size:0.85rem;line-height:1.4;color:var(--ink-soft);}
+.ice-note b{color:var(--ink);}
+.ice-edit td{padding:0;}
+.ice-edit input{
+  width:100%;box-sizing:border-box;height:100%;min-height:2.5rem;border:2px solid transparent;border-radius:8px;
+  background:transparent;font:inherit;text-align:center;color:var(--ink);padding:0.3rem 0.15rem;
+}
+.ice-edit input:focus{outline:none;border-color:var(--accent);background:var(--tray);}
+.ice-edit input.calc{color:var(--accent);}
+.ice-edit input.bad{border-color:var(--delta-pos);}
+.ice-edit input::placeholder{color:var(--dim);opacity:0.75;}
+.ice-k{display:flex;flex-wrap:wrap;align-items:center;gap:0.45rem 0.5rem;}
+.ice-k label{font-family:var(--font-mono);font-weight:700;font-size:0.95rem;}
+.ice-k input{
+  width:8rem;font-family:var(--font-mono);font-weight:700;font-size:0.9rem;text-align:center;
+  border:2px solid var(--line-strong);border-radius:8px;padding:0.3rem 0.4rem;background:var(--tray);color:var(--ink);
+}
+.ice-k input:focus{outline:3px solid var(--accent);outline-offset:2px;}
+.ice-k input.bad{border-color:var(--delta-pos);}
+.ice-result{font-size:0.86rem;line-height:1.45;min-height:2.6em;color:var(--ink-soft);}
+.ice-result p{margin:0 0 0.3rem;}
+.ice-result .ice-math{display:block;font-family:var(--font-mono);font-size:0.8rem;color:var(--ink);margin-top:0.1rem;overflow-wrap:anywhere;}
+.ice-result .ice-err{color:#b3123a;font-weight:700;}
+.ice-result .ice-x-out{color:var(--accent);font-weight:700;}
+
+@media (max-width:980px){
+  /* minmax(0,…) so a canvas's pixel width can't widen the column */
+  .eq-main,.eq-main.ice-open{grid-template-columns:minmax(0,1fr);}
+  .eq-main .heat-stage{min-height:min(60vh,480px);}
+}
+@media (max-width:640px){
+  .eq-gauges{grid-template-columns:minmax(0,1fr);}
+}
+  </style>
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+</head>
+<body>
+  <div class="module-wrap heat-wrap eq-wrap">
+    <div class="top-nav">
+      <a href="index.html" class="back-link">← Unit 2 - Equilibrium</a>
+      <div class="mod-meta">Equilibrium · Le Châtelier</div>
+    </div>
+
+    <div class="sandbox-layout">
+      <div class="sandbox-lead">
+        <h1>Equilibrium</h1>
+        <p id="leadText">A sealed vessel of gas at equilibrium. Heat it, squeeze it, or add or remove gas, and watch Q settle back toward K.</p>
+        <!-- Hidden until Intro to Equilibrium ships
+        <p class="lead-intro">New to equilibrium? Start with <a href="index.html">Intro to Equilibrium</a>.</p>
+        -->
+      </div>
+
+      <div class="controls-row eq-controls">
+        <div class="field">
+          <label for="rxn-select">Reaction</label>
+          <select id="rxn-select">
+            <option value="no2">N₂O₄ ⇌ 2 NO₂</option>
+            <option value="ammonia">N₂ + 3 H₂ ⇌ 2 NH₃</option>
+            <option value="hi">H₂ + I₂ ⇌ 2 HI</option>
+            <option value="pbi2">PbI₂(s) ⇌ Pb²⁺ + 2 I⁻</option>
+          </select>
+        </div>
+        <div class="field eq-range">
+          <label for="sl-t">Temperature · <output id="tOut" for="sl-t">298 K</output></label>
+          <input type="range" id="sl-t" min="260" max="380" step="1" value="298">
+          <div class="eq-range-ends" aria-hidden="true"><span id="tMinLbl">260 K</span><span id="tMaxLbl">380 K</span></div>
+        </div>
+        <div class="field eq-range">
+          <label for="sl-v"><span id="vLbl">Volume</span> · <output id="vOut" for="sl-v">4.50 L</output></label>
+          <input type="range" id="sl-v" min="30" max="100" value="100">
+          <div class="eq-range-ends" aria-hidden="true"><span>Squeeze</span><span>Expand</span></div>
+        </div>
+        <div class="field eq-add">
+          <label id="addLbl">Add gas</label>
+          <div class="btn-row" role="group" aria-labelledby="addLbl">
+            <button type="button" class="btn" id="inj-no2" title="Add NO₂ dose">+ NO₂</button>
+            <button type="button" class="btn" id="inj-n2o4" title="Add N₂O₄ dose">+ N₂O₄</button>
+            <button type="button" class="btn" id="inj-3" hidden title="Add dose">+ NH₃</button>
+          </div>
+        </div>
+        <div class="field eq-add">
+          <label id="remLbl">Remove gas</label>
+          <div class="btn-row" role="group" aria-labelledby="remLbl">
+            <button type="button" class="btn" id="rem-1" title="Remove some NO₂">− NO₂</button>
+            <button type="button" class="btn" id="rem-2" title="Remove some N₂O₄">− N₂O₄</button>
+            <button type="button" class="btn" id="rem-3" hidden title="Remove some">− NH₃</button>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn" id="btn-reset">Start over</button>
+        </div>
+      </div>
+
+      <div class="eq-gauges" aria-label="Gauges">
+        <section class="gauge mini" aria-labelledby="gTempLabel">
+          <h2 class="gauge-label" id="gTempLabel">Temperature</h2>
+          <div class="mini-body">
+            <div class="gauge-read"><span id="gT">298</span><small> K</small></div>
+            <div class="gauge-sub"><span id="gTc">25</span> °C</div>
+          </div>
+          <div class="thermo" aria-hidden="true"><div class="thermo-fill" id="thermoFill"></div></div>
+        </section>
+
+        <section class="gauge mini" aria-labelledby="gPresLabel">
+          <h2 class="gauge-label" id="gPresLabel">Pressure</h2>
+          <div class="mini-body pres">
+            <svg class="dial dial-mini" viewBox="0 0 120 70" aria-hidden="true">
+              <path d="M18 62 A42 42 0 0 1 102 62" fill="none" stroke="#e6eaf1" stroke-width="10" stroke-linecap="round"/>
+              <g id="dialTicks"></g>
+              <line id="needle" x1="60" y1="62" x2="60" y2="26" stroke="#1d2433" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="60" cy="62" r="7" fill="#1d2433"/>
+            </svg>
+            <div>
+              <div class="gauge-read"><span id="gP">0.00</span><small id="gPUnit"> atm</small></div>
+              <div class="gauge-sub" id="gSub">in 4.50 L</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="gauge mini" aria-labelledby="gCountLabel">
+          <h2 class="gauge-label" id="gCountLabel">Molecules shown</h2>
+          <div class="count-list" id="k-countList"></div>
+        </section>
+      </div>
+
+      <div class="eq-main">
+        <div class="stage-wrap heat-stage">
+          <canvas id="sim" role="img" aria-label="A sealed vessel of gas molecules reacting back and forth."></canvas>
+        </div>
+
+        <div class="eq-side">
+          <section class="heat-curve eq-curve" id="curvePanel" tabindex="0" aria-labelledby="curveLabel" aria-describedby="expandHint">
+            <div class="curve-head">
+              <h2 class="gauge-label" id="curveLabel">Concentration over time</h2>
+              <div class="legend" id="chartLegend" aria-hidden="true"></div>
+              <span class="expand-hint" id="expandHint">Click to expand ⤢</span>
+            </div>
+            <div class="chart-box"><canvas id="chart" role="img" aria-label="Line graph of each gas's concentration over the last few seconds."></canvas></div>
+          </section>
+
+          <section class="heat-curve ice-card" id="icePanel" aria-labelledby="iceLabel" hidden>
+            <div class="curve-head">
+              <h2 class="gauge-label" id="iceLabel">ICE table</h2>
+              <div class="ice-modes" role="group" aria-label="ICE table mode">
+                <button type="button" class="btn btn-sm" id="iceModeLive" aria-pressed="true">Live</button>
+                <button type="button" class="btn btn-sm" id="iceModeOwn" aria-pressed="false">Enter your own data</button>
+              </div>
+              <button type="button" class="btn btn-close" id="iceClose" aria-label="Close ICE table and show the graph">×</button>
+            </div>
+
+            <div class="ice-pane" id="iceLive">
+              <span class="ice-units" id="iceLiveUnits"></span>
+              <table class="ice-table" id="iceLiveTable"></table>
+              <p class="ice-note" id="iceLiveNote"></p>
+            </div>
+
+            <div class="ice-pane" id="iceOwn" hidden>
+              <p class="ice-note">Type into any squares you know and leave the rest blank. <span style="color:var(--accent);font-weight:700">Blue</span> numbers are worked out for you.</p>
+              <span class="ice-units" id="iceOwnUnits"></span>
+              <table class="ice-table ice-edit" id="iceOwnTable"></table>
+              <div class="ice-k">
+                <label for="iceK" id="iceKLbl">K<sub>c</sub> =</label>
+                <input type="text" id="iceK" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="type K">
+                <button type="button" class="btn btn-sm" id="iceRevealK">Reveal K</button>
+                <button type="button" class="btn btn-sm" id="iceCalcQ">Calculate Q</button>
+              </div>
+              <div class="ice-k">
+                <button type="button" class="btn btn-sm" id="iceCopyLive" title="Fill the I row with the live table's I row">Copy the live I row</button>
+                <button type="button" class="btn btn-sm" id="iceClear">Clear</button>
+              </div>
+              <div class="ice-result" id="iceResult" aria-live="polite"></div>
+            </div>
+          </section>
+
+          <section class="heat-curve" id="k-panel" aria-labelledby="kLabel">
+            <div class="k-head">
+              <h2 class="gauge-label" id="kLabel">Equilibrium check</h2>
+              <button type="button" class="btn btn-sm" id="iceOpen" aria-expanded="false" aria-controls="icePanel">See ICE table</button>
+            </div>
+            <div class="k-rows">
+              <div class="k-row"><span class="k-name" id="k-kc-lbl">Kc</span><span class="k-val" id="k-kc"></span></div>
+              <div class="k-row"><span class="k-name" id="k-q-lbl">Q</span><span class="k-val" id="k-q"></span></div>
+            </div>
+            <div class="k-status" id="k-eq" aria-live="polite"></div>
+            <div class="k-eqn">
+              <div class="eqnRow">
+                <span class="eqnLbl" id="k-eqn-lbl">Kc =</span>
+                <span class="eqnBig products" id="k-prod">[NO₂]<span class="eqnPow">2</span></span>
+                <span class="eqnOp" id="k-op">/</span>
+                <span class="eqnBig reactants" id="k-react">[N₂O₄]</span>
+              </div>
+              <div class="eqnSmall" aria-hidden="true">
+                <span class="rxnHeat" id="k-heat">heat +</span>
+                <span class="rxnReactants" id="k-rxn-react">N₂O₄</span>
+                <span class="rxnArrowWrap">
+                  <span class="rxnRev" id="k-arrow-rev">←</span>
+                  <span class="rxnFwd" id="k-arrow-fwd">→</span>
+                </span>
+                <span class="rxnProducts" id="k-rxn-prod">2 NO₂</span>
+                <span class="rxnHeat" id="k-heat-prod"></span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <p class="colophon">The bigger arrow shows which direction is running faster right now.</p>
+  </div>
+
+  <div class="chart-modal" id="chartModal" hidden>
+    <div class="chart-card" role="dialog" aria-modal="true" aria-labelledby="bigLabel">
+      <div class="curve-head">
+        <h2 class="gauge-label" id="bigLabel">Concentration over time</h2>
+        <div class="legend" id="bigLegend" aria-hidden="true"></div>
+        <button type="button" class="btn btn-close" id="bigClose" aria-label="Close graph">×</button>
+      </div>
+      <div class="big-tools">
+        <button type="button" class="btn primary" id="bigPause">❚❚ Pause</button>
+        <label class="big-zoom">Time shown
+          <input type="range" id="bigZoom" min="0" max="100" step="0.5" value="100" aria-label="Time shown">
+          <output id="bigZoomOut" for="bigZoom"></output>
+        </label>
+        <span class="big-hint" id="bigHint">Scroll on the graph to zoom · hover to read values · space pauses</span>
+      </div>
+      <div class="chart-box big" id="bigBox"><canvas id="chartBig" role="img" aria-label="Line graph of each species' concentration over the whole run, with a marker at each change you made."></canvas></div>
+    </div>
+  </div>
+<script>
+(function () {
+  'use strict';
+
+  const CFG = {
+    T0: 298.15,
+    // NO2 system uses the convention N2O4 ⇌ 2 NO2, so Kc = [NO2]^2 / [N2O4]
+    // Calibrated to Kc(298.15 K) ≈ 4.64e-3 (matches reference screenshot).
+    Kc0: 4.64e-3,
+    // Forward dissociation is endothermic => K increases with temperature.
+    deltaH: 57e3,
+    R: 8.314462618,
+    R_L_atm: 0.082057366080959,
+    k_r: 0.09,
+    doseNO2: 0.014,
+    doseN2O4: 0.018,
+    V_L_min: 0.35,
+    V_L_max: 4.5,
+    spritePad: 24,
+    capNO2: 160,
+    capN2O4: 150,
+    wallRest: 0.92,
+    speedCap: 105,
+    // Thermostat: collisions lose energy, so the mean speed is eased back toward this
+    // (px/s at T0, scaled by √(T/T0)) at thermoRate per second.
+    thermoSpeed: 34,
+    thermoRate: 1.5,
+    // Visual dynamics tuning
+    initSpeed: 78,
+    spriteScale: 0.82,
+    rotBase: 1.15,
+    rotJitter: 1.1,
+    rotBounceKick: 0.65,
+    rotCollideKick: 0.9,
+    // Sprite-sprite collisions (visual only)
+    collideRest: 0.92,
+    collideSlipZ: 0.85,
+    // For NO2+NO2 -> N2O4, require similar orientation
+    alignThresh: 0.55,
+    rkSubsteps: 10,
+    // Multiplies the chemistry time step (RK4 + visual reaction budgeting) so the system
+    // reaches equilibrium faster without changing K(T).
+    chemSpeed: 30,
+    // Haber tends to look “stuck” at classroom concentrations/pressures; run its chemistry faster.
+    chemSpeedAmmonia: 9.0,
+    // Pace of the spontaneous split/merge animations at equilibrium, kept
+    // separate from chemSpeed so fast relaxation doesn't make the dynamic exchange frantic.
+    eventSpeed: 8,
+    // Haber's rates climb steeply with pressure, so its exchange runs on a slower pace.
+    eventSpeedAmmonia: 2.5,
+    zJitter: 0.75,
+    zRest: 0.8,
+    // Depth: the back wall is drawn at perspBack × the front size; far molecules fade by depthAlpha.
+    perspBack: 0.62,
+    // The vessel is a glass cylinder seen slightly from above: its round ends are drawn
+    // as ellipses vesselTilt × as tall as they are wide; depth (z) runs into the screen.
+    vesselTilt: 0.2,
+    // a full beaker (the most water) still leaves this much of the glass above the water line
+    waterHead: 0.86,
+    depthAlpha: 0.32,
+    // Keep molecules drifting in and out of the page: mean |vz| (depth units/s) at T0.
+    thermoZ: 0.32,
+    collideDist: 19,
+    collideZ: 0.62,
+    mergeCooldown: 0.14,
+    splitKick: 64,
+    // Animated NO2 ⇌ N2O4 events: a pair glides together and docks, or a split flies
+    // apart with its N–N bond stretching and fading (seconds of real time / px).
+    dockTime: 0.5,
+    breakTime: 0.9,
+    dockHalf: 6,
+    dockReach: 160,
+    // Startup mix (will be nudged to near-equilibrium for NO2 on load/reset)
+    // Note: equilibrium composition depends on total concentration; using a higher initial loading
+    // makes the small Kc value correspond to visibly more N2O4 than NO2 at equilibrium.
+    initNO2: 0.002,
+    initN2O4: 0.18,
+    visibleBias: 1.0,
+    // Molecules on screen follow the amount of gas (moles), not its concentration, so
+    // changing the volume never adds or removes molecules: only the equilibrium shift
+    // does, through animated splits and merges. NO2 counts in "NO2 units" (N2O4 = 2).
+    unitsPerMol: 360,
+    // Haber runs at industrial pressures (~100–400 atm), so far fewer molecules per mole.
+    ammoniaPerMol: 11,
+    // Haber add-gas doses (mol)
+    doseN2: 0.5,
+    doseH2: 1.5,
+    doseNH3: 0.8,
+    // H2 + I2 ⇌ 2 HI: sprites per mol and add-gas doses (mol)
+    hiPerMol: 250,
+    doseHIH2: 0.04,
+    doseHII2: 0.04,
+    doseHI: 0.06,
+    // PbI2 dissolving: formula units per mol, ion cap, dissolution rate (mol/s at full
+    // crystal surface), nucleation surface floor, glide-in time and doses (mol)
+    pbi2PerMol: 1714,
+    ionCap: 320,
+    kDiss: 0.008,
+    gNuc: 0.04,
+    solidRef: 0.035,
+    attachTime: 0.7,
+    doseKI: 0.02,
+    dosePb: 0.01,
+    dosePbI2: 0.01,
+    // graph: seconds the small graph shows, seconds of history kept, samples per second
+    chartSeconds: 8,
+    histSeconds: 300,
+    histRate: 30,
+    // water molecules: shown, then faded out (s)
+    waterShow: 2.5,
+    waterFade: 2,
+    // water line: height fraction at the least and most water, and how fast it moves (1/s)
+    waterLevelMin: 0.22,
+    waterLevelRate: 0.3,
+  };
+
+  const sim = document.getElementById('sim');
+  const chart = document.getElementById('chart');
+  const ctxS = sim.getContext('2d');
+  const ctxC = chart.getContext('2d');
+  const slT = document.getElementById('sl-t');
+  const slV = document.getElementById('sl-v');
+  const injNO2 = document.getElementById('inj-no2');
+  const injN2O4 = document.getElementById('inj-n2o4');
+  const inj3 = document.getElementById('inj-3');
+  const remBtns = [1, 2, 3].map((k) => document.getElementById('rem-' + k));
+  const btnReset = document.getElementById('btn-reset');
+  const rxnSelect = document.getElementById('rxn-select');
+  const kCountList = document.getElementById('k-countList');
+  const chartLegend = document.getElementById('chartLegend');
+  const kPanel = document.getElementById('k-panel');
+  const kKcEl = document.getElementById('k-kc');
+  const kQEl = document.getElementById('k-q');
+  const kKcLbl = document.getElementById('k-kc-lbl');
+  const kQLbl = document.getElementById('k-q-lbl');
+  const kEqnLbl = document.getElementById('k-eqn-lbl');
+  const kEqEl = document.getElementById('k-eq');
+  const kProdEl = document.getElementById('k-prod');
+  const kReactEl = document.getElementById('k-react');
+  const kRxnReactEl = document.getElementById('k-rxn-react');
+  const kRxnProdEl = document.getElementById('k-rxn-prod');
+  const kHeatEl = document.getElementById('k-heat');
+  const kHeatProdEl = document.getElementById('k-heat-prod');
+  const kArrowFwdEl = document.getElementById('k-arrow-fwd');
+  const kArrowRevEl = document.getElementById('k-arrow-rev');
+  const el = (id) => document.getElementById(id);
+
+  // Toy Box palette (shared with the IMF suite): model-kit atoms, ink chrome.
+  const INK = '#1d2433';
+  const DIM = '#5b6474';
+  const EL = {
+    H: ['#ffffff', '#d5d9e3'],
+    N: ['#8494ff', '#4152d9'],
+    O: ['#ff8a6a', '#e0503a'],
+    // NO2 is a brown gas, so both its atoms are brown (not model-kit colours)
+    Nb: ['#c9956a', '#8b5a2b'],
+    Ob: ['#d4a574', '#8f5e32'],
+    // NH3 is green to match its chart line and labels
+    Ng: ['#6fd39b', '#24835a'],
+    Hg: ['#e3f7ea', '#9fd8b5'],
+    // iodine: violet, as its vapour is
+    I: ['#c39bf0', '#7a3fc4'],
+    // lead(II) iodide crystal: gold, as the real solid is
+    AuPb: ['#fff1a8', '#d9b42a'],
+    AuI: ['#ffe16b', '#c99a12'],
+  };
+  const RIM = 'rgba(40,48,66,0.55)';
+  const SPECIES_COLOR = {
+    no2: '#9a5b2e',
+    n2o4: INK,
+    n2: '#4152d9',
+    h2: DIM,
+    nh3: '#24835a',
+    i2: '#7a3fc4',
+    hi: INK,
+    pb: '#3d6fb6',
+    i: '#7a3fc4',
+  };
+  // Pressure dial full scale (atm), per reaction
+  let pMax = 20;
+
+  let reactionId = 'no2';
+  const RXNS = {
+    no2: {
+      id: 'no2',
+      label: 'N₂O₄ ⇌ 2 NO₂',
+      species: ['no2', 'n2o4'],
+      // Forward direction is dissociation: N2O4 -> 2 NO2
+      nu: { n2o4: -1, no2: 2 },
+      init: { no2: CFG.initNO2, n2o4: CFG.initN2O4 },
+      tRef: CFG.T0,
+      pMax: 20,
+      chemSpeed: CFG.chemSpeed,
+      eventSpeed: CFG.eventSpeed,
+    },
+    ammonia: {
+      id: 'ammonia',
+      label: 'Ammonia (Haber)',
+      species: ['n2', 'h2', 'nh3'],
+      nu: { n2: -1, h2: -3, nh3: 2 },
+      // 1 : 3 feed, about 120 atm at 723 K in 4.5 L: the industrial regime, where the
+      // equilibrium actually holds a visible share of NH3. Settled to equilibrium on reset.
+      init: { n2: 2.5, h2: 7.5, nh3: 0 },
+      tRef: 723.15,
+      pMax: 400,
+      chemSpeed: CFG.chemSpeedAmmonia,
+      eventSpeed: CFG.eventSpeedAmmonia,
+    },
+    hi: {
+      id: 'hi',
+      label: 'H₂ + I₂ ⇌ 2 HI',
+      species: ['h2', 'i2', 'hi'],
+      nu: { h2: -1, i2: -1, hi: 2 },
+      // Equal moles of gas on both sides (Δn = 0): squeezing changes the pressure but not
+      // the balance. About 5 atm at 721 K in 4.5 L; settled to equilibrium on reset.
+      init: { h2: 0.2, i2: 0.2, hi: 0 },
+      tRef: 721.15,
+      pMax: 20,
+      chemSpeed: 12,
+      eventSpeed: 4,
+    },
+    pbi2: {
+      id: 'pbi2',
+      label: 'PbI₂(s) ⇌ Pb²⁺ + 2 I⁻',
+      species: ['pbi2s', 'pb', 'i'],
+      chartSpecies: ['pb', 'i'], // the solid has no concentration
+      nu: { pbi2s: -1, pb: 1, i: 2 },
+      // 0.035 mol (16 g) of crystal in 4.5 L of water: mostly solid at 25 °C, all of it
+      // dissolves near 100 °C. Settled to saturation on reset.
+      init: { pbi2s: 0.035, pb: 0, i: 0 },
+      tRef: 298.15,
+      pMax: 20, // dial shows grams of undissolved solid
+      chemSpeed: 1,
+      eventSpeed: 0.12,
+      thermoSpeed: 22, // ions in water move more slowly than gas molecules
+    },
+  };
+
+  let n = { ...RXNS.no2.init };
+  let T = CFG.T0;
+  let V_L = 1.2;
+
+  // Concentration history, sampled against `clock`: the seconds the run has been playing
+  // (it stops while paused). Each change the user makes leaves a marker on the graph.
+  const history = [];
+  let clock = 0;
+  let paused = false;
+  const markers = []; // { t, tEnd, kind, label, n }
+  let simTime = 0;
+  const sprites = [];
+  // Haber gathers in progress: id → { ids: [N2, H2, H2, H2], t, ang }
+  const groups = new Map();
+  let nextGroupId = 1;
+  let nextSpriteId = 1;
+  let pendingForward = 0;
+  let pendingReverse = 0;
+  // ICE table: extent of reaction (mol, forward +) since the latest change, and that change
+  let iceXi = 0;
+  let iceMark = null;
+  // gas added in that change (mol per species): its I square turns red and counts down
+  let iceAdded = {};
+  let bias = { no2: 0, n2o4: 0, n2: 0, h2: 0, nh3: 0, i2: 0, hi: 0, pbi2s: 0 };
+
+  function activeRxn() {
+    return RXNS[reactionId] || RXNS.no2;
+  }
+
+  function getN(id) {
+    return n[id] || 0;
+  }
+
+  function setN(id, val) {
+    n[id] = Math.max(0, val);
+  }
+
+  // an add-gas button's dose, remembered for the ICE table
+  function addDose(id, mol) {
+    setN(id, getN(id) + mol);
+    iceAdded[id] = (iceAdded[id] || 0) + mol;
+  }
+
+  // a remove button: the same dose as its add button, but never more than half of
+  // what's there, so the species never runs out. Kept as a negative dose for the ICE table.
+  function removeDose(id, mol) {
+    const take = Math.min(mol, 0.5 * getN(id));
+    if (!(take > 0)) return 0;
+    setN(id, getN(id) - take);
+    iceAdded[id] = (iceAdded[id] || 0) - take;
+    return take;
+  }
+
+  // What each remove button takes out, per reaction: [species, dose (mol), label, title].
+  // PbI2(s) has no remove button: taking out some solid doesn't shift the equilibrium.
+  function removeSlots() {
+    const id = activeRxn().id;
+    if (id === 'ammonia') return [['n2', CFG.doseN2, 'N₂'], ['h2', CFG.doseH2, 'H₂'], ['nh3', CFG.doseNH3, 'NH₃']];
+    if (id === 'hi') return [['h2', CFG.doseHIH2, 'H₂'], ['i2', CFG.doseHII2, 'I₂'], ['hi', CFG.doseHI, 'HI']];
+    if (id === 'pbi2') {
+      return [
+        ['i', CFG.doseKI, 'I⁻', 'Remove some I⁻ (silver nitrate takes it out as solid AgI)'],
+        ['pb', CFG.dosePb, 'Pb²⁺', 'Remove some Pb²⁺ (sodium sulfate takes it out as solid PbSO₄)'],
+        null,
+      ];
+    }
+    return [['no2', CFG.doseNO2, 'NO₂'], ['n2o4', CFG.doseN2O4, 'N₂O₄'], null];
+  }
+
+  function initNearEquilibrium_NO2() {
+    // Initialize NO2/N2O4 close to equilibrium to reduce startup “settling time”.
+    // Convention: N2O4 ⇌ 2 NO2, so Kc = [NO2]^2/[N2O4] = (nNO2^2) / (nN2O4 * V_L)
+    const V = Math.max(1e-6, V_L);
+    const kc = Math.max(1e-12, Kc(T));
+    const A = (n.no2 || 0) + 2 * (n.n2o4 || 0); // total NO2 “units” conserved
+    if (A <= 0) return;
+
+    // Solve for x = nN2O4 in: (A - 2x)^2 = kc * x * V
+    // => 4x^2 + x(-4A - kc*V) + A^2 = 0
+    const b = (-4 * A - kc * V);
+    const disc = b * b - 16 * A * A;
+    if (disc <= 0) return;
+    const s = Math.sqrt(disc);
+    const x1 = (-b - s) / 8;
+    const x2 = (-b + s) / 8;
+    const lo = 0;
+    const hi = A * 0.5;
+    let x = (x1 >= lo && x1 <= hi) ? x1 : ((x2 >= lo && x2 <= hi) ? x2 : null);
+    if (x == null) x = Math.max(lo, Math.min(hi, x2));
+
+    const n2o4 = x;
+    const no2 = Math.max(0, A - 2 * n2o4);
+    n.no2 = no2;
+    n.n2o4 = n2o4;
+  }
+
+  function initNearEquilibrium_NH3() {
+    // Keep N and H atoms fixed and bisect on nNH3 until Qc = Kc (Qc rises with nNH3).
+    const V = Math.max(1e-6, V_L);
+    const kc = Kc(T);
+    const NA = 2 * (n.n2 || 0) + (n.nh3 || 0);
+    const HA = 2 * (n.h2 || 0) + 3 * (n.nh3 || 0);
+    let lo = 0;
+    let hi = Math.min(NA, HA / 3);
+    for (let i = 0; i < 60; i++) {
+      const y = 0.5 * (lo + hi);
+      const a = (NA - y) / 2;
+      const b = (HA - 3 * y) / 2;
+      const q = (a > 0 && b > 0) ? ((y / V) ** 2) / ((a / V) * (b / V) ** 3) : Infinity;
+      if (q < kc) lo = y;
+      else hi = y;
+    }
+    const y = 0.5 * (lo + hi);
+    n.nh3 = y;
+    n.n2 = (NA - y) / 2;
+    n.h2 = (HA - 3 * y) / 2;
+  }
+
+  function initNearEquilibrium_HI() {
+    // Keep H and I atoms fixed and bisect on nHI until Qc = Kc (V cancels: Δn = 0).
+    const kc = Kc(T);
+    const HA = 2 * (n.h2 || 0) + (n.hi || 0);
+    const IA = 2 * (n.i2 || 0) + (n.hi || 0);
+    let lo = 0;
+    let hi = Math.min(HA, IA);
+    for (let i = 0; i < 60; i++) {
+      const y = 0.5 * (lo + hi);
+      const a = (HA - y) / 2;
+      const b = (IA - y) / 2;
+      const q = (a > 0 && b > 0) ? (y * y) / (a * b) : Infinity;
+      if (q < kc) lo = y;
+      else hi = y;
+    }
+    const y = 0.5 * (lo + hi);
+    n.hi = y;
+    n.h2 = (HA - y) / 2;
+    n.i2 = (IA - y) / 2;
+  }
+
+  function initNearEquilibrium_PbI2() {
+    // Saturate the water: x mol dissolves with x (2x)² / V³ = Ksp, or all of it if less.
+    const x = Math.min(n.pbi2s, V_L * Math.cbrt(Kc(T) / 4));
+    n.pbi2s -= x;
+    n.pb = (n.pb || 0) + x;
+    n.i = (n.i || 0) + 2 * x;
+  }
+
+  function resetForReaction() {
+    const r = activeRxn();
+    n = { ...r.init };
+    if (r.id === 'no2') initNearEquilibrium_NO2();
+    else if (r.id === 'hi') initNearEquilibrium_HI();
+    else if (r.id === 'pbi2') initNearEquilibrium_PbI2();
+    else initNearEquilibrium_NH3();
+    crystals.length = 0;
+    dropNextCrystal = false;
+    if (r.id === 'pbi2') startWaterIntro();
+    else waterT = 99;
+    waterLevel = waterLevelTarget();
+    vapour.length = 0;
+    pourA = 0;
+    simTime = 0;
+    clock = 0;
+    history.length = 0;
+    markers.length = 0;
+    sprites.length = 0;
+    groups.clear();
+    pendingForward = 0;
+    pendingReverse = 0;
+    for (const k of Object.keys(bias)) bias[k] = 0;
+    iceXi = 0;
+    iceMark = null;
+    iceAdded = {};
+  }
+
+  function updateLegend() {
+    if (!chartLegend) return;
+    const rxn = activeRxn();
+    const labels = { no2: 'NO<sub>2</sub>', n2o4: 'N<sub>2</sub>O<sub>4</sub>', n2: 'N<sub>2</sub>', h2: 'H<sub>2</sub>', nh3: 'NH<sub>3</sub>', i2: 'I<sub>2</sub>', hi: 'HI', pb: 'Pb<sup>2+</sup>', i: 'I<sup>−</sup>' };
+    chartLegend.innerHTML = (rxn.chartSpecies || rxn.species)
+      .map((sp) => `<span class="leg-item"><span class="leg-swatch" style="background:${SPECIES_COLOR[sp]}"></span><span>${labels[sp]}</span></span>`)
+      .join('');
+  }
+
+  function updateInjectUI() {
+    const rxn = activeRxn();
+    if (rxn.id === 'ammonia') {
+      injNO2.textContent = '+ N₂';
+      injNO2.title = 'Add N₂ dose';
+      injN2O4.textContent = '+ H₂';
+      injN2O4.title = 'Add H₂ dose';
+      if (inj3) {
+        inj3.hidden = false;
+        inj3.textContent = '+ NH₃';
+        inj3.title = 'Add NH₃ dose';
+      }
+    } else if (rxn.id === 'pbi2') {
+      injNO2.textContent = '+ KI';
+      injNO2.title = 'Add potassium iodide: more I⁻ (common ion)';
+      injN2O4.textContent = '+ Pb(NO₃)₂';
+      injN2O4.title = 'Add lead(II) nitrate: more Pb²⁺ (common ion)';
+      if (inj3) {
+        inj3.hidden = false;
+        inj3.textContent = '+ PbI₂(s)';
+        inj3.title = 'Drop in more lead(II) iodide crystal';
+      }
+    } else if (rxn.id === 'hi') {
+      injNO2.textContent = '+ H₂';
+      injNO2.title = 'Add H₂ dose';
+      injN2O4.textContent = '+ I₂';
+      injN2O4.title = 'Add I₂ dose';
+      if (inj3) {
+        inj3.hidden = false;
+        inj3.textContent = '+ HI';
+        inj3.title = 'Add HI dose';
+      }
+    } else {
+      injNO2.textContent = '+ NO₂';
+      injNO2.title = 'Add NO₂ dose';
+      injN2O4.textContent = '+ N₂O₄';
+      injN2O4.title = 'Add N₂O₄ dose';
+      if (inj3) inj3.hidden = true;
+    }
+    removeSlots().forEach((slot, k) => {
+      const btn = remBtns[k];
+      if (!btn) return;
+      btn.hidden = !slot;
+      if (!slot) return;
+      btn.textContent = '− ' + slot[2];
+      btn.title = slot[3] || `Remove some ${slot[2]}`;
+    });
+  }
+
+  // Per-reaction slider range labels for the temperature field.
+  function updateReactionText() {
+    el('tMinLbl').textContent = slT.min + ' K';
+    el('tMaxLbl').textContent = slT.max + ' K';
+    const solid = activeRxn().id === 'pbi2';
+    el('leadText').textContent = solid
+      ? 'A beaker of water with a lead(II) iodide crystal. Heat to dissolve it, cool to grow gold crystals back, or add or remove an ion.'
+      : 'A sealed vessel of gas at equilibrium. Heat it, squeeze it, or add or remove gas, and watch Q settle back toward K.';
+    el('gPresLabel').textContent = solid ? 'Undissolved PbI₂' : 'Pressure';
+    el('addLbl').textContent = solid ? 'Add' : 'Add gas';
+    el('remLbl').textContent = solid ? 'Remove' : 'Remove gas';
+    el('vLbl').textContent = solid ? 'Water' : 'Volume';
+    el('gCountLabel').textContent = solid ? 'Particles shown' : 'Molecules shown';
+  }
+
+  const SPECIES_HTML = {
+    no2: '<span class="chemNO2">NO<sub>2</sub></span>',
+    n2o4: '<span class="chemN2O4">N<sub>2</sub>O<sub>4</sub></span>',
+    n2: '<span class="chemN2">N<sub>2</sub></span>',
+    h2: '<span class="chemH2">H<sub>2</sub></span>',
+    nh3: '<span class="chemNH3">NH<sub>3</sub></span>',
+    i2: '<span class="chemI2">I<sub>2</sub></span>',
+    hi: '<span class="chemHI">HI</span>',
+    pbi2s: '<span class="chemPbI2">PbI<sub>2</sub>(s)</span>',
+    pb: '<span class="chemPb">Pb<sup>2+</sup></span>',
+    i: '<span class="chemI">I<sup>−</sup></span>',
+  };
+
+  function updateCountsInK() {
+    if (!kCountList) return;
+    const rxn = activeRxn();
+    const sc = spriteCounts();
+    const order = rxn.species;
+    kCountList.innerHTML = order
+      .map((sp) => {
+        const v = Math.round(sc[sp] || 0);
+        return `<div class="count-row"><span>${SPECIES_HTML[sp] || sp}</span><span class="val">${v}</span></div>`;
+      })
+      .join('');
+  }
+
+  function Kc_NO2(TK) {
+    const x = -(CFG.deltaH / CFG.R) * (1 / TK - 1 / CFG.T0);
+    return CFG.Kc0 * Math.exp(x);
+  }
+
+  function Kp_NH3(TK) {
+    // N2 + 3H2 ⇌ 2NH3
+    // Calibrate to Kp(723.15 K) = 1.45e-5 (450 °C).
+    // Use van’t Hoff with ΔH≈−92.4 kJ per reaction (forming 2 NH3).
+    const Tref = 723.15;
+    const KpRef = 1.45e-5;
+    const dH = -92.4e3;
+    const x = -(dH / CFG.R) * (1 / TK - 1 / Tref);
+    return KpRef * Math.exp(x);
+  }
+
+  function Kc_NH3(TK) {
+    const Kp = Kp_NH3(TK);
+    // Δn = 2 - (1+3) = -2 => Kc = Kp * (RT)^2
+    const RT = CFG.R_L_atm * TK;
+    return Kp * RT * RT;
+  }
+
+  function Kc_HI(TK) {
+    // H2 + I2 ⇌ 2 HI: Kc = 50.2 at 721 K (448 °C), ΔH ≈ −9.5 kJ (gas phase), van 't Hoff.
+    // Δn = 0, so Kp = Kc.
+    const Tref = 721.15;
+    const dH = -9.5e3;
+    return 50.2 * Math.exp(-(dH / CFG.R) * (1 / TK - 1 / Tref));
+  }
+
+  function Ksp_PbI2(TK) {
+    // Ksp = 8.5e-9 at 25 °C (BC Chemistry 12 Data Booklet, shared with solubility/); ΔH(solution)
+    // ≈ +70 kJ/mol, which gives the real ~6× rise in solubility from 25 °C to 100 °C (about 0.6 → 3.9 g/L).
+    return 8.5e-9 * Math.exp(-(70e3 / CFG.R) * (1 / TK - 1 / 298));
+  }
+
+  function Kc(TK) {
+    const id = activeRxn().id;
+    return id === 'ammonia' ? Kc_NH3(TK) : id === 'hi' ? Kc_HI(TK) : id === 'pbi2' ? Ksp_PbI2(TK) : Kc_NO2(TK);
+  }
+
+  function volumeFromSlider(u) {
+    const t = u / 100;
+    return CFG.V_L_min + t * (CFG.V_L_max - CFG.V_L_min);
+  }
+
+  function vesselGeom(cssW, cssH, scale) {
+    // A glass cylinder standing on the bench, seen slightly from above. scale runs 0.72 → 1.27
+    // with volume: the largest vessel nearly fills the stage, the smallest is 62% as big.
+    // The PbI2 beaker stays full size: its water line moves instead.
+    // cx, cy, rw, rh describe the molecules' space (x across, y down); the round ends add
+    // ry = rw × vesselTilt above the top and below the bottom.
+    if (activeRxn().id === 'pbi2') scale = 1.27;
+    const vNorm = (scale - 0.72) / 0.55;
+    const pad = 12 + 14 * (1 - vNorm);
+    const f = 0.62 + 0.38 * vNorm;
+    const lid = 22; // room for the sealed vessel's lid
+    const rw = Math.max(40, (cssW * 0.5 - pad) * 0.62 * f);
+    const ry = rw * CFG.vesselTilt;
+    const rh = Math.max(40, ((cssH - 2 * pad - lid) * f - 2 * ry) / 2);
+    const cx = cssW * 0.5;
+    const cy = cssH - pad - ry - rh;
+    const cornerR = 0;
+    return { cx, cy, rw, rh, ry, cornerR };
+  }
+
+  function innerAABB(g) {
+    const inset = Math.max(CFG.spritePad, g.cornerR * 0.85);
+    // ions stay below the water line
+    const top = activeRxn().id === 'pbi2' ? g.cy + g.rh - 2 * g.rh * waterLevel * CFG.waterHead : g.cy - g.rh;
+    return {
+      minX: g.cx - g.rw + inset,
+      maxX: g.cx + g.rw - inset,
+      minY: top + inset,
+      maxY: g.cy + g.rh - inset,
+    };
+  }
+
+  // Keep a molecule inside the cylinder's round cross-section (x across, z into the screen),
+  // bouncing off the curved wall.
+  function roundClamp(s, b, wr, zr) {
+    const hx = (b.maxX - b.minX) / 2, mx = (b.maxX + b.minX) / 2;
+    if (hx <= 0) return;
+    const u = (s.x - mx) / hx, rr = Math.hypot(u, s.z);
+    if (rr <= 1) return;
+    const nu = u / rr, nz = s.z / rr;
+    s.x = mx + nu * hx;
+    s.z = nz;
+    const vn = (s.vx / hx) * nu + s.vz * nz; // outward speed in the round cross-section
+    if (vn > 0) {
+      s.vx -= (1 + wr) * vn * nu * hx;
+      s.vz -= (1 + zr) * vn * nz;
+    }
+  }
+
+  function clampSpritesToVessel(cssW, cssH, scale) {
+    const g = vesselGeom(cssW, cssH, scale);
+    const b = innerAABB(g);
+    if (b.minX >= b.maxX || b.minY >= b.maxY) return;
+    for (const s of sprites) {
+      if (s.solid || s.att) continue;
+      if (s.x < b.minX) { s.x = b.minX; s.vx = Math.abs(s.vx) * CFG.wallRest + 4; s.ph += (Math.random() - 0.5) * CFG.rotBounceKick; }
+      else if (s.x > b.maxX) { s.x = b.maxX; s.vx = -Math.abs(s.vx) * CFG.wallRest - 4; s.ph += (Math.random() - 0.5) * CFG.rotBounceKick; }
+      if (s.y < b.minY) { s.y = b.minY; s.vy = Math.abs(s.vy) * CFG.wallRest + 4; s.ph += (Math.random() - 0.5) * CFG.rotBounceKick; }
+      else if (s.y > b.maxY) { s.y = b.maxY; s.vy = -Math.abs(s.vy) * CFG.wallRest - 4; s.ph += (Math.random() - 0.5) * CFG.rotBounceKick; }
+      if (s.z < -1) { s.z = -1; s.vz = Math.abs(s.vz) * CFG.zRest; }
+      else if (s.z > 1) { s.z = 1; s.vz = -Math.abs(s.vz) * CFG.zRest; }
+      roundClamp(s, b, CFG.wallRest, CFG.zRest);
+    }
+  }
+
+  function jiggleAmp() {
+    // across the temperature slider's range, whatever the reaction
+    const lo = parseFloat(slT.min);
+    const hi = parseFloat(slT.max);
+    return 10 + Math.max(0, Math.min(1, (T - lo) / (hi - lo))) * 55;
+  }
+
+  function kickSprites(strength) {
+    const st = strength || 1;
+    for (const s of sprites) {
+      s.vx += (Math.random() - 0.5) * 90 * st;
+      s.vy += (Math.random() - 0.5) * 90 * st;
+      s.vz += (Math.random() - 0.5) * 2.4 * st;
+    }
+  }
+
+  function extentRates(currN, V, TK) {
+    const rxn = activeRxn();
+    if (rxn.id === 'ammonia') {
+      const n2 = currN.n2 || 0;
+      const h2 = currN.h2 || 0;
+      const nh3 = currN.nh3 || 0;
+      const kr = CFG.k_r;
+      const kf = Kc(TK) * kr;
+      // Speed up relaxation without changing equilibrium:
+      // multiply both forward and reverse rates by the same factor.
+      const rateScale = Math.pow(Math.max(0.55, TK / 723.15), 1.4);
+      const rf = rateScale * (V > 0 ? (kf * n2 * h2 * h2 * h2) / (V * V * V) : 0); // kf*[N2][H2]^3*V
+      const rr = rateScale * (V > 0 ? (kr * nh3 * nh3) / V : 0); // kr*[NH3]^2*V
+      return { rf, rr };
+    }
+    if (rxn.id === 'pbi2') {
+      // Dissolving runs on the crystal surface (∝ solid^⅔); growing does too, at Q/Ksp of
+      // that rate, so they balance at saturation. With no solid left nothing dissolves, and
+      // new crystals only nucleate above saturation.
+      const solid = currN.pbi2s || 0;
+      const ksp = Kc(TK);
+      const q = V > 0 ? ((currN.pb || 0) / V) * ((currN.i || 0) / V) ** 2 : 0;
+      if (solid > 1e-12) {
+        const g = CFG.gNuc + Math.pow(solid / CFG.solidRef, 2 / 3);
+        return { rf: CFG.kDiss * g, rr: CFG.kDiss * g * q / ksp };
+      }
+      return { rf: 0, rr: q > ksp ? CFG.kDiss * CFG.gNuc * (q / ksp - 1) : 0 };
+    }
+    if (rxn.id === 'hi') {
+      const h2 = currN.h2 || 0;
+      const i2 = currN.i2 || 0;
+      const hi = currN.hi || 0;
+      const kr = CFG.k_r;
+      const kf = Kc(TK) * kr;
+      const rateScale = Math.pow(Math.max(0.55, TK / 721.15), 1.4);
+      const rf = rateScale * (V > 0 ? (kf * h2 * i2) / V : 0); // kf*[H2][I2]*V
+      const rr = rateScale * (V > 0 ? (kr * hi * hi) / V : 0); // kr*[HI]^2*V
+      return { rf, rr };
+    }
+    const no2 = currN.no2 || 0;
+    const n2o4 = currN.n2o4 || 0;
+    const kr = CFG.k_r;
+    const kf = Kc(TK) * kr;
+    // NO2 convention: forward = N2O4 -> 2 NO2, so Kc = kf/kr = [NO2]^2/[N2O4]
+    // Speed up relaxation (esp. after T changes) without changing equilibrium:
+    // multiply both rf and rr by the same temperature factor.
+    const rateScale = Math.pow(Math.max(0.6, TK / CFG.T0), 1.8);
+    const rf = rateScale * (kf * n2o4);
+    const rr = rateScale * (V > 0 ? (kr * no2 * no2) / V : 0);
+    return { rf, rr };
+  }
+
+  function deriv(currN, V, TK) {
+    const rxn = activeRxn();
+    const { rf, rr } = extentRates(currN, V, TK);
+    const r = rf - rr;
+    const dn = {};
+    for (const sp of rxn.species) dn[sp] = (rxn.nu[sp] || 0) * r;
+    return dn;
+  }
+
+  function addScaled(base, d, s) {
+    const out = { ...base };
+    for (const k of Object.keys(d)) out[k] = (out[k] || 0) + s * d[k];
+    return out;
+  }
+
+  function rk4Step(dt) {
+    const V = V_L;
+    const TK = T;
+    const s0 = n;
+    const a = deriv(s0, V, TK);
+    const b = deriv(addScaled(s0, a, 0.5 * dt), V, TK);
+    const c = deriv(addScaled(s0, b, 0.5 * dt), V, TK);
+    const d = deriv(addScaled(s0, c, dt), V, TK);
+
+    const rxn = activeRxn();
+    const next = { ...s0 };
+    for (const sp of rxn.species) {
+      const v = (s0[sp] || 0) + (dt / 6) * ((a[sp] || 0) + 2 * (b[sp] || 0) + 2 * (c[sp] || 0) + (d[sp] || 0));
+      next[sp] = Math.max(0, v);
+    }
+    // the ICE table's extent since the last change, read off the first product
+    const xiSp = rxn.species.find((sp) => rxn.nu[sp] > 0);
+    iceXi += (next[xiSp] - (s0[xiSp] || 0)) / rxn.nu[xiSp];
+    n = next;
+  }
+
+  function totalGasMoles() {
+    const rxn = activeRxn();
+    let sum = 0;
+    for (const sp of rxn.species) sum += getN(sp);
+    return sum;
+  }
+
+  function pressureAtm() {
+    const n = totalGasMoles();
+    if (n <= 0 || V_L <= 0) return 0;
+    return (n * CFG.R_L_atm * T) / V_L;
+  }
+
+  // Sprite targets for N2 + 3 H2 ⇌ 2 NH3. Built from the N and H atom totals with an even
+  // NH3 count, so a shift of 2 NH3 is exactly one N2 and three H2: every change in the mix
+  // can play as a gather or a split, and only added gas changes the atom totals.
+  function ammoniaTargets() {
+    const k = CFG.visibleBias * CFG.ammoniaPerMol;
+    const nA = Math.round(k * (2 * getN('n2') + getN('nh3')));
+    const hA = Math.round(k * (2 * getN('h2') + 3 * getN('nh3')));
+    let nh3 = 2 * Math.round((k * getN('nh3') + (bias.nh3 || 0)) / 2);
+    nh3 = Math.max(0, Math.min(nh3, nA, Math.floor(hA / 3), 160));
+    if (nh3 % 2) nh3 -= 1;
+    return {
+      nh3,
+      n2: Math.max(0, Math.round((nA - nh3) / 2)),
+      h2: Math.max(0, Math.round((hA - 3 * nh3) / 2)),
+    };
+  }
+
+  /* ---------- PbI2(s) ⇌ Pb2+(aq) + 2 I−(aq): crystals in water ----------
+     Crystals are layered lattices on the beaker floor (I / Pb / I sandwiches, like the real
+     CdI2-type structure). Each formula unit fills one slot. Layers fill one at a time: a
+     unit lands on any open slot of the growing layer and leaves from anywhere on the top
+     layer, so at equilibrium ions come and go all over the crystal's surface.
+     Ions in a crystal (s.solid) or gliding into one (s.att) are placed by the crystal; free
+     ions move like the gas molecules elsewhere. Ions fade gold in the crystal, clear in water. */
+
+  const crystals = [];
+  const XTAL = { cellW: 17, layerH: 30, dy: 9, depthZ: 0.14 };
+  let dropNextCrystal = false; // "+ PbI2(s)" drops a new crystal in from the top
+
+  function makeCrystal(fx, y, z, w, falling) {
+    const order = [0];
+    for (let c = 1; order.length < w; c++) { order.push(c); if (order.length < w) order.push(-c); }
+    const cr = { fx, x: 0, y, z, w, d: 2, order, units: [], falling, vy: 0 };
+    crystals.push(cr);
+    return cr;
+  }
+
+  // Where ion `role` ('pb' | 'it' | 'ib') of formula-unit slot `k` sits
+  function ionPos(cr, k, role) {
+    const per = cr.w * cr.d;
+    const L = Math.floor(k / per);
+    const r = k % per;
+    const dRow = r % cr.d;
+    const col = cr.order[Math.floor(r / cr.d)];
+    const x = cr.x + (col + (L % 2 ? 0.5 : 0)) * XTAL.cellW;
+    const yMid = cr.y - (L + 0.5) * XTAL.layerH;
+    const z = Math.max(-1, Math.min(1, cr.z + (dRow - (cr.d - 1) / 2) * 2 * XTAL.depthZ));
+    if (role === 'pb') return { x, y: yMid, z };
+    return { x: x + XTAL.cellW * 0.5, y: yMid + (role === 'it' ? -XTAL.dy : XTAL.dy), z };
+  }
+
+  function freeIon(s, kind) {
+    return s.kind === kind && !s.solid && !s.att && s.cd <= 0;
+  }
+
+  // Open slots of the growing layer (every layer below it is full), centre-out
+  function openSlots(cr) {
+    const per = cr.w * cr.d;
+    const L = Math.floor(cr.units.length / per);
+    const taken = new Set(cr.units.map((u) => u.slot));
+    const out = [];
+    for (let k = L * per; k < (L + 1) * per; k++) if (!taken.has(k)) out.push(k);
+    return out;
+  }
+
+  // Put a formula unit straight into a crystal (start-up, or an added crystal)
+  function addUnitNow(cr) {
+    const slot = openSlots(cr)[0];
+    const mk = (kind, role) => {
+      const p = ionPos(cr, slot, role);
+      const s = { id: nextSpriteId++, kind, x: p.x, y: p.y, z: p.z, vx: 0, vy: 0, vz: 0, ph: 0, cd: 99, pop: 0, gold: 1 };
+      s.solid = { cr, slot, role };
+      sprites.push(s);
+      return s;
+    };
+    cr.units.push({ slot, pb: mk('pb', 'pb'), it: mk('i', 'it'), ib: mk('i', 'ib') });
+  }
+
+  // Free Pb2+ and the two nearest free I− glide into an open slot of the growing layer
+  function startAttach(cr) {
+    const open = openSlots(cr);
+    const slot = open[(Math.random() * open.length) | 0];
+    const target = ionPos(cr, slot, 'pb');
+    let pb = null;
+    let best = Infinity;
+    for (const s of sprites) {
+      if (!freeIon(s, 'pb')) continue;
+      const d2 = (s.x - target.x) ** 2 + (s.y - target.y) ** 2;
+      if (d2 < best) { best = d2; pb = s; }
+    }
+    if (!pb) return false;
+    const ii = sprites
+      .filter((s) => freeIon(s, 'i'))
+      .map((s) => ({ s, d2: (s.x - pb.x) ** 2 + (s.y - pb.y) ** 2 }))
+      .sort((a, b) => a.d2 - b.d2)
+      .slice(0, 2)
+      .map((o) => o.s);
+    if (ii.length < 2) return false;
+    const unit = { slot, pb, it: ii[0], ib: ii[1] };
+    cr.units.push(unit);
+    for (const [role, s] of [['pb', pb], ['it', ii[0]], ['ib', ii[1]]]) {
+      s.att = { cr, slot, role, t: CFG.attachTime };
+      s.cd = 99;
+    }
+    return true;
+  }
+
+  // A formula unit anywhere on the crystal's top layer breaks off into the water. If it is
+  // still gliding in, those ions simply turn back.
+  function startDetach(cr) {
+    if (!cr.units.length) return false;
+    const per = cr.w * cr.d;
+    const top = Math.floor((cr.units.length - 1) / per);
+    const exposed = cr.units.filter((u) => Math.floor(u.slot / per) === top);
+    const unit = exposed[(Math.random() * exposed.length) | 0];
+    cr.units.splice(cr.units.indexOf(unit), 1);
+    for (const s of [unit.pb, unit.it, unit.ib]) {
+      s.solid = null;
+      s.att = null;
+      s.cd = CFG.mergeCooldown;
+      s.vx = (s.x - cr.x) * 0.8 + (Math.random() - 0.5) * 30;
+      s.vy = -25 - Math.random() * 25;
+      s.vz = (Math.random() - 0.5) * 0.6;
+    }
+    if (!cr.units.length) crystals.splice(crystals.indexOf(cr), 1);
+    return true;
+  }
+
+  // Where new solid grows: an existing crystal, or (strongly supersaturated / no crystal
+  // left) a new seed in the water that sinks to the floor: the "golden rain".
+  function crystalForGrowth(b, qRatio) {
+    const seed = !crystals.length || (qRatio > 2 && crystals.length < 7 && Math.random() < 0.3);
+    if (!seed) return crystals[(Math.random() * crystals.length) | 0];
+    const fx = 0.12 + Math.random() * 0.76;
+    const y = b.minY + (0.15 + Math.random() * 0.45) * (b.maxY - b.minY);
+    return makeCrystal(fx, y, (Math.random() - 0.5) * 1.2, 3, true);
+  }
+
+  function crystalForDissolve() {
+    const some = crystals.filter((cr) => cr.units.length);
+    return some.length ? some[(Math.random() * some.length) | 0] : null;
+  }
+
+  function solidUnits() {
+    let n = 0;
+    for (const cr of crystals) n += cr.units.length;
+    return n;
+  }
+
+  // Sprite targets from the Pb and I atom totals: one formula unit dissolving is exactly
+  // one Pb2+ and two I− more in the water.
+  function pbi2Targets() {
+    const k = CFG.visibleBias * CFG.pbi2PerMol;
+    const pbA = Math.round(k * (getN('pbi2s') + getN('pb')));
+    const iA = Math.round(k * (2 * getN('pbi2s') + getN('i')));
+    let solid = Math.round(k * getN('pbi2s') + (bias.pbi2s || 0));
+    solid = Math.max(0, Math.min(solid, pbA, Math.floor(iA / 2)));
+    return { pbi2s: solid, pb: Math.min(CFG.ionCap, pbA - solid), i: Math.min(CFG.ionCap, iA - 2 * solid) };
+  }
+
+  function syncPbI2(b, mkSprite) {
+    const want = pbi2Targets();
+    const have = { pbi2s: solidUnits(), pb: 0, i: 0 };
+    for (const s of sprites) if (!s.solid && !s.att && have[s.kind] !== undefined) have[s.kind]++;
+    // 1) Material was added or the run reset: fix the atom totals.
+    let dPb = (want.pbi2s + want.pb) - (have.pbi2s + have.pb);
+    let dI = (2 * want.pbi2s + want.i) - (2 * have.pbi2s + have.i);
+    if (dPb >= 1 && dI >= 2 && have.pbi2s < want.pbi2s) {
+      let cr = null;
+      if (dropNextCrystal || !crystals.length) {
+        cr = dropNextCrystal
+          ? makeCrystal(0.2 + Math.random() * 0.6, b.minY + 10, (Math.random() - 0.5) * 0.8, 4, true)
+          : makeCrystal(0.5, b.maxY + 6, 0, 12, false); // a wide, flat plate, as PbI2 grows
+      } else {
+        cr = crystals[0];
+      }
+      dropNextCrystal = false;
+      while (dPb >= 1 && dI >= 2 && have.pbi2s < want.pbi2s) { addUnitNow(cr); have.pbi2s++; dPb--; dI -= 2; }
+    }
+    while (dPb >= 1) { sprites.push(mkSprite('pb')); have.pb++; dPb--; }
+    while (dI >= 1) { sprites.push(mkSprite('i')); have.i++; dI--; }
+    const removeFree = (kind) => {
+      for (let i = sprites.length - 1; i >= 0; i--) if (freeIon(sprites[i], kind)) { sprites.splice(i, 1); return true; }
+      return false;
+    };
+    while (dPb <= -1 && removeFree('pb')) { have.pb--; dPb++; }
+    while (dI <= -1 && removeFree('i')) { have.i--; dI++; }
+    // 2) Dissolving or crystallizing: a couple of formula units per frame, so it reads as a flow.
+    const qRatio = getN('pb') * getN('i') ** 2 / Math.max(1e-30, V_L ** 3 * Kc(T));
+    for (let it = 0; it < 2 && want.pbi2s > have.pbi2s && have.pb >= 1 && have.i >= 2; it++) {
+      if (!startAttach(crystalForGrowth(b, qRatio))) break;
+      have.pbi2s++; have.pb--; have.i -= 2;
+    }
+    for (let it = 0; it < 2 && have.pbi2s > want.pbi2s; it++) {
+      const cr = crystalForDissolve();
+      if (!cr || !startDetach(cr)) break;
+      have.pbi2s--; have.pb++; have.i += 2;
+    }
+  }
+
+  // Dynamic equilibrium at saturation: units break off and others land at the same rate.
+  function pbi2Events(dtEvent) {
+    const { rf, rr } = extentRates(n, V_L, T);
+    const k = CFG.visibleBias * CFG.pbi2PerMol;
+    pendingForward += rf * dtEvent * k;
+    pendingReverse += rr * dtEvent * k;
+    if (pendingForward >= 1) {
+      pendingForward -= 1;
+      const cr = crystalForDissolve();
+      if (cr && startDetach(cr)) bias.pbi2s = (bias.pbi2s || 0) - 1;
+    }
+    if (pendingReverse >= 1) {
+      pendingReverse -= 1;
+      if (crystals.length && startAttach(crystals[(Math.random() * crystals.length) | 0])) bias.pbi2s = (bias.pbi2s || 0) + 1;
+    }
+    pendingForward = Math.min(pendingForward, 3);
+    pendingReverse = Math.min(pendingReverse, 3);
+  }
+
+  function stepCrystals(dt, b) {
+    const floorY = b.maxY + 6;
+    for (const cr of crystals) {
+      if (cr.falling) {
+        cr.vy = Math.min(cr.vy + 70 * dt, 55);
+        cr.y += cr.vy * dt;
+        // a sinking crystal stays under a falling water line
+        cr.y = Math.max(cr.y, b.minY + XTAL.layerH);
+        if (cr.y >= floorY) { cr.y = floorY; cr.falling = false; }
+      } else {
+        cr.y = floorY;
+      }
+      cr.x = b.minX + cr.fx * (b.maxX - b.minX);
+      {
+        // the whole crystal stays inside the round floor of the beaker
+        const hx = (b.maxX - b.minX) / 2, mx = (b.maxX + b.minX) / 2;
+        const half = ((cr.w / 2 + 1) * XTAL.cellW) / hx;
+        const zr = Math.min(0.95, Math.abs(cr.z) + 2 * XTAL.depthZ);
+        const lim = Math.max(0, Math.sqrt(1 - zr * zr) - half);
+        const u = (cr.x - mx) / hx;
+        if (Math.abs(u) > lim) cr.x = mx + Math.sign(u) * lim * hx;
+      }
+    }
+    const lo = parseFloat(slT.min);
+    const hi = parseFloat(slT.max);
+    const vib = 0.4 + 1.4 * Math.max(0, Math.min(1, (T - lo) / (hi - lo)));
+    const k = 1 - Math.exp(-dt * 7);
+    const kg = 1 - Math.exp(-dt / 0.35);
+    for (const s of sprites) {
+      if (s.solid) {
+        const p = ionPos(s.solid.cr, s.solid.slot, s.solid.role);
+        s.x = p.x + Math.sin(simTime * 9 + s.id) * vib;
+        s.y = p.y + Math.cos(simTime * 11 + s.id * 1.7) * vib * 0.7;
+        s.z = p.z;
+        s.vx = s.vy = s.vz = 0;
+      } else if (s.att) {
+        const p = ionPos(s.att.cr, s.att.slot, s.att.role);
+        s.x += (p.x - s.x) * k;
+        s.y += (p.y - s.y) * k;
+        s.z += (p.z - s.z) * k;
+        s.att.t -= dt;
+        if (s.att.t <= 0) { s.solid = s.att; s.att = null; }
+      } else if (s.kind === 'pb' || s.kind === 'i') {
+        // free ions don't drift through a crystal: lift them out over its top
+        for (const cr of crystals) {
+          const half = (cr.w / 2 + 1) * XTAL.cellW;
+          const top = cr.y - (Math.ceil(cr.units.length / (cr.w * cr.d)) + 0.2) * XTAL.layerH;
+          if (Math.abs(s.x - cr.x) < half && s.y > top && s.y < cr.y && Math.abs(s.z - cr.z) < 0.45) {
+            s.y = top;
+            s.vy = -Math.abs(s.vy);
+          }
+        }
+      }
+      if (s.kind === 'pb' || s.kind === 'i') {
+        const want = s.solid || s.att ? 1 : 0;
+        s.gold = (s.gold || 0) + (want - (s.gold || 0)) * kg;
+      }
+    }
+  }
+
+  // Water molecules are drawn for the first few seconds, then fade: the water is implied.
+  const water = [];
+  let waterT = 99;
+  function startWaterIntro() {
+    water.length = 0;
+    for (let i = 0; i < 150; i++) {
+      water.push({ u: Math.random(), v: Math.random(), z: Math.random() * 2 - 1, vu: (Math.random() - 0.5) * 0.06, vv: (Math.random() - 0.5) * 0.06, a: Math.random() * 6 });
+    }
+    waterT = 0;
+  }
+  function waterAlpha() {
+    return waterT < CFG.waterShow ? 1 : Math.max(0, 1 - (waterT - CFG.waterShow) / CFG.waterFade);
+  }
+  function stepWater(dt) {
+    if (waterT > CFG.waterShow + CFG.waterFade + 4) return;
+    waterT += dt;
+    for (const w of water) {
+      w.vu += (Math.random() - 0.5) * 0.08 * dt;
+      w.vv += (Math.random() - 0.5) * 0.08 * dt;
+      w.u += w.vu * dt;
+      w.v += w.vv * dt;
+      w.a += dt * 0.8;
+      if (w.u < 0 || w.u > 1) { w.vu = -w.vu; w.u = Math.max(0, Math.min(1, w.u)); }
+      if (w.v < 0 || w.v > 1) { w.vv = -w.vv; w.v = Math.max(0, Math.min(1, w.v)); }
+    }
+  }
+
+  // The water line follows the Water slider at a steady pace. Going down, vapour drifts
+  // off the surface; going up, a stream pours in from the top.
+  let waterLevel = 1; // fraction of the beaker's inner height
+  let pourA = 0; // stream opacity, eased so it doesn't flicker while the slider moves
+  let flowT = 0;
+  const vapour = [];
+  function waterLevelTarget() {
+    const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
+    return CFG.waterLevelMin + (1 - CFG.waterLevelMin) * vNorm;
+  }
+  function stepWaterLevel(dt) {
+    const d = waterLevelTarget() - waterLevel;
+    const step = CFG.waterLevelRate * dt;
+    waterLevel += Math.max(-step, Math.min(step, d));
+    flowT += dt;
+    pourA += ((d > 0.001 ? 1 : 0) - pourA) * (1 - Math.exp(-dt / 0.15));
+    if (d < -0.001) {
+      for (let k = 0; k < 2; k++) {
+        vapour.push({ u: Math.random(), z: Math.random() * 1.8 - 0.9, lv: waterLevel, rise: 0, vr: 18 + Math.random() * 20, age: 0, life: 1.2 + Math.random() * 0.8, ph: Math.random() * 6 });
+      }
+    }
+    for (let i = vapour.length - 1; i >= 0; i--) {
+      const v = vapour[i];
+      v.age += dt;
+      v.rise += v.vr * dt;
+      if (v.age > v.life) vapour.splice(i, 1);
+    }
+  }
+
+  // Sprite targets for H2 + I2 ⇌ 2 HI, from the H and I atom totals with an even HI count:
+  // a shift of 2 HI is exactly one H2 and one I2, so every change can play as a swap.
+  function hiTargets() {
+    const k = CFG.visibleBias * CFG.hiPerMol;
+    const hA = Math.round(k * (2 * getN('h2') + getN('hi')));
+    const iA = Math.round(k * (2 * getN('i2') + getN('hi')));
+    let hi = 2 * Math.round((k * getN('hi') + (bias.hi || 0)) / 2);
+    hi = Math.max(0, Math.min(hi, hA, iA, 160));
+    if (hi % 2) hi -= 1;
+    return {
+      hi,
+      h2: Math.max(0, Math.round((hA - hi) / 2)),
+      i2: Math.max(0, Math.round((iA - hi) / 2)),
+    };
+  }
+
+  // Sprite targets for N2O4 ⇌ 2 NO2.
+  function no2Targets() {
+    // IMPORTANT: keep the NO2/N2O4 sprite targets mass-conserving.
+    // Reaction: N2O4 ⇌ 2 NO2, so the conserved “NO2 units” are A = nNO2 + 2 nN2O4.
+    // The visual "unit budget" follows A itself (not A / V, so volume changes conserve it),
+    // split between NO2 (1 unit per sprite) and N2O4 (2 units per sprite).
+    const A = (getN('no2') || 0) + 2 * (getN('n2o4') || 0);
+    const unitBias = (bias.no2 || 0) + 2 * (bias.n2o4 || 0);
+    const maxUnits = CFG.capNO2 + 2 * CFG.capN2O4;
+    let targetUnits = Math.floor(CFG.visibleBias * CFG.unitsPerMol * A + unitBias);
+    targetUnits = Math.max(0, Math.min(maxUnits, targetUnits));
+
+    const fracNO2 = A > 1e-18 ? ((getN('no2') || 0) / A) : 0;
+    let targetNO2 = Math.round(targetUnits * fracNO2);
+    targetNO2 = Math.max(0, Math.min(CFG.capNO2, targetNO2));
+
+    let remainingUnits = targetUnits - targetNO2;
+    if (remainingUnits < 0) remainingUnits = 0;
+    let targetN4 = Math.floor(remainingUnits / 2);
+    targetN4 = Math.max(0, Math.min(CFG.capN2O4, targetN4));
+
+    // If caps prevented us from using the full unit budget, backfill NO2 first.
+    let usedUnits = targetNO2 + 2 * targetN4;
+    if (usedUnits < targetUnits) {
+      const addNO2 = Math.min(CFG.capNO2 - targetNO2, targetUnits - usedUnits);
+      if (addNO2 > 0) {
+        targetNO2 += addNO2;
+        usedUnits += addNO2;
+      }
+    }
+    // Any 1-unit remainder that can't become N2O4 also goes to NO2 (if possible).
+    remainingUnits = targetUnits - usedUnits;
+    if (remainingUnits >= 1 && targetNO2 < CFG.capNO2) {
+      targetNO2 += 1;
+      usedUnits += 1;
+    }
+
+    return { no2: targetNO2, n2o4: targetN4 };
+  }
+
+  function syncSprites(cssW, cssH, scale) {
+    const g = vesselGeom(cssW, cssH, scale);
+    const b = innerAABB(g);
+    const spanX = Math.max(1e-6, b.maxX - b.minX);
+    const spanY = Math.max(1e-6, b.maxY - b.minY);
+    const rxn = activeRxn();
+    const targets = {};
+    if (rxn.id === 'pbi2') {
+      // handled by syncPbI2 below
+    } else if (rxn.id === 'ammonia') {
+      Object.assign(targets, ammoniaTargets());
+    } else if (rxn.id === 'hi') {
+      Object.assign(targets, hiTargets());
+    } else {
+      const t = no2Targets();
+      targets.no2 = t.no2;
+      targets.n2o4 = t.n2o4;
+    }
+
+    function mkSprite(kind) {
+      return {
+        id: nextSpriteId++,
+        kind,
+        x: b.minX + Math.random() * spanX,
+        y: b.minY + Math.random() * spanY,
+        z: (Math.random() * 2 - 1) * 0.85,
+        vx: (Math.random() - 0.5) * CFG.initSpeed,
+        vy: (Math.random() - 0.5) * CFG.initSpeed,
+        vz: (Math.random() - 0.5) * 0.8,
+        ph: Math.random() * Math.PI * 2,
+        cd: 0,
+        pop: 0,
+      };
+    }
+
+    // A docking NO2 pair already counts as the N2O4 it is about to become.
+    let haveNO2 = 0;
+    let haveN4 = 0;
+    let docking = 0;
+    for (const s of sprites) {
+      if (s.dock) docking++;
+      else if (s.kind === 'no2') haveNO2++;
+      else if (s.kind === 'n2o4') haveN4++;
+    }
+    haveN4 += docking / 2;
+
+    function removeOne(kind) {
+      for (let i = sprites.length - 1; i >= 0; i--) {
+        const s = sprites[i];
+        if (s.kind === kind) {
+          if (s.cd > 0 || s.pop > 0 || s.solid || s.att) continue;
+          sprites.splice(i, 1);
+          return true;
+        }
+      }
+      return false;
+    }
+
+    if (rxn.id === 'pbi2') {
+      syncPbI2(b, mkSprite);
+    } else if (rxn.id === 'ammonia') {
+      const want = targets;
+      // A gathering N2 + 3 H2 group already counts as the 2 NH3 it is about to become.
+      const have = { n2: 0, h2: 0, nh3: 0 };
+      for (const s of sprites) {
+        if (s.grp) have[s.as] += s.asW;
+        else if (have[s.kind] !== undefined) have[s.kind]++;
+      }
+      // 1) Gas was added or the run reset: fix the N and H atom totals by spawning/removing.
+      let dN = (2 * want.n2 + want.nh3) - (2 * have.n2 + have.nh3);
+      let dH = (2 * want.h2 + 3 * want.nh3) - (2 * have.h2 + 3 * have.nh3);
+      while (dN >= 1 && dH >= 3 && have.nh3 < want.nh3) { sprites.push(mkSprite('nh3')); have.nh3++; dN -= 1; dH -= 3; }
+      while (dN >= 2) { sprites.push(mkSprite('n2')); have.n2++; dN -= 2; }
+      while (dH >= 2) { sprites.push(mkSprite('h2')); have.h2++; dH -= 2; }
+      while (dN <= -1 && dH <= -3 && have.nh3 > want.nh3 && removeOne('nh3')) { have.nh3--; dN += 1; dH += 3; }
+      while (dN <= -2 && removeOne('n2')) { have.n2--; dN += 2; }
+      while (dH <= -2 && removeOne('h2')) { have.h2--; dH += 2; }
+      // 2) The equilibrium shifted: N2 + 3 H2 gather into 2 NH3, or 2 NH3 break apart.
+      let guard = 0;
+      while (want.nh3 - have.nh3 >= 2 && have.n2 >= 1 && have.h2 >= 3 && guard++ < 40) {
+        const grp = nearestAmmoniaGroup();
+        if (!grp || !mergeAmmoniaAt(grp.iN2, grp.h2Idx, true)) break;
+        have.nh3 += 2; have.n2 -= 1; have.h2 -= 3;
+      }
+      guard = 0;
+      while (have.nh3 - want.nh3 >= 2 && guard++ < 40) {
+        const pr = nearestNH3Pair();
+        if (!pr || !splitAmmoniaAt(pr.i, pr.j, true)) break;
+        have.nh3 -= 2; have.n2 += 1; have.h2 += 3;
+      }
+    } else if (rxn.id === 'hi') {
+      const want = targets;
+      // A swapping pair already counts as the two molecules it is about to become.
+      const have = { h2: 0, i2: 0, hi: 0 };
+      for (const s of sprites) {
+        if (s.grp) have[s.as] += s.asW;
+        else if (have[s.kind] !== undefined) have[s.kind]++;
+      }
+      // 1) Gas was added or the run reset: fix the H and I atom totals by spawning/removing.
+      let dH = (2 * want.h2 + want.hi) - (2 * have.h2 + have.hi);
+      let dI = (2 * want.i2 + want.hi) - (2 * have.i2 + have.hi);
+      while (dH >= 1 && dI >= 1 && have.hi < want.hi) { sprites.push(mkSprite('hi')); have.hi++; dH--; dI--; }
+      while (dH >= 2) { sprites.push(mkSprite('h2')); have.h2++; dH -= 2; }
+      while (dI >= 2) { sprites.push(mkSprite('i2')); have.i2++; dI -= 2; }
+      while (dH <= -1 && dI <= -1 && have.hi > want.hi && removeOne('hi')) { have.hi--; dH++; dI++; }
+      while (dH <= -2 && removeOne('h2')) { have.h2--; dH += 2; }
+      while (dI <= -2 && removeOne('i2')) { have.i2--; dI += 2; }
+      // 2) The equilibrium shifted: H2 + I2 swap partners into 2 HI, or 2 HI into H2 + I2.
+      let guard = 0;
+      while (want.hi - have.hi >= 2 && have.h2 >= 1 && have.i2 >= 1 && guard++ < 40) {
+        const pr = nearestPairOf('h2', 'i2');
+        if (!pr || !startSwap(pr.i, pr.j, ['hi', 'hi'], true)) break;
+        have.hi += 2; have.h2--; have.i2--;
+      }
+      guard = 0;
+      while (have.hi - want.hi >= 2 && guard++ < 40) {
+        const pr = nearestPairOf('hi', 'hi');
+        if (!pr || !startSwap(pr.i, pr.j, ['h2', 'i2'], true)) break;
+        have.hi -= 2; have.h2++; have.i2++;
+      }
+    } else {
+      const targetNO2 = targets.no2 || 0;
+      const targetN4 = targets.n2o4 || 0;
+      // Prefer physically-plausible visual conversions over spawning/despawning:
+      // - If NO2 needs to rise and N2O4 needs to fall (e.g. higher T), split existing N2O4 -> 2 NO2.
+      // - If N2O4 needs to rise and NO2 needs to fall, merge 2 NO2 -> N2O4.
+      function findOne(kind) {
+        for (let i = sprites.length - 1; i >= 0; i--) {
+          const s = sprites[i];
+          if (s && s.kind === kind && s.cd <= 0 && s.pop <= 0) return i;
+        }
+        return -1;
+      }
+
+      // Split N2O4 to make NO2 (best matches “heating breaks down N2O4”).
+      let guard = 0;
+      while (haveNO2 < targetNO2 && haveN4 > targetN4 && guard++ < 220) {
+        const k = findOne('n2o4');
+        if (k < 0) break;
+        if (splitAt(k)) { haveN4 -= 1; haveNO2 += 2; }
+        else break;
+      }
+
+      // Merge NO2 pairs to make N2O4 when needed.
+      guard = 0;
+      while (haveN4 < targetN4 && haveNO2 > targetNO2 + 1 && guard++ < 220) {
+        const pairs = collidePairs();
+        let merged = false;
+        for (const p of pairs) {
+          if (mergeAt(p.i, p.j)) { haveN4 += 1; haveNO2 -= 2; merged = true; break; }
+        }
+        // Nothing touching: pull the nearest pair together instead of swapping sprites.
+        if (!merged) {
+          const p = nearestNO2Pair(CFG.dockReach);
+          if (p && mergeAt(p.i, p.j)) { haveN4 += 1; haveNO2 -= 2; merged = true; }
+        }
+        if (!merged) break;
+      }
+
+      // Spawn or remove only when the amount of gas itself changed (adding gas, Start over).
+      // A mix that is merely off (a split or merge blocked by a cooldown this frame) waits
+      // for the next frame's conversion instead of popping molecules in and out.
+      let dU = (targetNO2 + 2 * targetN4) - (haveNO2 + 2 * haveN4);
+      while (dU >= 2 && haveN4 < targetN4) { sprites.push(mkSprite('n2o4')); haveN4++; dU -= 2; }
+      while (dU >= 1) { sprites.push(mkSprite('no2')); haveNO2++; dU--; }
+      while (dU <= -2 && haveN4 > targetN4 && removeOne('n2o4')) { haveN4--; dU += 2; }
+      while (dU <= -1 && removeOne('no2')) { haveNO2--; dU++; }
+      while (dU <= -2 && removeOne('n2o4')) { haveN4--; dU += 2; }
+    }
+  }
+
+  function stepSprites(dt, cssW, cssH, scale) {
+    const g = vesselGeom(cssW, cssH, scale);
+    const b = innerAABB(g);
+    const amp = jiggleAmp();
+    const wr = CFG.wallRest;
+    const cap = CFG.speedCap;
+    if (b.minX >= b.maxX || b.minY >= b.maxY) return;
+    // speeds scale with √T relative to the reaction's own reference temperature
+    const tScale = Math.sqrt(Math.max(0.2, T / activeRxn().tRef));
+    const cap2 = cap * cap * tScale * tScale;
+    // One shared factor for everyone keeps the natural spread of fast and slow molecules.
+    // (ions held in a crystal are placed by stepCrystals and left out here)
+    const movers = sprites.filter((s) => !s.solid && !s.att);
+    let speedSum = 0;
+    for (const s of movers) speedSum += Math.hypot(s.vx, s.vy);
+    const meanSpeed = movers.length ? speedSum / movers.length : 0;
+    const thermoTarget = activeRxn().thermoSpeed || CFG.thermoSpeed;
+    const thermo = meanSpeed > 1e-3
+      ? 1 + (thermoTarget * tScale / meanSpeed - 1) * Math.min(1, CFG.thermoRate * dt)
+      : 1;
+    let zSum = 0;
+    for (const s of movers) zSum += Math.abs(s.vz);
+    const meanZ = movers.length ? zSum / movers.length : 0;
+    const thermoZ = meanZ > 1e-3
+      ? 1 + (CFG.thermoZ * tScale / meanZ - 1) * Math.min(1, CFG.thermoRate * dt)
+      : 1;
+    for (const s of movers) {
+      s.vx *= thermo;
+      s.vy *= thermo;
+      s.vz *= thermoZ;
+      if (s.cd > 0) s.cd = Math.max(0, s.cd - dt);
+      if (s.pop > 0) s.pop = Math.max(0, s.pop - dt);
+      s.ph += dt * (CFG.rotBase + (Math.random() - 0.5) * CFG.rotJitter);
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+      s.z += s.vz * dt;
+      if (s.x < b.minX) { s.x = b.minX; s.vx *= -wr; s.ph += (Math.random() - 0.5) * CFG.rotBounceKick; }
+      else if (s.x > b.maxX) { s.x = b.maxX; s.vx *= -wr; s.ph += (Math.random() - 0.5) * CFG.rotBounceKick; }
+      if (s.y < b.minY) { s.y = b.minY; s.vy *= -wr; s.ph += (Math.random() - 0.5) * CFG.rotBounceKick; }
+      else if (s.y > b.maxY) { s.y = b.maxY; s.vy *= -wr; s.ph += (Math.random() - 0.5) * CFG.rotBounceKick; }
+      if (s.z < -1) { s.z = -1; s.vz *= -CFG.zRest; }
+      else if (s.z > 1) { s.z = 1; s.vz *= -CFG.zRest; }
+      roundClamp(s, b, wr, CFG.zRest);
+
+      s.vx += (Math.random() - 0.5) * amp * tScale * dt;
+      s.vy += (Math.random() - 0.5) * amp * tScale * dt;
+      s.vz += (Math.random() - 0.5) * CFG.zJitter * tScale * dt;
+
+      const sp2 = cap2;
+      if (s.vx * s.vx + s.vy * s.vy > sp2) {
+        const m = Math.sqrt(sp2) / Math.hypot(s.vx, s.vy);
+        s.vx *= m; s.vy *= m;
+      }
+    }
+  }
+
+  // One matte model-kit sphere, lit from the top left (same recipe as the IMF suite).
+  function atom(ctx, x, y, r, e) {
+    if (e === 'clear') return clearAtom(ctx, x, y, r);
+    const c = EL[e];
+    const g = ctx.createRadialGradient(x - r * 0.38, y - r * 0.42, r * 0.06, x, y, r);
+    g.addColorStop(0, c[0]);
+    g.addColorStop(0.7, c[1]);
+    g.addColorStop(1, RIM);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.beginPath();
+    ctx.ellipse(x - r * 0.36, y - r * 0.44, r * 0.26, r * 0.16, -0.6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // N2O4 is colourless: a glassy, see-through sphere with an ink outline.
+  function clearAtom(ctx, x, y, r) {
+    const g = ctx.createRadialGradient(x - r * 0.38, y - r * 0.42, r * 0.06, x, y, r);
+    g.addColorStop(0, 'rgba(255,255,255,0.85)');
+    g.addColorStop(0.7, 'rgba(235,239,246,0.45)');
+    g.addColorStop(1, 'rgba(160,170,190,0.5)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(29,36,51,0.6)';
+    ctx.lineWidth = 1.25;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.beginPath();
+    ctx.ellipse(x - r * 0.36, y - r * 0.44, r * 0.26, r * 0.16, -0.6, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Atoms are [dx, dy, r, element], drawn back to front. Offsets rotate with the molecule
+  // but each sphere keeps its top-left light.
+  function drawMolecule(ctx, x, y, ang, atoms) {
+    const ca = Math.cos(ang);
+    const sa = Math.sin(ang);
+    for (const [dx, dy, r, e] of atoms) atom(ctx, x + dx * ca - dy * sa, y + dx * sa + dy * ca, r, e);
+  }
+
+  const MOL = {
+    // bent O–N–O
+    no2: [[-9, 4.5, 7.5, 'Ob'], [9, 4.5, 7.5, 'Ob'], [0, -2, 8.5, 'Nb']],
+    // a freshly split half, still colourless like the N2O4 it came from
+    no2Clear: [[-9, 4.5, 7.5, 'clear'], [9, 4.5, 7.5, 'clear'], [0, -2, 8.5, 'clear']],
+    // planar O2N–NO2
+    n2o4: [[-14, -10, 7.5, 'clear'], [-14, 10, 7.5, 'clear'], [14, -10, 7.5, 'clear'], [14, 10, 7.5, 'clear'], [-5.2, 0, 8.5, 'clear'], [5.2, 0, 8.5, 'clear']],
+    h2: [[-4.9, 0.5, 6.6, 'H'], [4.9, -0.5, 6.6, 'H']],
+    n2: [[-5.6, 0.6, 9, 'N'], [5.6, -0.6, 9, 'N']],
+    // trigonal pyramid seen from the front: two H behind N, one in front
+    nh3: [[-8, 4.5, 6, 'Hg'], [8, 4.5, 6, 'Hg'], [0, -2, 10, 'Ng'], [0, 7, 6.2, 'Hg']],
+    i2: [[-7.5, 0, 11, 'I'], [7.5, 0, 11, 'I']],
+    hi: [[-9.5, 0, 6.6, 'H'], [3.5, 0, 11, 'I']],
+    // ions: gold in the crystal, colourless (glassy, with a charge label) in water
+    pb: [[0, 0, 7.5, 'AuPb']],
+    pbClear: [[0, 0, 7.5, 'clear']],
+    i: [[0, 0, 9.5, 'AuI']],
+    iClear: [[0, 0, 9.5, 'clear']],
+    h2o: [[-6, 4.5, 4.6, 'H'], [6, 4.5, 4.6, 'H'], [0, 0, 7, 'O']],
+  };
+  function rand01() { return Math.random(); }
+
+  function poisson(lambda) {
+    if (lambda <= 0) return 0;
+    if (lambda < 0.08) return rand01() < lambda ? 1 : 0;
+    const L = Math.exp(-lambda);
+    let k = 0;
+    let p = 1;
+    do {
+      k++;
+      p *= rand01();
+    } while (p > L && k < 64);
+    return k - 1;
+  }
+
+  function spriteCounts() {
+    const out = { no2: 0, n2o4: 0, n2: 0, h2: 0, nh3: 0, i2: 0, hi: 0, pbi2s: 0, pb: 0, i: 0 };
+    for (const s of sprites) {
+      if (s.solid || s.att) { if (s.kind === 'pb') out.pbi2s++; continue; } // one per formula unit
+      if (s.dock) out.n2o4 += 0.5;
+      else if (s.grp) out[s.as] += s.asW; // counted as what the gather / swap will make
+      else if (out[s.kind] !== undefined) out[s.kind]++;
+    }
+    return out;
+  }
+
+  function reactionEventBudget(dt) {
+    const V = V_L;
+    if (V <= 0) return { fwd: 0, rev: 0 };
+    const { rf, rr } = extentRates(n, V, T);
+    const dMolF = Math.max(0, rf * dt);
+    const dMolR = Math.max(0, rr * dt);
+    const sc = spriteCounts();
+    const rxn = activeRxn();
+    function molPerSprite(sp) {
+      const cnt = sc[sp] || 0;
+      const nm = getN(sp);
+      return cnt > 0 ? (nm / cnt) : 0;
+    }
+    let molPerEventF = 0;
+    let molPerEventR = 0;
+    for (const sp of rxn.species) {
+      const nu = rxn.nu[sp] || 0;
+      if (nu < 0) molPerEventF += (-nu) * (molPerSprite(sp) || (getN(sp) > 0 ? getN(sp) / 60 : 0.001));
+      if (nu > 0) molPerEventR += (nu) * (molPerSprite(sp) || (getN(sp) > 0 ? getN(sp) / 60 : 0.001));
+    }
+    const fwd = molPerEventF > 0 ? (dMolF / molPerEventF) : 0;
+    const rev = molPerEventR > 0 ? (dMolR / molPerEventR) : 0;
+    return { fwd, rev };
+  }
+
+  function collidePairs() {
+    const idx = [];
+    for (let i = 0; i < sprites.length; i++) if (sprites[i].kind === 'no2') idx.push(i);
+    const pairs = [];
+    const d0 = CFG.collideDist;
+    const dz0 = CFG.collideZ;
+    for (let a = 0; a < idx.length; a++) {
+      const i = idx[a];
+      const A = sprites[i];
+      if (!A || A.cd > 0) continue;
+      for (let b = a + 1; b < idx.length; b++) {
+        const j = idx[b];
+        const B = sprites[j];
+        if (!B || B.cd > 0) continue;
+        const dz = Math.abs(A.z - B.z);
+        if (dz > dz0) continue;
+        const dx = A.x - B.x;
+        const dy = A.y - B.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 > d0 * d0) continue;
+        const rvx = A.vx - B.vx;
+        const rvy = A.vy - B.vy;
+        const rel = Math.hypot(rvx, rvy);
+        pairs.push({ i, j, d2, rel });
+      }
+    }
+    pairs.sort((p, q) => (q.rel - p.rel) || (p.d2 - q.d2));
+    return pairs;
+  }
+
+  function wrapAngle(a) {
+    a = (a + Math.PI) % (Math.PI * 2);
+    if (a < 0) a += Math.PI * 2;
+    return a - Math.PI;
+  }
+
+  function handleSpriteCollisions() {
+    const rxn = activeRxn();
+    const nSpr = sprites.length;
+    if (nSpr < 2) return;
+    const d0 = CFG.collideDist;
+    const d0_2 = d0 * d0;
+    const dz0 = CFG.collideZ;
+    const cell = d0 * 1.35;
+
+    // Simple spatial hash in XY for near-neighbor collision checks.
+    const grid = new Map();
+    function key(ix, iy) { return (ix << 16) ^ iy; }
+    for (let i = 0; i < nSpr; i++) {
+      const s = sprites[i];
+      const ix = (s.x / cell) | 0;
+      const iy = (s.y / cell) | 0;
+      const k = key(ix, iy);
+      let arr = grid.get(k);
+      if (!arr) { arr = []; grid.set(k, arr); }
+      arr.push(i);
+    }
+
+    function bounce(A, B, nx, ny, relN) {
+      const rest = CFG.collideRest;
+      // Resolve along normal (equal mass)
+      const j = -(1 + rest) * relN * 0.5;
+      A.vx += j * nx; A.vy += j * ny;
+      B.vx -= j * nx; B.vy -= j * ny;
+      // A little spin kick for both
+      const sgn = (Math.random() < 0.5 ? -1 : 1);
+      A.ph += sgn * (Math.random() * CFG.rotCollideKick);
+      B.ph -= sgn * (Math.random() * CFG.rotCollideKick);
+      // Small z shuffle to create “slip behind” feeling over time
+      const zKick = (Math.random() - 0.5) * CFG.collideSlipZ;
+      A.vz = Math.max(-2.2, Math.min(2.2, A.vz + zKick));
+      B.vz = Math.max(-2.2, Math.min(2.2, B.vz - zKick));
+    }
+
+    for (let i = 0; i < nSpr; i++) {
+      const A = sprites[i];
+      if (!A || A.cd > 0) continue;
+      const ix = (A.x / cell) | 0;
+      const iy = (A.y / cell) | 0;
+      for (let ox = -1; ox <= 1; ox++) {
+        for (let oy = -1; oy <= 1; oy++) {
+          const arr = grid.get(key(ix + ox, iy + oy));
+          if (!arr) continue;
+          for (const j of arr) {
+            if (j <= i) continue;
+            const B = sprites[j];
+            if (!B || B.cd > 0) continue;
+            const dz = Math.abs(A.z - B.z);
+            if (dz > dz0) continue; // slip behind: far in depth -> no collision
+            const dx = B.x - A.x;
+            const dy = B.y - A.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 <= 1e-6 || d2 > d0_2) continue;
+
+            // Separate overlap a bit (prevents clumping).
+            const d = Math.sqrt(d2);
+            const nx = dx / d, ny = dy / d;
+            const target = d0 * 0.92;
+            const push = Math.max(0, target - d) * 0.52;
+            if (push > 0) {
+              A.x -= nx * push; A.y -= ny * push;
+              B.x += nx * push; B.y += ny * push;
+            }
+
+            const rvx = A.vx - B.vx;
+            const rvy = A.vy - B.vy;
+            const relN = rvx * nx + rvy * ny;
+            // n points A → B, so relN > 0 means closing in; only approaching pairs bounce
+            if (relN <= 0) continue; // moving apart
+
+            // NO2 special: allow oriented association only when reverse budget is available.
+            if (rxn.id === 'no2' && A.kind === 'no2' && B.kind === 'no2') {
+              const dAng = Math.abs(wrapAngle(A.ph - B.ph));
+              const aligned = dAng < CFG.alignThresh;
+              const fastEnough = relN > 14;
+              if (aligned && fastEnough && pendingReverse >= 1) {
+                pendingReverse -= 1;
+                mergeAt(i, j);
+                // sprites array changed; abort this pass (next frame will rebuild grid).
+                return;
+              }
+            }
+
+            // All other combinations (including N2O4+N2O4): bounce.
+            bounce(A, B, nx, ny, relN);
+          }
+        }
+      }
+    }
+  }
+
+  function mergeAt(i, j) {
+    const A = sprites[i];
+    const B = sprites[j];
+    if (!A || !B || A.kind !== 'no2' || B.kind !== 'no2' || A.dock || B.dock) return false;
+    // Visual-only event: RK4 keeps the authoritative (smooth) chemistry state.
+    bias.no2 = Math.max(-120, (bias.no2 || 0) - 2);
+    bias.n2o4 = Math.min(80, (bias.n2o4 || 0) + 1);
+    // The pair glides together and docks (stepPairs), then finishMerge makes the N2O4.
+    // A long cooldown keeps docking sprites out of collisions, removal and other merges.
+    A.dock = B.id;
+    B.dock = A.id;
+    A.dockT = B.dockT = CFG.dockTime;
+    A.dockAng = B.dockAng = Math.atan2(B.y - A.y, B.x - A.x);
+    A.cd = B.cd = 99;
+    return true;
+  }
+
+  function nearestNO2Pair(maxD) {
+    const idx = [];
+    for (let i = 0; i < sprites.length; i++) {
+      const s = sprites[i];
+      if (s.kind === 'no2' && !s.dock && s.cd <= 0) idx.push(i);
+    }
+    let best = null;
+    let bestD2 = maxD * maxD;
+    for (let a = 0; a < idx.length; a++) {
+      const A = sprites[idx[a]];
+      for (let b = a + 1; b < idx.length; b++) {
+        const B = sprites[idx[b]];
+        const d2 = (A.x - B.x) ** 2 + (A.y - B.y) ** 2;
+        if (d2 < bestD2) { bestD2 = d2; best = { i: idx[a], j: idx[b] }; }
+      }
+    }
+    return best;
+  }
+
+  // Turn a sprite's drawn angle (ph × spin) toward target.
+  function turnToward(s, spin, target, k) {
+    const d = s.ph * spin;
+    s.ph = (d + wrapAngle(target - d) * k) / spin;
+  }
+
+  // Animate docking pairs and fade the bonds of fresh splits.
+  function stepPairs(dt) {
+    const byId = new Map();
+    for (const s of sprites) {
+      if (s.dock) byId.set(s.id, s);
+      if (s.linkT > 0) s.linkT = Math.max(0, s.linkT - dt);
+    }
+    const k = 1 - Math.exp(-dt * 12);
+    if (groups.size) {
+      const all = new Map(sprites.map((s) => [s.id, s]));
+      for (const [gid, G] of groups) {
+        const mem = G.ids.map((id) => all.get(id));
+        if (mem.some((m) => !m)) {
+          // a member was removed: release the rest as ordinary molecules
+          for (const m of mem) if (m) { m.grp = 0; m.cd = 0; }
+          groups.delete(gid);
+          continue;
+        }
+        if (G.kind === 'swap') {
+          const [A, B] = mem;
+          const mx = 0.5 * (A.x + B.x);
+          const my = 0.5 * (A.y + B.y);
+          const mz = 0.5 * (A.z + B.z);
+          A.vx = B.vx = 0.5 * (A.vx + B.vx);
+          A.vy = B.vy = 0.5 * (A.vy + B.vy);
+          A.vz = B.vz = 0.5 * (A.vz + B.vz);
+          const ca = Math.cos(G.ang);
+          const sa = Math.sin(G.ang);
+          const half = CFG.dockHalf * 1.3;
+          A.x += (mx - ca * half - A.x) * k;
+          A.y += (my - sa * half - A.y) * k;
+          B.x += (mx + ca * half - B.x) * k;
+          B.y += (my + sa * half - B.y) * k;
+          A.z += (mz - A.z) * k;
+          B.z += (mz - B.z) * k;
+          G.t -= dt;
+          if (G.t <= 0) {
+            finishSwap(A, B, G);
+            groups.delete(gid);
+          }
+          continue;
+        }
+        const [N2, ...H] = mem;
+        let vx = 0, vy = 0, vz = 0;
+        for (const m of mem) { vx += m.vx; vy += m.vy; vz += m.vz; }
+        for (const m of mem) { m.vx = vx / 4; m.vy = vy / 4; m.vz = vz / 4; }
+        // the three H2 settle around the N2, 120° apart
+        H.forEach((h, i) => {
+          const a = G.ang + (i * Math.PI * 2) / 3;
+          h.x += (N2.x + Math.cos(a) * CFG.dockHalf * 2 - h.x) * k;
+          h.y += (N2.y + Math.sin(a) * CFG.dockHalf * 2 - h.y) * k;
+          h.z += (N2.z - h.z) * k;
+        });
+        G.t -= dt;
+        if (G.t <= 0) {
+          finishAmmoniaMerge(N2, H);
+          groups.delete(gid);
+        }
+      }
+    }
+    if (!byId.size) return;
+    const half = CFG.dockHalf;
+    for (const A of byId.values()) {
+      const B = byId.get(A.dock);
+      if (!B) { A.dock = 0; A.cd = 0; continue; } // partner was removed
+      if (A.id > B.id) continue; // each pair once
+      const mx = 0.5 * (A.x + B.x);
+      const my = 0.5 * (A.y + B.y);
+      const mz = 0.5 * (A.z + B.z);
+      A.vx = B.vx = 0.5 * (A.vx + B.vx);
+      A.vy = B.vy = 0.5 * (A.vy + B.vy);
+      A.vz = B.vz = 0.5 * (A.vz + B.vz);
+      const ca = Math.cos(A.dockAng);
+      const sa = Math.sin(A.dockAng);
+      A.x += (mx - ca * half - A.x) * k;
+      A.y += (my - sa * half - A.y) * k;
+      B.x += (mx + ca * half - B.x) * k;
+      B.y += (my + sa * half - B.y) * k;
+      A.z += (mz - A.z) * k;
+      B.z += (mz - B.z) * k;
+      // N atoms turn to face each other
+      turnToward(A, 0.15, A.dockAng + Math.PI / 2, k);
+      turnToward(B, 0.15, A.dockAng - Math.PI / 2, k);
+      A.dockT -= dt;
+      B.dockT = A.dockT;
+      if (A.dockT <= 0) finishMerge(A, B);
+    }
+  }
+
+  function finishMerge(A, B) {
+    const x = 0.5 * (A.x + B.x);
+    const y = 0.5 * (A.y + B.y);
+    const z = 0.5 * (A.z + B.z);
+    const vx = 0.5 * (A.vx + B.vx);
+    const vy = 0.5 * (A.vy + B.vy);
+    const vz = 0.5 * (A.vz + B.vz);
+    const sNew = {
+      id: nextSpriteId++,
+      kind: 'n2o4',
+      x, y, z,
+      vx,
+      vy,
+      vz,
+      ph: A.dockAng / 0.08, // N–N axis along the docking line
+      cd: CFG.mergeCooldown,
+      pop: 0.16,
+    };
+    sprites.splice(sprites.indexOf(A), 1);
+    sprites.splice(sprites.indexOf(B), 1);
+    sprites.push(sNew);
+  }
+
+  // N2 + 3 H2 → 2 NH3 starts as a gather: the H2 glide in around the N2 (stepPairs),
+  // then finishAmmoniaMerge makes the NH3. fromSync: driven by the equilibrium shift itself,
+  // so no visual bias.
+  function mergeAmmoniaAt(iN2, h2Idx, fromSync) {
+    const N2 = sprites[iN2];
+    if (!N2 || N2.kind !== 'n2' || N2.cd > 0 || N2.grp) return false;
+    if (!h2Idx || h2Idx.length < 3) return false;
+    const H = h2Idx.slice(0, 3).map((i) => sprites[i]).filter(Boolean);
+    if (H.length < 3 || H.some((s) => s.kind !== 'h2' || s.cd > 0 || s.grp)) return false;
+
+    if (!fromSync) {
+      // Visual-only: bias toward product presence.
+      bias.n2 = (bias.n2 || 0) - 1;
+      bias.h2 = (bias.h2 || 0) - 3;
+      bias.nh3 = (bias.nh3 || 0) + 2;
+    }
+    const gid = nextGroupId++;
+    groups.set(gid, { ids: [N2.id, ...H.map((h) => h.id)], t: CFG.dockTime, ang: Math.random() * Math.PI * 2 });
+    for (const m of [N2, ...H]) { m.grp = gid; m.cd = 99; m.as = 'nh3'; m.asW = 0.5; }
+    return true;
+  }
+
+  function finishAmmoniaMerge(N2, H) {
+    const x = N2.x, y = N2.y, z = N2.z;
+    const vx = N2.vx;
+    const vy = N2.vy;
+    const vz = N2.vz;
+    const ph = N2.ph;
+
+    const kick = 10 + 14 * Math.random();
+    const ang = Math.random() * Math.PI * 2;
+    const nx = Math.cos(ang), ny = Math.sin(ang);
+    const a = {
+      id: nextSpriteId++,
+      kind: 'nh3',
+      x: x + nx * 4.5,
+      y: y + ny * 4.5,
+      z,
+      vx: vx + nx * kick,
+      vy: vy + ny * kick,
+      vz,
+      ph: ph + 0.4,
+      cd: CFG.mergeCooldown,
+      pop: 0.16,
+    };
+    const b = {
+      id: nextSpriteId++,
+      kind: 'nh3',
+      x: x - nx * 4.5,
+      y: y - ny * 4.5,
+      z,
+      vx: vx - nx * kick,
+      vy: vy - ny * kick,
+      vz,
+      ph: ph - 0.4,
+      cd: CFG.mergeCooldown,
+      pop: 0.16,
+    };
+    for (const m of [N2, ...H]) sprites.splice(sprites.indexOf(m), 1);
+    sprites.push(a, b);
+  }
+
+  // Free N2 with the three nearest free H2 (smallest total distance), for shift-driven gathers.
+  function nearestAmmoniaGroup() {
+    const free = (s) => !s.grp && s.cd <= 0;
+    const hIdx = [];
+    for (let j = 0; j < sprites.length; j++) if (sprites[j].kind === 'h2' && free(sprites[j])) hIdx.push(j);
+    if (hIdx.length < 3) return null;
+    let best = null;
+    let bestCost = Infinity;
+    for (let i = 0; i < sprites.length; i++) {
+      const N2 = sprites[i];
+      if (N2.kind !== 'n2' || !free(N2)) continue;
+      const near = hIdx
+        .map((j) => ({ j, d2: (sprites[j].x - N2.x) ** 2 + (sprites[j].y - N2.y) ** 2 }))
+        .sort((p, q) => p.d2 - q.d2)
+        .slice(0, 3);
+      const cost = near[0].d2 + near[1].d2 + near[2].d2;
+      if (cost < bestCost) { bestCost = cost; best = { iN2: i, h2Idx: near.map((q) => q.j) }; }
+    }
+    return best;
+  }
+
+  // H2 + I2 → 2 HI (or 2 HI → H2 + I2) as a swap: the pair glides together and docks
+  // (stepPairs), then finishSwap sends the two new molecules off. out: the product kinds.
+  function startSwap(i, j, out, fromSync) {
+    const A = sprites[i];
+    const B = sprites[j];
+    const free = (s) => s && !s.grp && !s.dock && s.cd <= 0;
+    if (!free(A) || !free(B) || A === B) return false;
+    if (!fromSync) {
+      const fwd = out[0] === 'hi';
+      const sgn = fwd ? 1 : -1;
+      bias.h2 = (bias.h2 || 0) - sgn;
+      bias.i2 = (bias.i2 || 0) - sgn;
+      bias.hi = (bias.hi || 0) + 2 * sgn;
+    }
+    const gid = nextGroupId++;
+    groups.set(gid, { kind: 'swap', ids: [A.id, B.id], t: CFG.dockTime, ang: Math.atan2(B.y - A.y, B.x - A.x), out });
+    A.grp = B.grp = gid;
+    A.cd = B.cd = 99;
+    A.as = out[0];
+    B.as = out[1];
+    A.asW = B.asW = 1;
+    return true;
+  }
+
+  function finishSwap(A, B, G) {
+    const mx = 0.5 * (A.x + B.x);
+    const my = 0.5 * (A.y + B.y);
+    const mz = 0.5 * (A.z + B.z);
+    const vx = 0.5 * (A.vx + B.vx);
+    const vy = 0.5 * (A.vy + B.vy);
+    const vz = 0.5 * (A.vz + B.vz);
+    // the new pair leaves across the line they came in on, as if they traded partners
+    const px = -Math.sin(G.ang);
+    const py = Math.cos(G.ang);
+    const kick = 18 + 14 * Math.random();
+    const made = G.out.map((kind, i) => {
+      const sg = i === 0 ? 1 : -1;
+      return {
+        id: nextSpriteId++,
+        kind,
+        x: mx + px * 6 * sg,
+        y: my + py * 6 * sg,
+        z: mz,
+        vx: vx + px * kick * sg,
+        vy: vy + py * kick * sg,
+        vz,
+        ph: Math.random() * Math.PI * 2 / 0.16,
+        cd: CFG.mergeCooldown,
+        pop: 0.14,
+      };
+    });
+    made[0].link = made[1].id;
+    made[1].link = made[0].id;
+    made[0].linkT = made[1].linkT = CFG.breakTime;
+    sprites.splice(sprites.indexOf(A), 1);
+    sprites.splice(sprites.indexOf(B), 1);
+    sprites.push(...made);
+  }
+
+  // Nearest free pair of the given kinds (ka === kb for two of the same).
+  function nearestPairOf(ka, kb) {
+    const free = (s) => !s.grp && !s.dock && s.cd <= 0;
+    const as = [];
+    const bs = [];
+    for (let i = 0; i < sprites.length; i++) {
+      const s = sprites[i];
+      if (!free(s)) continue;
+      if (s.kind === ka) as.push(i);
+      if (s.kind === kb && ka !== kb) bs.push(i);
+    }
+    const same = ka === kb;
+    let best = null;
+    let bestD2 = Infinity;
+    for (let a = 0; a < as.length; a++) {
+      const A = sprites[as[a]];
+      const list = same ? as.slice(a + 1) : bs;
+      for (const j of list) {
+        const B = sprites[j];
+        const d2 = (A.x - B.x) ** 2 + (A.y - B.y) ** 2;
+        if (d2 < bestD2) { bestD2 = d2; best = { i: as[a], j }; }
+      }
+    }
+    return best;
+  }
+
+  function nearestNH3Pair() {
+    const idx = [];
+    for (let i = 0; i < sprites.length; i++) {
+      const s = sprites[i];
+      if (s.kind === 'nh3' && !s.grp && s.cd <= 0) idx.push(i);
+    }
+    let best = null;
+    let bestD2 = Infinity;
+    for (let a = 0; a < idx.length; a++) {
+      const A = sprites[idx[a]];
+      for (let b = a + 1; b < idx.length; b++) {
+        const B = sprites[idx[b]];
+        const d2 = (A.x - B.x) ** 2 + (A.y - B.y) ** 2;
+        if (d2 < bestD2) { bestD2 = d2; best = { i: idx[a], j: idx[b] }; }
+      }
+    }
+    return best;
+  }
+
+  function splitAmmoniaAt(iA, iB, fromSync) {
+    const A = sprites[iA];
+    const B = sprites[iB];
+    if (!A || !B || A.kind !== 'nh3' || B.kind !== 'nh3') return false;
+    if (A.cd > 0 || B.cd > 0) return false;
+
+    if (!fromSync) {
+      bias.n2 = (bias.n2 || 0) + 1;
+      bias.h2 = (bias.h2 || 0) + 3;
+      bias.nh3 = (bias.nh3 || 0) - 2;
+    }
+
+    const x = 0.5 * (A.x + B.x);
+    const y = 0.5 * (A.y + B.y);
+    const z = 0.5 * (A.z + B.z);
+    const vx = 0.5 * (A.vx + B.vx);
+    const vy = 0.5 * (A.vy + B.vy);
+    const vz = 0.5 * (A.vz + B.vz);
+    const ph = 0.5 * (A.ph + B.ph);
+
+    const ang = Math.random() * Math.PI * 2;
+    const nx = Math.cos(ang), ny = Math.sin(ang);
+    const kick = 14 + 18 * Math.random();
+
+    const n2 = {
+      id: nextSpriteId++,
+      kind: 'n2',
+      x,
+      y,
+      z,
+      vx: vx + nx * kick,
+      vy: vy + ny * kick,
+      vz,
+      ph,
+      cd: CFG.mergeCooldown,
+      pop: 0.14,
+    };
+
+    const h2a = {
+      id: nextSpriteId++,
+      kind: 'h2',
+      x: x + nx * 10,
+      y: y + ny * 10,
+      z,
+      vx: vx + nx * kick * 1.1,
+      vy: vy + ny * kick * 1.1,
+      vz,
+      ph: ph + 0.6,
+      cd: CFG.mergeCooldown,
+      pop: 0.10,
+    };
+    const h2b = {
+      id: nextSpriteId++,
+      kind: 'h2',
+      x: x - nx * 10,
+      y: y - ny * 10,
+      z,
+      vx: vx - nx * kick * 1.1,
+      vy: vy - ny * kick * 1.1,
+      vz,
+      ph: ph - 0.6,
+      cd: CFG.mergeCooldown,
+      pop: 0.10,
+    };
+    const h2c = {
+      id: nextSpriteId++,
+      kind: 'h2',
+      x: x + ny * 10,
+      y: y - nx * 10,
+      z,
+      vx: vx + ny * kick * 1.1,
+      vy: vy - nx * kick * 1.1,
+      vz,
+      ph: ph + 1.2,
+      cd: CFG.mergeCooldown,
+      pop: 0.10,
+    };
+
+    // bond lines from the N2 to each H2 stretch and fade as they fly apart
+    n2.linkT = CFG.breakTime;
+    for (const h of [h2a, h2b, h2c]) { h.link = n2.id; h.linkT = CFG.breakTime; }
+    const toRemove = [iA, iB].sort((p, q) => q - p);
+    for (const idx of toRemove) sprites.splice(idx, 1);
+    sprites.push(n2, h2a, h2b, h2c);
+    return true;
+  }
+
+  function splitAt(k) {
+    const S = sprites[k];
+    if (!S || S.kind !== 'n2o4' || S.cd > 0) return false;
+    // Visual-only event: RK4 keeps the authoritative (smooth) chemistry state.
+    bias.no2 = Math.min(160, (bias.no2 || 0) + 2);
+    bias.n2o4 = Math.max(-90, (bias.n2o4 || 0) - 1);
+    // Each NO2 starts where its half of the N2O4 was, N facing the old N–N bond.
+    const ang = S.ph * 0.08;
+    const nx = Math.cos(ang);
+    const ny = Math.sin(ang);
+    const sep = CFG.dockHalf;
+    const kick = CFG.splitKick * (0.75 + 0.6 * Math.random()) * Math.sqrt(Math.max(0.25, T / CFG.T0));
+    const A = {
+      id: nextSpriteId++,
+      kind: 'no2',
+      x: S.x + nx * sep,
+      y: S.y + ny * sep,
+      z: Math.max(-1, Math.min(1, S.z + (Math.random() - 0.5) * 0.22)),
+      vx: S.vx + nx * kick,
+      vy: S.vy + ny * kick,
+      vz: S.vz + (Math.random() - 0.5) * 0.9,
+      ph: (ang - Math.PI / 2) / 0.15,
+      cd: CFG.mergeCooldown,
+      pop: 0.12,
+    };
+    const B = {
+      id: nextSpriteId++,
+      kind: 'no2',
+      x: S.x - nx * sep,
+      y: S.y - ny * sep,
+      z: Math.max(-1, Math.min(1, S.z + (Math.random() - 0.5) * 0.22)),
+      vx: S.vx - nx * kick,
+      vy: S.vy - ny * kick,
+      vz: S.vz + (Math.random() - 0.5) * 0.9,
+      ph: (ang + Math.PI / 2) / 0.15,
+      cd: CFG.mergeCooldown,
+      pop: 0.12,
+    };
+    A.link = B.id;
+    B.link = A.id;
+    A.linkT = B.linkT = CFG.breakTime;
+    sprites.splice(k, 1);
+    sprites.push(A, B);
+    return true;
+  }
+
+  function applySpriteReactions(dt) {
+    if (activeRxn().id === 'pbi2') { pbi2Events(dt); return; }
+    const b = reactionEventBudget(dt);
+    pendingForward += b.fwd;
+    pendingReverse += b.rev;
+
+    const rxn = activeRxn();
+    // Map “forward”/“reverse” sprite events to match each reaction's chosen forward direction.
+    // - NO2: forward = split (N2O4 -> 2 NO2), reverse = merge (2 NO2 -> N2O4)
+    // - Ammonia: forward = merge (N2 + 3 H2 -> 2 NH3), reverse = split (2 NH3 -> N2 + 3 H2)
+    const splitBudget = rxn.id === 'no2' ? pendingForward : pendingReverse;
+    const mergeBudget = rxn.id === 'no2' ? pendingReverse : pendingForward;
+
+    const wantSplit = Math.min(14, Math.floor(splitBudget));
+    if (wantSplit > 0) {
+      if (rxn.id === 'no2') pendingForward -= wantSplit;
+      else pendingReverse -= wantSplit;
+      let done = 0;
+      for (let tries = 0; tries < wantSplit * 6 && done < wantSplit; tries++) {
+        if (rxn.id === 'no2') {
+          const k = (Math.random() * sprites.length) | 0;
+          if (sprites[k] && sprites[k].kind === 'n2o4') {
+            if (splitAt(k)) done++;
+          }
+        } else if (rxn.id === 'hi') {
+          // Reverse: two HI that meet swap back into H2 + I2
+          const pr = nearestPairOf('hi', 'hi');
+          if (pr && (sprites[pr.i].x - sprites[pr.j].x) ** 2 + (sprites[pr.i].y - sprites[pr.j].y) ** 2 < (CFG.collideDist * 1.5) ** 2) {
+            if (startSwap(pr.i, pr.j, ['h2', 'i2'])) done++;
+          }
+          break;
+        } else {
+          // Reverse: 2 NH3 near each other split -> N2 + 3 H2
+          const iA = (Math.random() * sprites.length) | 0;
+          const A = sprites[iA];
+          if (!A || A.kind !== 'nh3' || A.cd > 0) continue;
+          let best = -1;
+          let bestD2 = 1e9;
+          for (let j = 0; j < sprites.length; j++) {
+            if (j === iA) continue;
+            const B = sprites[j];
+            if (!B || B.kind !== 'nh3' || B.cd > 0) continue;
+            const dz = Math.abs(A.z - B.z);
+            if (dz > CFG.collideZ) continue;
+            const dx = A.x - B.x, dy = A.y - B.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < bestD2) { bestD2 = d2; best = j; }
+          }
+          if (best >= 0 && bestD2 < (CFG.collideDist * 1.15) * (CFG.collideDist * 1.15)) {
+            if (splitAmmoniaAt(iA, best)) done++;
+          }
+        }
+      }
+      if (done < wantSplit) {
+        if (rxn.id === 'no2') pendingForward += (wantSplit - done);
+        else pendingReverse += (wantSplit - done);
+      }
+    }
+
+    let pairs = null;
+    const wantMerge = Math.min(18, Math.floor(mergeBudget));
+    if (wantMerge > 0) {
+      let done = 0;
+      if (rxn.id === 'no2') {
+        pairs = collidePairs();
+        const used = new Set();
+        for (const p of pairs) {
+          if (done >= wantMerge) break;
+          if (used.has(p.i) || used.has(p.j)) continue;
+          const A = sprites[p.i];
+          const B2 = sprites[p.j];
+          if (!A || !B2) continue;
+          const rel = p.rel;
+          const relN = Math.min(1.25, rel / 45);
+          const dz = Math.abs(A.z - B2.z);
+          const zN = 1 - Math.min(1, dz / CFG.collideZ);
+          const pHit = 0.18 + 0.55 * relN * zN;
+          if (Math.random() > pHit) continue;
+          if (mergeAt(p.i, p.j)) {
+            used.add(p.i); used.add(p.j);
+            done++;
+          }
+        }
+      }
+      if (rxn.id === 'hi') {
+        // Forward: an H2 and an I2 that meet swap into 2 HI
+        for (let tries = 0; tries < wantMerge && done < wantMerge; tries++) {
+          const pr = nearestPairOf('h2', 'i2');
+          if (!pr) break;
+          const d2 = (sprites[pr.i].x - sprites[pr.j].x) ** 2 + (sprites[pr.i].y - sprites[pr.j].y) ** 2;
+          if (d2 > (CFG.collideDist * 1.5) ** 2 || !startSwap(pr.i, pr.j, ['hi', 'hi'])) break;
+          done++;
+        }
+      }
+      if (rxn.id === 'ammonia') {
+        // Forward: N2 with at least three nearby H2 -> 2 NH3
+        for (let tries = 0; tries < wantMerge * 10 && done < wantMerge; tries++) {
+          const iN2 = (Math.random() * sprites.length) | 0;
+          const N2 = sprites[iN2];
+          if (!N2 || N2.kind !== 'n2' || N2.cd > 0) continue;
+          const nearby = [];
+          for (let j = 0; j < sprites.length; j++) {
+            const H = sprites[j];
+            if (!H || H.kind !== 'h2' || H.cd > 0) continue;
+            const dz = Math.abs(N2.z - H.z);
+            if (dz > CFG.collideZ) continue;
+            const dx = N2.x - H.x, dy = N2.y - H.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < (CFG.collideDist * 1.25) * (CFG.collideDist * 1.25)) nearby.push({ j, d2 });
+          }
+          if (nearby.length < 3) continue;
+          nearby.sort((a, b) => a.d2 - b.d2);
+          const idx = [nearby[0].j, nearby[1].j, nearby[2].j];
+          // Slightly probabilistic, more likely if crowded.
+          const pHit = Math.min(0.85, 0.22 + 0.12 * Math.min(6, nearby.length));
+          if (Math.random() > pHit) continue;
+          if (mergeAmmoniaAt(iN2, idx)) done++;
+        }
+      }
+      if (rxn.id === 'no2') {
+        pendingReverse -= done;
+        pendingReverse = Math.max(0, pendingReverse);
+      } else {
+        pendingForward -= done;
+        pendingForward = Math.max(0, pendingForward);
+      }
+    }
+
+    // If visuals drift too far from the RK4-driven targets, damp pending events.
+    const sc = spriteCounts();
+    if (rxn.id === 'no2') {
+      const t = no2Targets();
+      const drift4 = t.n2o4 - (sc.n2o4 || 0);
+      const drift2 = t.no2 - (sc.no2 || 0);
+      if (Math.abs(drift4) > 10 || Math.abs(drift2) > 16) {
+        pendingForward *= 0.65;
+        pendingReverse *= 0.65;
+      }
+    }
+  }
+
+  // The bench: a plain surface (no dot grid, per AGENTS.md), lighter at the back.
+  function paintTray(ctx, w, h) {
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(1, '#e9edf4');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  // N–N bonds under the molecules: forming while a pair docks, stretching and fading after a split.
+  function drawPairBonds(proj) {
+    const byId = new Map();
+    for (const s of sprites) if (s.dock || s.linkT > 0 || s.grp) byId.set(s.id, s);
+    if (!byId.size) return;
+    ctxS.save();
+    ctxS.lineCap = 'round';
+    // Haber gathers: dashed N–H bonds forming from the N2 to each incoming H2
+    ctxS.setLineDash([4, 4]);
+    ctxS.lineWidth = 2.5;
+    for (const G of groups.values()) {
+      const mem = G.ids.map((id) => byId.get(id));
+      if (mem.some((m) => !m)) continue;
+      const a = 1 - Math.max(0, G.t) / CFG.dockTime;
+      const pn = proj(mem[0].x, mem[0].y, mem[0].z);
+      ctxS.strokeStyle = `rgba(29,36,51,${(0.6 * a).toFixed(3)})`;
+      ctxS.beginPath();
+      for (const h of mem.slice(1)) {
+        const ph = proj(h.x, h.y, h.z);
+        ctxS.moveTo(pn.x, pn.y);
+        ctxS.lineTo(ph.x, ph.y);
+      }
+      ctxS.stroke();
+    }
+    for (const A of byId.values()) {
+      let a = 0;
+      let B = null;
+      if (A.dock) {
+        B = byId.get(A.dock);
+        a = 1 - Math.max(0, A.dockT) / CFG.dockTime;
+        ctxS.setLineDash([4, 4]);
+      } else if (A.linkT > 0 && A.link) {
+        B = byId.get(A.link);
+        a = A.linkT / CFG.breakTime;
+        ctxS.setLineDash([]);
+        // an NO2 pair links both ways: draw it once
+        if (B && B.link === A.id && A.id > B.id) continue;
+      } else {
+        continue;
+      }
+      if (!B || (A.dock && A.id > B.id)) continue;
+      const pa = proj(A.x, A.y, A.z);
+      const pb = proj(B.x, B.y, B.z);
+      ctxS.strokeStyle = A.kind === 'no2'
+        ? `rgba(139,90,43,${(0.85 * a).toFixed(3)})`
+        : `rgba(29,36,51,${(0.6 * a).toFixed(3)})`;
+      ctxS.lineWidth = 3.5 * 0.5 * (pa.p + pb.p);
+      ctxS.beginPath();
+      ctxS.moveTo(pa.x, pa.y);
+      ctxS.lineTo(pb.x, pb.y);
+      ctxS.stroke();
+    }
+    ctxS.restore();
+  }
+
+  // The PbI2 beaker's water line, vapour and pouring stream; in the opening seconds, water
+  // molecules fading out, then a caption.
+  function drawWater(proj, x0, y0, w, h) {
+    const y1 = y0 + h;
+    const ys = y1 - h * waterLevel * CFG.waterHead;
+    const wh = y1 - ys;
+    // the water surface: a round disc seen slightly from above, darker along the front (meniscus)
+    const cxw = x0 + w / 2, rxw = w / 2 - 2, ryw = Math.max(1, (w / 2) * CFG.vesselTilt - 1);
+    ctxS.save();
+    ctxS.beginPath(); ctxS.ellipse(cxw, ys, rxw, ryw, 0, 0, Math.PI * 2);
+    ctxS.fillStyle = 'rgba(255,255,255,0.28)'; ctxS.fill();
+    ctxS.lineWidth = 1.5; ctxS.strokeStyle = 'rgba(60,120,195,0.35)'; ctxS.stroke();
+    ctxS.beginPath(); ctxS.ellipse(cxw, ys, rxw, ryw, 0, 0.06, Math.PI - 0.06);
+    ctxS.strokeStyle = 'rgba(60,120,195,0.6)'; ctxS.lineWidth = 2; ctxS.stroke();
+    // vapour leaving the surface as the water evaporates
+    for (const v of vapour) {
+      const yv = y1 - h * v.lv * CFG.waterHead - v.rise;
+      const q = proj(x0 + 16 + v.u * (w - 32) + Math.sin(flowT * 3 + v.ph) * 4, yv, v.z);
+      const t = v.age / v.life;
+      ctxS.fillStyle = `rgba(90,140,205,${(0.28 * (1 - t) * Math.min(1, v.age * 6)).toFixed(3)})`;
+      ctxS.beginPath();
+      ctxS.arc(q.x, q.y, (2 + 3 * t) * q.p, 0, Math.PI * 2);
+      ctxS.fill();
+    }
+    // water poured in from the top, splashing onto the surface
+    if (pourA > 0.02 && ys > y0 + 4) {
+      const sx = x0 + w * 0.8;
+      const top = proj(sx, y0, 0.2), bot = proj(sx, ys, 0.2);
+      ctxS.fillStyle = `rgba(80,145,225,${(0.55 * pourA).toFixed(3)})`;
+      ctxS.beginPath();
+      const segs = 16;
+      const half = (k) => (4.5 - 1.5 * k / segs) * top.p;
+      for (let k = 0; k <= segs; k++) {
+        const yy = top.y + (bot.y - top.y) * k / segs;
+        ctxS.lineTo(top.x + Math.sin(flowT * 14 + k * 0.9) * 0.9 - half(k), yy);
+      }
+      for (let k = segs; k >= 0; k--) {
+        const yy = top.y + (bot.y - top.y) * k / segs;
+        ctxS.lineTo(top.x + Math.sin(flowT * 14 + k * 0.9) * 0.9 + half(k), yy);
+      }
+      ctxS.closePath();
+      ctxS.fill();
+      // ripples spreading from where the stream lands
+      ctxS.strokeStyle = `rgba(80,145,225,${(0.35 * pourA).toFixed(3)})`;
+      ctxS.lineWidth = 1.2;
+      for (let r = 0; r < 3; r++) {
+        const ph = (flowT * 1.6 + r / 3) % 1;
+        ctxS.globalAlpha = 1 - ph;
+        ctxS.beginPath();
+        ctxS.ellipse(bot.x, bot.y, (4 + 22 * ph) * bot.p, (1.5 + 5 * ph) * bot.p, 0, 0, Math.PI * 2);
+        ctxS.stroke();
+      }
+    }
+    ctxS.restore();
+    const a = waterAlpha();
+    if (a > 0.01) {
+      for (const m of water) {
+        const q = proj(x0 + 20 + m.u * (w - 40), ys + 20 + m.v * Math.max(0, wh - 40), m.z);
+        ctxS.save();
+        ctxS.globalAlpha = a * (0.55 + 0.35 * (m.z + 1) * 0.5);
+        ctxS.translate(q.x, q.y);
+        ctxS.scale(q.p * CFG.spriteScale * 0.85, q.p * CFG.spriteScale * 0.85);
+        drawMolecule(ctxS, 0, 0, m.a, MOL.h2o);
+        ctxS.restore();
+      }
+    }
+    // caption while the water fades, then gone
+    const t = waterT - CFG.waterShow;
+    const capA = t < 0 ? 0 : t < 0.6 ? t / 0.6 : t < 4.5 ? 1 : Math.max(0, 1 - (t - 4.5) / 1);
+    if (capA > 0.01) {
+      ctxS.save();
+      ctxS.globalAlpha = capA * 0.75;
+      ctxS.fillStyle = INK;
+      ctxS.font = '600 13px "Space Grotesk", Helvetica, sans-serif';
+      ctxS.textAlign = 'left';
+      ctxS.textBaseline = 'top';
+      ctxS.fillText('Water molecules hidden from here on: they are still there.', x0 + 18, y0 + 16);
+      ctxS.restore();
+    }
+  }
+
+  function drawSim() {
+    const sR = sim.getBoundingClientRect();
+    const cssW = sR.width;
+    const cssH = sR.height;
+    paintTray(ctxS, cssW, cssH);
+
+    const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
+    const scale = 0.72 + 0.55 * vNorm;
+    const { cx, cy, rw, rh } = vesselGeom(cssW, cssH, scale);
+    const x0 = cx - rw;
+    const y0 = cy - rh;
+    const w = rw * 2;
+    const h = rh * 2;
+    const y1 = y0 + h;
+
+    // A glass cylinder on the bench, seen slightly from above. Depth (z) runs into the
+    // screen: the front (z = +1) sits lower and the back (z = −1) higher by ry, and far
+    // molecules are drawn smaller and fainter. Molecules stay inside the round cross-section.
+    const ry = rw * CFG.vesselTilt;
+    const isBeaker = activeRxn().id === 'pbi2';
+    const pb = 0.76; // size of a molecule at the back wall
+    function proj(x, y, z) {
+      return { x, y: y + z * ry, p: pb + (1 - pb) * (z + 1) * 0.5 };
+    }
+    const x1 = x0 + w;
+    function silhouette() {
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0, rw, ry, 0, Math.PI, Math.PI * 2);
+      ctxS.lineTo(x1, y1);
+      ctxS.ellipse(cx, y1, rw, ry, 0, 0, Math.PI);
+      ctxS.closePath();
+    }
+
+    // shadow on the bench
+    const sh = ctxS.createRadialGradient(cx, y1 + ry * 0.4, 0, cx, y1 + ry * 0.4, rw * 1.2);
+    sh.addColorStop(0, 'rgba(29,36,51,0.20)');
+    sh.addColorStop(1, 'rgba(29,36,51,0)');
+    ctxS.fillStyle = sh;
+    ctxS.beginPath();
+    ctxS.ellipse(cx, y1 + ry * 0.45, rw * 1.2, ry * 1.4, 0, 0, Math.PI * 2);
+    ctxS.fill();
+
+    // the glass body, a little darker at the curved edges
+    silhouette();
+    const body = ctxS.createLinearGradient(x0, 0, x1, 0);
+    body.addColorStop(0, 'rgba(214,224,238,0.75)');
+    body.addColorStop(0.5, 'rgba(248,250,253,0.7)');
+    body.addColorStop(1, 'rgba(206,218,234,0.8)');
+    ctxS.fillStyle = body;
+    ctxS.fill();
+
+    ctxS.save();
+    silhouette();
+    ctxS.clip();
+    // the inside floor
+    ctxS.beginPath();
+    ctxS.ellipse(cx, y1, rw - 3, ry - 2, 0, 0, Math.PI * 2);
+    ctxS.fillStyle = 'rgba(29,36,51,0.07)';
+    ctxS.fill();
+    // the back of the rim, seen through the glass
+    ctxS.beginPath();
+    ctxS.ellipse(cx, y0, rw - 1, ry - 1, 0, Math.PI, Math.PI * 2);
+    ctxS.strokeStyle = 'rgba(29,36,51,0.3)';
+    ctxS.lineWidth = 1.5;
+    ctxS.stroke();
+
+    // water: fills the beaker up to its line
+    if (isBeaker) {
+      const ys = y1 - h * waterLevel * CFG.waterHead;
+      ctxS.beginPath();
+      ctxS.ellipse(cx, ys, rw - 2, ry - 1, 0, Math.PI, Math.PI * 2);
+      ctxS.lineTo(x1 - 2, y1);
+      ctxS.ellipse(cx, y1, rw - 2, ry - 1, 0, 0, Math.PI);
+      ctxS.closePath();
+      ctxS.fillStyle = 'rgba(110,170,235,0.16)';
+      ctxS.fill();
+    }
+    // iodine vapour tints the gas violet in proportion to [I2] (H2 and HI are colourless)
+    if (activeRxn().id === 'hi' && V_L > 0) {
+      const tint = 0.32 * (1 - Math.exp(-(getN('i2') / V_L) / 0.015));
+      ctxS.fillStyle = `rgba(122,62,190,${tint.toFixed(3)})`;
+      ctxS.fillRect(x0, y0 - ry, w, h + 2 * ry);
+    }
+    // NO2 tints the gas brown (N2O4 is colourless)
+    if (activeRxn().id === 'no2' && V_L > 0) {
+      const tint = 0.3 * (1 - Math.exp(-(getN('no2') / V_L) / 0.05));
+      ctxS.fillStyle = `rgba(154,91,46,${tint.toFixed(3)})`;
+      ctxS.fillRect(x0, y0 - ry, w, h + 2 * ry);
+    }
+
+    const drawList = sprites.slice();
+    drawList.sort((a, b) => (a.z - b.z) || (a.y - b.y));
+
+    // contact shadows on the floor, fainter the higher the molecule floats
+    for (const s of drawList) {
+      const f = proj(s.x, y1, s.z);
+      const lift = Math.max(0, Math.min(1, (y1 - s.y) / h));
+      const a = 0.11 * (1 - 0.9 * lift);
+      const r = 16 * f.p * CFG.spriteScale * (1 + 0.5 * lift);
+      ctxS.fillStyle = `rgba(29,36,51,${a.toFixed(3)})`;
+      ctxS.beginPath();
+      ctxS.ellipse(f.x, f.y - 6 * f.p, r, r * 0.28, 0, 0, Math.PI * 2);
+      ctxS.fill();
+    }
+
+    drawPairBonds(proj);
+    if (activeRxn().id === 'pbi2') drawWater(proj, x0, y0, w, h);
+    for (const s of drawList) {
+      const atoms = MOL[s.kind];
+      if (!atoms) continue;
+      const q = proj(s.x, s.y, s.z);
+      const zN = (s.z + 1) * 0.5;
+      const pop = s.pop > 0 ? (1 + 0.22 * (s.pop / 0.16)) : 1;
+      const spin = { no2: 0.15, n2o4: 0.08, h2: 0.2, n2: 0.16, nh3: 0.16, i2: 0.12, hi: 0.16, pb: 0, i: 0 }[s.kind];
+      const baseA = 1 - CFG.depthAlpha * (1 - zN);
+      ctxS.save();
+      ctxS.globalAlpha = baseA;
+      ctxS.translate(q.x, q.y);
+      ctxS.scale(q.p * pop * CFG.spriteScale, q.p * pop * CFG.spriteScale);
+      if (s.kind === 'pb' || s.kind === 'i') {
+        // gold in the crystal, clear in water, cross-fading as an ion joins or leaves
+        const gold = s.gold || 0;
+        ctxS.globalAlpha = baseA * (1 - gold);
+        drawMolecule(ctxS, 0, 0, 0, s.kind === 'pb' ? MOL.pbClear : MOL.iClear);
+        ctxS.globalAlpha = baseA * gold;
+        drawMolecule(ctxS, 0, 0, 0, atoms);
+        if (gold < 0.6) {
+          ctxS.globalAlpha = baseA * (1 - gold / 0.6);
+          ctxS.fillStyle = INK;
+          ctxS.font = '700 8px "Space Mono", monospace';
+          ctxS.textAlign = 'center';
+          ctxS.textBaseline = 'middle';
+          ctxS.fillText(s.kind === 'pb' ? '2+' : '−', 0, 0.5);
+        }
+        ctxS.restore();
+        continue;
+      }
+      if (s.kind === 'no2' && s.linkT > 0) {
+        // Split halves stay clear while they fly apart, then turn brown over the last 45%.
+        const t = 1 - s.linkT / CFG.breakTime;
+        const brown = Math.max(0, Math.min(1, (t - 0.55) / 0.45));
+        ctxS.globalAlpha = baseA * (1 - brown);
+        drawMolecule(ctxS, 0, 0, s.ph * spin, MOL.no2Clear);
+        ctxS.globalAlpha = baseA * brown;
+      }
+      drawMolecule(ctxS, 0, 0, s.ph * spin, atoms);
+      ctxS.restore();
+    }
+
+    // glass highlights and curved-edge shading, over the contents
+    const hl = (x, ww, a) => {
+      const gr = ctxS.createLinearGradient(x, 0, x + ww, 0);
+      gr.addColorStop(0, 'rgba(255,255,255,0)');
+      gr.addColorStop(0.5, `rgba(255,255,255,${a})`);
+      gr.addColorStop(1, 'rgba(255,255,255,0)');
+      ctxS.fillStyle = gr;
+      ctxS.fillRect(x, y0 - ry, ww, h + 2 * ry);
+    };
+    hl(cx - rw * 0.8, rw * 0.14, 0.7);
+    hl(cx - rw * 0.6, rw * 0.04, 0.45);
+    hl(cx + rw * 0.72, rw * 0.1, 0.35);
+    const eg = ctxS.createLinearGradient(x0, 0, x1, 0);
+    eg.addColorStop(0, 'rgba(29,36,51,0.10)');
+    eg.addColorStop(0.06, 'rgba(29,36,51,0)');
+    eg.addColorStop(0.94, 'rgba(29,36,51,0)');
+    eg.addColorStop(1, 'rgba(29,36,51,0.12)');
+    ctxS.fillStyle = eg;
+    ctxS.fillRect(x0, y0 - ry, w, h + 2 * ry);
+    ctxS.restore();
+
+    // litre marks on the beaker's front face, following its curve
+    if (isBeaker) {
+      for (let L = 0.5; L <= 4; L += 0.5) {
+        const lv = CFG.waterLevelMin + (1 - CFG.waterLevelMin) * (L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
+        const yy = y1 - h * lv * CFG.waterHead;
+        const major = L % 1 === 0;
+        const a0 = Math.PI * 0.62, a1 = a0 + (major ? 34 : 18) / rw;
+        ctxS.beginPath();
+        ctxS.ellipse(cx, yy, rw, ry, 0, a0, a1);
+        ctxS.strokeStyle = 'rgba(29,36,51,0.5)';
+        ctxS.lineWidth = major ? 1.8 : 1.2;
+        ctxS.stroke();
+        if (major) {
+          ctxS.font = '700 12px "Space Mono", monospace';
+          ctxS.fillStyle = 'rgba(29,36,51,0.65)';
+          ctxS.textAlign = 'left';
+          ctxS.textBaseline = 'middle';
+          ctxS.fillText(L + ' L', cx + rw * Math.cos(a1 + 0.03) + 5, yy + ry * Math.sin(a1 + 0.03));
+        }
+      }
+    }
+
+    // front walls and base
+    ctxS.strokeStyle = INK;
+    ctxS.lineWidth = 2.5;
+    ctxS.lineJoin = 'round';
+    ctxS.beginPath();
+    ctxS.moveTo(x0, y0);
+    ctxS.lineTo(x0, y1);
+    ctxS.ellipse(cx, y1, rw, ry, 0, Math.PI, 0, true);
+    ctxS.lineTo(x1, y0);
+    ctxS.stroke();
+    ctxS.beginPath();
+    ctxS.ellipse(cx, y1 - 4, rw - 3, ry - 1, 0, 0.15, Math.PI - 0.15);
+    ctxS.strokeStyle = 'rgba(29,36,51,0.18)';
+    ctxS.lineWidth = 3;
+    ctxS.stroke();
+
+    if (isBeaker) {
+      // open rim, with the glass's thickness, and a pour spout
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0, rw, ry, 0, 0, Math.PI * 2);
+      ctxS.strokeStyle = INK;
+      ctxS.lineWidth = 2.5;
+      ctxS.stroke();
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0 + 1, rw - 5, ry - 2.5, 0, 0, Math.PI * 2);
+      ctxS.strokeStyle = 'rgba(29,36,51,0.3)';
+      ctxS.lineWidth = 1.2;
+      ctxS.stroke();
+      ctxS.beginPath();
+      ctxS.moveTo(x0 + 2, y0 - ry * 0.55);
+      ctxS.quadraticCurveTo(x0 - 13, y0 - ry * 0.5, x0 - 15, y0 - 2);
+      ctxS.quadraticCurveTo(x0 - 9, y0 + 4, x0 + 1, y0 + ry * 0.45);
+      ctxS.fillStyle = 'rgba(240,245,251,0.95)';
+      ctxS.fill();
+      ctxS.strokeStyle = INK;
+      ctxS.lineWidth = 2.2;
+      ctxS.stroke();
+    } else {
+      // sealed: a ground-glass lid resting on the rim, with a knob
+      const lt = 9; // lid thickness
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0, rw + 6, ry + 1.5, 0, 0, Math.PI);
+      ctxS.lineTo(x0 - 6, y0 - lt);
+      ctxS.ellipse(cx, y0 - lt, rw + 6, ry + 1.5, 0, Math.PI, 0, true);
+      ctxS.closePath();
+      ctxS.fillStyle = 'rgba(226,233,243,0.95)';
+      ctxS.fill();
+      ctxS.strokeStyle = INK;
+      ctxS.lineWidth = 2.2;
+      ctxS.stroke();
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0 - lt, rw + 6, ry + 1.5, 0, 0, Math.PI * 2);
+      const lg = ctxS.createLinearGradient(x0, 0, x1, 0);
+      lg.addColorStop(0, 'rgba(236,241,248,0.97)');
+      lg.addColorStop(0.35, 'rgba(255,255,255,0.97)');
+      lg.addColorStop(1, 'rgba(222,229,240,0.97)');
+      ctxS.fillStyle = lg;
+      ctxS.fill();
+      ctxS.stroke();
+      // knob
+      const kw = Math.max(14, rw * 0.09), kh = 14;
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0 - lt, kw, kw * CFG.vesselTilt * 1.6, 0, 0, Math.PI);
+      ctxS.lineTo(cx - kw * 0.75, y0 - lt - kh);
+      ctxS.ellipse(cx, y0 - lt - kh, kw * 0.75, kw * 0.75 * CFG.vesselTilt * 1.6, 0, Math.PI, 0, true);
+      ctxS.closePath();
+      ctxS.fillStyle = '#eef2f8';
+      ctxS.fill();
+      ctxS.stroke();
+      ctxS.beginPath();
+      ctxS.ellipse(cx, y0 - lt - kh, kw * 0.75, kw * 0.75 * CFG.vesselTilt * 1.6, 0, 0, Math.PI * 2);
+      ctxS.fillStyle = '#ffffff';
+      ctxS.fill();
+      ctxS.stroke();
+    }
+  }
+
+  // Round the axis top up to 4 tidy steps (1, 2, 2.5 or 5 × 10ⁿ).
+  function niceAxis(max) {
+    const raw = max / 4;
+    const p = Math.pow(10, Math.floor(Math.log10(raw)));
+    const f = raw / p;
+    const nice = f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10;
+    const step = nice * p;
+    const dec = Math.max(0, -Math.floor(Math.log10(step)) + (nice === 2.5 ? 1 : 0));
+    return { step, top: step * 4, dec };
+  }
+
+  const PLAIN = { no2: 'NO₂', n2o4: 'N₂O₄', n2: 'N₂', h2: 'H₂', nh3: 'NH₃', i2: 'I₂', hi: 'HI', pb: 'Pb²⁺', i: 'I⁻' };
+
+  // First history index with t >= t
+  function histIndex(t) {
+    let lo = 0;
+    let hi = history.length;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (history[mid].t < t) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  }
+
+  // Seconds per tick for about `n` ticks across a window
+  function niceTimeStep(span, n) {
+    const steps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 60, 120];
+    for (const st of steps) if (span / st <= n) return st;
+    return 300;
+  }
+
+  // Concentration lines from t0 to t1 on ctx. The big graph adds time ticks, labelled
+  // markers and a hover readout.
+  function plotHistory(ctx, w, h, t0, t1, big) {
+    ctx.clearRect(0, 0, w, h);
+    const L = big ? 76 : 64;
+    const R = big ? 18 : 10;
+    const Tp = big ? 30 : 8;
+    const B = big ? 34 : 22;
+    const gw = w - L - R;
+    const gh = h - Tp - B;
+    if (gw < 10 || gh < 10) return null;
+
+    const rxn = activeRxn();
+    const chartSp = rxn.chartSpecies || rxn.species;
+    const tw = Math.max(1e-6, t1 - t0);
+    const i0 = Math.max(0, histIndex(t0) - 1);
+    const i1 = Math.min(history.length, histIndex(t1) + 1);
+    let ymax = 1e-12;
+    for (let i = i0; i < i1; i++) {
+      for (const sp of chartSp) ymax = Math.max(ymax, history[i].c[sp] || 0);
+    }
+    const axis = niceAxis(ymax * 1.12);
+    const yAt = (c) => Tp + gh * (1 - c / axis.top);
+    const xAt = (t) => L + ((t - t0) / tw) * gw;
+
+    ctx.font = (big ? '12px' : '10px') + ' "Space Mono", monospace';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i <= 4; i++) {
+      const v = axis.step * i;
+      const y = yAt(v);
+      ctx.strokeStyle = i === 0 ? 'rgba(29,36,51,0.25)' : 'rgba(29,36,51,0.08)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(L, y);
+      ctx.lineTo(L + gw, y);
+      ctx.stroke();
+      ctx.fillStyle = DIM;
+      ctx.fillText(v.toFixed(axis.dec) + ' M', L - 6, y);
+    }
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    if (big) {
+      const st = niceTimeStep(tw, Math.max(3, Math.floor(gw / 90)));
+      const dec = st < 1 ? 1 : 0;
+      for (let t = Math.ceil(t0 / st) * st; t <= t1 + 1e-9; t += st) {
+        const x = xAt(t);
+        ctx.strokeStyle = 'rgba(29,36,51,0.08)';
+        ctx.beginPath();
+        ctx.moveTo(x, Tp);
+        ctx.lineTo(x, Tp + gh);
+        ctx.stroke();
+        ctx.fillStyle = DIM;
+        ctx.fillText(t.toFixed(dec) + ' s', x, Tp + gh + 6);
+      }
+    } else {
+      ctx.fillStyle = DIM;
+      ctx.fillText('time →', L + gw / 2, h - B + 7);
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(L, 0, gw, h);
+    ctx.clip();
+
+    // a dashed line at each change; labelled on the big graph, in rows so labels don't collide
+    const rowEnds = [];
+    for (const m of markers) {
+      if (m.t < t0 || m.t > t1) continue;
+      const x = xAt(m.t);
+      ctx.strokeStyle = big ? 'rgba(29,36,51,0.45)' : 'rgba(29,36,51,0.3)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(x, Tp);
+      ctx.lineTo(x, Tp + gh);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      if (!big) continue;
+      const text = m.n > 1 ? `${m.label} ×${m.n}` : m.label;
+      ctx.font = '700 11px "Space Mono", monospace';
+      const tw2 = ctx.measureText(text).width + 12;
+      const lx = Math.min(Math.max(x - tw2 / 2, L), L + gw - tw2);
+      let row = 0;
+      while (rowEnds[row] !== undefined && rowEnds[row] > lx - 4) row++;
+      rowEnds[row] = lx + tw2;
+      const ly = Tp + 4 + row * 20;
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = INK;
+      ctx.beginPath();
+      ctx.roundRect(lx, ly, tw2, 17, 5);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = INK;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, lx + 6, ly + 9);
+    }
+
+    // the lines, thinned to about two points per pixel
+    const stride = Math.max(1, Math.floor((i1 - i0) / (gw * 2)));
+    ctx.lineWidth = big ? 3 : 2.5;
+    ctx.lineJoin = 'round';
+    for (const sp of chartSp) {
+      ctx.beginPath();
+      for (let i = i0; i < i1; i += stride) {
+        const p = history[i];
+        const x = xAt(p.t);
+        const y = yAt(p.c[sp] || 0);
+        if (i === i0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      const p = history[i1 - 1];
+      if (p) ctx.lineTo(xAt(p.t), yAt(p.c[sp] || 0));
+      ctx.strokeStyle = SPECIES_COLOR[sp] || INK;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // hover readout: the sample nearest the pointer
+    if (big && bigView.hoverX !== null && history.length) {
+      const tH = t0 + ((bigView.hoverX - L) / gw) * tw;
+      if (tH >= t0 && tH <= t1) {
+        let k = Math.min(history.length - 1, histIndex(tH));
+        if (k > 0 && Math.abs(history[k - 1].t - tH) < Math.abs(history[k].t - tH)) k--;
+        const p = history[k];
+        const x = xAt(p.t);
+        ctx.strokeStyle = 'rgba(29,36,51,0.55)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, Tp);
+        ctx.lineTo(x, Tp + gh);
+        ctx.stroke();
+        for (const sp of chartSp) {
+          ctx.fillStyle = '#ffffff';
+          ctx.strokeStyle = SPECIES_COLOR[sp] || INK;
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(x, yAt(p.c[sp] || 0), 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        }
+        const rows = [`t = ${p.t.toFixed(1)} s`].concat(chartSp.map((sp) => `${PLAIN[sp]}  ${(p.c[sp] || 0).toPrecision(3)} M`));
+        ctx.font = '700 12px "Space Mono", monospace';
+        const bw = Math.max(...rows.map((r) => ctx.measureText(r).width)) + 20;
+        const bh = rows.length * 18 + 10;
+        const bx = x + 14 + bw > L + gw ? x - 14 - bw : x + 14;
+        const by = Tp + gh * 0.35;
+        ctx.fillStyle = 'rgba(255,255,255,0.95)';
+        ctx.strokeStyle = INK;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(bx, by, bw, bh, 8);
+        ctx.fill();
+        ctx.stroke();
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        rows.forEach((r, j) => {
+          ctx.fillStyle = j === 0 ? DIM : SPECIES_COLOR[chartSp[j - 1]] || INK;
+          ctx.fillText(r, bx + 10, by + 14 + j * 18);
+        });
+      }
+    }
+    return { L, gw };
+  }
+
+  function drawChart() {
+    const cR = chart.getBoundingClientRect();
+    const t1 = clock;
+    const t0 = Math.max(history.length ? history[0].t : 0, t1 - CFG.chartSeconds);
+    plotHistory(ctxC, cR.width, cR.height, t0, t1, false);
+  }
+
+  /* ---------- The big graph ----------
+     Opens over the page when the small graph is clicked. While it plays, the right edge is
+     "now"; paused, the window can be dragged back through the run. `win` is the seconds
+     shown (bigger than the run so far means all of it). */
+  const curvePanel = document.getElementById('curvePanel');
+  const chartModal = document.getElementById('chartModal');
+  const chartBig = document.getElementById('chartBig');
+  const ctxB = chartBig.getContext('2d');
+  const bigBox = document.getElementById('bigBox');
+  const bigPause = document.getElementById('bigPause');
+  const bigZoom = document.getElementById('bigZoom');
+  const bigZoomOut = document.getElementById('bigZoomOut');
+  const bigView = { open: false, win: CFG.histSeconds, end: 0, hoverX: null, drag: null, layout: null };
+  const ZOOM_MIN = 1;
+
+  function bigWindow() {
+    const first = history.length ? history[0].t : 0;
+    const span = Math.max(ZOOM_MIN, clock - first);
+    const W = Math.min(Math.max(ZOOM_MIN, bigView.win), span);
+    let end = paused ? bigView.end : clock;
+    end = Math.min(clock, Math.max(first + W, end));
+    if (paused) bigView.end = end;
+    return { t0: end - W, t1: end, W, span };
+  }
+
+  function drawBigChart() {
+    if (!bigView.open) return;
+    const r = chartBig.getBoundingClientRect();
+    const v = bigWindow();
+    bigView.layout = plotHistory(ctxB, r.width, r.height, v.t0, v.t1, true);
+    if (document.activeElement !== bigZoom) {
+      bigZoom.value = v.span > ZOOM_MIN ? (100 * Math.log(v.W / ZOOM_MIN) / Math.log(v.span / ZOOM_MIN)).toFixed(1) : '100';
+    }
+    bigZoomOut.textContent = v.W >= v.span - 0.05 ? `all ${v.span.toFixed(0)} s` : `${v.W < 10 ? v.W.toFixed(1) : v.W.toFixed(0)} s`;
+  }
+
+  function resizeBig() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const r = chartBig.getBoundingClientRect();
+    chartBig.width = Math.max(1, Math.floor(r.width * dpr));
+    chartBig.height = Math.max(1, Math.floor(r.height * dpr));
+    ctxB.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function setPaused(on) {
+    paused = on;
+    if (on) bigView.end = clock;
+    bigPause.textContent = on ? '▶ Play' : '❚❚ Pause';
+    bigPause.classList.toggle('primary', !on);
+    bigBox.classList.toggle('can-pan', on);
+    document.getElementById('bigHint').textContent = on
+      ? 'Paused · drag the graph to look back · scroll to zoom · space plays'
+      : 'Scroll on the graph to zoom · hover to read values · space pauses';
+  }
+
+  function openBig() {
+    if (bigView.open) return;
+    bigView.open = true;
+    bigView.win = CFG.histSeconds;
+    chartModal.hidden = false;
+    document.getElementById('bigLegend').innerHTML = chartLegend.innerHTML;
+    resizeBig();
+    drawBigChart();
+    bigPause.focus();
+  }
+
+  function closeBig() {
+    if (!bigView.open) return;
+    bigView.open = false;
+    bigView.hoverX = null;
+    bigView.drag = null;
+    chartModal.hidden = true;
+    setPaused(false);
+    curvePanel.focus();
+  }
+
+  curvePanel.addEventListener('click', openBig);
+  curvePanel.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); openBig(); }
+  });
+  document.getElementById('bigClose').addEventListener('click', closeBig);
+  chartModal.addEventListener('click', (e) => { if (e.target === chartModal) closeBig(); });
+  bigPause.addEventListener('click', () => setPaused(!paused));
+  bigZoom.addEventListener('input', () => {
+    const before = bigWindow();
+    // the slider runs from 1 s to the whole run so far; its right end keeps showing all of it
+    const u = parseFloat(bigZoom.value) / 100;
+    bigView.win = u >= 0.995 ? CFG.histSeconds : ZOOM_MIN * Math.pow(before.span / ZOOM_MIN, u);
+    // paused: zoom about the middle of the view
+    if (paused) bigView.end = (before.t0 + before.t1) / 2 + Math.min(bigView.win, before.span) / 2;
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!bigView.open) return;
+    if (e.key === 'Escape') { closeBig(); return; }
+    const onControl = e.target.closest && e.target.closest('button, input');
+    if (e.key === ' ' && !onControl) { e.preventDefault(); setPaused(!paused); }
+    if (paused && !onControl && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      const v = bigWindow();
+      bigView.end += (e.key === 'ArrowLeft' ? -0.1 : 0.1) * v.W;
+    }
+  });
+
+  // scroll to zoom: about the pointer when paused, keeping "now" at the right while playing
+  chartBig.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const v = bigWindow();
+    const f = Math.exp(e.deltaY * 0.0015);
+    const W2 = Math.min(Math.max(ZOOM_MIN, v.W * f), v.span);
+    bigView.win = W2 >= v.span - 0.05 ? CFG.histSeconds : W2;
+    if (paused && bigView.layout) {
+      const r = chartBig.getBoundingClientRect();
+      const fx = Math.min(1, Math.max(0, (e.clientX - r.left - bigView.layout.L) / bigView.layout.gw));
+      const tc = v.t0 + fx * v.W;
+      bigView.end = tc + (1 - fx) * W2;
+    }
+  }, { passive: false });
+
+  chartBig.addEventListener('pointermove', (e) => {
+    const r = chartBig.getBoundingClientRect();
+    bigView.hoverX = e.clientX - r.left;
+    if (bigView.drag && bigView.layout) {
+      const v = bigWindow();
+      bigView.end = bigView.drag.end - ((e.clientX - bigView.drag.x) / bigView.layout.gw) * v.W;
+    }
+  });
+  chartBig.addEventListener('pointerleave', () => { bigView.hoverX = null; });
+  chartBig.addEventListener('pointerdown', (e) => {
+    if (!paused) return;
+    bigView.drag = { x: e.clientX, end: bigView.end };
+    chartBig.setPointerCapture(e.pointerId);
+    bigBox.classList.add('panning');
+  });
+  const endDrag = () => { bigView.drag = null; bigBox.classList.remove('panning'); };
+  chartBig.addEventListener('pointerup', endDrag);
+  chartBig.addEventListener('pointercancel', endDrag);
+  if (window.ResizeObserver) new ResizeObserver(() => { if (bigView.open) resizeBig(); }).observe(chartBig);
+
+  // A marker for each change. Quick repeats (dragging a slider, clicking a button again)
+  // update the last marker instead of stacking new ones.
+  function mark(kind, label) {
+    const m = markers[markers.length - 1];
+    if (m && m.kind === kind && clock - m.tEnd < 1) {
+      m.label = label;
+      m.tEnd = clock;
+      if (kind.startsWith('add') || kind.startsWith('rem')) m.n++;
+      return;
+    }
+    markers.push({ t: clock, tEnd: clock, kind, label, n: 1 });
+    // a new change: the live ICE table's I row is taken from here
+    iceXi = 0;
+    iceMark = markers[markers.length - 1];
+    iceAdded = {};
+  }
+
+  function resize() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const simRect = sim.getBoundingClientRect();
+    const chartRect = chart.getBoundingClientRect();
+    sim.width = Math.max(1, Math.floor(simRect.width * dpr));
+    sim.height = Math.max(1, Math.floor(simRect.height * dpr));
+    chart.width = Math.max(1, Math.floor(chartRect.width * dpr));
+    chart.height = Math.max(1, Math.floor(chartRect.height * dpr));
+    ctxS.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctxC.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function pushHistory() {
+    if (history.length && clock - history[history.length - 1].t < 1 / CFG.histRate) return;
+    const rxn = activeRxn();
+    const c = {};
+    for (const sp of rxn.chartSpecies || rxn.species) c[sp] = V_L > 0 ? getN(sp) / V_L : 0;
+    history.push({ t: clock, c });
+    let drop = 0;
+    while (drop < history.length && history[drop].t < clock - CFG.histSeconds) drop++;
+    if (drop > 60) history.splice(0, drop);
+    while (markers.length && history.length && markers[0].t < history[0].t) markers.shift();
+  }
+
+  function updateGauges() {
+    const P = pressureAtm();
+    const lo = parseFloat(slT.min);
+    const hi = parseFloat(slT.max);
+    el('gT').textContent = T.toFixed(0);
+    el('gTc').textContent = (T - 273.15).toFixed(0);
+    el('thermoFill').style.width = (Math.max(0, Math.min(1, (T - lo) / (hi - lo))) * 100).toFixed(1) + '%';
+    el('tOut').textContent = T.toFixed(0) + ' K';
+    const solid = activeRxn().id === 'pbi2';
+    // for PbI2 the dial reads grams of undissolved solid instead of pressure
+    const reading = solid ? getN('pbi2s') * 461.0 : P;
+    el('gP').textContent = reading < 10 ? reading.toFixed(2) : reading < 100 ? reading.toFixed(1) : reading.toFixed(0);
+    el('gPUnit').textContent = solid ? ' g' : ' atm';
+    const ang = Math.min(reading, pMax * 1.04) / pMax * 180 - 90;
+    el('needle').setAttribute('transform', `rotate(${ang.toFixed(1)} 60 62)`);
+    el('gSub').textContent = `in ${V_L.toFixed(2)} L${solid ? ' of water' : ''}`;
+    el('vOut').textContent = V_L.toFixed(2) + ' L';
+  }
+
+  function updateKPanel() {
+    if (!kPanel) return;
+    const rxn = activeRxn();
+    let q = 0;
+    let k = 0;
+    let kLabel = 'Kc';
+    let qLabel = 'Q';
+    if (rxn.id === 'ammonia') {
+      // For Haber, show Kp and Qp (based on partial pressures) to match typical reference values.
+      const P = pressureAtm();
+      const nTot = totalGasMoles();
+      const yN2 = nTot > 0 ? (getN('n2') / nTot) : 0;
+      const yH2 = nTot > 0 ? (getN('h2') / nTot) : 0;
+      const yNH3 = nTot > 0 ? (getN('nh3') / nTot) : 0;
+      const pN2 = yN2 * P;
+      const pH2 = yH2 * P;
+      const pNH3 = yNH3 * P;
+      q = (pN2 > 0 && pH2 > 0) ? ((pNH3 * pNH3) / (pN2 * pH2 * pH2 * pH2)) : (pNH3 > 0 ? Infinity : 0);
+      k = Kp_NH3(T);
+      kLabel = 'Kp';
+      qLabel = 'Qp';
+      // Kp uses partial pressures, so the expression is written with P, not [ ]
+      if (kProdEl) kProdEl.innerHTML = '<span class="chemNH3">P<sub>NH₃</sub></span><span class="eqnPow">2</span>';
+      if (kReactEl) kReactEl.innerHTML = '<span class="chemN2">P<sub>N₂</sub></span> <span class="chemH2">P<sub>H₂</sub></span><span class="eqnPow">3</span>';
+      if (kRxnReactEl) kRxnReactEl.innerHTML = '<span class=\"chemN2\">N₂</span> + <span class=\"chemH2\">3 H₂</span>';
+      if (kRxnProdEl) kRxnProdEl.innerHTML = '<span class=\"chemNH3\">2 NH₃</span>';
+      // forward is exothermic: heat is a product
+      if (kHeatEl) kHeatEl.textContent = '';
+      if (kHeatProdEl) kHeatProdEl.textContent = '+ heat';
+    } else if (rxn.id === 'pbi2') {
+      // The solid is left out of the expression: Ksp = [Pb2+][I−]²
+      k = Kc(T);
+      const cPb = V_L > 0 ? getN('pb') / V_L : 0;
+      const cI = V_L > 0 ? getN('i') / V_L : 0;
+      q = cPb * cI * cI;
+      kLabel = 'Ksp';
+      if (kProdEl) kProdEl.innerHTML = '<span class="chemPb">[Pb<sup>2+</sup>]</span><span class="chemI">[I<sup>−</sup>]</span><span class="eqnPow">2</span>';
+      if (kReactEl) kReactEl.innerHTML = '';
+      if (kRxnReactEl) kRxnReactEl.innerHTML = '<span class="chemPbI2">PbI₂(s)</span>';
+      if (kRxnProdEl) kRxnProdEl.innerHTML = '<span class="chemPb">Pb<sup>2+</sup></span> + <span class="chemI">2 I<sup>−</sup></span>';
+      // dissolving is endothermic: heat is a reactant
+      if (kHeatEl) kHeatEl.textContent = 'heat +';
+      if (kHeatProdEl) kHeatProdEl.textContent = '';
+    } else if (rxn.id === 'hi') {
+      k = Kc(T);
+      const cH2 = V_L > 0 ? getN('h2') / V_L : 0;
+      const cI2 = V_L > 0 ? getN('i2') / V_L : 0;
+      const cHI = V_L > 0 ? getN('hi') / V_L : 0;
+      q = (cH2 > 0 && cI2 > 0) ? ((cHI * cHI) / (cH2 * cI2)) : (cHI > 0 ? Infinity : 0);
+      if (kProdEl) kProdEl.innerHTML = '<span class="chemHI">[HI]</span><span class="eqnPow">2</span>';
+      if (kReactEl) kReactEl.innerHTML = '<span class="chemH2">[H₂]</span><span class="chemI2">[I₂]</span>';
+      if (kRxnReactEl) kRxnReactEl.innerHTML = '<span class="chemH2">H₂</span> + <span class="chemI2">I₂</span>';
+      if (kRxnProdEl) kRxnProdEl.innerHTML = '<span class="chemHI">2 HI</span>';
+      // forward is (mildly) exothermic: heat is a product
+      if (kHeatEl) kHeatEl.textContent = '';
+      if (kHeatProdEl) kHeatProdEl.textContent = '+ heat';
+    } else {
+      const kc = Kc(T);
+      k = kc;
+      const c2 = V_L > 0 ? getN('no2') / V_L : 0;
+      const c4 = V_L > 0 ? getN('n2o4') / V_L : 0;
+      q = (c4 > 0) ? ((c2 * c2) / c4) : (c2 > 0 ? Infinity : 0);
+      if (kProdEl) kProdEl.innerHTML = '<span class=\"chemNO2\">[NO₂]</span><span class=\"eqnPow\">2</span>';
+      if (kReactEl) kReactEl.innerHTML = '<span class=\"chemN2O4\">[N₂O₄]</span>';
+      if (kRxnReactEl) kRxnReactEl.innerHTML = '<span class=\"chemN2O4\">N₂O₄</span>';
+      if (kRxnProdEl) kRxnProdEl.innerHTML = '<span class=\"chemNO2\">2 NO₂</span>';
+      // forward is endothermic: heat is a reactant
+      if (kHeatEl) kHeatEl.textContent = 'heat +';
+      if (kHeatProdEl) kHeatProdEl.textContent = '';
+    }
+    function formatSci(x) {
+      if (!isFinite(x)) return { m: '∞', e: '' };
+      if (x === 0) return { m: '0.00', e: '' };
+      const e = Math.floor(Math.log10(Math.abs(x)));
+      const m = x / Math.pow(10, e);
+      return { m: m.toFixed(2), e: String(e) };
+    }
+    const kS = formatSci(k);
+    const qS = formatSci(q);
+    // Ksp has no denominator
+    el('k-op').style.display = rxn.id === 'pbi2' ? 'none' : '';
+    kReactEl.style.display = rxn.id === 'pbi2' ? 'none' : '';
+    kKcLbl.textContent = kLabel;
+    kQLbl.textContent = qLabel;
+    kEqnLbl.textContent = kLabel + ' =';
+    kKcEl.innerHTML = kS.e ? `${kS.m} × 10<sup>${kS.e}</sup>` : kS.m;
+    kQEl.innerHTML = qS.e ? `${qS.m} × 10<sup>${qS.e}</sup>` : qS.m;
+    const rel = (q === Infinity) ? 99 : (k > 0 ? (q / k) : 0);
+    const kName = kLabel;
+    let status;
+    if (rxn.id === 'pbi2') {
+      const solidLeft = getN('pbi2s') > 1e-7;
+      if (!solidLeft && rel < 0.94) status = 'Unsaturated: Q < Ksp, all the solid has dissolved';
+      else if (Math.abs(rel - 1) < 0.06) status = 'Saturated: Q ≈ Ksp';
+      else if (q < k) status = 'Q < Ksp: dissolving →';
+      else status = 'Q > Ksp: crystallizing ←';
+    } else if (Math.abs(rel - 1) < 0.06) status = `At equilibrium: ${qLabel} ≈ ${kName}`;
+    else if (q < k) status = `${qLabel} < ${kName}: shifting forward →`;
+    else status = `${qLabel} > ${kName}: shifting back ←`;
+    // aria-live region: only touch it when the message changes
+    if (kEqEl.textContent !== status) kEqEl.textContent = status;
+
+    const logR = (q > 0 && k > 0 && q !== Infinity) ? Math.log(q / k) : (q === Infinity ? 6 : -6);
+    const t = Math.max(-1.2, Math.min(1.2, logR));
+    const swing = 8.5;
+    const base = 18;
+    const prod = base + swing * Math.max(0, t);
+    const react = base + swing * Math.max(0, -t);
+    kPanel.style.setProperty('--prodSize', prod.toFixed(2) + 'px');
+    kPanel.style.setProperty('--reactSize', react.toFixed(2) + 'px');
+    kPanel.style.setProperty('--rxnProdSize', (14 + 6.8 * Math.max(0, t)).toFixed(2) + 'px');
+    kPanel.style.setProperty('--rxnReactSize', (14 + 6.8 * Math.max(0, -t)).toFixed(2) + 'px');
+    const heatBase = 13.5;
+    const heatByShift = 5.2 * Math.min(1, Math.abs(t));
+    // how far the temperature sits from the middle of this reaction's slider
+    const tMid = 0.5 * (parseFloat(slT.min) + parseFloat(slT.max));
+    const tHalf = 0.5 * (parseFloat(slT.max) - parseFloat(slT.min));
+    const tOff = Math.min(1, Math.abs((T - tMid) / tHalf));
+    const heatByTemp = 4.8 * tOff;
+    kPanel.style.setProperty('--heatSize', (heatBase + heatByShift + heatByTemp).toFixed(2) + 'px');
+    if (kProdEl) kProdEl.style.opacity = (0.82 + 0.18 * (prod / (base + swing))).toFixed(3);
+    if (kReactEl) kReactEl.style.opacity = (0.82 + 0.18 * (react / (base + swing))).toFixed(3);
+    if (kRxnProdEl) kRxnProdEl.style.opacity = (0.80 + 0.20 * Math.max(0, t)).toFixed(3);
+    if (kRxnReactEl) kRxnReactEl.style.opacity = (0.80 + 0.20 * Math.max(0, -t)).toFixed(3);
+    const heatOp = (0.58 + 0.22 * Math.min(1, Math.abs(t)) + 0.12 * tOff).toFixed(3);
+    if (kHeatEl) kHeatEl.style.opacity = heatOp;
+    if (kHeatProdEl) kHeatProdEl.style.opacity = heatOp;
+
+    // Arrow emphasis from instantaneous forward vs reverse rates.
+    const V = V_L;
+    const { rf, rr } = extentRates(n, V, T);
+    const sum = rf + rr + 1e-12;
+    const f = rf / sum;
+    const r = rr / sum;
+    // More illustrative than strictly proportional: exaggerate the dominant direction.
+    const fOp = 0.25 + 0.75 * Math.pow(f, 0.45);
+    const rOp = 0.25 + 0.75 * Math.pow(r, 0.45);
+    kPanel.style.setProperty('--fwdOp', fOp.toFixed(3));
+    kPanel.style.setProperty('--revOp', rOp.toFixed(3));
+    const fSize = 14 + 22 * Math.pow(f, 0.55);
+    const rSize = 14 + 22 * Math.pow(r, 0.55);
+    kPanel.style.setProperty('--fwdSize', fSize.toFixed(2) + 'px');
+    kPanel.style.setProperty('--revSize', rSize.toFixed(2) + 'px');
+    if (kArrowFwdEl) kArrowFwdEl.style.opacity = fOp.toFixed(3);
+    if (kArrowRevEl) kArrowRevEl.style.opacity = rOp.toFixed(3);
+  }
+
+  /* ---------- ICE table ----------
+     Opens from the K card in place of the small graph. Two modes:
+     Live: I is the mix just after the latest change (before it began to shift back), C is
+     the change since then in multiples of x, and E is the mix now ("Now" until Q ≈ K).
+     iceXi tallies the extent since that change in rk4Step, so I = n − ν·ξ at the current
+     volume, which keeps I right even while the volume is being dragged.
+     Own data: students fill in any squares and K; the rest is solved through x.
+     Ammonia's table is in partial pressures (atm) to match Kp; the solid's column stays blank. */
+  const icePanel = el('icePanel');
+  const iceOpenBtn = el('iceOpen');
+  const iceLiveTable = el('iceLiveTable');
+  const iceOwnTable = el('iceOwnTable');
+  const iceKIn = el('iceK');
+  const iceResult = el('iceResult');
+  const ICE_TXT = { no2: 'NO₂', n2o4: 'N₂O₄', n2: 'N₂', h2: 'H₂', nh3: 'NH₃', i2: 'I₂', hi: 'HI', pb: 'Pb²⁺', i: 'I⁻', pbi2s: 'PbI₂(s)' };
+  const SUPS = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+  let iceOpen = false;
+  let iceMode = 'live';
+  let iceLiveCells = null; // { I: {sp: td}, C, E, eRow, eLbl }
+  const own = { kNote: '', showQ: false };
+
+  const isSolid = (sp) => sp === 'pbi2s';
+  const icePressure = () => activeRxn().id === 'ammonia';
+  const iceUnitName = () => (icePressure() ? 'atm' : 'M');
+
+  // reactants, then products
+  function iceSpecies() {
+    const rxn = activeRxn();
+    return rxn.species.filter((sp) => rxn.nu[sp] < 0).concat(rxn.species.filter((sp) => rxn.nu[sp] > 0));
+  }
+  const iceDissolved = () => iceSpecies().filter((sp) => !isSolid(sp));
+
+  // mol → the table's unit: mol/L, or atm for ammonia
+  function iceUnit(mol) {
+    if (V_L <= 0) return 0;
+    return icePressure() ? (mol * CFG.R_L_atm * T) / V_L : mol / V_L;
+  }
+  function iceK() { return icePressure() ? Kp_NH3(T) : Kc(T); }
+  function iceKName() {
+    const id = activeRxn().id;
+    return id === 'ammonia' ? 'K<sub>p</sub>' : id === 'pbi2' ? 'K<sub>sp</sub>' : 'K<sub>c</sub>';
+  }
+
+  function supNum(s) { return String(s).replace(/-/g, '⁻').replace(/\d/g, (d) => SUPS[d]); }
+  // 3 significant figures; scientific notation outside 0.001–9999
+  function fmt(v) {
+    if (v == null || Number.isNaN(v)) return '';
+    if (!isFinite(v)) return '∞';
+    if (v === 0) return '0';
+    const a = Math.abs(v);
+    const sign = v < 0 ? '−' : '';
+    if (a >= 1000 && a < 1e4) return sign + Math.round(a);
+    if (a >= 1e-3 && a < 1000) return sign + a.toPrecision(3);
+    let e = Math.floor(Math.log10(a));
+    let m = a / Math.pow(10, e);
+    if (Number(m.toFixed(2)) >= 10) { m /= 10; e += 1; }
+    return `${sign}${m.toFixed(2)}×10${supNum(e)}`;
+  }
+  function fmtSigned(v) { return v > 0 ? '+' + fmt(v) : fmt(v); }
+  // "1.2e-3", "1.2x10^-3", "1.2×10⁻³" and "−0.5" all read
+  function parseNum(s) {
+    let t = String(s).replace(/\s+/g, '').replace(/[−–]/g, '-').replace(/⁻/g, '-')
+      .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, (c) => SUPS.indexOf(c));
+    t = t.replace(/[x×*·]10\^?/i, 'e');
+    if (!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(t)) return NaN;
+    return Number(t);
+  }
+  // "−x", "+2x"
+  function coefX(nu) { return (nu < 0 ? '−' : '+') + (Math.abs(nu) === 1 ? '' : Math.abs(nu)) + 'x'; }
+
+  // Q (or K) from one row: Π value^ν over the dissolved species
+  function iceQ(vals) {
+    const rxn = activeRxn();
+    let lq = 0;
+    let zeroR = false;
+    let zeroP = false;
+    for (const sp of iceDissolved()) {
+      const v = vals[sp];
+      if (!(v > 0)) { if (rxn.nu[sp] < 0) zeroR = true; else zeroP = true; continue; }
+      lq += rxn.nu[sp] * Math.log(v);
+    }
+    if (zeroR) return zeroP ? NaN : Infinity;
+    return zeroP ? 0 : Math.exp(lq);
+  }
+
+  // K written out, e.g. "[NO₂]² / [N₂O₄]" or "P(NH₃)² / P(N₂) P(H₂)³"
+  function iceKExpr() {
+    const rxn = activeRxn();
+    const term = (sp) => (icePressure() ? `P(${ICE_TXT[sp]})` : `[${ICE_TXT[sp]}]`) + (Math.abs(rxn.nu[sp]) > 1 ? supNum(Math.abs(rxn.nu[sp])) : '');
+    const sps = iceDissolved();
+    const top = sps.filter((sp) => rxn.nu[sp] > 0).map(term).join(' ');
+    const bot = sps.filter((sp) => rxn.nu[sp] < 0).map(term).join(' ');
+    return bot ? `${top} / ${bot}` : top;
+  }
+
+  function iceHeadRow() {
+    return '<tr><th class="ice-row" scope="col"></th>' +
+      iceSpecies().map((sp) => `<th scope="col">${SPECIES_HTML[sp]}</th>`).join('') + '</tr>';
+  }
+  const ICE_ROWS = [
+    ['I', 'Initial: just after your latest change'],
+    ['C', 'Change since then'],
+    ['E', 'Equilibrium (or the mix right now, until it settles)'],
+  ];
+
+  function iceBuild() {
+    const sps = iceSpecies();
+    const rxn = activeRxn();
+    const units = icePressure() ? 'Partial pressures in atm' : 'Concentrations in mol/L';
+    el('iceLiveUnits').textContent = units;
+    el('iceOwnUnits').textContent = units;
+    el('iceKLbl').innerHTML = iceKName() + ' =';
+
+    iceLiveTable.innerHTML = iceHeadRow() + ICE_ROWS.map(([r, title]) =>
+      `<tr class="ice-${r.toLowerCase()}"><th class="ice-row" scope="row" title="${title}">${r}</th>` +
+      sps.map((sp) => (isSolid(sp) ? '<td class="ice-solid">—</td>' : `<td data-r="${r}" data-sp="${sp}"></td>`)).join('') +
+      '</tr>').join('');
+    iceLiveCells = { I: {}, C: {}, E: {} };
+    iceLiveTable.querySelectorAll('td[data-r]').forEach((td) => { iceLiveCells[td.dataset.r][td.dataset.sp] = td; });
+    iceLiveCells.eRow = iceLiveTable.querySelector('tr.ice-e');
+    iceLiveCells.eLbl = iceLiveCells.eRow.querySelector('th');
+
+    iceOwnTable.innerHTML = iceHeadRow() + ICE_ROWS.map(([r]) =>
+      `<tr class="ice-${r.toLowerCase()}"><th class="ice-row" scope="row">${r}</th>` +
+      sps.map((sp) => (isSolid(sp)
+        ? '<td class="ice-solid" title="A solid stays out of the K expression">—</td>'
+        : `<td><input type="text" inputmode="decimal" autocomplete="off" spellcheck="false" data-r="${r}" data-sp="${sp}"` +
+          ` aria-label="${r} for ${ICE_TXT[sp]}"${r === 'C' ? ` placeholder="${coefX(rxn.nu[sp])}"` : ''}></td>`)).join('') +
+      '</tr>').join('');
+    iceClearOwn();
+  }
+
+  function setCell(td, html) {
+    if (td._h !== html) { td._h = html; td.innerHTML = html; }
+  }
+
+  // The live I and E rows (table units) and x
+  function iceLiveValues() {
+    const rxn = activeRxn();
+    const I = {};
+    const E = {};
+    for (const sp of iceDissolved()) {
+      E[sp] = iceUnit(getN(sp));
+      I[sp] = Math.max(0, iceUnit(getN(sp) - rxn.nu[sp] * iceXi));
+    }
+    return { I, E, x: iceUnit(iceXi) };
+  }
+
+  function iceUpdateLive() {
+    if (!iceOpen || iceMode !== 'live' || !iceLiveCells) return;
+    const rxn = activeRxn();
+    const { I, E, x: x0 } = iceLiveValues();
+    // hide round-off once x is tiny next to the amounts present
+    const big = Math.max(1e-30, ...Object.values(E), ...Object.values(I));
+    const x = Math.abs(x0) < 1e-5 * big ? 0 : x0;
+    // x stays positive, as students write it: a shift back flips the signs in the C row
+    const dir = x < 0 ? -1 : 1;
+    const added = [];
+    const removed = [];
+    for (const sp of iceDissolved()) {
+      // what's left of the added gas: the dose, less what the shift has used up since
+      const dose = iceAdded[sp] || 0;
+      const left = Math.max(0, Math.min(dose, dose + rxn.nu[sp] * iceXi));
+      iceLiveCells.I[sp].classList.toggle('ice-added', dose > 0);
+      iceLiveCells.I[sp].classList.toggle('ice-removed', dose < 0);
+      // a removal is already taken out of I: the note just says how much
+      if (dose < 0) removed.push(`${ICE_TXT[sp]} ${fmt(iceUnit(-dose))}`);
+      if (dose > 0) {
+        added.push(`${ICE_TXT[sp]} +${fmt(iceUnit(dose))}, ${fmt(iceUnit(left))} not used up yet`);
+        setCell(iceLiveCells.I[sp], `${fmt(I[sp])}<span class="ice-add">+${fmt(iceUnit(left))}</span>`);
+      } else setCell(iceLiveCells.I[sp], fmt(I[sp]));
+      setCell(iceLiveCells.C[sp], `<span class="ice-x">${coefX(dir * rxn.nu[sp])}</span>${fmtSigned(rxn.nu[sp] * x)}`);
+      setCell(iceLiveCells.E[sp], fmt(E[sp]));
+    }
+    const q = iceQ(E);
+    const k = iceK();
+    const atEq = isFinite(q) && k > 0 && Math.abs(q / k - 1) < 0.06;
+    const allGone = rxn.id === 'pbi2' && getN('pbi2s') <= 1e-7 && !atEq;
+    iceLiveCells.eRow.classList.toggle('at-eq', atEq);
+    setCell(iceLiveCells.eLbl, atEq ? 'E' : 'Now');
+    const after = iceMark ? `just after “${iceMark.n > 1 ? `${iceMark.label} ×${iceMark.n}` : iceMark.label}”` : 'at the start';
+    const unit = iceUnitName();
+    let state;
+    if (atEq) state = x === 0 ? 'At equilibrium: nothing has shifted yet. Heat, squeeze or add something.' : '<b>Settled:</b> Q = K again, so the E row is the new equilibrium.';
+    else if (allGone) state = 'All the solid has dissolved, so Q stays below K<sub>sp</sub>: no equilibrium.';
+    else state = `<b>Still shifting ${q < k ? 'forward →' : 'back ←'}</b>: C keeps changing until Q = K.`;
+    const xTxt = x === 0 ? 'x = 0' : `x = ${fmt(Math.abs(x))} ${unit}, ${x > 0 ? 'toward products' : 'back toward reactants'}`;
+    let addTxt = added.length ? `<br><span class="ice-add-note">Added ${added.join('; ')}.</span>` : '';
+    if (removed.length) addTxt += `<br><span class="ice-rem-note">Removed ${removed.join('; ')} (already taken out of I).</span>`;
+    setCell(el('iceLiveNote'), `I is the mix ${after}. ${xTxt}.${addTxt}<br>${state}`);
+  }
+
+  /* --- Own data --- */
+  const ownInputs = () => iceOwnTable.querySelectorAll('input');
+
+  function iceClearOwn() {
+    ownInputs().forEach((inp) => { inp.value = ''; delete inp.dataset.user; inp.classList.remove('calc', 'bad'); });
+    iceKIn.value = '';
+    iceKIn.classList.remove('bad');
+    own.kNote = '';
+    own.showQ = false;
+    iceSolveOwn();
+  }
+
+  // Bisect for x in K = Π E(x)^ν. ln of the right side rises with x, so one root at most,
+  // inside the range where no I or E goes negative.
+  function iceSolveX(sps, nu, I, E, K) {
+    let lo = -Infinity;
+    let hi = Infinity;
+    let scale = 1;
+    for (const sp of sps) {
+      const v = nu[sp];
+      if (I[sp] != null) { const b = -I[sp] / v; if (v > 0) lo = Math.max(lo, b); else hi = Math.min(hi, b); scale = Math.max(scale, I[sp]); }
+      else { const b = E[sp] / v; if (v > 0) hi = Math.min(hi, b); else lo = Math.max(lo, b); scale = Math.max(scale, E[sp]); }
+    }
+    if (!isFinite(lo)) lo = (isFinite(hi) ? hi : 0) - 1e6 * scale;
+    if (!isFinite(hi)) hi = lo + 2e6 * scale;
+    if (!(lo < hi)) return null;
+    const f = (x) => {
+      let s = -Math.log(K);
+      for (const sp of sps) s += nu[sp] * Math.log(Math.max(1e-300, I[sp] != null ? I[sp] + nu[sp] * x : E[sp]));
+      return s;
+    };
+    if (f(lo) > 1e-9 || f(hi) < -1e-9) return null;
+    for (let i = 0; i < 200; i++) {
+      const mid = 0.5 * (lo + hi);
+      if (f(mid) < 0) lo = mid;
+      else hi = mid;
+    }
+    return 0.5 * (lo + hi);
+  }
+
+  // "(0.100 − x)(0.100 − x)" style working, with I filled in
+  function iceSubstituted(sps, nu, I, E) {
+    const term = (sp) => {
+      const v = nu[sp];
+      const p = Math.abs(v) > 1 ? supNum(Math.abs(v)) : '';
+      if (I[sp] == null) return `(${fmt(E[sp])})${p}`;
+      const c = Math.abs(v) === 1 ? '' : Math.abs(v);
+      const body = I[sp] === 0 ? `${v < 0 ? '−' : ''}${c}x` : `${fmt(I[sp])} ${v < 0 ? '−' : '+'} ${c}x`;
+      return `(${body})${p}`;
+    };
+    const top = sps.filter((sp) => nu[sp] > 0).map(term).join('');
+    const bot = sps.filter((sp) => nu[sp] < 0).map(term).join('');
+    return bot ? `${top} / ${bot}` : top;
+  }
+
+  const close = (a, b, tol) => Math.abs(a - b) <= (tol || 0.02) * Math.max(Math.abs(a), Math.abs(b)) + 1e-15;
+
+  function iceSolveOwn() {
+    const rxn = activeRxn();
+    const nu = rxn.nu;
+    const sps = iceDissolved();
+    const names = (list) => list.map((sp) => ICE_TXT[sp]).join(', ');
+    const unit = iceUnitName();
+    const kName = iceKName();
+    const given = { I: {}, C: {}, E: {} };
+    let typo = false;
+    ownInputs().forEach((inp) => {
+      inp.classList.remove('bad');
+      if (!inp.dataset.user) return;
+      const v = parseNum(inp.value);
+      if (Number.isNaN(v)) { inp.classList.add('bad'); typo = true; return; }
+      given[inp.dataset.r][inp.dataset.sp] = v;
+    });
+    let K = null;
+    iceKIn.classList.remove('bad');
+    if (iceKIn.value.trim()) {
+      const v = parseNum(iceKIn.value);
+      if (Number.isNaN(v) || v <= 0) { iceKIn.classList.add('bad'); typo = true; }
+      else K = v;
+    }
+
+    const I = { ...given.I };
+    const E = { ...given.E };
+    let x = null;
+    const msgs = [];
+    let err = '';
+    let need = '';
+    let solvedFromK = false;
+
+    if (typo) err = 'A red square isn’t a number I can read. Try 0.25, 1.5e-3 or 1.5×10^-3.';
+    else if (sps.some((sp) => I[sp] < 0 || E[sp] < 0)) err = `${icePressure() ? 'Pressures' : 'Concentrations'} can’t be negative. Only the C row can go below zero.`;
+
+    if (!err) {
+      // every square that pins x has to agree on it
+      const pins = [];
+      for (const sp of sps) {
+        if (given.C[sp] != null) pins.push({ x: given.C[sp] / nu[sp], why: `C for ${ICE_TXT[sp]}` });
+        if (I[sp] != null && E[sp] != null) pins.push({ x: (E[sp] - I[sp]) / nu[sp], why: `I → E for ${ICE_TXT[sp]}` });
+      }
+      if (pins.length) {
+        x = pins[0].x;
+        const off = pins.find((p) => !close(p.x, x));
+        if (off) err = `These don’t agree on x: ${pins[0].why} gives x = ${fmt(pins[0].x)}, but ${off.why} gives x = ${fmt(off.x)}. Each C has to be its coefficient × x.`;
+      }
+    }
+
+    if (!err && x == null && K != null) {
+      const blank = sps.filter((sp) => I[sp] == null && E[sp] == null);
+      if (blank.length) need = `To solve for x, fill in an I or E square for ${names(blank)}.`;
+      else if (sps.some((sp) => I[sp] != null)) {
+        const r = iceSolveX(sps, nu, I, E, K);
+        if (r == null) err = `No x fits ${kName} = ${fmt(K)} without making something negative. Check K and the I row.`;
+        else {
+          x = r;
+          solvedFromK = true;
+          msgs.push(`Put the I row into ${kName} and solve for x:` +
+            `<span class="ice-math">${kName} = ${iceKExpr()}</span>` +
+            `<span class="ice-math">${fmt(K)} = ${iceSubstituted(sps, nu, I, E)}</span>` +
+            `<span class="ice-math ice-x-out">x = ${fmt(x)} ${unit}</span>`);
+        }
+      }
+    }
+
+    if (!err && x != null) {
+      if (!msgs.length) msgs.push(`From the squares you filled in, <span class="ice-x-out">x = ${fmt(x)} ${unit}</span>.`);
+      if (x < 0) msgs.push('A negative x means it shifted back ←: products turned into reactants.');
+      for (const sp of sps) {
+        if (I[sp] == null && E[sp] != null) I[sp] = E[sp] - nu[sp] * x;
+        else if (E[sp] == null && I[sp] != null) E[sp] = I[sp] + nu[sp] * x;
+      }
+      const blank = sps.filter((sp) => E[sp] == null);
+      if (blank.length === 1 && K != null) {
+        // the one unknown species comes from K itself
+        const m = blank[0];
+        let rest = 0;
+        for (const sp of sps) if (sp !== m) rest += nu[sp] * Math.log(Math.max(1e-300, E[sp]));
+        E[m] = Math.exp((Math.log(K) - rest) / nu[m]);
+        I[m] = E[m] - nu[m] * x;
+        msgs.push(`${ICE_TXT[m]} was the only unknown left, so its E comes from ${kName}.`);
+      } else if (blank.length) {
+        need = `To finish ${names(blank)}, fill in its I or E square${K == null ? `, or give ${kName}` : ''}.`;
+      }
+      const neg = sps.find((sp) => I[sp] < -1e-12 || E[sp] < -1e-12);
+      if (neg) err = `With x = ${fmt(x)}, ${ICE_TXT[neg]} would go negative. Check the signs in the C row.`;
+    }
+
+    if (!err && sps.every((sp) => E[sp] != null)) {
+      const kCalc = iceQ(E);
+      if (K == null) msgs.push(`The E row gives <span class="ice-math">${kName} = ${iceKExpr()} = ${fmt(kCalc)}</span>`);
+      else if (!solvedFromK) {
+        if (close(kCalc, K, 0.03)) msgs.push(`The E row checks out: it gives ${kName} = ${fmt(kCalc)}.`);
+        else msgs.push(`<span class="ice-err">The E row gives ${kName} = ${fmt(kCalc)}, not ${fmt(K)}.</span> That mix isn’t at equilibrium.`);
+      }
+    }
+
+    if (!err && x == null && !need && !sps.every((sp) => E[sp] != null)) {
+      const any = sps.some((sp) => I[sp] != null || E[sp] != null);
+      need = any
+        ? `Now give ${kName} (type it or Reveal K), or one square that pins x: a C value, or both I and E for one species.`
+        : `Start with the I row: what's in the ${icePressure() ? 'vessel' : 'mix'} before it shifts.`;
+    }
+
+    // Q from the I row, once asked for
+    if (own.showQ) {
+      if (!err && sps.every((sp) => I[sp] != null)) {
+        const q = iceQ(I);
+        let line = `From the I row, <span class="ice-math">Q = ${iceKExpr()} = ${fmt(q)}</span>`;
+        if (Number.isNaN(q)) line = 'Q can’t be worked out when both sides start at zero.';
+        else if (K != null) {
+          if (close(q, K, 0.03)) line += ` Q = ${kName}: already at equilibrium, so x = 0.`;
+          else if (q < K) line += ` Q < ${kName}, so it shifts <b>forward →</b>: reactants drop, products rise (x is positive).`;
+          else line += ` Q > ${kName}, so it shifts <b>back ←</b>: products drop, reactants rise (x is negative).`;
+        } else line += ` Give ${kName} to see which way it shifts.`;
+        msgs.unshift(line);
+      } else if (!err) msgs.unshift('Fill in the whole I row to calculate Q.');
+    }
+
+    // write the worked-out squares
+    ownInputs().forEach((inp) => {
+      if (inp.dataset.user) { inp.classList.remove('calc'); return; }
+      const sp = inp.dataset.sp;
+      const v = err ? null : inp.dataset.r === 'I' ? I[sp] : inp.dataset.r === 'E' ? E[sp] : (x != null ? nu[sp] * x : null);
+      inp.value = v == null ? '' : (inp.dataset.r === 'C' ? fmtSigned(v) : fmt(Math.max(0, v)));
+      inp.classList.toggle('calc', v != null);
+    });
+
+    let html = '';
+    if (own.kNote) html += `<p>${own.kNote}</p>`;
+    if (err) html += `<p class="ice-err">${err}</p>`;
+    else {
+      html += msgs.map((m) => `<p>${m}</p>`).join('');
+      if (need) html += `<p>${need}</p>`;
+    }
+    iceResult.innerHTML = html;
+  }
+
+  iceOwnTable.addEventListener('input', (e) => {
+    const inp = e.target;
+    if (inp.tagName !== 'INPUT') return;
+    if (inp.value.trim()) inp.dataset.user = '1';
+    else delete inp.dataset.user;
+    iceSolveOwn();
+  });
+  iceKIn.addEventListener('input', () => { own.kNote = ''; iceSolveOwn(); });
+  el('iceRevealK').addEventListener('click', () => {
+    iceKIn.value = fmt(iceK());
+    own.kNote = `${iceKName()} at ${T.toFixed(0)} K, from the simulation.`;
+    iceSolveOwn();
+  });
+  el('iceCalcQ').addEventListener('click', () => { own.showQ = true; iceSolveOwn(); });
+  el('iceClear').addEventListener('click', iceClearOwn);
+  el('iceCopyLive').addEventListener('click', () => {
+    const { I } = iceLiveValues();
+    ownInputs().forEach((inp) => {
+      if (inp.dataset.r === 'I') { inp.value = fmt(I[inp.dataset.sp]); inp.dataset.user = '1'; }
+      else { inp.value = ''; delete inp.dataset.user; }
+    });
+    iceSolveOwn();
+  });
+
+  function setIceMode(mode) {
+    iceMode = mode;
+    el('iceModeLive').setAttribute('aria-pressed', String(mode === 'live'));
+    el('iceModeOwn').setAttribute('aria-pressed', String(mode === 'own'));
+    el('iceLive').hidden = mode !== 'live';
+    el('iceOwn').hidden = mode !== 'own';
+  }
+  el('iceModeLive').addEventListener('click', () => setIceMode('live'));
+  el('iceModeOwn').addEventListener('click', () => setIceMode('own'));
+
+  function setIceOpen(on) {
+    iceOpen = on;
+    icePanel.hidden = !on;
+    curvePanel.hidden = on;
+    document.querySelector('.eq-main').classList.toggle('ice-open', on);
+    iceOpenBtn.textContent = on ? 'Show graph' : 'See ICE table';
+    iceOpenBtn.setAttribute('aria-expanded', String(on));
+    resize();
+    iceUpdateLive();
+  }
+  iceOpenBtn.addEventListener('click', () => setIceOpen(!iceOpen));
+  el('iceClose').addEventListener('click', () => { setIceOpen(false); iceOpenBtn.focus(); });
+
+  let last = performance.now();
+  function frame(now) {
+    const dtReal = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    if (!paused) stepAll(dtReal);
+    updateGauges();
+    updateKPanel();
+    updateCountsInK();
+    drawSim();
+    if (iceOpen) iceUpdateLive();
+    else drawChart();
+    drawBigChart();
+    requestAnimationFrame(frame);
+  }
+
+  function stepAll(dtReal) {
+    clock += dtReal;
+    // Run chemistry on an accelerated clock (visual motion stays real-time).
+    const rxn = activeRxn();
+    const chemMult = rxn.chemSpeed || CFG.chemSpeed || 1;
+    const dtChemReal = dtReal * chemMult;
+    const sub = CFG.rkSubsteps;
+    const dt = dtChemReal / sub;
+    for (let i = 0; i < sub; i++) {
+      if (totalGasMoles() > 1e-18) rk4Step(dt);
+      simTime += dt;
+    }
+
+    const sR = sim.getBoundingClientRect();
+    const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
+    const scale = 0.72 + 0.55 * vNorm;
+    // Decay any short-lived visual bias back to 0 so visuals follow the smooth RK4 state.
+    const decay = Math.pow(0.12, dtReal); // ~0.12 per second
+    for (const k of Object.keys(bias)) bias[k] *= decay;
+    syncSprites(sR.width, sR.height, scale);
+    stepSprites(dtReal, sR.width, sR.height, scale);
+    stepPairs(dtReal);
+    if (rxn.id === 'pbi2') {
+      stepWaterLevel(dtReal);
+      stepCrystals(dtReal, innerAABB(vesselGeom(sR.width, sR.height, scale)));
+      stepWater(dtReal);
+    }
+    handleSpriteCollisions();
+    clampSpritesToVessel(sR.width, sR.height, scale);
+    applySpriteReactions(dtReal * (rxn.eventSpeed || CFG.eventSpeed));
+    clampSpritesToVessel(sR.width, sR.height, scale);
+
+    pushHistory();
+  }
+
+  slT.addEventListener('input', () => {
+    T = parseFloat(slT.value);
+    mark('T', `T → ${T.toFixed(0)} K`);
+    const sR = sim.getBoundingClientRect();
+    const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
+    const scale = 0.72 + 0.55 * vNorm;
+    kickSprites(0.35);
+    clampSpritesToVessel(sR.width, sR.height, scale);
+  });
+
+  slV.addEventListener('input', () => {
+    const oldV = V_L;
+    V_L = volumeFromSlider(parseFloat(slV.value));
+    mark('V', `${activeRxn().id === 'pbi2' ? 'Water' : 'V'} → ${V_L.toFixed(2)} L`);
+    const sR = sim.getBoundingClientRect();
+    const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
+    const scale = 0.72 + 0.55 * vNorm;
+    clampSpritesToVessel(sR.width, sR.height, scale);
+    const dv = Math.abs(V_L - oldV) / Math.max(oldV, 0.05);
+    if (dv > 0.04) kickSprites(0.25 + Math.min(1.2, dv * 0.8));
+  });
+
+  injNO2.addEventListener('click', () => {
+    mark('add-injNO2', 'Added ' + injNO2.textContent.replace('+', '').trim());
+    const id = activeRxn().id;
+    if (id === 'ammonia') addDose('n2', CFG.doseN2);
+    else if (id === 'hi') addDose('h2', CFG.doseHIH2);
+    else if (id === 'pbi2') addDose('i', CFG.doseKI);
+    else addDose('no2', CFG.doseNO2);
+    const sR = sim.getBoundingClientRect();
+    const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
+    const scale = 0.72 + 0.55 * vNorm;
+    kickSprites(0.55);
+    clampSpritesToVessel(sR.width, sR.height, scale);
+  });
+  injN2O4.addEventListener('click', () => {
+    mark('add-injN2O4', 'Added ' + injN2O4.textContent.replace('+', '').trim());
+    const id = activeRxn().id;
+    if (id === 'ammonia') addDose('h2', CFG.doseH2);
+    else if (id === 'hi') addDose('i2', CFG.doseHII2);
+    else if (id === 'pbi2') addDose('pb', CFG.dosePb);
+    else addDose('n2o4', CFG.doseN2O4);
+    const sR = sim.getBoundingClientRect();
+    const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
+    const scale = 0.72 + 0.55 * vNorm;
+    kickSprites(0.55);
+    clampSpritesToVessel(sR.width, sR.height, scale);
+  });
+  if (inj3) {
+    inj3.addEventListener('click', () => {
+      mark('add-inj3', 'Added ' + inj3.textContent.replace('+', '').trim());
+      const id = activeRxn().id;
+      if (id === 'ammonia') addDose('nh3', CFG.doseNH3);
+      else if (id === 'hi') addDose('hi', CFG.doseHI);
+      else if (id === 'pbi2') { addDose('pbi2s', CFG.dosePbI2); dropNextCrystal = true; }
+      const sR = sim.getBoundingClientRect();
+      const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
+      const scale = 0.72 + 0.55 * vNorm;
+      kickSprites(0.55);
+      clampSpritesToVessel(sR.width, sR.height, scale);
+    });
+  }
+  remBtns.forEach((btn, k) => {
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const slot = removeSlots()[k];
+      if (!slot) return;
+      mark('rem-' + (k + 1), 'Removed ' + slot[2]);
+      removeDose(slot[0], slot[1]);
+      const sR = sim.getBoundingClientRect();
+      const vNorm = (V_L - CFG.V_L_min) / (CFG.V_L_max - CFG.V_L_min);
+      const scale = 0.72 + 0.55 * vNorm;
+      kickSprites(0.35);
+      clampSpritesToVessel(sR.width, sR.height, scale);
+    });
+  });
+  btnReset.addEventListener('click', () => {
+    resetForReaction();
+  });
+
+  rxnSelect.addEventListener('change', () => {
+    reactionId = RXNS[rxnSelect.value] ? rxnSelect.value : 'no2';
+    // Give each system its own temperature range and start at its usual temperature.
+    // (The ranges don't overlap, and setting min/max clamps the old value, so the default
+    // is set after the range rather than kept "if in range".)
+    if (reactionId === 'ammonia') {
+      slT.min = '500';
+      slT.max = '900';
+      slT.value = '723';
+    } else if (reactionId === 'pbi2') {
+      // 20–100 °C: the liquid-water range, where PbI2's solubility rises about sixfold
+      slT.min = '293';
+      slT.max = '373';
+      slT.value = '298';
+    } else if (reactionId === 'hi') {
+      // above ~460 K iodine stays a gas; 721 K is the textbook Kc ≈ 50 temperature
+      slT.min = '600';
+      slT.max = '800';
+      slT.value = '721';
+    } else {
+      slT.min = '260';
+      slT.max = '380';
+      slT.value = '298';
+    }
+    T = parseFloat(slT.value);
+    resetForReaction();
+    updateLegend();
+    updateInjectUI();
+    updateReactionText();
+    buildDialTicks();
+    iceBuild();
+  });
+
+  // Pressure dial ticks, 0 → pMax (20 atm for NO2, 400 atm for Haber)
+  function buildDialTicks() {
+    pMax = activeRxn().pMax;
+    const ticks = el('dialTicks');
+    ticks.innerHTML = '';
+    for (let i = 0; i <= 4; i++) {
+      const a = Math.PI * (1 - i / 4);
+      const x1 = 60 + Math.cos(a) * 46, y1 = 62 - Math.sin(a) * 46;
+      const x2 = 60 + Math.cos(a) * 38, y2 = 62 - Math.sin(a) * 38;
+      const tx = 60 + Math.cos(a) * 54, ty = 62 - Math.sin(a) * 54 + 3;
+      ticks.insertAdjacentHTML('beforeend',
+        `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${INK}" stroke-width="1.5"/>` +
+        `<text x="${tx}" y="${ty}" font-size="8" font-family="Space Mono, monospace" text-anchor="middle" fill="${DIM}">${i * pMax / 4}</text>`);
+    }
+  }
+  buildDialTicks();
+
+  window.addEventListener('resize', resize);
+  // the stage stretches with the side column, not just the window
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(sim);
+  resize();
+  updateLegend();
+  updateInjectUI();
+  updateReactionText();
+  V_L = volumeFromSlider(parseFloat(slV.value));
+  T = parseFloat(slT.value);
+  // Start NO2 system near equilibrium immediately (faster “settling” on first load).
+  resetForReaction();
+  iceBuild();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

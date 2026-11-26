@@ -5,7 +5,7 @@ with more specific build rules; those add to this file, they don't replace it.
 
 ## Student-facing copy
 
-- **Write in the teacher's voice: read `VOICE.md` first.** It holds the confirmed voice rules and a
+- **Write in the teacher's voice: read `docs/VOICE.md` first.** It holds the confirmed voice rules and a
   before → after log of the teacher's own rewrites. When the teacher rewrites copy, add the pair to that log.
 
 - **No personification of particles.** Atoms, ions, molecules, and electrons are not people.
@@ -29,7 +29,7 @@ with more specific build rules; those add to this file, they don't replace it.
     Cᵢ × Vᵢ gives the moles moved, then those moles over the final volume. Then finish with
     `CᵢVᵢ = C_fV_f` rearranged and worked out, as the same answer in one step. Label the picture the same way
     (CᵢVᵢ and its values under the starting solution). The Solubility Guide's Dilution tab is the model.
-- Solubility builds these with `SolUI.ua` (`frac`, `x`, `chain`) in `solubility/assets/sol-ui.js`, styled
+- Solubility builds these with `SolUI.ua` (`frac`, `x`, `chain`) in `ap-chemistry-12/solubility/assets/sol-ui.js`, styled
   by `.ua-*` in `sol.css`. Reuse it rather than writing fractions by hand.
 
 ## Visual
@@ -46,8 +46,22 @@ with more specific build rules; those add to this file, they don't replace it.
   labelled with symbol + charge. Acids (H⁺ / H₃O⁺) magenta `#c2347a`, bases (OH⁻) violet-blue `#5b5fd6`:
   they never use the plain cation / anion colours. Neutral products such as H₂O are pale grey `#e4ebf3`.
   Ions inside a solid take the solid's real colour; a yellow solid is a paler yellow than the anion yellow
-  (PbI₂ `#f6e39a`, user 2026-11-20), so solid and dissolved never look alike. Tokens live in `solubility/assets/sol.css`; the
+  (PbI₂ `#f6e39a`, user 2026-11-20), so solid and dissolved never look alike. Tokens live in `ap-chemistry-12/solubility/assets/sol.css`; the
   acids and bases unit reuses them.
+
+## Folder layout
+
+The folders mirror the site (user, 2026-11-25): one folder per course hub, one subfolder per unit, sims inside.
+
+- `ap-chemistry-12/` → `kinetics/` (hub + collision theory, Maxwell–Boltzmann, Beer's law, `rate-laws/`),
+  `equilibrium/` (intro suite + `le-chatelier.html`), `solubility/`, `acids-bases/` (hub + `titration.html`).
+- `chemistry-11h/` → `atomic-structure/` (Unit 1), `bonding/` (Unit 2), `imf/` (Unit 3).
+- `other/` → sims outside a course (`bc-tides.html`).
+- `assets/` at the root holds files several suites share: `suite.css` and `suite-chrome.js` (the shared suite
+  chrome), `courses.css`, `home.css`, `section-jump.js`. A suite's own `assets/` holds only its own files.
+- A new unit or sim goes in its course folder, gets a card on that hub, and an entry in `sitemap.xml`.
+- **Moving a public page changes its URL.** Update every link to it, its canonical / `og:url` / JSON-LD URLs and
+  `sitemap.xml`, and add the old path to the redirect list in `404.html` so old links and bookmarks still work.
 
 ## Hosting & search
 
@@ -56,6 +70,6 @@ with more specific build rules; those add to this file, they don't replace it.
   `meta description`, an absolute `canonical` URL, Open Graph / Twitter tags, and a JSON-LD
   `LearningResource` block. Copy them from an existing sim when adding a page.
 - Every page (public or dev-only) links the water-molecule tab icon just before `</head>`:
-  `/favicon.svg`, with `/favicon-32.png` and `/apple-touch-icon.png` as fallbacks.
+  `/assets/icons/favicon.svg`, with `/assets/icons/favicon-32.png` and `/assets/icons/apple-touch-icon.png` as fallbacks.
 - Add each new public page to `sitemap.xml`. Dev-only pages (taste passes, screenshot harnesses)
   get `<meta name="robots" content="noindex, nofollow">` instead.

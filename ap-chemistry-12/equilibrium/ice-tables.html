@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ICE Tables: Equilibrium Calculations with Kc and Kp | AP Chemistry</title>
+  <meta name="description" content="Learn to fill in ICE tables step by step: finding Kc from equilibrium data, unknown starting amounts, Q vs K, solving with x, disturbing an equilibrium, and Kp with partial pressures. Worked examples, then practice with instant checking.">
+  <meta name="author" content="M DiPietro">
+  <link rel="canonical" href="https://atomicsimulations.ca/ap-chemistry-12/equilibrium/ice-tables.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Atomic Simulations">
+  <meta property="og:title" content="ICE Tables: Equilibrium Calculations with Kc and Kp | AP Chemistry">
+  <meta property="og:description" content="Learn to fill in ICE tables step by step: finding Kc from equilibrium data, unknown starting amounts, Q vs K, solving with x, disturbing an equilibrium, and Kp with partial pressures. Worked examples, then practice with instant checking.">
+  <meta property="og:url" content="https://atomicsimulations.ca/ap-chemistry-12/equilibrium/ice-tables.html">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "ICE Tables: Equilibrium Calculations with Kc and Kp | AP Chemistry", "url": "https://atomicsimulations.ca/ap-chemistry-12/equilibrium/ice-tables.html", "description": "Learn to fill in ICE tables step by step: finding Kc from equilibrium data, unknown starting amounts, Q vs K, solving with x, disturbing an equilibrium, and Kp with partial pressures. Worked examples, then practice with instant checking.", "inLanguage": "en", "isAccessibleForFree": true, "learningResourceType": "Simulation", "author": {"@type": "Person", "name": "M DiPietro"}, "isPartOf": {"@type": "WebSite", "name": "Atomic Simulations", "url": "https://atomicsimulations.ca/"}, "educationalLevel": "Grade 12", "about": "Chemistry"}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/suite.css?v=19">
+  <link rel="stylesheet" href="assets/eq-intro.css?v=20">
+  <link rel="stylesheet" href="assets/ice.css?v=6">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+</head>
+<body>
+  <div class="module-wrap guide-wrap ice-guide">
+    <div class="top-nav">
+      <a href="index.html" class="back-link">← Unit 2 - Equilibrium</a>
+      <div class="top-nav-end">
+        <div class="mod-meta">ICE Tables</div>
+        <div class="learn-controls">
+          <button type="button" class="btn learn-step" id="learnPrev" aria-label="Previous step">‹</button>
+          <button type="button" class="btn learn-step" id="learnNext" aria-label="Next step">›</button>
+          <button type="button" class="learn-toggle" id="learnToggle" aria-pressed="false" aria-keyshortcuts="P" title="Presentation view (press P)"><span class="learn-switch" aria-hidden="true"></span>Presentation view</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="room-switch" aria-label="Unit 2 rooms">
+      <a href="index.html" data-room="hub">Hub</a>
+      <a href="guide.html" data-room="guide">Guide</a>
+      <a href="sandbox.html" data-room="sandbox">Sandbox</a>
+      <a href="ice-tables.html" data-room="ice">ICE Tables</a>
+    </nav>
+
+    <header class="guide-hero">
+      <h1 id="guideTitle" tabindex="-1">ICE Tables</h1>
+      <p>One way we use K is to find concentrations we cannot measure directly. An ICE table keeps track of how each concentration changes on the way to equilibrium.</p>
+      <p class="guide-hero-note">Each example has a worked solution, then a “Your turn” problem to try on your own. Examples A to F are from Hebden, <i>Chemistry 12</i>, pages 63 to 69. Nothing is saved.</p>
+    </header>
+
+    <nav class="guide-toc" aria-label="Sections">
+      <a href="#ice-brief">Before we begin</a>
+      <a href="#ice-intro">What is an ICE table?</a>
+      <a href="#ex-a">A: No table needed</a>
+      <a href="#ex-b">B: Filling one in</a>
+      <a href="#ex-c">C: Unknown start</a>
+      <a href="#ex-d">D: Which way?</a>
+      <a href="#ex-e">E: Letting x be the change</a>
+      <a href="#ex-f">F: Disturbing equilibrium</a>
+      <a href="#ex-kp">G: K<sub>p</sub></a>
+      <a href="#ice-summary">Summary</a>
+    </nav>
+
+    <div class="guide-layout">
+      <div class="guide-rail">
+
+        <article class="guide-beat" id="ice-brief" data-badge="Before we begin" data-nav="Before we begin">
+          <h2>Before We Begin</h2>
+          <div class="brief-cols">
+            <div class="brief-block">
+              <h3>Learning intentions</h3>
+              <ul>
+                <li>We will learn when a problem needs an ICE table, and when it doesn't.</li>
+                <li>We will learn how to fill in an ICE table one row at a time, using the coefficients of the balanced equation.</li>
+                <li>We will use the E row to calculate K<sub>c</sub> or K<sub>p</sub>, or to find an unknown concentration or pressure.</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="guide-beat" id="ice-intro" data-badge="What is an ICE table?" data-nav="What is an ICE table?">
+          <h2>What Is an ICE Table?</h2>
+          <p>When a reaction runs, the concentrations change until the system reaches equilibrium. An ICE table is how we keep track of those changes.</p>
+          <p><strong>I: Initial.</strong> The concentrations at the start, before the reaction shifts.<br>
+            <strong>C: Change.</strong> How much each concentration goes up or down as the reaction shifts.<br>
+            <strong>E: Equilibrium.</strong> The concentrations once the system has reached equilibrium.</p>
+          <p>Every column follows one rule: <strong>I + C = E</strong>.</p>
+          <p><strong>Other names:</strong> Hebden labels the same rows START, +Δ and = EQUIL, so the rule reads START + Δ = EQUIL. Some textbooks add a row on top for the Reaction and call it a RICE table. They all work the same way.</p>
+          <p><strong>Recall:</strong> K is products over reactants, each raised to its coefficient. When we use concentrations, we call it <strong>K<sub>c</sub></strong>. Hebden writes K<sub>eq</sub>; for these problems, that is the same thing as K<sub>c</sub>.</p>
+          <p>In the simulation, click the “Next step” button to see what each row means.</p>
+        </article>
+
+        <article class="guide-beat" id="ex-a" data-badge="Example A: No table needed" data-nav="Example A: No table needed">
+          <h2>Does This Problem Need an ICE Table?</h2>
+          <p>The first question we ask is whether time passes in the problem.</p>
+          <p>If the problem only describes a system that is already at equilibrium, there is nothing to keep track of. We go straight to K<sub>c</sub>.</p>
+          <p>If something is put in a container and then left to react, the concentrations change. Therefore, we need an ICE table.</p>
+          <p>In the simulation, click the “Next step” button to see how we find K<sub>c</sub> when nothing changes. Then <a href="#ex-a" data-open-you>try one on your own</a>.</p>
+        </article>
+
+        <article class="guide-beat" id="ex-b" data-badge="Example B: Filling in an ICE table" data-nav="Example B: Filling in an ICE table">
+          <h2>Filling In an ICE Table</h2>
+          <p>Example B has a sense of time passing: NO<sub>2</sub> is put in a bulb, and then the reaction runs until it reaches equilibrium. Therefore, we need an ICE table.</p>
+          <p><strong>Fill in what we know first.</strong> Then use I + C = E, and the coefficients of the balanced equation, to fill in the rest.</p>
+          <p><strong>The C row follows the coefficients.</strong> In this reaction, the changes must be in a 2 : 1 : 2 ratio.</p>
+          <p>In the simulation, click the “Next step” button to fill in the ICE table one cell at a time, and watch the bulb as the reaction shifts. Then <a href="#ex-b" data-open-you>try one on your own</a>.</p>
+        </article>
+
+        <article class="guide-beat" id="ex-c" data-badge="Example C: When the start is unknown" data-nav="Example C: When the start is unknown">
+          <h2>When the Start Is Unknown</h2>
+          <p>Sometimes the value we don't know is in the I row. We give it a letter, X, and carry it through the table.</p>
+          <p><strong>Important:</strong> we will not need the quadratic formula for these problems. Whenever it looks like we do, we can take the square root of both sides instead.</p>
+          <p>In the simulation, click the “Next step” button to see how X moves through the table. Then <a href="#ex-c" data-open-you>try one on your own</a>.</p>
+        </article>
+
+        <article class="guide-beat" id="ex-d" data-badge="Example D: Which way will it shift?" data-nav="Example D: Which way will it shift?">
+          <h2>Which Way Will It Shift?</h2>
+          <p>Not every problem asks for a number. Sometimes it asks for a decision.</p>
+          <p>We calculate <strong>Q</strong>, the <strong>reaction quotient</strong>, using the starting concentrations. It is the same expression as K<sub>c</sub>, at any moment.</p>
+          <p>If Q = K<sub>c</sub>, the system is at equilibrium.<br>
+            If Q is LESS than K<sub>c</sub>, the reaction must shift to produce more PRODUCTS.<br>
+            If Q is GREATER than K<sub>c</sub>, the reaction must shift to produce more REACTANTS.</p>
+          <p>In the simulation, click the “Next step” button to compare Q with K<sub>c</sub>. Then <a href="#ex-d" data-open-you>try three on your own</a>.</p>
+        </article>
+
+        <article class="guide-beat" id="ex-e" data-badge="Example E: Letting x be the change" data-nav="Example E: Letting x be the change">
+          <h2>Letting x Be the Change</h2>
+          <p>When we don't know any value in the C or E rows, we let the variable be the <strong>change in concentration</strong> of one substance.</p>
+          <p>The coefficients tell us how the other changes compare. The side that started at zero must gain, so the other side must lose.</p>
+          <p>In the simulation, click the “Next step” button to see how x fills the table, and then how the square root solves it. Then <a href="#ex-e" data-open-you>try one on your own</a>.</p>
+        </article>
+
+        <article class="guide-beat" id="ex-f" data-badge="Example F: Disturbing an equilibrium" data-nav="Example F: Disturbing an equilibrium">
+          <h2>Disturbing an Equilibrium</h2>
+          <p>When something is added to a system that is already at equilibrium, we use Le Châtelier's principle, but now with numbers.</p>
+          <p>First, we need K<sub>c</sub>, from the equilibrium before anything was added.</p>
+          <p>Then the addition goes on the I row. The system will not shift by itself; something has to cause the shift.</p>
+          <p>In the simulation, click the “Next step” button to find K<sub>c</sub>, then add the SO<sub>2</sub> and watch the bulb shift. Then <a href="#ex-f" data-open-you>try one on your own</a>.</p>
+        </article>
+
+        <article class="guide-beat" id="ex-kp" data-badge="Example G: K&#8346; and partial pressures" data-nav="Example G: K&#8346; and partial pressures">
+          <h2>K<sub>p</sub>: ICE Tables With Pressures</h2>
+          <p>When every substance is a gas, we can also write K using <strong>partial pressures</strong>. This is <strong>K<sub>p</sub></strong>.</p>
+          <p><strong>K<sub>c</sub>:</strong> uses concentrations, in mol/L.<br>
+            <strong>K<sub>p</sub>:</strong> uses partial pressures, in atm.</p>
+          <p>In a sealed flask at a constant temperature, the pressure of each gas goes up and down with its moles. Therefore, the ICE table works the same way: the C row still follows the coefficients. We fill it in with pressures instead of concentrations.</p>
+          <p><strong>Total pressure:</strong> the sum of all the partial pressures. Sometimes it is the only equilibrium value we are given.</p>
+          <p>In the simulation, click the “Next step” button to fill in the table with pressures. Then <a href="#ex-kp" data-open-you>try one on your own</a>.</p>
+        </article>
+
+        <article class="guide-beat guide-beat-end" id="ice-summary" data-badge="What to take with you" data-nav="What to take with you">
+          <h2>What to Take With You</h2>
+          <p><strong>Does time pass?</strong> If not, go straight to K. If it does, set up an ICE table.</p>
+          <p><strong>Units:</strong> every value in the table is in mol/L for K<sub>c</sub>, or atm for K<sub>p</sub>. Convert moles first.</p>
+          <p><strong>Fill in what we know first,</strong> then use I + C = E.</p>
+          <p><strong>The C row follows the coefficients.</strong> One side is positive, and the other side is negative.</p>
+          <p><strong>Additions and removals go on the I row.</strong></p>
+          <p><strong>No quadratic formula:</strong> take the square root of both sides.</p>
+          <p><strong>A decision, not a number?</strong> Compare Q with K.</p>
+          <p style="margin-top:1rem">Next, open <a href="le-chatelier.html">Equilibrium Simulations</a> to push a system at equilibrium and watch it shift back.</p>
+        </article>
+      </div>
+
+      <aside class="guide-stage-panel ice-stage" id="stage" aria-label="Interactive stage">
+        <div class="guide-stage-head">
+          <p class="force-badge" id="badge" aria-live="polite"></p>
+          <div class="ice-head-end">
+            <div class="seg ice-modes" id="modes" role="group" aria-label="Example or Your turn" hidden>
+              <button type="button" class="btn" data-mode="ex" aria-pressed="true">Example</button>
+              <button type="button" class="btn" data-mode="you" aria-pressed="false">Your turn</button>
+            </div>
+          </div>
+        </div>
+        <div class="ice-grid" id="grid">
+          <div class="ice-top" id="top"></div>
+          <div class="ice-left" id="left"></div>
+          <div class="ice-right" id="right"></div>
+        </div>
+        <div class="ice-foot">
+          <label class="ice-full" id="fullWrap" hidden><input type="checkbox" id="fullToggle"> Show full explanation</label>
+          <div class="ice-foot-l" id="footL"></div>
+          <div class="ice-foot-r" id="footR"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Before we begin: the hub tile's table, large, and the learning intentions (shown on the stage in presentation view) -->
+  <template id="tpl-ice-brief">
+    <div class="ice-static">
+      <div class="ice-brief-pic">
+        <svg class="hub-anim anim-ice" viewBox="20 8 200 104" focusable="false" aria-hidden="true">
+              <rect class="ic-hl" x="32" y="38" width="176" height="22" rx="4" fill="#e7eaff"/>
+              <g font-family="Space Grotesk, sans-serif" font-weight="700" fill="#1d2433" text-anchor="middle" font-size="13">
+                <text x="96" y="31">N₂O₄</text><text x="140" y="31">⇌</text><text x="180" y="31">2 NO₂</text>
+                <g text-anchor="start"><text x="38" y="54">I</text><text x="37" y="76">C</text><text x="37" y="98">E</text></g>
+              </g>
+              <path d="M30,37 H210" stroke="#1d2433" stroke-width="2.2"/>
+              <path d="M30,60 H210 M30,82 H210" stroke="rgba(29,36,51,0.18)" stroke-width="1.4"/>
+              <g font-family="Space Mono, monospace" font-weight="700" font-size="12" fill="#1d2433" text-anchor="middle">
+                <g class="ic-r ic-1"><text x="96" y="54">1.00</text><text x="180" y="54">0</text></g>
+                <g class="ic-r ic-2"><text x="96" y="76">−x</text><text x="180" y="76">+2x</text></g>
+                <g class="ic-r ic-3"><text x="96" y="98">1.00 − x</text><text x="180" y="98">2x</text></g>
+              </g>
+            </svg>
+      </div>
+      <div class="ice-brief-text">
+        <h2>ICE Tables</h2>
+        <ul>
+          <li>We will learn when a problem needs an ICE table, and when it doesn't.</li>
+          <li>We will learn how to fill in an ICE table one row at a time, using the coefficients of the balanced equation.</li>
+          <li>We will use the E row to calculate K<sub>c</sub> or K<sub>p</sub>, or to find an unknown concentration or pressure.</li>
+        </ul>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-ice-summary">
+    <div class="ice-static ice-summary">
+      <h2>What to Take With You</h2>
+      <ol>
+        <li><strong>Does time pass?</strong> No: go straight to K. Yes: ICE table.</li>
+        <li><strong>Units:</strong> mol/L for K<sub>c</sub>, atm for K<sub>p</sub>. Convert moles first.</li>
+        <li><strong>Fill in what we know,</strong> then I + C = E.</li>
+        <li><strong>C row:</strong> follows the coefficients. One side +, the other side −.</li>
+        <li><strong>Additions and removals</strong> go on the I row.</li>
+        <li><strong>No quadratic formula:</strong> square root both sides.</li>
+        <li><strong>A decision?</strong> Compare Q with K.</li>
+      </ol>
+    </div>
+  </template>
+
+
+  <script src="../../assets/suite-chrome.js?v=2"></script>
+  <script src="../../assets/section-jump.js?v=1"></script>
+  <script src="../solubility/assets/sol-ui.js?v=23"></script>
+  <script src="assets/ice-ui.js?v=3"></script>
+  <script src="assets/ice-data.js?v=4"></script>
+  <script src="assets/ice-guide.js?v=5"></script>
+</body>
+</html>

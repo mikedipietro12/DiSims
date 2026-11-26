@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Not Found | Atomic Simulations</title>
+  <meta name="robots" content="noindex, nofollow">
+  <script>
+    /* The sims moved into course folders on 2026-11-25. GitHub Pages serves this page for any
+       missing address, so old links and bookmarks are sent on to the new address here.
+       Old path prefix (decoded) -> new path. Most specific first. */
+    (function () {
+      var MOVES = [
+        ['/ap-chemistry-12/kinetics.html',    '/ap-chemistry-12/kinetics/'],
+        ['/ap-chemistry-12/acids-bases.html', '/ap-chemistry-12/acids-bases/'],
+        ['/collision_theory.html',            '/ap-chemistry-12/kinetics/collision-theory.html'],
+        ['/Maxwell-Boltzman.html',            '/ap-chemistry-12/kinetics/maxwell-boltzmann.html'],
+        ['/beers_law.html',                   '/ap-chemistry-12/kinetics/beers-law.html'],
+        ['/rate-laws/',                       '/ap-chemistry-12/kinetics/rate-laws/'],
+        ['/equilibrium_simulations.html',     '/ap-chemistry-12/equilibrium/le-chatelier.html'],
+        ['/equilibrium-intro/',               '/ap-chemistry-12/equilibrium/'],
+        ['/solubility/',                      '/ap-chemistry-12/solubility/'],
+        ['/Titration Simulator (1).html',     '/ap-chemistry-12/acids-bases/titration.html'],
+        ['/Unit 1b/08-electron-spin.html',    '/chemistry-11h/atomic-structure/08-electron-diagrams-spin.html'],
+        ['/chemistry-11h/atomic-structure/08-electron-spin.html', '/chemistry-11h/atomic-structure/08-electron-diagrams-spin.html'],
+        ['/Unit 1b/',                         '/chemistry-11h/atomic-structure/'],
+        ['/chemical-bonding/',                '/chemistry-11h/bonding/'],
+        ['/intermolecular-forces/',           '/chemistry-11h/imf/'],
+        ['/bc-tides.html',                    '/other/bc-tides.html']
+      ];
+      var path;
+      try { path = decodeURIComponent(location.pathname); } catch (e) { path = location.pathname; }
+      for (var i = 0; i < MOVES.length; i++) {
+        var from = MOVES[i][0], to = MOVES[i][1];
+        var folder = from.charAt(from.length - 1) === '/';
+        var hit = path === from || (folder && (path === from.slice(0, -1) || path.indexOf(from) === 0));
+        if (hit) {
+          var rest = folder ? path.slice(Math.min(path.length, from.length)) : '';
+          location.replace(to + rest + location.search + location.hash);
+          return;
+        }
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/suite.css?v=19">
+  <link rel="stylesheet" href="/assets/courses.css?v=3">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+</head>
+<body>
+  <div class="hub course-hub">
+    <div class="top-nav">
+      <a href="/" class="back-link">← All courses</a>
+    </div>
+    <header class="hub-header">
+      <h1>Page not found</h1>
+      <p class="subtitle">This page may have moved. Start from <a href="/">All courses</a> and pick your course.</p>
+    </header>
+  </div>
+</body>
+</html>

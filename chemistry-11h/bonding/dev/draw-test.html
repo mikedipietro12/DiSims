@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Draw Engine Harness | Chemical Bonding (dev)</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../assets/suite.css?v=20261113m">
+  <link rel="stylesheet" href="../assets/bonding.css?v=20261113m">
+  <style>
+    .wrap{max-width:1180px;margin:0 auto;padding:1.5rem 1.4rem 4rem;}
+    h1{font-size:2rem;letter-spacing:-0.03em;margin:0.3rem 0 0.6rem;}
+    h2{font-size:1.3rem;margin:2.4rem 0 0.8rem;}
+    .controls{display:flex;flex-wrap:wrap;gap:0.8rem;align-items:end;margin-bottom:1rem;}
+    .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.8rem;}
+    .gallery figure{background:#fff;border:2px solid var(--ink);border-radius:14px;padding:0.4rem 0.6rem 0.6rem;margin:0;}
+    .gallery svg{width:100%;height:auto;display:block;}
+    .gallery figcaption{font-family:var(--font-mono);font-size:0.72rem;font-weight:700;border-top:1px solid var(--line);padding-top:0.3rem;}
+  </style>
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+</head>
+<body>
+  <div class="wrap">
+    <p class="stub-kicker">Dev · Task 4 · Draw engine harness</p>
+    <h1>Draw engine</h1>
+    <div class="controls">
+      <div class="field"><label for="load">Load a reference</label>
+        <select id="load"><option value="">Blank</option></select></div>
+      <div class="field"><label for="fc">Formal charge</label>
+        <select id="fc"><option value="teach">Teach (full equation)</option><option value="compact" selected>Compact</option><option value="off">Off</option></select></div>
+    </div>
+    <div id="mount"></div>
+
+    <h2>Every reference structure (static render)</h2>
+    <div class="gallery" id="gallery"></div>
+  </div>
+  <script src="../assets/bonding-kit.js?v=20261113m"></script>
+  <script src="../assets/lewis-model.js?v=20261113m"></script>
+  <script src="../assets/draw-engine.js?v=20261113m"></script>
+  <script>
+    (function () {
+      var d = DrawEngine.create(document.getElementById('mount'), { fcMode: 'compact', palette: ['H','C','N','O','F','P','S','Cl','Br','B','Xe','Na','Mg'] });
+      window.__draw = d;
+      var sel = document.getElementById('load');
+      BondingKit.MOLECULES.forEach(function (m) {
+        var o = document.createElement('option'); o.value = m.id; o.textContent = m.formula + ' · ' + m.name; sel.appendChild(o);
+      });
+      sel.addEventListener('change', function () { sel.value ? d.load(BondingKit.structure(sel.value)) : d.clear(); });
+      document.getElementById('fc').addEventListener('change', function (e) { d.setFcMode(e.target.value); });
+      var q = new URLSearchParams(location.search);
+      if (q.get('fc')) { document.getElementById('fc').value = q.get('fc'); d.setFcMode(q.get('fc')); }
+      if (q.get('load')) { sel.value = q.get('load'); d.load(BondingKit.structure(q.get('load'))); if (q.get('select')) d.select(+q.get('select')); }
+      if (q.get('scene') === 'midbuild') d.load({ atoms: [{ el: 'O', x: -1.2, y: 0, ne: 2 }, { el: 'C', x: 0, y: 0, ne: 0 }, { el: 'O', x: 1.2, y: 0, ne: 4 }, { el: 'H', x: 0, y: 2, ne: 0 }], bonds: [{ a: 0, b: 1, order: 1 }, { a: 1, b: 2, order: 2 }], charge: 0 });
+      if (q.get('reveal')) d.showReference(true);
+      if (q.get('hover')) {
+        var hp = d._atomPx(+q.get('hover')), rr = d.svg.getBoundingClientRect();
+        d.svg.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: rr.left + hp.x, clientY: rr.top + hp.y, pointerType: 'mouse' }));
+      }
+      if (/selftest/.test(location.search)) window.addEventListener('load', function () {
+        try { selfTest(d); } catch (err) { var pre = document.createElement('pre'); pre.id = 'selftest'; pre.textContent = 'ERROR ' + err.message + '\n' + err.stack; document.querySelector('.wrap').prepend(pre); }
+      });
+      var g = document.getElementById('gallery');
+      BondingKit.MOLECULES.forEach(function (m) {
+        var f = document.createElement('figure');
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        DrawEngine.renderStatic(svg, BondingKit.structure(m.id), { fcMode: 'compact' });
+        f.appendChild(svg);
+        var c = document.createElement('figcaption'); c.textContent = m.formula + ' · ' + m.name; f.appendChild(c);
+        g.appendChild(f);
+      });
+    })();
+  </script>
+  <script src="draw-selftest.js?v=9"></script>
+</body>
+</html>

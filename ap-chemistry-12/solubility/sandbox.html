@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solubility Sandbox: Dissolving, Saturation &amp; Ksp | AP Chemistry</title>
+  <meta name="description" content="Solubility sandbox. Dissolve salts in water, reach saturation, compare Q and Ksp, and add a common ion to dissolve more or less.">
+  <meta name="author" content="M DiPietro">
+  <!-- In development: remove when the room ships, then add to sitemap.xml -->
+  <link rel="canonical" href="https://atomicsimulations.ca/ap-chemistry-12/solubility/sandbox.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Atomic Simulations">
+  <meta property="og:title" content="Solubility Sandbox: Dissolving, Saturation &amp; Ksp | AP Chemistry">
+  <meta property="og:description" content="Solubility sandbox. Dissolve salts in water, reach saturation, compare Q and Ksp, and add a common ion to dissolve more or less.">
+  <meta property="og:url" content="https://atomicsimulations.ca/ap-chemistry-12/solubility/sandbox.html">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Solubility Sandbox: Dissolving, Saturation & Ksp | AP Chemistry", "url": "https://atomicsimulations.ca/ap-chemistry-12/solubility/sandbox.html", "description": "Solubility sandbox. Dissolve salts in water, reach saturation, compare Q and Ksp, and add a common ion to dissolve more or less.", "inLanguage": "en", "isAccessibleForFree": true, "learningResourceType": "Simulation", "author": {"@type": "Person", "name": "M DiPietro"}, "isPartOf": {"@type": "WebSite", "name": "Atomic Simulations", "url": "https://atomicsimulations.ca/"}, "educationalLevel": "Grade 12", "about": "Chemistry"}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/suite.css?v=15">
+  <link rel="stylesheet" href="assets/sol.css?v=60">
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+</head>
+<body>
+  <div class="module-wrap sol-wrap">
+    <div class="top-nav">
+      <a href="index.html" class="back-link">← Solubility &amp; Ksp</a>
+      <div class="mod-meta">Room 2 · Sandbox</div>
+    </div>
+    <nav class="room-switch" aria-label="Solubility rooms">
+      <a href="index.html" data-room="hub">Hub</a>
+      <a href="guide.html" data-room="guide">Guide</a>
+      <a href="sandbox.html" data-room="sandbox">Sandbox</a>
+    </nav>
+    <h1 class="sr-only">Solubility Sandbox</h1>
+
+    <section class="sbx" aria-label="Sandbox">
+      <div class="sbx-modes" role="group" aria-label="Mode">
+        <button type="button" class="btn" data-mode="dissolve" aria-pressed="true">Dissolve a solid</button>
+        <button type="button" class="btn" data-mode="mix" aria-pressed="false">Mix two solutions</button>
+      </div>
+
+      <div class="sbx-grid">
+        <div class="sbx-main">
+          <div class="sbx-salts" id="salts" role="group" aria-label="Salt"></div>
+          <div class="sbx-canvas"><canvas id="cv" role="img" aria-label=""></canvas></div>
+          <p class="sbx-hint">Tap the picture to skip to the end.</p>
+
+          <div class="sbx-controls" id="dissolveCtl">
+            <div class="sbx-row" id="stressBtns"></div>
+            <div class="sbx-row">
+              <label class="sg-temp" id="tempWrap"><span>Temperature</span><input id="temp" type="range" min="0" max="100" step="1" value="25"><output id="tempOut">25 °C</output></label>
+            </div>
+            <p class="sbx-note" id="tempNote" hidden></p>
+          </div>
+
+          <div class="sbx-controls" id="mixCtl" hidden>
+            <div class="sbx-mix">
+              <fieldset class="sbx-sol" id="solA"><legend></legend>
+                <label>Concentration <input type="range" min="-6" max="-1" step="0.1" value="-3"><output></output></label>
+                <label>Volume <input type="range" min="10" max="75" step="5" value="50"><output></output></label>
+              </fieldset>
+              <fieldset class="sbx-sol" id="solB"><legend></legend>
+                <label>Concentration <input type="range" min="-6" max="-1" step="0.1" value="-3"><output></output></label>
+                <label>Volume <input type="range" min="10" max="75" step="5" value="50"><output></output></label>
+              </fieldset>
+            </div>
+            <div class="sbx-row">
+              <button type="button" class="btn primary" id="mixBtn">Mix</button>
+              <button type="button" class="btn" id="mixReset">Start over</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="sbx-side" aria-label="Readings">
+          <div id="check"></div>
+          <div id="readout"></div>
+        </aside>
+      </div>
+      <p class="sr-only" id="live" aria-live="polite"></p>
+    </section>
+  </div>
+  <script src="../../assets/suite-chrome.js?v=1"></script>
+  <script src="assets/salts.js?v=5"></script>
+  <script src="assets/sol-engine.js?v=21"></script>
+  <script src="assets/sol-draw.js?v=7"></script>
+  <script src="assets/sol-ui.js?v=25"></script>
+  <script src="assets/sol-scene.js?v=26"></script>
+  <script src="assets/sol-pictures.js?v=45"></script>
+  <script src="assets/sandbox.js?v=2"></script>
+</body>
+</html>

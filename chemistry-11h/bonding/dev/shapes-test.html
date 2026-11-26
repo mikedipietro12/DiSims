@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shape View Gallery | Chemical Bonding (dev)</title><meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../../assets/suite.css">
+<style>.g{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:12px}.c{background:#fff;border:2px solid #1d2433;border-radius:14px;padding:4px}.c p{margin:0;font:700 13px var(--font-mono);text-align:center}svg{width:100%;height:auto;display:block}</style>
+<link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml"><link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+</head><body><div class="g" id="g"></div>
+<script src="../assets/bonding-kit.js"></script><script src="../assets/lewis-model.js"></script>
+<script src="../assets/geometry.js"></script><script src="../assets/shape-view.js"></script>
+<script>
+var q = new URLSearchParams(location.search), mode = q.get('mode') || 'shape';
+var ids = (q.get('ids') || 'co2 bf3 ch4 nh3 h2o so2 pcl5 sf4 clf3 xef2 sf6 brf5 xef4 chcl3 ccl4 hcn c2h4 c2h2 c2h6 c3h6').split(' ');
+ids.forEach(function (id) {
+  var c = document.createElement('div'); c.className = 'c';
+  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); c.appendChild(svg);
+  var m = Geometry.embed(BondingKit.structure(id)); if (BondingKit.get(id).center == null) Geometry.level(m);
+  ShapeView.render(svg, m, { width: 260, height: 200, angle: true, dipoles: mode === 'dip' ? 1 : 0, sum: mode === 'dip' ? +(q.get('sum') || 0) : 0, net: true, sumBelow: mode === 'dip', maxScale: 64 });
+  var p = document.createElement('p'); p.textContent = BondingKit.get(id).formula + ' · ' + (m.atoms[m.root].shape || ''); c.appendChild(p);
+  document.getElementById('g').appendChild(c);
+});
+</script></body></html>
