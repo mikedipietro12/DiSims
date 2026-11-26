@@ -28,7 +28,7 @@
     var svg = document.querySelector('.scene-host:not(.is-leaving) .de-svg');
     svg.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
     ok('arrow keys inside the drawing do not step beats', shell.active().id === before);
-    // Corner counts: on through multiple-bond practice (b14), off from polyatomic ions (b15) on
+    // Corner counts: on through the multiple bonds beat (b12), off from b13 on
     function cornersAfterOneElectron(id) {
       shell.goTo(document.getElementById(id));
       var host = document.querySelector('.scene-host:not(.is-leaving)');
@@ -38,18 +38,44 @@
       atom.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));   // one electron
       return host.querySelectorAll('.de-count-octet, .de-count-valence').length;
     }
-    var c14 = cornersAfterOneElectron('b14-practice-multiple'), c15 = cornersAfterOneElectron('b15-ions');
-    ok('corner counts show on b14 and are gone from b15', c14 > 0 && c15 === 0, c14 + ' / ' + c15);
+    var c12 = cornersAfterOneElectron('b12-multiple'), c14 = cornersAfterOneElectron('b14-practice-multiple'), c15 = cornersAfterOneElectron('b15-ions');
+    ok('corner counts show on b12 and are gone from b14 and b15', c12 > 0 && c14 === 0 && c15 === 0, c12 + ' / ' + c14 + ' / ' + c15);
 
     // Atom table: open on the formal-charge beat (its prompt reads it), closed elsewhere; the panel stays inside the stage
     function hostQ(sel) { return document.querySelector('.scene-host:not(.is-leaving) ' + sel); }
     shell.goTo(document.getElementById('b13-formal-charge'));
     var fcs = Array.prototype.map.call(document.querySelectorAll('.scene-host:not(.is-leaving) .de-tally-row .de-fc'), function (c) { return c.textContent; });
-    ok('b13: atom table open, with FC worked out in each row', hostQ('.de-table-toggle').getAttribute('aria-pressed') === 'true' && fcs.length === 6 && fcs.every(function (x) { return /= [+−]?\d$/.test(x); }), fcs.join(' ; '));
+    ok('b13: atom table open, with FC worked out in each row', hostQ('[data-switch="table"]').getAttribute('aria-pressed') === 'true' && hostQ('[data-switch="fc"]').hidden && fcs.length === 6 && fcs.every(function (x) { return /= [+−]?\d$/.test(x); }), fcs.join(' ; '));
     var stage = document.querySelector('.guide-stage-panel').getBoundingClientRect(), tally = hostQ('.de-tally').getBoundingClientRect(), svgR = hostQ('.de-svg').getBoundingClientRect();
     ok('b13 in Present: table fits inside the stage, drawing keeps its 200 px minimum', tally.bottom <= stage.bottom + 1 && svgR.height >= 199, Math.round(tally.bottom) + ' vs ' + Math.round(stage.bottom) + ', svg ' + Math.round(svgR.height));
     shell.goTo(document.getElementById('b15-ions'));
-    ok('b15: atom table closed (follows the last switch), count line shows NH₄⁺ and CO₃²⁻', hostQ('.de-table-toggle').getAttribute('aria-pressed') === 'false' && hostQ('.de-tally-list').hidden && /NH₄⁺ 8 \+ CO₃²⁻ 24 = 32/.test(hostQ('.de-tally-sum').textContent), hostQ('.de-tally-sum').textContent);
+    ok('b15: count, table and formal charge all start off; FC switch offered', ['count', 'table', 'fc'].every(function (n) { var b = hostQ('[data-switch="' + n + '"]'); return b && !b.hidden && b.getAttribute('aria-pressed') === 'false'; }) && hostQ('.de-tally-list').hidden && hostQ('.de-tally-sum').hidden);
+    hostQ('[data-switch="count"]').click();
+    shell.goTo(document.getElementById('b11-practice-single'));
+    ok('before formal charge (b11): no formal charge switch', hostQ('[data-switch="fc"]').hidden && !hostQ('[data-switch="count"]').hidden);
+    shell.goTo(document.getElementById('b15-ions'));
+    ok('the count switch is carried from beat to beat', hostQ('[data-switch="count"]').getAttribute('aria-pressed') === 'true' && !hostQ('.de-tally-sum').hidden);
+    // b15 asks for NH₄⁺ and CO₃²⁻, but only the H placed above is counted: no answer up front
+    ok('b15: the count holds only what is placed (one H, one electron)', hostQ('.de-tally-sum').textContent === 'Valence electrons: H 1 = 1 · Placed: 1 · Still to place: 0', hostQ('.de-tally-sum').textContent);
+    var lines;
+    shell.goTo(document.getElementById('b13-formal-charge'));
+    lines = Array.prototype.map.call(document.querySelectorAll('.scene-host:not(.is-leaving) .de-sum-line'), function (x) { return x.textContent; });
+    ok('b13: structure A and structure B each have their own count of 16', lines.length === 2 && /^A · CO₂.*= 16 · Placed: 16/.test(lines[0]) && /^B · CO₂.*= 16 · Placed: 16/.test(lines[1]), lines.join(' | '));
+    // Practice on paper: small tiles round a large centre; a tile shows its answer there, again hides it
+    shell.goTo(document.getElementById('b18-paper'));
+    var ptiles = document.querySelectorAll('.scene-host:not(.is-leaving) .paper-tile'), pc = hostQ('.paper-centre');
+    var pcR = pc.getBoundingClientRect(), t0 = ptiles[0].getBoundingClientRect(), panel = document.querySelector('.guide-stage-panel').getBoundingClientRect();
+    var inside = Array.prototype.every.call(ptiles, function (t) { var r = t.getBoundingClientRect(); return r.bottom <= panel.bottom + 1 && r.right <= panel.right + 1 && r.height >= 43; });
+    ok('paper: 20 tiles round a centre tile larger than any tile, all inside the stage', ptiles.length === 20 && pcR.width > 3 * t0.width && pcR.height > 2 * t0.height && inside,
+      ptiles.length + ' tiles, centre ' + Math.round(pcR.width) + '×' + Math.round(pcR.height) + ', tile ' + Math.round(t0.width) + '×' + Math.round(t0.height) + ', inside ' + inside);
+    ok('paper: nothing shown to start', !pc.classList.contains('is-open') && !hostQ('.paper-centre-empty').hidden);
+    var ch3oh = Array.prototype.filter.call(ptiles, function (t) { return /CH₃OH/.test(t.textContent); })[0];
+    ch3oh.click();
+    ok('paper: a tile shows its structure in the centre', pc.classList.contains('is-open') && ch3oh.getAttribute('aria-pressed') === 'true' && /methanol/.test(hostQ('.paper-centre-title').textContent) && hostQ('.paper-svg').querySelectorAll('text').length === 6);
+    ptiles[1].click();
+    ok('paper: another tile swaps the answer', ch3oh.getAttribute('aria-pressed') === 'false' && ptiles[1].getAttribute('aria-pressed') === 'true');
+    ptiles[1].click();
+    ok('paper: clicking it again hides the answer', !pc.classList.contains('is-open'));
     key('Escape');
     ok('Esc leaves presentation mode', !document.body.classList.contains('present'));
     ok('no script errors', errs.length === 0, errs.join(' | '));

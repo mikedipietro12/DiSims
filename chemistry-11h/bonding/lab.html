@@ -18,7 +18,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../assets/suite.css?v=20261113m">
-  <link rel="stylesheet" href="assets/bonding.css?v=20261125d">
+  <link rel="stylesheet" href="assets/bonding.css?v=20261125k">
+  <script src="../../assets/theme.js?v=1"></script>
   <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
@@ -41,7 +42,7 @@
       <p class="lab-lead">Pick a molecule from the list, or start with a blank canvas, and draw its Lewis structure.</p>
       <ul class="lab-key">
         <li><strong>Red number (top right):</strong> how many more electrons that atom needs for a full octet.</li>
-        <li><strong>Black number (bottom right):</strong> how many of that atom&rsquo;s own valence electrons we still need to place.</li>
+        <li><strong><span class="if-light">Black</span><span class="if-dark">White</span> number (bottom right):</strong> how many of that atom&rsquo;s own valence electrons we still need to place.</li>
         <li><strong>Green box:</strong> the drawing matches the accepted Lewis structure.</li>
         <li><strong>3D:</strong> once every count is complete, click &ldquo;3D&rdquo; to see the shape.</li>
       </ul>
@@ -52,11 +53,11 @@
       <select id="labPick" class="scene-select lab-pick"></select>
       <button type="button" class="btn lab-btn" id="labNext">Next</button>
       <span class="lab-spacer"></span>
-      <button type="button" class="learn-toggle lab-switch" id="labCounters" aria-pressed="true"><span class="learn-switch" aria-hidden="true"></span>Electron counters</button>
       <button type="button" class="btn lab-btn lab-btn-3d" id="lab3d" aria-pressed="false" aria-controls="lab3dPanel" aria-describedby="lab3dNote" disabled>3D</button>
       <button type="button" class="btn lab-btn" id="labBig" aria-pressed="false">Present</button>
     </div>
     <p class="lab-3d-note" id="lab3dNote" aria-live="polite"></p>
+    <div class="lab-switches" id="labSwitches"></div>
 
     <div class="lab-body">
       <div class="lab-draw" id="labDraw"></div>
@@ -71,14 +72,14 @@
     </div>
     <p class="sr-only" id="labLive" aria-live="polite"></p>
   </div>
-  <script src="assets/bonding-kit.js?v=20261125a"></script>
+  <script src="assets/bonding-kit.js?v=20261125m"></script>
   <script src="assets/lewis-model.js?v=20261125a"></script>
-  <script src="assets/draw-engine.js?v=20261125c"></script>
+  <script src="assets/draw-engine.js?v=20261125i"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="assets/geometry.js?v=20261125a"></script>
-  <script src="assets/turntable.js?v=20261125a"></script>
+  <script src="assets/turntable.js?v=20261125dk4"></script>
   <script src="assets/shape-lift.js?v=20261125a"></script>
-  <script src="assets/lab.js?v=20261125c"></script>
+  <script src="assets/lab.js?v=20261125f"></script>
   <script src="assets/chem-text.js?v=20261125a"></script>
 </body>
 </html>

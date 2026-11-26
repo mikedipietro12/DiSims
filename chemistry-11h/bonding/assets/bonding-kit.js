@@ -153,7 +153,7 @@
       atoms: 'Cl 0 0 2; F -1 0 3; F 1 0 3; F 0 1 3', bonds: '0-1, 0-2, 0-3', center: 0,
       polar: [true, 'T-shaped: the Cl–F pulls do not cancel.'], tags: ['vsepr', 'lab'] },
     { id: 'brf5', formula: 'BrF₅', name: 'bromine pentafluoride',
-      atoms: 'Br 0 0 1; F -1 0 3; F 1 0 3; F 0 1 3; F -0.7 0.7 3; F 0.7 0.7 3', bonds: '0-1, 0-2, 0-3, 0-4, 0-5', center: 0,
+      atoms: 'Br 0 0 1; F 0 -1 3; F 0.95 -0.31 3; F 0.59 0.81 3; F -0.59 0.81 3; F -0.95 -0.31 3', bonds: '0-1, 0-2, 0-3, 0-4, 0-5', center: 0,   // spread like PCl₅ (the old layout put two F 0.76 apart: electrons overlapped)
       polar: [true, 'Square pyramidal: the Br–F pulls do not cancel.'], tags: ['vsepr', 'lab'] },
 
     // --- Chapter B·2 / B·3: shape and polarity ----------------------------
@@ -167,6 +167,26 @@
     { id: 'chcl3', formula: 'CHCl₃', name: 'chloroform',
       atoms: 'C 0 0 0; H 0 -1 0; Cl 1 0 3; Cl 0 1 3; Cl -1 0 3', bonds: '0-1, 0-2, 0-3, 0-4', center: 0,
       polar: [true, 'Swapping one Cl for H breaks the balance: the pulls no longer cancel.'], tags: ['b24', 'polarity', 'lab'] },
+
+    // --- B·1 'Now practice on paper' only (user 2026-11-25: 'add a bunch more'); not in the Lab picker ---
+    { id: 'h2s', formula: 'H₂S', name: 'hydrogen sulfide',
+      atoms: 'S 0 0 2; H -0.8 0.6 0; H 0.8 0.6 0', bonds: '0-1, 0-2', center: 0, tags: ['paper'] },
+    { id: 'h2co', formula: 'H₂CO', name: 'formaldehyde',
+      atoms: 'C 0 0 0; O 1 0 2; H -0.6 -0.8 0; H -0.6 0.8 0', bonds: '0=1, 0-2, 0-3', center: 0, tags: ['paper'] },
+    { id: 'ch3oh', formula: 'CH₃OH', name: 'methanol',
+      atoms: 'C 0 0 0; O 1 0 2; H 0 -1 0; H -1 0 0; H 0 1 0; H 1.8 0.6 0', bonds: '0-1, 0-2, 0-3, 0-4, 1-5', center: null, tags: ['paper'] },
+    { id: 'cs2', formula: 'CS₂', name: 'carbon disulfide',
+      atoms: 'S -1 0 2; C 0 0 0; S 1 0 2', bonds: '0=1, 1=2', center: 1, tags: ['paper'] },
+    { id: 'nf3', formula: 'NF₃', name: 'nitrogen trifluoride',
+      atoms: 'N 0 0 1; F -1 0 3; F 1 0 3; F 0 1 3', bonds: '0-1, 0-2, 0-3', center: 0, tags: ['paper'] },
+    { id: 'scn', formula: 'SCN⁻', name: 'thiocyanate', charge: -1,
+      atoms: 'S -1 0 2; C 0 0 0; N 1 0 2', bonds: '0=1, 1=2', center: 1, tags: ['paper'] },
+    { id: 'i3', formula: 'I₃⁻', name: 'triiodide', charge: -1,
+      atoms: 'I -1 0 3; I 0 0 3; I 1 0 3', bonds: '0-1, 1-2', center: 1,
+      note: 'Expanded octet on the central I (10 electrons), which carries the −1.', tags: ['paper'] },
+    { id: 'icl4', formula: 'ICl₄⁻', name: 'tetrachloroiodate', charge: -1,
+      atoms: 'I 0 0 2; Cl 0 -1 3; Cl 1 0 3; Cl 0 1 3; Cl -1 0 3', bonds: '0-1, 0-2, 0-3, 0-4', center: 0,
+      note: 'Expanded octet on I (12 electrons), which carries the −1.', tags: ['paper'] },
 
     // --- Chapter C: hybridization -----------------------------------------
     { id: 'c2h6', formula: 'C₂H₆', name: 'ethane',

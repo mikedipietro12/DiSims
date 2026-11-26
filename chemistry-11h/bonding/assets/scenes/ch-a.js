@@ -536,7 +536,7 @@
       if (S.box != null) {
         var pad = S.box, flat = S.span[1] < 0.01;
         var bx = new T.BoxGeometry(S.span[0] + pad * 2, flat ? 0.02 : S.span[1] + pad * 2, S.span[2] + pad * 2);
-        edges = new T.LineSegments(new T.EdgesGeometry(bx), new T.LineBasicMaterial({ color: 0x1d2433, transparent: true, opacity: 0.35 }));
+        edges = new T.LineSegments(new T.EdgesGeometry(bx), tt.track(new T.LineBasicMaterial({ color: 0x1d2433, transparent: true, opacity: 0.35 }), 0x1d2433, 0xffffff));
         bx.dispose();
         tt.content.add(edges);
       }

@@ -91,9 +91,13 @@
 .de-svg .de-hit-bond:focus-visible{stroke:rgba(65,82,217,0.25);}
 .de-hint{position:absolute;left:1rem;bottom:0.7rem;right:1rem;margin:0;font-family:var(--font-mono);font-size:0.76rem;color:var(--dim);pointer-events:none;}
 .de-tally{font-family:var(--font-mono);font-size:0.82rem;line-height:1.5;display:flex;flex-direction:column;gap:0.5rem;}
-.de-tally-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.4rem 1rem;}
-.de-tally-sum{font-weight:700;margin:0;flex:1 1 20rem;min-width:0;}
-.de-table-toggle{min-height:44px;flex:0 0 auto;}
+.de-switches{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;}
+.de-switch{min-height:44px;}
+.de-switch[hidden],.de-tally-sum[hidden]{display:none;}
+.de-tally-sum{font-weight:700;margin:0;min-width:0;}
+.de-sum-line{display:block;}
+.de-sum-line + .de-sum-line{margin-top:0.2rem;}
+.de-sum-label{display:inline-block;margin-right:0.6rem;padding:0 0.4rem;border:1.5px solid var(--line-strong);border-radius:6px;background:var(--tray);}
 .de-tally-list{display:flex;flex-wrap:wrap;align-items:flex-start;gap:0.6rem 1.6rem;}
 .de-tally-list[hidden]{display:none;}
 .de-tally-table{border-collapse:collapse;font-variant-numeric:tabular-nums;}
@@ -104,6 +108,9 @@
 .de-tally-table thead th.de-th-group{border-bottom:1.5px solid var(--line-strong);}
 .de-tally-table .de-td-atom{text-align:left;font-weight:700;color:var(--ink);}
 .de-td-note{font-size:0.72rem;color:var(--ink-soft);}
+.de-fc-table .de-td-calc{text-align:left;}
+.de-fc-table .de-fc{font-weight:700;color:var(--ink);}
+.de-fc-empty{margin:0;color:var(--ink-soft);}
 .de-tally-row{cursor:pointer;color:var(--ink-soft);}
 .de-tally-row:hover > *{background:var(--field);}
 .de-tally-row:focus-visible{outline:3px solid var(--accent);outline-offset:-2px;}
@@ -166,7 +173,7 @@
 .scene-draw .de-stage{min-height:0;}
 /* the atom table may not squeeze the drawing: it scrolls inside its own box when the stage is short */
 .scene-draw .de-tally{flex:0 1 auto;min-height:0;}
-.scene-draw .de-tally-list{min-height:0;max-height:30vh;overflow-y:auto;}
+.scene-draw .de-tally-list{min-height:0;max-height:24vh;overflow-y:auto;}
 .guide-stage-panel .de-svg{height:100%;min-height:200px;}
 .scene-host{animation:scene-in 0.32s cubic-bezier(.2,.8,.2,1);}
 .scene-host.is-leaving{position:absolute;inset:0;animation:scene-out 0.2s ease forwards;pointer-events:none;}
@@ -339,14 +346,20 @@ body.present .salt-list.is-compact .salt-name strong{font-size:1.2rem;}
 body.present .salt-list.is-compact .salt-track{height:1.5rem;}
 
 /* VSEPR gallery + practice */
-.paper-grid{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:0.6rem;}
-.paper-card{min-height:0;display:flex;flex-direction:column;gap:0.2rem;padding:0.5rem 0.6rem;background:var(--tray);border:2px solid var(--ink);border-radius:var(--radius);}
-.paper-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.3rem 0.5rem;}
-.paper-formula{font-size:1.4rem;}
-.paper-svg{width:100%;flex:1 1 0;min-height:0;visibility:hidden;}
-.paper-card.is-open .paper-svg{visibility:visible;}
-.paper-btn{font-size:0.85rem;white-space:nowrap;}
-body.present .paper-formula{font-size:1.9rem;}
+.paper-ring{flex:1 1 auto;min-height:0;display:grid;gap:0.5rem;}
+.paper-tile{min-width:0;min-height:44px;display:flex;align-items:center;justify-content:center;padding:0.3rem;font-family:var(--font-display);font-size:clamp(1rem,1.9vw,1.5rem);font-weight:700;color:var(--ink);background:var(--tray);border:2px solid var(--ink);border-radius:var(--radius);cursor:pointer;}
+.paper-tile:hover{background:var(--accent-soft);}
+.paper-tile:focus-visible{outline:3px solid var(--accent);outline-offset:2px;}
+.paper-tile[aria-pressed="true"]{background:var(--ink);color:var(--tray);}
+.paper-centre{min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;padding:0.6rem 0.8rem;background:var(--tray);border:2px solid var(--ink);border-radius:var(--radius);}
+.paper-centre-title{margin:0;align-self:flex-start;font-family:var(--font-display);font-size:1.25rem;font-weight:700;}
+.paper-centre-title:empty{display:none;}
+.paper-centre-empty{margin:0;max-width:22rem;text-align:center;color:var(--ink-soft);}
+.paper-centre-empty[hidden]{display:none;}
+.paper-svg{width:100%;flex:1 1 0;min-height:0;}
+.paper-centre:not(.is-open) .paper-svg{display:none;}
+body.present .paper-tile{font-size:clamp(1.2rem,2.2vw,1.8rem);}
+body.present .paper-centre-title{font-size:1.6rem;}
 .shape-grid{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:0.6rem;}
 @media (max-width:860px){.shape-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:auto;}}
 .shape-card{display:flex;flex-direction:column;align-items:center;gap:0.1rem;padding:0.4rem 0.4rem 0.6rem;background:var(--tray);border:2px solid var(--ink);border-radius:var(--radius);cursor:pointer;font:inherit;color:inherit;}
@@ -581,7 +594,7 @@ body.present .ptable-toggle{font-size:1rem;min-height:42px;}
 .lab-pick-label{font-family:var(--font-display);font-weight:700;}
 .lab-pick{max-width:100%;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;}   /* options can't hold the chem-text spans; system fonts have real ₀–₉ */
 .lab-btn{min-height:44px;padding:0.45rem 0.9rem;}
-.lab-switch{min-height:44px;}
+.lab-switches{margin:0.6rem 0 1rem;}
 .lab-btn:disabled{opacity:0.4;cursor:default;transform:none;}
 .lab-spacer{flex:1 1 auto;}
 .lab-3d-note{margin:0.35rem 0 0.6rem;min-height:1.3em;font-family:var(--font-mono);font-size:0.8rem;color:var(--dim);text-align:right;}
@@ -603,7 +616,128 @@ body.present .ptable-toggle{font-size:1rem;min-height:42px;}
 .lab-big .lab-key{display:none;}
 .lab-big .de{--de-scale:1.35;}
 .lab-big .de .btn,.lab-big .lab-btn,.lab-big .lab-pick{min-height:52px;font-size:1.05rem;}
-.lab-big .lab-switch{min-height:52px;font-size:0.9rem;}
+.lab-big .de-switch{min-height:52px;font-size:0.9rem;}
 .lab-big .de-svg,.lab-big .lab-3d-view{height:clamp(360px,66vh,820px);}
 .lab-big .de-tally{font-size:0.95rem;}
 .lab-big .scene-readout{font-size:1.1rem;}
+
+/* =====================================================================================
+   Dark mode (students asked, 2026-11-25). Turned on by ../../assets/theme.js, which sets
+   <html data-theme="dark"> and adds the sun/moon keycap to the top nav.
+   Page and panels go black with white text. Drawings (draw stage, scene SVGs, 3D views, hub-card
+   animations) keep their light tray and colours: their code draws in dark ink, so the light tokens are
+   put back inside them. Bonding only for now; lift this block into suite.css when the next suite gets it.
+   ===================================================================================== */
+:root{--on-ink:#ffffff;}
+/* Copy that names the ink colour ("Black number"): one word for each theme */
+.if-dark{display:none;}
+:root[data-theme="dark"] .if-light{display:none;}
+:root[data-theme="dark"] .if-dark{display:inline;}
+.theme-toggle{display:inline-grid;place-items:center;min-width:40px;min-height:40px;padding:0.35rem;}
+.theme-toggle .theme-moon{display:none;}
+.theme-toggle[aria-pressed="true"]{transform:none;box-shadow:var(--key-drop);}
+.theme-toggle[aria-pressed="true"] .theme-sun{display:none;}
+.theme-toggle[aria-pressed="true"] .theme-moon{display:inline;}
+
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --field:#0b0d12;
+  --field-2:#0b0d12;
+  --tray:#161a22;
+  --ink:#ffffff;
+  --ink-soft:#dde1e9;
+  --dim:#aeb5c4;
+  --faint:#aeb5c4;
+  --accent:#8f9bff;
+  --accent-soft:#262c52;
+  --line:rgba(255,255,255,0.16);
+  --line-strong:#c9cfdb;
+  --key-drop:0 3px 0 #4a5264;
+  --on-ink:#0b0d12;
+}
+:root[data-theme="dark"] body{background:var(--field);}
+
+/* Text on an --ink fill: ink is white in dark mode, so the text turns black */
+:root[data-theme="dark"] .room-switch a[aria-current="page"],
+:root[data-theme="dark"] .btn.primary,
+:root[data-theme="dark"] .btn[aria-pressed="true"],
+:root[data-theme="dark"] .scene-chip[aria-pressed="true"],
+:root[data-theme="dark"] .shape-choice[aria-pressed="true"],
+:root[data-theme="dark"] .which-next{color:var(--on-ink);}
+:root[data-theme="dark"] .btn.primary:hover{background:var(--ink-soft);}
+:root[data-theme="dark"] .theme-toggle[aria-pressed="true"]{background:var(--tray);color:var(--ink);}
+/* White text on the lighter dark-mode accent */
+:root[data-theme="dark"] .lift-go{color:var(--on-ink);}
+/* The drag ghost floats over the page, outside any drawing */
+:root[data-theme="dark"] .de-ghost{background:var(--tray);}
+
+/* ---- Simulation stages go black too. The drawing code writes colours as SVG attributes
+   (fill="#1d2433"), and CSS beats presentation attributes, so the ink is remapped by value here:
+   ink → white, grey → light grey, blue → lighter blue, white masks / pills → the stage colour.
+   Pictures keep their colours: clouds, model-kit spheres (and the symbol on each sphere), ion and
+   orbital-box fills, the periodic table. Save JPEG reads the attributes, so exports stay ink on white. */
+:root{--stage:#ffffff;}
+:root[data-theme="dark"]{--stage:#0b0d12;}
+:root[data-theme="dark"] :is(.de-stage, .de-svg, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,
+  .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-list,
+  .hyb-3d, .lift-3d, .which-3d, .vs-3d, .lat-3d, .practice-3d, .lab-3d-view){background:var(--stage);}
+:root[data-theme="dark"] :is(.de-reveal-forms svg, .vs-lewis-svg, .sort-svg, .sk-svg, .shape-card-svg,
+  .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg){border-radius:10px;}
+
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) [fill="#1d2433"]{fill:#ffffff;}
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) [stroke="#1d2433"]{stroke:#ffffff;}
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) [stroke="rgba(29,36,51,0.35)"]{stroke:rgba(255,255,255,0.45);}
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) [fill="#5b6474"]{fill:#aeb5c4;}
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) [stroke="#5b6474"]{stroke:#aeb5c4;}
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) [fill="#4152d9"]{fill:#8f9bff;}
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) [stroke="#4152d9"]{stroke:#8f9bff;}
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) :is([fill="#ffffff"], [fill="#fff"]){fill:var(--stage);}
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) :is([stroke="#ffffff"], [stroke="#fff"]){stroke:var(--stage);}
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) [fill="#e7eaff"]{fill:#262c52;}
+/* Pictures: cloud highlights and the symbol printed on a model-kit sphere keep their colours */
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) g[filter] [fill="#ffffff"]{fill:#ffffff;}
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) circle[fill^="url("] + text[fill="#1d2433"]{fill:#1d2433;}
+:root[data-theme="dark"] :is(.de-stage, .de-reveal-forms, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg,   .shape-card-svg, .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg, .salt-ions, .mod-anim) circle[fill^="url("] + text[fill="#ffffff"]{fill:#ffffff;}
+
+/* Diagrams that stay on their light card: the periodic table and the orbital boxes */
+:root[data-theme="dark"] :is(.ptable, .orb-boxes){
+  color-scheme:light;
+  --tray:#ffffff; --field:#eef1f6; --field-2:#e6eaf1;
+  --ink:#1d2433; --ink-soft:#3d4658; --dim:#5b6474; --faint:#596274;
+  --accent:#4152d9; --accent-soft:#e7eaff;
+  --line:rgba(29,36,51,0.12); --line-strong:#1d2433; --key-drop:0 3px 0 #1d2433; --on-ink:#ffffff;
+  color:var(--ink);
+}
+:root[data-theme="dark"] .pt-cell[data-slot]::after{color:#ffffff;}
+
+/* Text on the stage gets a thin outline in the stage colour. It can't be seen on black, but it keeps white
+   letters readable where they cross a light picture (a pale cloud, the ΔEN band, an orbital lobe). */
+:root[data-theme="dark"] :is(.de-svg, .scene-svg, .which-svg, .vs-lewis-svg, .sort-svg, .sk-svg, .shape-card-svg,
+  .res-thumb-svg, .practice-svg, .pattern-svg, .paper-svg) text:not([stroke]){
+  paint-order:stroke;stroke:#0b0d12;stroke-width:3px;stroke-linejoin:round;
+}
+:root[data-theme="dark"] :is(.scene-svg, .which-svg, .shape-card-svg, .pattern-svg, .sort-svg) circle[fill^="url("] + text{stroke:none;}
+
+/* 3D labels: white on the black stage with a dark halo. Atom letters are printed on spheres, so they keep ink. */
+:root[data-theme="dark"] .tt-label{text-shadow:0 0 3px #0b0d12,0 0 3px #0b0d12;}
+:root[data-theme="dark"] .tt-label.is-atom{color:#1d2433;text-shadow:0 0 3px #fff,0 0 3px #fff;}
+:root[data-theme="dark"] .tt-label.is-atom.is-dark{color:#fff;text-shadow:none;}
+:root[data-theme="dark"] :is(.tt-label.is-fixed-tl, .tt-label.is-angle){background:var(--stage);}
+:root[data-theme="dark"] .tt-label.is-amber{color:#f2b33a;}
+:root[data-theme="dark"] .tt-label.is-fixed-bc{color:var(--on-ink);}
+:root[data-theme="dark"] .orb-key{background:var(--tray);}
+:root[data-theme="dark"] .orb-key-sw{border-color:rgba(255,255,255,0.45);}
+
+/* Resonance thumbnails: dim the drawing, not the card */
+:root[data-theme="dark"] .res-thumb{background:var(--stage);}
+:root[data-theme="dark"] .res-thumb:not(.is-on){opacity:1;}
+:root[data-theme="dark"] .res-thumb:not(.is-on) .res-thumb-svg > *{opacity:0.55;}
+/* Dropdown chevron is a drawn image in ink; redraw it white */
+:root[data-theme="dark"] :is(#chapterJump,.scene-select){
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1.5 1.5l4.5 4.5 4.5-4.5' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+/* ΔEN continuum band (beat 4): the pastel bands are too pale under white labels on black.
+   Deep versions of the same three families: slate (nonpolar), indigo (polar covalent), wine (ionic). */
+:root[data-theme="dark"] #cont-bands stop[stop-color="#dfe3eb"]{stop-color:#353d4f;}
+:root[data-theme="dark"] #cont-bands stop[stop-color="#dfe2ff"]{stop-color:#343d94;}
+:root[data-theme="dark"] #cont-bands stop[stop-color="#ffe0e6"]{stop-color:#7d2444;}

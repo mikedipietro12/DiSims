@@ -381,7 +381,7 @@
         g.add(s1);
         tt.label('a' + j, 'H', [0, 0, 0], { obj: hc });
         var pr = V.mul(d, L * 0.7), sd = perp(d);
-        [[BLUE, 0.08], [0x1d2433, -0.08]].forEach(function (c) { var e = ball(T, 0.075, c[0]); put(e, V.add(pr, V.mul(sd, c[1]))); g.add(e); });
+        [[BLUE, 0.08], [0x1d2433, -0.08]].forEach(function (c) { var e = ball(T, 0.075, c[0]); if (c[0] !== BLUE) tt.track(e.material, 0x1d2433, 0xffffff); put(e, V.add(pr, V.mul(sd, c[1]))); g.add(e); });
         var sg = glow(L * 0.2, d, HYB_DEEP);
         sg.material.opacity = 0.3;
         orbTag(sg, 'hyb');
@@ -481,6 +481,7 @@
       g.add(core);
       g.add(ball(T, 0.46, GREY, 0.28));   // the 1s orbital
       var e = ball(T, 0.075, 0x1d2433);
+      tt.track(e.material, 0x1d2433, 0xffffff);   // the electron: ink, white in dark mode
       g.add(e);
       var fin = rel(m.atoms[hi].p);
       return { g: g, e: e, core: core, hi: hi, k: k, d: d, L: L, n: n, fin: fin, far: V.add(fin, V.mul(d, 1.9)), own: V.mul(d, -0.26),

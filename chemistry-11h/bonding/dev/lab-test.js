@@ -39,34 +39,62 @@
     ok('closing 3D: button off again until the counts are complete', btn3d().disabled);
 
     // --- Electron counters switch ---
-    var sw = document.getElementById('labCounters');
+    function swOf(n) { return document.querySelector('#labSwitches [data-switch="' + n + '"]'); }
+    ok('controls row holds four switches; only electron counters starts on',
+      ['counters', 'count', 'table', 'fc'].map(function (n) { return swOf(n) && swOf(n).getAttribute('aria-pressed'); }).join(' ') === 'true false false false' &&
+      document.querySelectorAll('#labSwitches .de-switch').length === 4);
     function cornerNums() { return eng().svg.querySelectorAll('.de-count-octet, .de-count-valence').length; }
     var oneE = { atoms: [{ el: 'C', x: 0, y: 0, slots: [0, 0, 0, 0, 0, 0, 1, 0] }], bonds: [], transfers: [] };
     Lab.pick('hcn'); eng().restore(oneE);
-    var line = eng().root.querySelector('.de-tally-sum').textContent;
-    ok('mid-build, the count comes from HCN, not the drawing: 10, 1 placed, 9 to place', line === 'Valence electrons: C 4 + H 1 + N 5 = 10 · Placed: 1 · Still to place: 9', line);
-    var fcCell = eng().root.querySelector('.de-tally-row .de-fc');
+    function sum() { return eng().root.querySelector('.de-tally-sum').textContent; }
+    ok('running count: only the C placed so far, so only its 4 (not the answer)', sum() === 'Valence electrons: C 4 = 4 · Placed: 1 · Still to place: 3', sum());
+    eng().place('N', 2, 0); eng().place('H', -2, 0);
+    ok('each atom placed adds its term, in the order placed', sum() === 'Valence electrons: C 4 + N 5 + H 1 = 10 · Placed: 1 · Still to place: 9', sum());
+    eng().restore(oneE);
+    eng().restore({ atoms: [{ el: 'C', x: 0, y: 0, slots: [0, 0, 0, 0, 0, 0, 1, 0] }, { el: 'N', x: 1, y: 0, slots: [0, 0, 0, 0, 0, 0, 0, 0] }], bonds: [{ a: 0, b: 1, order: 1 }], transfers: [] });
+    eng().setFc(true);
+    var fcCell = eng().root.querySelector('.de-fc-table .de-fc');
     ok('FC waits (–) until the molecule is complete', fcCell && fcCell.textContent === '–', fcCell && fcCell.textContent);
-    ok('counters start on: a touched C shows its two corner numbers', sw.getAttribute('aria-pressed') === 'true' && cornerNums() === 2, cornerNums());
-    sw.click();
-    ok('switching counters off hides them', sw.getAttribute('aria-pressed') === 'false' && cornerNums() === 0, cornerNums());
+    eng().setFc(false);
+    eng().restore(oneE);
+    ok('counters start on: a touched C shows its two corner numbers', swOf('counters').getAttribute('aria-pressed') === 'true' && cornerNums() === 2, cornerNums());
+    swOf('counters').click();
+    ok('switching counters off hides them', swOf('counters').getAttribute('aria-pressed') === 'false' && cornerNums() === 0, cornerNums());
     Lab.pick('nh3'); eng().restore(oneE);
     ok('off carries over to the next molecule', cornerNums() === 0, cornerNums());
-    sw.click();
+    swOf('counters').click();
     ok('switching back on shows them again', cornerNums() === 2, cornerNums());
     Lab.pick('ch4');
 
     // --- Atom table switch ---
-    var tsw = eng().root.querySelector('.de-table-toggle'), tlist = eng().root.querySelector('.de-tally-list');
+    var tsw = swOf('table'), tlist = eng().root.querySelector('.de-tally-list');
+    ok('total e⁻ count starts hidden', eng().root.querySelector('.de-tally-sum').hidden);
+    swOf('count').click();
+    ok('the count switch shows it', !eng().root.querySelector('.de-tally-sum').hidden);
+    swOf('count').click();
     ok('atom table starts closed under the count line', tsw.getAttribute('aria-pressed') === 'false' && tlist.hidden && /Placed: 10 · 2 too many$/.test(eng().root.querySelector('.de-tally-sum').textContent), tsw.getAttribute('aria-pressed') + ' ' + tlist.hidden + ' ' + eng().root.querySelector('.de-tally-sum').textContent);
     tsw.click();
     ok('the switch opens the table and reads on', tsw.getAttribute('aria-pressed') === 'true' && !tlist.hidden);
     Lab.pick('h2o');
-    ok('the table stays open on the next molecule', eng().root.querySelector('.de-table-toggle').getAttribute('aria-pressed') === 'true' && !eng().root.querySelector('.de-tally-list').hidden);
+    ok('the table stays open on the next molecule', swOf('table').getAttribute('aria-pressed') === 'true' && !eng().root.querySelector('.de-tally-list').hidden);
+    eng().load(Kit.structure('co'));
+    function fcRows() { return Array.prototype.map.call(eng().root.querySelectorAll('.de-fc-table .de-tally-row'), function (r) { return Array.prototype.map.call(r.children, function (c) { return c.textContent; }).join('|'); }).join(' ; '); }
+    ok('formal charge off: no FC table, nothing written on the drawing', eng().root.querySelector('.de-fc-list').hidden && fcRows() === '' && !eng().svg.querySelector('.de-fc-mark'));
+    swOf('fc').click();
+    ok('formal charge on: a table below works out each atom (CO: C −1, O +1)', !eng().root.querySelector('.de-fc-list').hidden && fcRows() === 'C|4 − 2 − ½(6)|−1 ; O|6 − 2 − ½(6)|+1', fcRows());
+    ok('the atom table keeps to electrons (no FC column)', eng().root.querySelectorAll('.de-tally-list:not(.de-fc-list) .de-fc').length === 0);
+    eng().place('H', 3, 0);
+    ok('a loose atom gets no formal charge row', fcRows() === 'C|4 − 2 − ½(6)|−1 ; O|6 − 2 − ½(6)|+1', fcRows());
+    swOf('fc').click();
+    Lab.pick('nh4');
+    eng().place('N', 0, 0); eng().place('H', 1.5, 0); eng().place('H', -1.5, 0); eng().place('H', 0, 1.5);
+    ok('NH₄⁺ with three H placed: no charge term yet', !/charge/.test(sum()) && /= 8 ·/.test(sum()), sum());
+    eng().place('H', 0, -1.5);
+    ok('the fourth H brings in the charge: 9 − 1 = 8', / − 1 \(charge\) = 8 ·/.test(sum()), sum());
     Lab.pick('co3'); eng().load(Kit.structure('co3'));
     var co3 = eng().root.querySelector('.de-tally-sum').textContent;
     ok('carbonate: charge term from the ion, 24 in all', /^Valence electrons: C 4 \+ O 6 \+ O 6 \+ O 6 \+ 2 \(charge\) = 24 · Placed: 24 · Still to place: 0$/.test(co3), co3);
-    eng().root.querySelector('.de-table-toggle').click();
+    swOf('table').click();
     Lab.pick('ch4');
 
     // --- Work is kept per molecule ---

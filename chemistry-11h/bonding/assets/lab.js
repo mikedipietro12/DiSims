@@ -31,10 +31,13 @@
 
   var store = {};          // molecule id → engine state, so switching back keeps the work
   var engine = null, cur = null, tt = null, vt = null, open = false, lastOk = null, lastMatched = '';
-  var countersBtn = $('labCounters'), COUNTERS_KEY = 'bonding-lab-counters', TABLE_KEY = 'bonding-lab-table';
-  // Remembered on this device: the two corner counts on each atom (on to start) and the atom table (closed to start)
-  var counters = true, tableOn = false;
-  try { counters = global.localStorage.getItem(COUNTERS_KEY) !== 'off'; tableOn = global.localStorage.getItem(TABLE_KEY) === 'on'; } catch (e) { /* storage blocked: defaults */ }
+  // The engine's switches sit in the controls row, remembered on this device: electron counters (on to start),
+  // total e⁻ count, atom table and formal charge (off to start)
+  var switchHost = $('labSwitches'), KEY = 'bonding-lab-';
+  var shown = { counters: true, count: false, table: false, fc: false };
+  try {
+    Object.keys(shown).forEach(function (n) { var v = global.localStorage.getItem(KEY + n); if (v) shown[n] = v === 'on'; });
+  } catch (e) { /* storage blocked: defaults */ }
 
   // --- Picker -------------------------------------------------------------------------------
   function optionText(id) { var m = Kit.get(id); return m.formula + ' · ' + m.name; }
@@ -73,9 +76,13 @@
       references: mol ? [id] : null,
       allowReveal: true,
       matchBox: true,
-      counters: counters,
-      table: tableOn,
-      onTable: function (on) { tableOn = on; try { global.localStorage.setItem(TABLE_KEY, on ? 'on' : 'off'); } catch (e) { /* not remembered */ } },
+      counters: shown.counters, countersSwitch: true,
+      count: shown.count, table: shown.table, fc: shown.fc,
+      switchHost: switchHost,
+      onToggle: function (name, on) {
+        shown[name] = on;
+        try { global.localStorage.setItem(KEY + name, on ? 'on' : 'off'); } catch (e) { /* not remembered */ }
+      },
       prompt: mol ? 'Draw ' + mol.formula : '',
       onChange: onChange,
     });
@@ -187,16 +194,6 @@
   btn3d.addEventListener('click', function () { show3d(!open); });
   close3d.addEventListener('click', function () { show3d(false); btn3d.focus(); });
 
-  // --- Electron counters (the red and black corner numbers) --------------------------------
-  function setCounters(on) {
-    counters = !!on;
-    countersBtn.setAttribute('aria-pressed', counters ? 'true' : 'false');
-    if (engine) engine.setCounters(counters);
-    try { global.localStorage.setItem(COUNTERS_KEY, counters ? 'on' : 'off'); } catch (e) { /* not remembered */ }
-  }
-  countersBtn.setAttribute('aria-pressed', counters ? 'true' : 'false');
-  countersBtn.addEventListener('click', function () { setCounters(!counters); });
-
   // --- Present (bigger drawing and buttons for the projector) -------------------------------
   bigBtn.addEventListener('click', function () {
     var on = !document.body.classList.contains('lab-big');
@@ -213,7 +210,6 @@
     pick: pick,
     engine: function () { return engine; },
     open3d: show3d,
-    setCounters: setCounters,
     state: function () { return { cur: cur, open: open, ready: !!lastOk, note: note3d.textContent, readout: readout.textContent, hasTurntable: !!tt }; },
   };
 })(window);

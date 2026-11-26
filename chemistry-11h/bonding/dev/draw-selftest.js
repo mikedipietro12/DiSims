@@ -71,8 +71,13 @@ function selfTest(d) {
   function sumLine() { return d.root.querySelector('.de-tally-sum').textContent; }
   ok('count line from the tray (no reference): CO₂ 16, all placed', /= 16 · Placed: 16 · Still to place: 0/.test(sumLine()), sumLine());
   d.setTable(true);
+  ok('formal charge switch off: no FC table', d.root.querySelectorAll('.de-fc-table').length === 0);
+  d.setFc(true);
+  function fcCells() { return Array.prototype.map.call(d.root.querySelectorAll('.de-fc-table .de-tally-row'), function (r) { return Array.prototype.map.call(r.children, function (c) { return c.textContent; }).join('|'); }).join(' ; '); }
+  ok('formal charge on: its own table, the calculation for each atom', fcCells() === 'C|4 − 0 − ½(8)|0 ; O₁|6 − 4 − ½(4)|0 ; O₂|6 − 4 − ½(4)|0', fcCells());
   function cells() { return Array.prototype.map.call(d.root.querySelectorAll('.de-tally-row'), function (r) { return Array.prototype.map.call(r.children, function (c) { return c.textContent; }).join('|'); }); }
-  ok('atom table: C first, then O₁ and O₂ (numbered in the table only)', cells().join(' ; ') === 'C|8|0|8 / 8|0 ; O₁|4|4|8 / 8|0 ; O₂|4|4|8 / 8|0' && layerCount('text') === 3, cells().join(' ; '));
+  ok('atom table: C first, then O₁ and O₂ (numbered in the table only)', cells().join(' ; ') === 'C|8|0|8 / 8 ; O₁|4|4|8 / 8 ; O₂|4|4|8 / 8 ; C|4 − 0 − ½(8)|0 ; O₁|6 − 4 − ½(4)|0 ; O₂|6 − 4 − ½(4)|0' && layerCount('text') === 3, cells().join(' ; '));
+  d.setFc(false);
   fire(svg, 'pointermove', abs(A(1)), 0);
   ok('hovering C highlights its tally row', d.root.querySelectorAll('.de-tally-row.is-focus').length === 1);
 
@@ -166,6 +171,15 @@ function selfTest(d) {
   d.setReference(null);
   d.loadMany([BondingKit.structure('co2'), BondingKit.structure('co2-alt')]);
   ok('loadMany: two structures side by side with all electrons', m().atoms.length === 6 && LewisModel.tally(m()).placed === 32);
+  function sumLines() { return Array.prototype.map.call(d.root.querySelectorAll('.de-sum-line'), function (x) { return x.textContent; }); }
+  d.setReference(['ch4', 'h2o']);
+  d.loadMany([BondingKit.structure('ch4'), BondingKit.structure('h2o')]);
+  var sl = sumLines();
+  ok('two molecules, two counts: CH₄ 8 and H₂O 8, each on its own line', sl.length === 2 && /^CH₄Valence electrons: C 4 \+ H 1 \+ H 1 \+ H 1 \+ H 1 = 8 · Placed: 8/.test(sl[0]) && /^H₂OValence electrons: O 6 \+ H 1 \+ H 1 = 8 · Placed: 8/.test(sl[1]), sl.join(' | '));
+  d.place('H', 0, 3);
+  sl = sumLines();
+  ok('a loose atom gets its own line until it joins a molecule', sl.length === 3 && /^Not bonded yetValence electrons: H 1 = 1 · Placed: 0 · Still to place: 1$/.test(sl[2]), sl.join(' | '));
+  d.setReference(null);
 
   var pre = document.createElement('pre');
   pre.id = 'selftest';

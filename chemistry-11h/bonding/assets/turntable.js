@@ -9,6 +9,7 @@
  *   tt.setShape(on) / tt.shapeOptions({ faces })   the atoms' outline as a solid (tetrahedron …), or
  *                       with faces:false the bonds traced (linear, bent, T-shaped); off with space filling
  *   tt.showMolecule(on)  hide / show the ball-and-stick model (content stays)
+ *   tt.track(material, lightHex, darkHex)  colour a material for the page theme, now and on every theme change
  *   tt.settle(), tt.destroy()
  *   Turntable.lobe(dir, length, width, colour, opacity)  teardrop mesh along dir
  *
@@ -17,7 +18,8 @@
 (function (global) {
   'use strict';
   var Gm = global.Geometry;
-  var INK = 0x3d4658;
+  var INK = 0x3d4658, INK_DARK = 0xc9cfdb;   // bond sticks: slate on the light tray, pale grey on the dark one
+  function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
 
   function hasWebGL() {
     try { var c = document.createElement('canvas'); return !!(global.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl'))); }
@@ -58,7 +60,7 @@
     if (!T || !hasWebGL()) {
       wrap.classList.add('tt-fallback');
       wrap.textContent = '3D needs WebGL, which this browser has turned off.';
-      return { content: null, setMolecule: function () {}, label: function () {}, preset: function () {}, render: function () {}, settle: function () {}, destroy: function () { wrap.remove(); } };
+      return { content: null, setMolecule: function () {}, label: function () {}, track: function (m) { return m; }, preset: function () {}, render: function () {}, settle: function () {}, destroy: function () { wrap.remove(); } };
     }
     var renderer = new T.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
     renderer.setPixelRatio(Math.min(2, global.devicePixelRatio || 1));
@@ -199,7 +201,7 @@
       if (labelMap[id]) { labelMap[id].el.remove(); delete labelMap[id]; }
       if (text == null) return;
       var el = document.createElement('span');
-      el.className = 'tt-label' + (opt && opt.cls ? ' ' + opt.cls : '');
+      el.className = 'tt-label' + (opt && opt.obj ? ' is-atom' : '') + (opt && opt.cls ? ' ' + opt.cls : '');   // is-atom: a letter printed on a sphere
       if (opt && opt.html) el.innerHTML = text; else el.textContent = text;
       labels.appendChild(el);
       labelMap[id] = { el: el, p: p, obj: opt && opt.obj, fixed: opt && opt.fixed };
@@ -208,7 +210,12 @@
     function clearLabels() { Object.keys(labelMap).forEach(function (k) { label(k, null); }); }
 
     // --- Ball and stick -----------------------------------------------------------------------------
-    var bondMat = new T.MeshStandardMaterial({ color: INK, roughness: 0.5 });
+    // Materials that change colour with the page theme (dark mode: the stage behind the model goes black)
+    var tracked = [];
+    function track(mat, light, dark) { tracked.push([mat, light, dark]); mat.color.setHex(isDark() ? dark : light); return mat; }
+    function onTheme() { var d = isDark(); tracked.forEach(function (t) { t[0].color.setHex(d ? t[2] : t[1]); }); kick(); }
+    global.addEventListener('themechange', onTheme);
+    var bondMat = track(new T.MeshStandardMaterial({ color: INK, roughness: 0.5 }), INK, INK_DARK);
     var lpDot = new T.MeshStandardMaterial({ color: 0xd99a00, roughness: 0.5, emissive: 0x6b4a00, emissiveIntensity: 0.25 });
     var cyl = new T.CylinderGeometry(1, 1, 1, 18);
     function clearGroup(g) {
@@ -249,8 +256,8 @@
 
     // --- Shape mode -------------------------------------------------------------------------------
     var shapeOn = false, shapeOpt = { faces: true }, shapeG = null, shapeT = 0;
-    var faceMat = new T.MeshStandardMaterial({ color: 0x4152d9, roughness: 0.7, transparent: true, opacity: 0, side: T.DoubleSide, depthWrite: false });
-    var edgeMat = new T.MeshStandardMaterial({ color: 0x4152d9, roughness: 0.5, transparent: true, opacity: 0 });
+    var faceMat = track(new T.MeshStandardMaterial({ color: 0x4152d9, roughness: 0.7, transparent: true, opacity: 0, side: T.DoubleSide, depthWrite: false }), 0x4152d9, 0x8f9bff);
+    var edgeMat = track(new T.MeshStandardMaterial({ color: 0x4152d9, roughness: 0.5, transparent: true, opacity: 0 }), 0x4152d9, 0x8f9bff);
     faceMat.userData.keep = edgeMat.userData.keep = true;
     bondMat.transparent = true;
     /** Faces of the convex hull of a few points: each face is its corner indices in order. All in one plane → one face. */
@@ -423,7 +430,7 @@
         axis.normalize();
         var R = 0.62, pts = [];
         for (var i = 0; i <= 32; i++) pts.push(a.clone().applyAxisAngle(axis, ang * i / 32).multiplyScalar(R).add(new T.Vector3(c[0], c[1], c[2])));
-        var tube = new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts), 48, 0.018, 8, false), new T.MeshBasicMaterial({ color: 0x4152d9 }));
+        var tube = new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts), 48, 0.018, 8, false), track(new T.MeshBasicMaterial({ color: 0x4152d9 }), 0x4152d9, 0x8f9bff));
         content.add(tube);
         var mid = a.clone().applyAxisAngle(axis, ang / 2).multiplyScalar(R + 0.32).add(new T.Vector3(c[0], c[1], c[2]));
         label(id || 'arc', text, [mid.x, mid.y, mid.z], { cls: 'is-angle' });
@@ -439,7 +446,10 @@
       },
       render: function () { kick(); },
       settle: function () { anims.forEach(function (a) { a.step(1); if (a.done) a.done(); }); anims = []; render(); },
+      track: track,
       destroy: function () {
+        global.removeEventListener('themechange', onTheme);
+        tracked = [];
         cancelAnimationFrame(raf);
         if (ro) ro.disconnect();
         clearGroup(mol); clearGroup(content);

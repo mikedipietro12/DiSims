@@ -924,36 +924,53 @@
     return {};
   });
   // =================================================================================================
-  // After beat 18 · practice on paper: a card per formula, Show answer draws the Lewis structure
+  // After beat 18 · practice on paper (user 2026-11-25): small formula tiles in a ring round one large centre
+  // tile. Clicking a tile shows its Lewis structure in the centre; clicking it again hides it.
   // =================================================================================================
   GuideShell.registerScene('paper', function (mount, beat) {
-    var ids = (beat.dataset.mols || 'pcl3 hcn so2').split(/\s+/);
+    var ids = (beat.dataset.mols || 'pcl3 hcn so2').split(/\s+/).filter(function (id) { return Kit.get(id); });
     var root = h('div', 'scene scene-paper');
-    var grid = h('div', 'paper-grid');
+    var grid = h('div', 'paper-ring');
     root.appendChild(grid);
     mount.appendChild(root);
+    // Ring size: the tiles go round the edge of a cols × rows grid, the centre fills the middle
+    var rows = ids.length > 12 ? 5 : 4, cols = Math.max(3, Math.ceil((ids.length - 2 * (rows - 2)) / 2));
+    grid.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(0, 1fr))';
+    grid.style.gridTemplateRows = 'repeat(' + rows + ', minmax(0, 1fr))';
+
+    var centre = h('section', 'paper-centre');
+    centre.style.gridColumn = '2 / ' + cols;
+    centre.style.gridRow = '2 / ' + rows;
+    centre.setAttribute('aria-live', 'polite');
+    var title = h('p', 'paper-centre-title');
+    var sv = K.svg('paper-svg');
+    sv.setAttribute('role', 'img');
+    var empty = h('p', 'paper-centre-empty', 'Draw one on paper, then click its formula to check it here.');
+    centre.appendChild(title); centre.appendChild(sv); centre.appendChild(empty);
+    grid.appendChild(centre);
+
+    var tiles = {}, current = null;
+    function show(id) {
+      current = id;
+      Object.keys(tiles).forEach(function (k) { tiles[k].setAttribute('aria-pressed', k === id ? 'true' : 'false'); });
+      centre.classList.toggle('is-open', !!id);
+      empty.hidden = !!id;
+      if (!id) { title.textContent = ''; sv.innerHTML = ''; sv.removeAttribute('aria-label'); return; }
+      var mol = Kit.get(id);
+      title.textContent = mol.formula + ' · ' + mol.name;
+      sv.setAttribute('aria-label', 'Lewis structure of ' + mol.formula);
+      DrawEngine.renderStatic(sv, Kit.structure(id), { width: 640, height: 340, maxScale: 2.6, fcMode: 'compact' });
+    }
     ids.forEach(function (id) {
-      var card = h('div', 'paper-card'), top = h('div', 'paper-top');
-      top.appendChild(h('strong', 'paper-formula', formula(id)));
-      card.appendChild(top);
-      var sv = K.svg('paper-svg');
-      sv.setAttribute('role', 'img');
-      sv.setAttribute('aria-label', 'Lewis structure of ' + formula(id));
-      card.appendChild(sv);
-      var btn = h('button', 'btn paper-btn', 'Show answer');
-      btn.type = 'button';
-      btn.setAttribute('aria-expanded', 'false');
-      top.appendChild(btn);
-      var drawn = false;
-      btn.addEventListener('click', function () {
-        var open = !card.classList.contains('is-open');
-        if (open && !drawn) { DrawEngine.renderStatic(sv, Kit.structure(id), { width: 300, height: 170, maxScale: 1.5, fcMode: 'compact' }); drawn = true; }
-        card.classList.toggle('is-open', open);
-        btn.textContent = open ? 'Hide answer' : 'Show answer';
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-      grid.appendChild(card);
+      var b = h('button', 'paper-tile', formula(id));
+      b.type = 'button';
+      b.setAttribute('aria-pressed', 'false');
+      b.setAttribute('aria-label', formula(id) + ': show the answer');
+      b.addEventListener('click', function () { show(current === id ? null : id); });
+      tiles[id] = b;
+      grid.appendChild(b);   // auto-placed round the centre
     });
+    show(null);
     return {};
   });
 })(window);
