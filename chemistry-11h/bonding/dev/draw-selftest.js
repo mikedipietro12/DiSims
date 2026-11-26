@@ -56,6 +56,10 @@ function selfTest(d) {
   ok('O with 4 electrons shows 2 valence electrons still to place', counts('.de-count-valence') === '2', counts('.de-count-valence'));
   clickN(1, 1);
   ok('C with its first electron shows 7 (octet) and 3 (valence)', pills() === '4,7' && counts('.de-count-valence') === '2,3', pills() + ' / ' + counts('.de-count-valence'));
+  d.setCounters(false);
+  ok('counters off: no corner numbers, the drawing is unchanged', layerCount('.de-count') === 0 && m().atoms[1].ne === 1);
+  d.setCounters(true);
+  ok('counters back on: the same numbers return', pills() === '4,7' && counts('.de-count-valence') === '2,3');
   clickN(0, 2); clickN(1, 3); clickN(2, 6);
   ok('unbonded O, C, O count to the octet: 2, 4, 2', pills() === '2,2,4', pills());
   ok('full valence shells hide the valence count', counts('.de-count-valence') === '', counts('.de-count-valence'));
@@ -64,6 +68,11 @@ function selfTest(d) {
   share(1, 0); share(1, 2); share(1, 2);
   ok('sharing again raises the order: O=C=O matches', LewisModel.sameStructure(m(), BondingKit.structure('co2')), JSON.stringify(m()));
   ok('every octet complete: no numbers left', layerCount('.de-count') === 0);
+  function sumLine() { return d.root.querySelector('.de-tally-sum').textContent; }
+  ok('count line from the tray (no reference): CO₂ 16, all placed', /= 16 · Placed: 16 · Still to place: 0/.test(sumLine()), sumLine());
+  d.setTable(true);
+  function cells() { return Array.prototype.map.call(d.root.querySelectorAll('.de-tally-row'), function (r) { return Array.prototype.map.call(r.children, function (c) { return c.textContent; }).join('|'); }); }
+  ok('atom table: C first, then O₁ and O₂ (numbered in the table only)', cells().join(' ; ') === 'C|8|0|8 / 8|0 ; O₁|4|4|8 / 8|0 ; O₂|4|4|8 / 8|0' && layerCount('text') === 3, cells().join(' ; '));
   fire(svg, 'pointermove', abs(A(1)), 0);
   ok('hovering C highlights its tally row', d.root.querySelectorAll('.de-tally-row.is-focus').length === 1);
 

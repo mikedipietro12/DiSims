@@ -6,6 +6,9 @@
  *   data-set="ch4 h2o"     kit ids to build (all on the same tray); "Show answer" shows each
  *   data-prompt="…"        override the prompt
  *   data-fc="teach|compact|off"   formal-charge display (off until the formal-charge beat)
+ *   data-counters="off"    no corner counts on the atoms (every draw beat after multiple-bond practice)
+ *   data-table             open the atom table on arrival (formal charge beat: its prompt reads the table);
+ *                          otherwise the table follows the student's last switch (closed to start)
  *   data-palette="Na Cl"   override the palette (default: the elements in the set)
  *   data-load              start with the reference structures already on the tray (side by side)
  *   data-letters           label molecules A, B… on the tray and in the tally (comparisons)
@@ -21,6 +24,7 @@
   var Kit = global.BondingKit;
   var ORDER = ['H', 'Li', 'Na', 'K', 'Mg', 'Ca', 'B', 'C', 'N', 'O', 'F', 'P', 'S', 'Cl', 'Br', 'I', 'Xe'];
   var store = {};   // beatId → raw engine state
+  var tableOn = false;   // the 'Atom table' switch, carried from beat to beat
 
   function paletteFor(beat, ids) {
     if (beat.dataset.palette) return beat.dataset.palette.split(/\s+/);
@@ -45,6 +49,9 @@
     var engine = DrawEngine.create(host, {
       palette: paletteFor(beat, ids),
       fcMode: beat.dataset.fc || 'off',
+      counters: beat.dataset.counters !== 'off',
+      table: 'table' in beat.dataset || tableOn,
+      onTable: function (on) { tableOn = on; },
       references: ids.length ? ids : null,
       allowReveal: ids.length > 0,
       prompt: prompt,

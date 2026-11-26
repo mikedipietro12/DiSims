@@ -831,7 +831,7 @@
     root.appendChild(cols); root.appendChild(foot);
     mount.appendChild(root);
     var engine = DrawEngine.create(left, {
-      palette: (beat.dataset.palette || 'H C N O Cl').split(/\s+/), fcMode: 'off', allowReveal: false, allowExport: false,
+      palette: (beat.dataset.palette || 'H C N O Cl').split(/\s+/), fcMode: 'off', allowReveal: false, allowExport: false, counters: false,
       prompt: beat.dataset.prompt || 'Draw, then lift',
     });
     if (beat.dataset.load) engine.loadMany([Kit.structure(beat.dataset.load)]);

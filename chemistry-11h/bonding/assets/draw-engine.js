@@ -14,7 +14,10 @@
  * bond or an electron; it is hidden when 0. Brackets + overall charge appear around a molecule
  * or ion once every atom in it is satisfied. The tally shows working, never a verdict.
  *
- *   var d = DrawEngine.create(mountEl, { palette, fcMode, references, prompt, letters, onChange })
+ *   var d = DrawEngine.create(mountEl, { palette, fcMode, references, prompt, letters, counters, onChange })
+ *   counters: false hides the two corner counts on each atom (Guide beats after multiple-bond practice;
+ *   the Draw Lab's 'Electron counters' switch calls d.setCounters(on))
+ *   table: true opens the atom table under the count line (its 'Atom table' switch); onTable(on) hears the switch
  *   d.load(structure) · d.loadMany([...]) · d.get() · d.state() · d.restore(raw) · d.clear() · d.undo()
  *   DrawEngine.renderStatic(svgEl, structure, { fcMode })
  *
@@ -445,7 +448,7 @@
       // Two fixed corner counts (metals show none; nothing until the atom is touched):
       //   top right, red: electrons still needed for the octet (+n if it has too many)
       //   bottom right, ink: valence electrons still to place (+n if it has too many)
-      var counting = marks.showCharges !== false && !METALS[a.el] && touched(s, i);
+      var counting = marks.showCharges !== false && marks.counters !== false && !METALS[a.el] && touched(s, i);
       //   Both go once the octet is complete (formal-charge structures such as CO end off by one on purpose).
       var need = st.target - st.around, full = st.status === 'ok' || st.status === 'expanded';
       if (counting && !full && need !== 0) {
@@ -455,7 +458,7 @@
       if (counting && !full && short !== 0) {
         cornerCount(gm, X(a) + 31 * k, Y(a) + 29 * k, short > 0 ? String(short) : '+' + (-short), INK, 'valence', k);
       }
-      taken.push(315, 45);   // the corners stay theirs
+      if (marks.counters !== false) taken.push(315, 45);   // the corners stay theirs
       if (marks.selected === i) {
         var tr = openDir([135, 45, 90, 225, 315, 180, 0, 270]);
         pill(gm, X(a) + Math.cos(tr) * 46 * k, Y(a) + Math.sin(tr) * 40 * k, st.around + ' / ' + st.target, k);
@@ -512,7 +515,7 @@
     var span = Math.max(b.x1 - b.x0 + pad, (b.y1 - b.y0 + pad) * w / hgt);
     var k = opts.scale || Math.min(opts.maxScale || 1, w / (span * UNIT));
     var view = { ox: w / 2 - b.cx * UNIT * k, oy: hgt / 2 - b.cy * UNIT * k, k: k };
-    drawState(el('g', {}, svg), s, view, { tally: L.tally(toModel(s)), showCharges: opts.fcMode !== 'off' }, false);
+    drawState(el('g', {}, svg), s, view, { tally: L.tally(toModel(s)), showCharges: opts.fcMode !== 'off', counters: opts.counters }, false);
     svg.__lewis = { view: view, s: s, unit: UNIT };   // lets scenes pin labels to atoms
     return svg;
   }
@@ -576,7 +579,7 @@
     opts = opts || {};
     var W = 1600, H = 1100, HEAD = 150;
     var svg = document.createElementNS(NS, 'svg');
-    renderStatic(svg, structure, { width: W, height: H - HEAD, maxScale: 3.4, fcMode: opts.fcMode || 'compact' });
+    renderStatic(svg, structure, { width: W, height: H - HEAD, maxScale: 3.4, fcMode: opts.fcMode || 'compact', counters: opts.counters });
     var canvas = document.createElement('canvas');
     canvas.width = W; canvas.height = H;
     var ctx = canvas.getContext('2d');
@@ -617,6 +620,7 @@
   var ARROW_MS = 1100;   // a sent electron's arrow shows during the flight, then fades from the tray
   var HINT = 'Click an atom to add an electron. Drag an electron onto another atom\u2019s electron to share them. Drag an atom to move it. Click a bond to break one pair.';
 
+  var tableSeq = 0;
   function create(mount, opts) {
     opts = opts || {};
     var palette = opts.palette || DEFAULT_PALETTE;
@@ -625,6 +629,8 @@
       erase: false,
       selected: null, source: null, hover: null,
       fcMode: opts.fcMode || 'compact',
+      counters: opts.counters !== false,
+      table: !!opts.table,
       references: opts.references || (opts.reference ? [opts.reference] : null),
       reveal: false,
       history: [],
@@ -707,11 +713,26 @@
     work.appendChild(stageWrap);
     work.appendChild(revealEl);
 
+    // Under the drawing: the count line (always), and the atom table behind its switch (user 2026-11-25)
     var tallyEl = h('div', 'de-tally');
+    var tallyBar = h('div', 'de-tally-bar');
     var tallySum = h('p', 'de-tally-sum');
     tallySum.setAttribute('aria-live', 'polite');
-    var tallyList = h('ul', 'de-tally-list');
-    tallyEl.appendChild(tallySum);
+    var tableBtn = h('button', 'learn-toggle de-table-toggle');
+    tableBtn.type = 'button';
+    tableBtn.innerHTML = '<span class="learn-switch" aria-hidden="true"></span>Atom table';
+    var tallyList = h('div', 'de-tally-list');
+    tallyList.id = 'de-table-' + (++tableSeq);
+    tableBtn.setAttribute('aria-controls', tallyList.id);
+    tableBtn.addEventListener('click', function () {
+      state.table = !state.table;
+      tallyList.hidden = !state.table;   // before the refit, so the drawing fits the room that is left
+      refit(); render();
+      if (opts.onTable) opts.onTable(state.table);
+    });
+    tallyBar.appendChild(tallySum);
+    tallyBar.appendChild(tableBtn);
+    tallyEl.appendChild(tallyBar);
     tallyEl.appendChild(tallyList);
 
     root.appendChild(bar);
@@ -977,7 +998,7 @@
       dots = drawState(layer, state.s, view, {
         selected: state.selected, source: state.source, hover: state.hover, tally: t, subs: subs,
         target: drag && drag.target ? drag.target.atom : null,
-        showCharges: true, letters: !!opts.letters, arrows: Date.now() < (state.arrowUntil || 0),
+        showCharges: true, counters: state.counters, letters: !!opts.letters, arrows: Date.now() < (state.arrowUntil || 0),
       }, true);
       drawMatch();
       eraseBtn.setAttribute('aria-pressed', state.erase ? 'true' : 'false');
@@ -1068,47 +1089,111 @@
       });
     }
 
+    /**
+     * The count line: the valence electrons of the molecule(s) asked for (the prompt's, not the drawing's,
+     * so the total is right before anything is placed), what is placed, and what is still to place.
+     * No reference (blank canvas, ionic and lift beats): the atoms on the tray, with the charge of any
+     * molecule or ion they already make.
+     */
+    function chargeTerm(c) { return c ? (c > 0 ? ' − ' : ' + ') + Math.abs(c) + ' (charge)' : ''; }
+    function atomTerms(els, centre) {
+      var order = els.map(function (_, i) { return i; });
+      if (centre != null) order = [centre].concat(order.filter(function (i) { return i !== centre; }));
+      var first = {};
+      order.forEach(function (i, n) { if (!(els[i] in first)) first[els[i]] = n; });
+      order.sort(function (p, q) { return first[els[p]] - first[els[q]] || p - q; });   // same elements side by side
+      return order.map(function (i) { return els[i] + ' ' + Kit.ELEMENTS[els[i]].valence; });
+    }
+    function sumEls(els) { return els.reduce(function (n, e) { return n + Kit.ELEMENTS[e].valence; }, 0); }
+    function countLine(t) {
+      var refs = state.references && state.references.length ? state.references : null, terms, charge = 0, total;
+      if (refs && refs.length === 1) {
+        var mol = Kit.get(refs[0]), els = Kit.structure(refs[0]).atoms.map(function (a) { return a.el; });
+        terms = atomTerms(els, mol.center); charge = mol.charge || 0; total = sumEls(els) - charge;
+      } else if (refs) {
+        total = 0;
+        terms = refs.map(function (id) {
+          var n = sumEls(Kit.structure(id).atoms.map(function (a) { return a.el; })) - (Kit.get(id).charge || 0);
+          total += n;
+          return Kit.get(id).formula + ' ' + n;
+        });
+      } else {
+        var trayEls = state.s.atoms.map(function (a) { return a.el; });
+        fragments(state.s).forEach(function (f) {
+          if (f.members.length < 2) return;
+          var id = findReference(subModel(state.s, f.members));
+          if (id) charge += Kit.get(id).charge || 0;
+        });
+        terms = atomTerms(trayEls, null); total = sumEls(trayEls) - charge;
+      }
+      var left = total - t.placed;
+      return 'Valence electrons: ' + terms.join(' + ') + chargeTerm(charge) + ' = ' + total +
+        ' · Placed: ' + t.placed + ' · ' + (left >= 0 ? 'Still to place: ' + left : (-left) + ' too many');
+    }
+
     function renderTally(t, model, subs) {
-      if (!state.s.atoms.length) { tallySum.textContent = 'Nothing placed yet.'; tallyList.innerHTML = ''; return; }
-      var inBonds = model.bonds.reduce(function (n, b) { return n + 2 * b.order; }, 0);
-      tallySum.textContent = t.availableText.replace(/^Valence/, 'Valence electrons') + ' · placed ' + t.placed +
-        ' (bonds ' + inBonds + ', lone ' + (t.placed - inBonds) + ')';
+      tableBtn.setAttribute('aria-pressed', state.table ? 'true' : 'false');
+      tallyList.hidden = !state.table;
       tallyList.innerHTML = '';
+      if (!state.s.atoms.length && !(state.references && state.references.length)) { tallySum.textContent = 'Nothing placed yet.'; return; }
+      tallySum.textContent = countLine(t);
+      if (!state.s.atoms.length) return;
+      var nums = atomNumbers(state.s);   // O₁, O₂…: in the table only (the teach beat also writes them on the tray)
       var focusAtom = state.hover != null ? state.hover : state.selected;
-      var frs = fragments(state.s).filter(function (f) { return f.members.length > 1 || touched(state.s, f.members[0]); });
-      var untouched = fragments(state.s).filter(function (f) { return f.members.length === 1 && !touched(state.s, f.members[0]); });
-      var groups = frs.sort(function (p, q) { return state.s.atoms[p.members[0]].x - state.s.atoms[q.members[0]].x; });
-      // Loose, untouched atoms share one column; each molecule gets its own column (side by side when there is room)
-      if (untouched.length) groups.push({ members: [].concat.apply([], untouched.map(function (f) { return f.members; })), loose: true });
+      // Each molecule or polyatomic ion gets its own table, side by side when there is room;
+      // single atoms (loose, or ions made by a transfer) share one table at the end
+      var isPiece = function (f) { return f.members.length > 1; };
+      var groups = fragments(state.s).filter(isPiece).sort(function (p, q) { return state.s.atoms[p.members[0]].x - state.s.atoms[q.members[0]].x; });
+      var singles = fragments(state.s).filter(function (f) { return !isPiece(f); });
+      if (singles.length) groups.push({ members: [].concat.apply([], singles.map(function (f) { return f.members; })), loose: true });
       var multi = groups.filter(function (g) { return g.members.length > 1 && !g.loose; }).length > 1 || opts.letters;
-      var sub, n = 0;
+      var showFc = state.fcMode !== 'off', n = 0;
       groups.forEach(function (g) {
-        var col = h('li', 'de-tally-group');
-        sub = h('ul', 'de-tally-sub');
-        col.appendChild(sub);
-        tallyList.appendChild(col);
+        var tbl = h('table', 'de-tally-table');
         if (multi && g.members.length > 1 && !g.loose) {
-          var head = h('li', 'de-tally-head', (opts.letters ? 'ABCDEFGH'[n] + ' · ' : '') + fragmentFormula(subModel(state.s, g.members), g.charge));
-          head.setAttribute('aria-hidden', 'true');
-          sub.appendChild(head);
+          tbl.appendChild(h('caption', 'de-tally-head', (opts.letters ? 'ABCDEFGH'[n] + ' · ' : '') + fragmentFormula(subModel(state.s, g.members), g.charge)));
           n++;
         }
-        g.members.slice().sort(function (p, q) { return p - q; }).forEach(function (i) { row(t.atoms[i], i); });
+        var thead = h('thead'), r1 = h('tr'), r2 = h('tr');
+        var eh = h('th', 'de-th-group', 'Electrons');
+        eh.colSpan = 3; eh.scope = 'colgroup';
+        r1.appendChild(h('th')); r1.appendChild(eh); if (showFc) r1.appendChild(h('th'));
+        ['Atom', 'in bonds', 'lone', 'around'].concat(showFc ? ['FC'] : []).forEach(function (c) { var th = h('th', null, c); th.scope = 'col'; r2.appendChild(th); });
+        thead.appendChild(r1); thead.appendChild(r2); tbl.appendChild(thead);
+        var tbody = h('tbody');
+        tbl.appendChild(tbody);
+        // FC waits until every atom in this molecule has its full count
+        var done = !g.loose && g.members.every(function (i) { var st = t.atoms[i]; return st.status === 'ok' || st.status === 'expanded'; });
+        // rows like the count line: the centre (most bonds) first, then each element together, O₁, O₂, O₃
+        var deg = function (i) { return state.s.bonds.filter(function (bd) { return bd.a === i || bd.b === i; }).length; };
+        var lead = g.loose ? [] : g.members.slice().sort(function (p, q) { return deg(q) - deg(p) || p - q; }).slice(0, 1);
+        var firstOf = {};
+        lead.concat(g.members.slice().sort(function (p, q) { return p - q; })).forEach(function (i) { var e = state.s.atoms[i].el; if (!(e in firstOf)) firstOf[e] = i === lead[0] ? -1 : i; });
+        g.members.slice().sort(function (p, q) {
+          return firstOf[state.s.atoms[p].el] - firstOf[state.s.atoms[q].el] || nums[p] - nums[q] || p - q;
+        }).forEach(function (i) { row(tbody, t.atoms[i], i, done); });
+        tallyList.appendChild(tbl);
       });
-      function row(a, i) {
-        var li = h('li', 'de-tally-row' + (state.selected === i ? ' is-selected' : '') + (focusAtom === i ? ' is-focus' : ''));
-        var ct = a.countText;
-        if (subs && subs[i]) ct = ct.replace(/^(\S+)/, '$1' + SUBD(subs[i]));
-        li.appendChild(h('span', 'de-count', ct + (a.status === 'expanded' ? ' (expanded)' : '')));
-        if (state.fcMode !== 'off') li.appendChild(h('span', 'de-fc', state.fcMode === 'teach' ? a.fcTeach : a.fcCompact));
-        li.tabIndex = 0;
-        li.setAttribute('role', 'button');
-        li.setAttribute('aria-pressed', state.selected === i ? 'true' : 'false');
-        li.addEventListener('click', function () { state.selected = state.selected === i ? null : i; render(); });
-        li.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); li.click(); } });
-        li.addEventListener('mouseenter', function () { state.hover = i; render(); });
-        li.addEventListener('mouseleave', function () { if (state.hover === i) { state.hover = null; render(); } });
-        sub.appendChild(li);
+      function row(tbody, a, i, done) {
+        var tr = h('tr', 'de-tally-row' + (state.selected === i ? ' is-selected' : '') + (focusAtom === i ? ' is-focus' : ''));
+        var name = a.el + (nums[i] ? SUBD(nums[i]) : '');
+        var th = h('th', 'de-td-atom', name);
+        th.scope = 'row';
+        tr.appendChild(th);
+        tr.appendChild(h('td', null, String(a.bonding)));
+        tr.appendChild(h('td', null, String(a.nonbonding)));
+        var ar = h('td', 'de-td-around', a.around + ' / ' + a.target);
+        if (a.status === 'expanded') ar.appendChild(h('span', 'de-td-note', ' expanded'));
+        tr.appendChild(ar);
+        if (showFc) tr.appendChild(h('td', 'de-fc', !done ? '–' : state.fcMode === 'teach' ? a.fcTeach.replace(/^FC = /, '') : a.fcCompact.replace(/^FC /, '')));
+        tr.tabIndex = 0;
+        tr.setAttribute('aria-label', name + ': ' + a.bonding + ' electrons in bonds, ' + a.nonbonding + ' in lone pairs, ' + a.around + ' of ' + a.target + '.' +
+          (showFc && done ? ' Formal charge ' + (a.fc === 0 ? 'zero' : (a.fc > 0 ? 'plus ' : 'minus ') + Math.abs(a.fc)) + '.' : '') + ' Activate to pick it out on the drawing.');
+        tr.addEventListener('click', function () { state.selected = state.selected === i ? null : i; render(); });
+        tr.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tr.click(); } });
+        tr.addEventListener('mouseenter', function () { state.hover = i; render(); });
+        tr.addEventListener('mouseleave', function () { if (state.hover === i) { state.hover = null; render(); } });
+        tbody.appendChild(tr);
       }
     }
 
@@ -1384,7 +1469,7 @@
     function save() {
       if (!state.s.atoms.length) { say('Place some atoms first, then save.'); render(); return Promise.resolve(); }
       var t = exportTitle();
-      return exportJPEG(clone(state.s), { title: t.title, subtitle: t.subtitle, fcMode: state.fcMode }).then(function (blob) {
+      return exportJPEG(clone(state.s), { title: t.title, subtitle: t.subtitle, fcMode: state.fcMode, counters: state.counters }).then(function (blob) {
         return deliverFile(blob, t.slug + '-' + new Date().toISOString().slice(0, 10) + '.jpg');
       });
     }
@@ -1419,13 +1504,15 @@
       clear: function () { refit(); snapshot(); state.s = { atoms: [], bonds: [], transfers: [] }; state.selected = state.source = null; changed(); },
       undo: undo,
       setFcMode: function (m) { state.fcMode = m; render(); },
+      setCounters: function (on) { state.counters = !!on; render(); },
+      setTable: function (on) { state.table = !!on; tallyList.hidden = !state.table; refit(); render(); },
       matched: function () { return (state.matched || []).slice(); },
       setReference: function (ids) { state.references = ids ? [].concat(ids) : null; revealEl.dataset.key = ''; render(); },
       showReference: function (on) { state.reveal = !!on; render(); },
       setPrompt: function (text) { promptEl.textContent = text || ''; promptEl.hidden = !text; msgEl.classList.toggle('has-prompt', !!text); },
       select: function (i) { state.selected = i; render(); },
       place: function (sym, x, y) { placeAt(sym, { x: x, y: y }); },   // tests / scripted demos
-      exportJPEG: function () { var t = exportTitle(); return exportJPEG(clone(state.s), { title: t.title, subtitle: t.subtitle, fcMode: state.fcMode }); },
+      exportJPEG: function () { var t = exportTitle(); return exportJPEG(clone(state.s), { title: t.title, subtitle: t.subtitle, fcMode: state.fcMode, counters: state.counters }); },
       save: save,
       render: render,
       _dots: function () { return dots.slice(); },

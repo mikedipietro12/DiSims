@@ -38,6 +38,37 @@
     Lab.open3d(false);
     ok('closing 3D: button off again until the counts are complete', btn3d().disabled);
 
+    // --- Electron counters switch ---
+    var sw = document.getElementById('labCounters');
+    function cornerNums() { return eng().svg.querySelectorAll('.de-count-octet, .de-count-valence').length; }
+    var oneE = { atoms: [{ el: 'C', x: 0, y: 0, slots: [0, 0, 0, 0, 0, 0, 1, 0] }], bonds: [], transfers: [] };
+    Lab.pick('hcn'); eng().restore(oneE);
+    var line = eng().root.querySelector('.de-tally-sum').textContent;
+    ok('mid-build, the count comes from HCN, not the drawing: 10, 1 placed, 9 to place', line === 'Valence electrons: C 4 + H 1 + N 5 = 10 · Placed: 1 · Still to place: 9', line);
+    var fcCell = eng().root.querySelector('.de-tally-row .de-fc');
+    ok('FC waits (–) until the molecule is complete', fcCell && fcCell.textContent === '–', fcCell && fcCell.textContent);
+    ok('counters start on: a touched C shows its two corner numbers', sw.getAttribute('aria-pressed') === 'true' && cornerNums() === 2, cornerNums());
+    sw.click();
+    ok('switching counters off hides them', sw.getAttribute('aria-pressed') === 'false' && cornerNums() === 0, cornerNums());
+    Lab.pick('nh3'); eng().restore(oneE);
+    ok('off carries over to the next molecule', cornerNums() === 0, cornerNums());
+    sw.click();
+    ok('switching back on shows them again', cornerNums() === 2, cornerNums());
+    Lab.pick('ch4');
+
+    // --- Atom table switch ---
+    var tsw = eng().root.querySelector('.de-table-toggle'), tlist = eng().root.querySelector('.de-tally-list');
+    ok('atom table starts closed under the count line', tsw.getAttribute('aria-pressed') === 'false' && tlist.hidden && /Placed: 10 · 2 too many$/.test(eng().root.querySelector('.de-tally-sum').textContent), tsw.getAttribute('aria-pressed') + ' ' + tlist.hidden + ' ' + eng().root.querySelector('.de-tally-sum').textContent);
+    tsw.click();
+    ok('the switch opens the table and reads on', tsw.getAttribute('aria-pressed') === 'true' && !tlist.hidden);
+    Lab.pick('h2o');
+    ok('the table stays open on the next molecule', eng().root.querySelector('.de-table-toggle').getAttribute('aria-pressed') === 'true' && !eng().root.querySelector('.de-tally-list').hidden);
+    Lab.pick('co3'); eng().load(Kit.structure('co3'));
+    var co3 = eng().root.querySelector('.de-tally-sum').textContent;
+    ok('carbonate: charge term from the ion, 24 in all', /^Valence electrons: C 4 \+ O 6 \+ O 6 \+ O 6 \+ 2 \(charge\) = 24 · Placed: 24 · Still to place: 0$/.test(co3), co3);
+    eng().root.querySelector('.de-table-toggle').click();
+    Lab.pick('ch4');
+
     // --- Work is kept per molecule ---
     eng().load(Kit.structure('ch4'));
     Lab.pick('h2o'); Lab.pick('ch4');
