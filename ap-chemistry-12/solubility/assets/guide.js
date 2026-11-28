@@ -508,6 +508,14 @@
     first.insertBefore(list, first.firstElementChild);
   });
   let active = null, cur = null; // cur: { preset, tab, scenes, steps, readout, check, picMarks, salt, hot, acted, run }
+  // narrow screens: each section's text, then the stage under it (assets/guide-inline.js)
+  const inline = GuideInline.attach({
+    stage, beats,
+    skip: b => b.classList.contains('brief-beat'),
+    current: () => active,
+    activate: b => applyBeat(b),
+    presenting: () => document.body.classList.contains('learn-mode')
+  });
 
   function makeScene(cfg) {
     const sc = SolScene.create({ salt: cfg.salt, volume: 0.100, showIons: cfg.showIons, minOwn: cfg.minOwn, dropper: cfg.dropper, maxIons: cfg.maxIons, base: cfg.base });
@@ -518,18 +526,19 @@
   }
   function clearStage() {
     tools.innerHTML = ''; $('html').innerHTML = ''; $('btns').innerHTML = '';
-    document.querySelectorAll('.sg-ro-under').forEach(e => e.remove());
+    stage.querySelectorAll('.sg-ro-under').forEach(e => e.remove());
     $('html').hidden = true; $('btns').hidden = true; $('cvWrap').hidden = false;
   }
   // On a wide screen, Before you begin is its own full-width block with no stage beside it, so it hands
   // the stage to the Part's first section; the stage sits in that Part's block, ready before it scrolls in.
-  // Presentation view and narrow screens (stage on top of the page) keep Before you begin on the stage.
+  // Narrow screens do the same: Before you begin has no stage under it. Presentation view keeps it on the stage.
   const wideMQ = matchMedia('(min-width:861px)');
   function stageTarget(b) {
-    if (!b || !b.classList.contains('brief-beat') || !wideMQ.matches || document.body.classList.contains('learn-mode')) return b;
+    if (!b || !b.classList.contains('brief-beat') || (!wideMQ.matches && !inline.on()) || document.body.classList.contains('learn-mode')) return b;
     return b.closest('.guide-part').querySelector('.part-beats .guide-beat') || b;
   }
   function placeStage() {
+    if (inline.on()) { inline.place(active); return; }
     const dock = (wideMQ.matches && active && active.closest('.guide-part').querySelector('.part-body .stage-dock')) || $('stageDockTop');
     if (stage.parentNode !== dock) { dock.appendChild(stage); requestAnimationFrame(fit); }
   }
@@ -647,7 +656,7 @@
   // presentation view: questions and links marked "under" sit below the picture, where there is room; the scrolling
   // view keeps them at the end of the column, after the steps they follow
   function placeUnder() {
-    document.querySelectorAll('.sg-chips-under, .sg-link-under').forEach(el => {
+    stage.querySelectorAll('.sg-chips-under, .sg-link-under').forEach(el => {
       if (learnOn()) { el.classList.add('sg-ro-under'); $('btns').before(el); }
       else { el.classList.remove('sg-ro-under'); const hint = tools.querySelector('.sg-hint'); tools.insertBefore(el, hint); }
     });
@@ -749,7 +758,7 @@
     cur.scenes = [sceneNow()];
     if (cur.check) cur.check.setSalt(id);
     makeReadout(); renderButtons(); syncTabs();
-    if (cur.compare) { document.querySelectorAll('.sg-ro-under').forEach(e => e.remove()); cur.compare = makeCompare(); } // its column heads name this salt's ions
+    if (cur.compare) { stage.querySelectorAll('.sg-ro-under').forEach(e => e.remove()); cur.compare = makeCompare(); } // its column heads name this salt's ions
   }
   function startOver() {
     if (cur.mix) return resetMix();
@@ -1168,13 +1177,13 @@
     cur.scenes.forEach(s => { if (s.chemRate > 0) s.settle(); }); // a paused beaker (ICE row I) stays as it is
   });
   if (window.ResizeObserver) new ResizeObserver(() => fit()).observe($('cvWrap'));
-  addEventListener('resize', () => { fit(); sizeStepsBox(); });
+  addEventListener('resize', () => { fit(); sizeStepsBox(); if (!inline.on()) placeStage(); }); // placeStage: a backstop for the width change below
 
   // ---------- scroll: the section nearest the reading line drives the stage ----------
   let activeDist = Infinity, pinUntil = 0;
   const HYSTERESIS = 56;
   function pickBeatFromScroll() {
-    if (Date.now() < pinUntil) return;
+    if (Date.now() < pinUntil || inline.on()) return;
     const mid = innerHeight * 0.38; let best = null, bestDist = Infinity;
     activeDist = Infinity;
     beats.forEach(el => {
@@ -1202,6 +1211,7 @@
   const noScroll = new URLSearchParams(location.search).has('beat'); // headless shots go blank after a scroll
   function scrollToBeat(el, smooth) {
     if (noScroll) return;
+    if (inline.on()) { inline.scrollTo(el, smooth); return; }
     const r = el.getBoundingClientRect();
     scrollTo({ top: Math.max(0, scrollY + r.top + r.height / 2 - innerHeight * 0.38), behavior: smooth ? 'smooth' : 'auto' });
   }
@@ -1231,6 +1241,7 @@
   }
   function setLearn(on) {
     document.body.classList.toggle('learn-mode', on);
+    inline.sync(); // narrow screens: the stage leaves (or returns to) the slot under its section
     learnToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
     try { localStorage.setItem(LEARN_KEY, on ? '1' : '0'); } catch (e) { /* private window */ }
     requestAnimationFrame(fit);

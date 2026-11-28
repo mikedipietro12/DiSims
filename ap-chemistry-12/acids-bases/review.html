@@ -19,9 +19,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../assets/suite.css?v=20261127">
-  <link rel="stylesheet" href="../equilibrium/assets/ice.css?v=6">
-  <link rel="stylesheet" href="assets/ab.css?v=5">
+  <link rel="stylesheet" href="../../assets/suite.css?v=20261127b">
+  <link rel="stylesheet" href="../equilibrium/assets/ice.css?v=7">
+  <link rel="stylesheet" href="assets/ab.css?v=25">
   <script src="../../assets/theme.js"></script>
   <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
@@ -49,33 +49,37 @@
 
     <nav class="guide-toc part-picker" aria-label="Guide Parts">
       <a href="#p11-brief"><span class="pp-title">Part 1.1: What Makes an Acid an Acid?</span><span class="pp-teaser">Arrhenius and Brønsted-Lowry, hydronium, conjugate pairs, strong and weak.</span></a>
-      <a class="is-soon" aria-disabled="true"><span class="pp-title">Part 1.2: Water Reacts With Itself</span><span class="pp-teaser">K<sub>w</sub>, pH and pOH. Being built.</span></a>
-      <a class="is-soon" aria-disabled="true"><span class="pp-title">Part 1.3: Neutralization and Titration</span><span class="pp-teaser">Mixing strong acids and bases, and the classic titration. Being built.</span></a>
+      <a href="#p12-brief"><span class="pp-title">Part 1.2: Water Reacts With Itself</span><span class="pp-teaser">Self-ionization and K<sub>w</sub>, pH and pOH, the magic square.</span></a>
+      <a href="#p13-brief"><span class="pp-title">Part 1.3: Neutralization and Titration</span><span class="pp-teaser">Mixing strong acids and bases, the classic titration and its calculation.</span></a>
     </nav>
+
+    <!-- Each Part: Before we begin runs the full page width, then its sections with the stage beside them.
+         The one stage moves into the dock of the Part being read (ab-guide.js). -->
+    <!-- ================= Part 1.1 ================= -->
+    <section class="guide-part" id="part-11" aria-labelledby="p11-title">
+    <article class="guide-beat brief-beat" id="p11-brief" data-nav="Part 1.1: Before we begin" data-badge="Part 1.1: Before we begin">
+      <h2 id="p11-title">Part 1.1: What Makes an Acid an Acid?</h2>
+      <div class="brief-cols">
+        <div class="brief-block">
+          <h3>Learning intentions</h3>
+          <ul>
+            <li>I can identify an acid or a base molecule or solution based on my previous knowledge</li>
+            <li>I can distinguish between strong and weak acids and bases.</li>
+          </ul>
+        </div>
+        <div class="brief-block cc">
+          <h3>Curricular competencies</h3>
+          <ul>
+            <li><strong>Questioning and predicting:</strong> We will make observations based on what we know about acids and bases to help review our current understandings</li>
+            <li><strong>Processing and analyzing data and information:</strong> We will seek and analyze patterns and trends</li>
+          </ul>
+        </div>
+      </div>
+    </article>
 
     <div class="guide-layout">
       <div class="guide-rail">
 
-        <!-- ================= Part 1.1 ================= -->
-        <article class="guide-beat brief-beat" id="p11-brief" data-nav="Part 1.1: Before we begin" data-badge="Part 1.1: Before we begin">
-          <h2>Part 1.1: What Makes an Acid an Acid?</h2>
-          <div class="brief-cols">
-            <div class="brief-block">
-              <h3>Learning intentions</h3>
-              <ul>
-                <li>I can identify an acid or a base molecule or solution based on my previous knowledge</li>
-                <li>I can distinguish between strong and weak acids and bases.</li>
-              </ul>
-            </div>
-            <div class="brief-block cc">
-              <h3>Curricular competencies</h3>
-              <ul>
-                <li><strong>Questioning and predicting:</strong> We will make observations based on what we know about acids and bases to help review our current understandings</li>
-                <li><strong>Processing and analyzing data and information:</strong> We will seek and analyze patterns and trends</li>
-              </ul>
-            </div>
-          </div>
-        </article>
 
         <article class="guide-beat" id="p11-arrhenius" data-nav="The Arrhenius theory" data-badge="The Arrhenius theory">
           <h2>The Arrhenius Theory</h2>
@@ -86,7 +90,7 @@
           <p><strong>A quick way to tell:</strong> an acid's formula starts with H, a base's formula ends with OH, and a salt is ionic but does neither. Watch for exceptions: CH<sub>3</sub>OH ends with OH, but it is not ionic, so it is not a base.</p>
           <p><strong>An acid:</strong> HCl is a molecule. When it dissolves, the pair of electrons in the H–Cl bond stays with Cl. Therefore H leaves as H<sup>+</sup>, and Cl becomes Cl<sup>−</sup>.<br>
           <strong>A base:</strong> NaOH is ionic. In water, its Na<sup>+</sup> and OH<sup>−</sup> ions separate.</p>
-          <p>In the simulation, click the “Next step” button to see an acid and then a base come apart in water. Then try “Sort them”: choose acid, base, salt or none for each compound. A card turns green for a correct answer.</p>
+          <p>In the simulation, click the “Next step” button to see an acid and then a base come apart in water. Use the buttons above the picture to switch between Lewis structures, ball-and-stick and space-filling models. Then try “Sort them”: choose acid, base, salt or none for each compound. A card turns green for a correct answer.</p>
         </article>
 
         <article class="guide-beat" id="p11-neut" data-nav="Neutralization" data-badge="Neutralization">
@@ -112,7 +116,7 @@
           <p>A bare proton has its whole +1 charge packed into a tiny space, so it is strongly attracted to the lone pairs on a water molecule. In water, every H<sup>+</sup> bonds to a water molecule to make H<sub>3</sub>O<sup>+</sup>, the <strong>hydronium ion</strong>.</p>
           <p>Therefore H<sup>+</sup>(aq) and H<sub>3</sub>O<sup>+</sup>(aq) mean the same thing. When we write an acid in water, we add H<sub>2</sub>O to both sides, and the H<sup>+</sup> and H<sub>2</sub>O on the right join as H<sub>3</sub>O<sup>+</sup>:<br>
           HCl(g) → H<sup>+</sup>(aq) + Cl<sup>−</sup>(aq) becomes HCl(g) + H<sub>2</sub>O(l) → H<sub>3</sub>O<sup>+</sup>(aq) + Cl<sup>−</sup>(aq).</p>
-          <p>In the simulation, click the “Next step” button to see the proton land on water. Use the buttons above the picture to switch between Lewis structures, ball-and-stick and space-filling models.</p>
+          <p>In the simulation, click the “Next step” button to watch the H–Cl bond break, zoom in on the H<sup>+</sup> to see that it is just a proton, then follow that same proton as it bonds to a water molecule. Use the buttons above the picture to switch between Lewis structures, ball-and-stick and space-filling models.</p>
         </article>
 
         <article class="guide-beat" id="p11-bl" data-nav="The Brønsted-Lowry theory" data-badge="The Brønsted-Lowry theory">
@@ -124,7 +128,7 @@
           <p><strong>The trick:</strong> find the similar species on the other side of the equation. If it has one more H, the reactant was a base. If it has one less H, the reactant was an acid.</p>
           <p><strong>Amphiprotic:</strong> can act as an acid or a base, depending on what it reacts with. Water is the main example. Negative ions that still have an H to lose, such as HS<sup>−</sup> and HCO<sub>3</sub><sup>−</sup>, are amphiprotic too.</p>
           <p><strong>Polyprotic:</strong> can supply more than one proton. A monoprotic acid supplies one (HCl), a diprotic acid up to two (H<sub>2</sub>SO<sub>4</sub>), a triprotic acid up to three (H<sub>3</sub>PO<sub>4</sub>).</p>
-          <p>In the simulation, click the “Next step” button to watch the proton move forward, then back, then see the acid and base on each side. Compare NH<sub>3</sub> + H<sub>2</sub>O with HF + H<sub>2</sub>O to see water act both ways, then try “Check yourself”.</p>
+          <p>In the simulation, click the “Next step” button to watch the proton move forward, then back, then see the acid and base on each side. Compare NH<sub>3</sub> + H<sub>2</sub>O with HF + H<sub>2</sub>O to see water act both ways. In “Amphiprotic and polyprotic”, watch HS<sup>−</sup> act as an acid and then as a base, then see a monoprotic, a diprotic and a triprotic acid release their protons one at a time. Then try “Check yourself”.</p>
         </article>
 
         <article class="guide-beat" id="p11-conj" data-nav="Conjugate acids and bases" data-badge="Conjugate acids and bases">
@@ -149,7 +153,7 @@
         </article>
 
       </div>
-
+      <div class="stage-dock">
       <aside class="guide-stage-panel ice-stage ab-stage" id="stage" aria-label="Interactive stage">
         <div class="guide-stage-head">
           <p class="force-badge" id="badge" aria-live="polite"></p>
@@ -164,14 +168,238 @@
           <div class="ice-foot-r" id="footR"></div>
         </div>
       </aside>
+      </div>
     </div>
+    </section>
+
+    <!-- ================= Part 1.2 ================= -->
+    <section class="guide-part part-start" id="part-12" aria-labelledby="p12-title">
+    <article class="guide-beat brief-beat" id="p12-brief" data-nav="Part 1.2: Before we begin" data-badge="Part 1.2: Before we begin">
+      <h2 id="p12-title">Part 1.2: Water Reacts With Itself</h2>
+      <div class="brief-cols">
+        <div class="brief-block">
+          <h3>Learning intentions</h3>
+          <ul>
+            <li>I can visualize how water reacts with itself, and other molecules, to create an acidic or basic solution.</li>
+            <li>I can calculate the concentration of hydronium or hydroxide in a solution.</li>
+            <li>I can understand the relationship between hydronium and hydroxide in a solution.</li>
+          </ul>
+        </div>
+        <div class="brief-block cc">
+          <h3>Curricular competencies</h3>
+          <ul>
+            <li><strong>Communicating:</strong> We will formulate mental models to describe how water can be both an acid or base.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <div class="guide-layout">
+      <div class="guide-rail">
+
+        <article class="guide-beat" id="p12-self" data-nav="Self-ionization of water" data-badge="Self-ionization of water">
+          <h2>Self-Ionization of Water</h2>
+          <p>In Part 1.1, we saw water act as a base with HF and as an acid with NH<sub>3</sub>. Water can also do both at once, with another water molecule.</p>
+          <p><strong>Self-ionization:</strong> one water molecule passes a proton to another. At any moment, this happens to only a tiny fraction of the molecules.<br>
+          H<sub>2</sub>O(l) + 59 kJ ⇌ H<sup>+</sup>(aq) + OH<sup>−</sup>(aq)</p>
+          <p><strong>K<sub>w</sub>:</strong> the equilibrium constant for this reaction. [H<sub>2</sub>O] is a constant, so it is left out of the expression.<br>
+          K<sub>w</sub> = [H<sup>+</sup>][OH<sup>−</sup>] = 1.00 × 10<sup>−14</sup> at 25 °C<br>
+          Written with hydronium, this is K<sub>w</sub> = [H<sub>3</sub>O<sup>+</sup>][OH<sup>−</sup>]. In this Part, we write H<sup>+</sup> to keep the expressions short.</p>
+          <p><strong>Neutral:</strong> [H<sup>+</sup>] = [OH<sup>−</sup>]. In pure water, both are 1.0 × 10<sup>−7</sup> M.<br>
+          <strong>Acidic:</strong> [H<sup>+</sup>] &gt; [OH<sup>−</sup>].<br>
+          <strong>Basic:</strong> [H<sup>+</sup>] &lt; [OH<sup>−</sup>].</p>
+          <p><strong>Heating water:</strong> the reaction is endothermic, so heating shifts it to the right. That means K<sub>w</sub> gets bigger, but [H<sup>+</sup>] and [OH<sup>−</sup>] stay equal, so hot pure water is still neutral. From now on, we assume 25 °C unless we are told otherwise.</p>
+          <p>In the simulation, click the “Next step” button to watch one water molecule pass a proton to another. Then try “Hot water”.</p>
+        </article>
+
+        <article class="guide-beat" id="p12-balance" data-nav="The balance" data-badge="The balance">
+          <h2>The Balance</h2>
+          <p>K<sub>w</sub> is fixed, so [H<sup>+</sup>] and [OH<sup>−</sup>] are tied together. When one goes up, the other must come down by the same factor, so their product stays 1.00 × 10<sup>−14</sup>.</p>
+          <p><strong>Adding an acid:</strong> [H<sup>+</sup>] goes up. The extra H<sup>+</sup> reacts with OH<sup>−</sup> to make water, so [OH<sup>−</sup>] goes down. It never reaches zero: even an acidic solution has a little OH<sup>−</sup>.<br>
+          <strong>Adding a base:</strong> [OH<sup>−</sup>] goes up, and [H<sup>+</sup>] goes down.</p>
+          <p><strong>Notice:</strong> a weak acid or base at the same concentration moves the balance much less, because only a small part of it ionizes.</p>
+          <p>In the simulation, choose what to add to pure water, or click the “Next step” button to go through them in turn. Watch the two sides of the K<sub>w</sub> expression grow and shrink while their product stays the same. The bars show each concentration on a powers-of-ten scale. The particle picture is scaled down, but the numbers are exact.</p>
+        </article>
+
+        <article class="guide-beat" id="p12-find" data-nav="Finding one from the other" data-badge="Finding one from the other">
+          <h2>Finding One From the Other</h2>
+          <p>Since [H<sup>+</sup>][OH<sup>−</sup>] = 1.00 × 10<sup>−14</sup>, knowing one concentration gives us the other:<br>
+          [OH<sup>−</sup>] = K<sub>w</sub> ÷ [H<sup>+</sup>] and [H<sup>+</sup>] = K<sub>w</sub> ÷ [OH<sup>−</sup>]</p>
+          <p><strong>Strong acids:</strong> 100% ionized, so [H<sup>+</sup>] is the acid's concentration.<br>
+          <strong>Strong bases:</strong> 100% ionized, so [OH<sup>−</sup>] is the base's concentration times the number of OH<sup>−</sup> in its formula. Sr(OH)<sub>2</sub> gives two OH<sup>−</sup> for each formula unit.</p>
+          <p><strong>Recall:</strong> to go from grams to moles to mol/L, we use unit analysis, as we did in the Solubility unit.</p>
+          <p>In the simulation, click the “Next step” button to build each calculation. The three tabs show a strong acid, a base made from a mass of solid, and a base with two OH<sup>−</sup>. Then try “Your turn”.</p>
+        </article>
+
+        <article class="guide-beat" id="p12-ph" data-nav="pH and pOH" data-badge="pH and pOH">
+          <h2>pH and pOH</h2>
+          <p>Concentrations of H<sup>+</sup> and OH<sup>−</sup> are often tiny, so we use their powers of ten instead.</p>
+          <p><strong>pH:</strong> pH = −log[H<sup>+</sup>]<br>
+          <strong>pOH:</strong> pOH = −log[OH<sup>−</sup>]</p>
+          <p><strong>Logs:</strong> the log of a number is its power of ten. log(1000) = 3 and log(0.01) = −2. To go back, we take the antilog: [H<sup>+</sup>] = 10<sup>−pH</sup>.</p>
+          <p><strong>A factor of ten:</strong> when the pH goes up by 1, [H<sup>+</sup>] goes down by 10 times.<br>
+          <strong>The scale:</strong> at 25 °C, an acidic solution has a pH below 7, a neutral one 7, and a basic one above 7.</p>
+          <p><strong>Significant figures:</strong> in a pH, only the digits after the decimal are significant. They come from the number in front of the power of ten. The digits before the decimal only come from the power of ten.<br>
+          For example, [H<sup>+</sup>] = 4.7 × 10<sup>−4</sup> M has 2 significant figures, so its pH has 2 decimal places: pH = 3.33.</p>
+          <p>In the simulation, drag the slider along the pH scale and watch [H<sup>+</sup>] and [OH<sup>−</sup>] change by powers of ten. Then look at “Significant figures”.</p>
+        </article>
+
+        <article class="guide-beat" id="p12-square" data-nav="The magic square" data-badge="The magic square">
+          <h2>The Magic Square</h2>
+          <p>[H<sup>+</sup>], [OH<sup>−</sup>], pH and pOH sit at the four corners of a square. Given any one of them, we can find the other three.</p>
+          <p><strong>Top:</strong> [H<sup>+</sup>][OH<sup>−</sup>] = 1.00 × 10<sup>−14</sup><br>
+          <strong>Bottom:</strong> pH + pOH = 14.00<br>
+          <strong>Left:</strong> pH = −log[H<sup>+</sup>], and back again with [H<sup>+</sup>] = 10<sup>−pH</sup><br>
+          <strong>Right:</strong> pOH = −log[OH<sup>−</sup>], and back again with [OH<sup>−</sup>] = 10<sup>−pOH</sup></p>
+          <p>In the simulation, type a value into any corner and press Enter: the square works out the other three corners and shows each step. Or click the “Next step” button to travel around the square one corner at a time, starting from [OH<sup>−</sup>] = 3.2 × 10<sup>−5</sup> M. Then try “Acidic or basic?”.</p>
+        </article>
+
+        <article class="guide-beat guide-beat-end" id="p12-h3o" data-nav="From now on: H₃O⁺" data-badge="From now on: H₃O⁺">
+          <h2>From Now On: H<sub>3</sub>O<sup>+</sup></h2>
+          <p>In Part 1.1, we saw that H<sup>+</sup>(aq) is really H<sub>3</sub>O<sup>+</sup>(aq): every proton in water is bonded to a water molecule. In this Part, we wrote H<sup>+</sup> to keep things short.</p>
+          <p><strong>From now on</strong>, we write H<sub>3</sub>O<sup>+</sup>:<br>
+          K<sub>w</sub> = [H<sub>3</sub>O<sup>+</sup>][OH<sup>−</sup>] = 1.00 × 10<sup>−14</sup><br>
+          pH = −log[H<sub>3</sub>O<sup>+</sup>]</p>
+          <p>In the simulation, click the “Next step” button to see the proton land on water, then the expressions rewritten with H<sub>3</sub>O<sup>+</sup>.</p>
+          <p class="ab-practice"><b>Practice in Hebden:</b> questions 28 to 30 and 47 to 57.</p>
+        </article>
+
+      </div>
+      <div class="stage-dock"></div>
+    </div>
+    </section>
+
+    <!-- ================= Part 1.3 ================= -->
+    <section class="guide-part part-start" id="part-13" aria-labelledby="p13-title">
+    <article class="guide-beat brief-beat" id="p13-brief" data-nav="Part 1.3: Before we begin" data-badge="Part 1.3: Before we begin">
+      <h2 id="p13-title">Part 1.3: Neutralization and Titration</h2>
+      <div class="brief-cols">
+        <div class="brief-block">
+          <h3>Learning intentions</h3>
+          <ul>
+            <li>I can calculate the pH or pOH of a solution that has been partially neutralized by another solution.</li>
+            <li>I can identify the glassware and skills needed to conduct a “classic” strong acid strong base titration.</li>
+            <li>I can calculate the concentration of an unknown strong acid or base titration.</li>
+            <li>I can identify the equivalence point of a titration.</li>
+          </ul>
+        </div>
+        <div class="brief-block cc">
+          <h3>Curricular competencies</h3>
+          <ul>
+            <li><strong>Planning and conducting:</strong> We will analyze cause-and-effect relationships of neutralization reactions.</li>
+            <li><strong>Planning and conducting:</strong> We will apply the concepts of accuracy and precision in the titration lab.</li>
+            <li><strong>Processing and analyzing data and information:</strong> We will analyze the cause-and-effect relationship of mono and diprotic acids on a titration.</li>
+            <li><strong>Evaluating:</strong> You will evaluate your methods and identify sources of error.</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <div class="guide-layout">
+      <div class="guide-rail">
+
+        <article class="guide-beat" id="p13-mix" data-nav="Mixing a strong acid and base" data-badge="Mixing a strong acid and a strong base">
+          <h2>Mixing a Strong Acid and a Strong Base</h2>
+          <p>When we mix a strong acid and a strong base, H<sub>3</sub>O<sup>+</sup> and OH<sup>−</sup> react to make water until one of them runs out:<br>
+          H<sub>3</sub>O<sup>+</sup> + OH<sup>−</sup> → 2 H<sub>2</sub>O</p>
+          <p><strong>The excess:</strong> whichever ion is left over decides the pH. If H<sub>3</sub>O<sup>+</sup> is left over, the mixture is acidic. If OH<sup>−</sup> is left over, it is basic.</p>
+          <p><strong>The moles route:</strong></p>
+          <ol class="ab-list">
+            <li>Find the moles of H<sub>3</sub>O<sup>+</sup> and the moles of OH<sup>−</sup>.</li>
+            <li>Subtract the smaller from the larger to find the moles left over.</li>
+            <li>Divide by the <strong>total</strong> volume of the mixture to find the concentration.</li>
+            <li>Find the pH (or the pOH first, if OH<sup>−</sup> is left over).</li>
+          </ol>
+          <p><strong>Notice:</strong> the volume is both solutions added together. Mixing dilutes both of them.</p>
+          <p>In the simulation, click the “Next step” button to find the moles under each beaker, then pour them together: the mixture fills to the total volume. The two amounts of moles move over to the mixture, where the smaller is taken from the larger to find what is left over.</p>
+        </article>
+
+        <article class="guide-beat" id="p13-two" data-nav="Two OH⁻ per formula" data-badge="Two OH⁻ per formula">
+          <h2>Two OH<sup>−</sup> per Formula</h2>
+          <p>Sr(OH)<sub>2</sub> releases two OH<sup>−</sup> for each formula unit:<br>
+          Sr(OH)<sub>2</sub>(s) → Sr<sup>2+</sup>(aq) + 2 OH<sup>−</sup>(aq)</p>
+          <p>Therefore the moles of OH<sup>−</sup> are twice the moles of Sr(OH)<sub>2</sub>. The 2 goes into the unit analysis as a mole ratio. The rest is the same as before.</p>
+          <p><strong>If OH<sup>−</sup> is left over:</strong> find [OH<sup>−</sup>], then the pOH, then pH = 14.000 − pOH.</p>
+          <p>In the simulation, click the “Next step” button to build the calculation under each beaker. Count the OH<sup>−</sup> in the base's beaker: there are two for every Sr<sup>2+</sup>.</p>
+        </article>
+
+        <article class="guide-beat" id="p13-back" data-nav="Working backwards" data-badge="Working backwards">
+          <h2>Working Backwards</h2>
+          <p>Sometimes we know the pH we want, and need to find how much acid or base will get us there.</p>
+          <p><strong>The plan:</strong></p>
+          <ol class="ab-list">
+            <li>From the target pH, find the [H<sub>3</sub>O<sup>+</sup>] that will be left over, then its moles.</li>
+            <li>Find the moles of H<sub>3</sub>O<sup>+</sup> we start with.</li>
+            <li>The difference is the moles that must react, so that is the moles of OH<sup>−</sup> to add.</li>
+            <li>Turn those moles into grams of the base.</li>
+          </ol>
+          <p><strong>Assume:</strong> adding a small mass of solid does not change the volume.</p>
+          <p>In the simulation, click the “Next step” button to work through the example. Then try “Your turn”.</p>
+        </article>
+
+        <article class="guide-beat" id="p13-glass" data-nav="The glassware" data-badge="The glassware">
+          <h2>The Glassware</h2>
+          <p>A <strong>titration</strong> measures how much of one solution exactly reacts with a known volume of another. One of the two has an unknown concentration.</p>
+          <p><strong>Burette:</strong> delivers a measured volume of the titrant. Rinse it with the solution it will hold. Read the bottom of the meniscus at eye level, to 0.01 mL.<br>
+          <strong>Pipette and bulb:</strong> measures an exact volume of the sample, such as 25.00 mL, into the flask. Rinse it with the sample first. Never pipette by mouth.<br>
+          <strong>Erlenmeyer flasks:</strong> three, one for each trial. Each holds a sample and the indicator, and its shape lets us swirl without spilling. Rinsing a flask with distilled water is fine, because extra water does not change the moles inside.<br>
+          <strong>Waste beakers:</strong> two, to catch the rinsings from the burette and the pipette, so nothing goes back into the stock bottles.<br>
+          <strong>Indicator:</strong> a few drops change colour at the end of the titration. We use phenolphthalein.<br>
+          <strong>White tile:</strong> sits under the flask, so the first faint pink is easy to see.<br>
+          <strong>Wash bottle:</strong> distilled water to rinse the burette tip and the walls of the flask.</p>
+          <p><strong>Standard solution:</strong> a solution with an accurately known concentration.<br>
+          <strong>Primary standard:</strong> a pure, stable solid with a known molar mass, which we weigh to make a standard solution. The three to know are potassium hydrogen phthalate (KHC<sub>8</sub>H<sub>4</sub>O<sub>4</sub>), oxalic acid dihydrate (H<sub>2</sub>C<sub>2</sub>O<sub>4</sub>·2H<sub>2</sub>O) and sodium carbonate (Na<sub>2</sub>CO<sub>3</sub>).<br>
+          NaOH is not a primary standard: it absorbs water and CO<sub>2</sub> from the air. Therefore we find its exact concentration by titrating it, which <strong>standardizes</strong> it.</p>
+          <p>In the simulation, click each piece of glassware to see its name.</p>
+        </article>
+
+        <article class="guide-beat" id="p13-equiv" data-nav="The equivalence point" data-badge="The equivalence point">
+          <h2>The Equivalence Point</h2>
+          <p><strong>Equivalence point:</strong> the moles of acid and base exactly match the mole ratio in the balanced equation.<br>
+          HCl + NaOH → NaCl + H<sub>2</sub>O: 1 mol HCl for every 1 mol NaOH.<br>
+          H<sub>2</sub>SO<sub>4</sub> + 2 NaOH → Na<sub>2</sub>SO<sub>4</sub> + 2 H<sub>2</sub>O: 1 mol H<sub>2</sub>SO<sub>4</sub> for every 2 mol NaOH.</p>
+          <p><strong>End point:</strong> where the indicator changes colour. With phenolphthalein, it is the first faint pink that stays when we swirl. We will see why indicators work in Part 3.1.</p>
+          <p><strong>Notice:</strong> pink flashes where the NaOH lands, then fades when we swirl. Near the end point, it takes longer to fade. That is the sign to slow down to one drop at a time.</p>
+          <p>In the simulation, the titration uses the same solutions as our lab: NaOH in the burette, and 25.00 mL of acid with phenolphthalein in the flask. Open the stopcock to a stream, switch to dropwise near the end, and finish one drop at a time. Swirl after each addition. When the faint pink stays, start a new trial: the burette readings go into the table.</p>
+          <p><strong>Keyboard:</strong> hold S to stream, D for dropwise, F for one drop, hold W to swirl, N for a new trial, and 1 or 2 to choose the acid.</p>
+        </article>
+
+        <article class="guide-beat" id="p13-calc" data-nav="The titration calculation" data-badge="The titration calculation">
+          <h2>The Titration Calculation</h2>
+          <p>Every titration calculation has three steps, written as unit analysis:</p>
+          <ol class="ab-list">
+            <li>The moles of the solution we know both the volume and the concentration of.</li>
+            <li>The mole ratio from the balanced equation, to the moles of the other substance.</li>
+            <li>Those moles divided by the volume of the other solution, for its concentration.</li>
+          </ol>
+          <p><strong>Precision:</strong> one trial is not enough. We repeat the titration until at least two trials agree within 0.1 mL. A trial that does not agree is left out, and we average the rest. The first, quick trial is usually the one left out.</p>
+          <p>In the simulation, click the “Next step” button to build each calculation. The H<sub>2</sub>SO<sub>4</sub> tab shows the 1 : 2 mole ratio.</p>
+        </article>
+
+        <article class="guide-beat guide-beat-end" id="p13-error" data-nav="Sources of error" data-badge="Sources of error">
+          <h2>Sources of Error</h2>
+          <p>In our lab, we find the concentration of the acid from the volume of NaOH we needed.</p>
+          <p><strong>Too high:</strong> anything that makes the NaOH volume we record bigger than it should be.<br>
+          <strong>Too low:</strong> anything that makes it smaller, or puts fewer moles of acid in the flask than we think.<br>
+          <strong>No different:</strong> anything that changes neither the moles of acid in the flask nor the moles of NaOH that react.</p>
+          <p>In the simulation, decide what each mistake does to the concentration we calculate for the acid.</p>
+          <p class="ab-practice"><b>Practice in Hebden:</b> questions 58 to 68, 94 to 99, 106 and 121 to 123.</p>
+        </article>
+
+      </div>
+      <div class="stage-dock"></div>
+    </div>
+    </section>
   </div>
 
   <script src="../../assets/suite-chrome.js?v=2"></script>
   <script src="../../assets/section-jump.js?v=1"></script>
   <script src="assets/ab-chem.js?v=1"></script>
-  <script src="assets/ab-draw.js?v=4"></script>
-  <script src="assets/ab-ui.js?v=2"></script>
-  <script src="assets/ab-guide.js?v=3"></script>
+  <script src="assets/ab-draw.js?v=18"></script>
+  <script src="assets/ab-ui.js?v=5"></script>
+  <script src="../solubility/assets/sol-ui.js?v=1"></script>
+  <script src="assets/ab-titration.js?v=7"></script>
+  <script src="../../assets/guide-inline.js?v=1"></script>
+  <script src="assets/ab-guide.js?v=24"></script>
 </body>
 </html>

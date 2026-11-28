@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../assets/suite.css?v=19">
+  <link rel="stylesheet" href="../../assets/suite.css?v=20">
   <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
@@ -213,6 +213,7 @@
   <script src="assets/imf-engine.js?v=70"></script>
   <script src="../../assets/suite-chrome.js?v=1"></script>
   <script src="../../assets/section-jump.js?v=1"></script>
+  <script src="../../assets/guide-inline.js?v=1"></script>
   <script>
 (function () {
   var STATUS_TEXT = {
@@ -233,6 +234,13 @@
   var controls = document.getElementById('guideControls');
   var canvas = document.getElementById('guideStage');
   var panel = document.querySelector('.guide-stage-panel');
+  // Narrow screens: each beat's text, then the stage under it (assets/guide-inline.js)
+  var inline = GuideInline.attach({
+    stage: panel, beats: beats,
+    current: function () { return activeBeat; },
+    activate: function (b) { applyBeat(b); },
+    presenting: function () { return document.body.classList.contains('learn-mode'); }
+  });
 
   var stage = ImfEngine.create({
     canvas: canvas,
@@ -340,6 +348,7 @@
 
   function applyBeat(el, opts) {
     if (!el) return;
+    inline.place(el);
     opts = opts || {};
     activeBeat = el;
     activeId = el.id;
@@ -439,7 +448,7 @@
   var HYSTERESIS = 56;
 
   function pickBeatFromScroll() {
-    if (Date.now() < pinUntil) return;
+    if (Date.now() < pinUntil || inline.on()) return;
     var mid = window.innerHeight * 0.38;
     var best = null;
     var bestDist = Infinity;
@@ -510,6 +519,7 @@
 
   // Scroll so the beat sits on the reading line that pickBeatFromScroll uses
   function scrollToBeat(el, smooth) {
+    if (inline.on()) { inline.scrollTo(el, smooth); return; }
     var r = el.getBoundingClientRect();
     var top = window.scrollY + r.top + r.height / 2 - window.innerHeight * 0.38;
     window.scrollTo({ top: Math.max(0, top), behavior: smooth && !reduced ? 'smooth' : 'auto' });
@@ -531,6 +541,7 @@
 
   function setLearn(on) {
     document.body.classList.toggle('learn-mode', on);
+    inline.sync();
     learnToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
     try {
       localStorage.setItem(LEARN_KEY, on ? '1' : '0');

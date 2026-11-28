@@ -15,6 +15,13 @@
   const footL = $('footL'), footR = $('footR'), stage = $('stage'), fullToggle = $('fullToggle'), fullWrap = $('fullWrap');
   const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
   let active = null, cur = null;
+  // narrow screens: each section's text, then the stage under it (assets/guide-inline.js)
+  const inline = GuideInline.attach({
+    stage, beats,
+    current: () => active,
+    activate: b => applyBeat(b),
+    presenting: () => document.body.classList.contains('learn-mode')
+  });
 
   // ---------- one section on the stage ----------
   function clear() {
@@ -29,6 +36,7 @@
   }
   function applyBeat(b) {
     if (!b || b === active) return;
+    inline.place(b); // before the stage is cleared, so its still copy keeps the last section
     beats.forEach(x => x.classList.toggle('is-active', x === b));
     active = b;
     $('badge').innerHTML = b.dataset.badge || '';
@@ -187,7 +195,7 @@
   let activeDist = Infinity, pinUntil = 0;
   const HYSTERESIS = 56;
   function pickBeatFromScroll() {
-    if (Date.now() < pinUntil) return;
+    if (Date.now() < pinUntil || inline.on()) return;
     const mid = innerHeight * 0.38; let best = null, bestDist = Infinity;
     activeDist = Infinity;
     beats.forEach(b => {
@@ -229,6 +237,7 @@
   const noScroll = q.has('beat'); // headless shots go blank after a scroll
   function scrollToBeat(b, smooth) {
     if (noScroll) return;
+    if (inline.on()) { inline.scrollTo(b, smooth); return; }
     const r = b.getBoundingClientRect();
     scrollTo({ top: Math.max(0, scrollY + r.top + r.height / 2 - innerHeight * 0.38), behavior: smooth ? 'smooth' : 'auto' });
   }
@@ -261,6 +270,7 @@
   }
   function setLearn(on) {
     document.body.classList.toggle('learn-mode', on);
+    inline.sync(); // narrow screens: the stage leaves (or returns to) the slot under its section
     learnToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
     try { localStorage.setItem(LEARN_KEY, on ? '1' : '0'); } catch (e) { /* private window */ }
     if (active) { pinUntil = Date.now() + 300; scrollToBeat(active, false); }

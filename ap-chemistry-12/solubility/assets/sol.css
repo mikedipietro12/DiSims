@@ -188,7 +188,9 @@
 .ua-den{padding:0.12em 0.3em 0;white-space:nowrap;}
 .ua-op{margin:0 0.1em;}
 .ua-step{white-space:nowrap;}
-.ua-x{text-decoration:line-through;text-decoration-color:var(--accent);text-decoration-thickness:2px;}
+.ua-x{text-decoration:none;padding:0 0.05em;background-repeat:no-repeat;   /* a diagonal stroke, corner to corner: a line
+  through the middle hid parts of some letters (teacher, 2026-11-27) */
+  background-image:linear-gradient(to top right,transparent calc(50% - 1.3px),var(--accent) calc(50% - 1.3px),var(--accent) calc(50% + 1.3px),transparent calc(50% + 1.3px));}
 .ws-line.is-current{background:var(--accent-soft);box-shadow:inset 4px 0 0 var(--accent);}
 .ws-line.is-current .ws-note{color:var(--ink-soft);}
 /* ICE table above the worked steps: cells stay laid out but blank until their step */
@@ -452,6 +454,7 @@ body.learn-mode .sg-brief-pic{height:min(46vh,420px);}
 }
 @media (max-width:860px){
   .stage-dock-top{margin-bottom:1.6rem;}
+  body.guide-inline .stage-dock-top{display:none;}   /* the stage sits under each section instead (guide-inline.js) */
   .sol-stage{max-height:none;overflow:visible;}
   body:not(.learn-mode) .sol-guide .brief-beat{padding:1.1rem 1.1rem 1.3rem;}
   body:not(.learn-mode) .sol-guide .part-body{padding:0 1.1rem;}

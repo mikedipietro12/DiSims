@@ -6,10 +6,12 @@
   --ab-acid:#d62828; --ab-base:#5b5fd6; --ab-anion:#ffd257; --ab-cation:#f06a84;
   --ab-right:#1f8a5b; --ab-right-soft:#e3f6ec; --ab-wrong:#c8233f; --ab-wrong-soft:#fde7eb;
   --ab-stage:#ffffff; --ab-part-alt:#eceffd;
+  --ab-water:#d6e8f8; --ab-soap:#eef2f8;
 }
 :root[data-theme="dark"]{
   --ab-right:#4fe08a; --ab-right-soft:#0f2a1b; --ab-wrong:#ff6b86; --ab-wrong-soft:#33141c;
   --ab-stage:#0b1020; --ab-part-alt:#12172a;
+  --ab-water:#1d3350; --ab-soap:#2a3554;
 }
 
 /* ---------- layout: text on the left, a wider stage on the right (as ICE Tables) ---------- */
@@ -29,6 +31,12 @@
 body:not(.learn-mode) .ab-guide .brief-beat{background:var(--tray);border:2px solid var(--line-strong);border-radius:var(--radius-lg);
   box-shadow:0 4px 0 var(--ink);padding:1.4rem 1.5rem 1.6rem;min-height:0;margin:0 0 1.2rem;}
 .ab-guide .brief-beat + .guide-beat{border-top:none;}
+/* Before we begin spans the page above the two columns; the stage starts beside the first section (all LI / CC blocks) */
+.ab-guide .guide-part > .brief-beat{margin-bottom:1.6rem;}
+@media (min-width:861px){ .ab-guide .guide-part > .brief-beat .brief-cols{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.8rem;} }
+/* each Part's dock holds the one stage while that Part is read; the dock itself takes no room in the grid */
+.stage-dock{display:contents;}
+.ab-guide .guide-rail > .guide-beat:first-child{border-top:none;padding-top:0.4rem;}
 .ab-guide .part-start{margin-top:2.6rem;}
 .brief-cols{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:0.8rem;}
 .brief-block{border-left:4px solid var(--accent);padding:0.1rem 0 0.1rem 1rem;}
@@ -42,6 +50,11 @@ body:not(.learn-mode) .ab-guide .brief-beat{background:var(--tray);border:2px so
 
 /* ---------- the stage ---------- */
 .ab-stage .ice-grid{gap:0.75rem;}
+/* scrolling view: the stage is as tall as what it holds (at most a screen), so the step buttons sit right under
+   the picture instead of at the bottom of an empty panel; taller content scrolls inside it as before */
+body:not(.learn-mode) .ab-stage{height:auto;max-height:calc(100vh - 2rem);}
+@supports (height:100dvh){ body:not(.learn-mode) .ab-stage{max-height:calc(100dvh - 2rem);} }
+body:not(.learn-mode) .ab-stage .ice-grid{flex:0 1 auto;}
 .ab-tab-row,.ab-switch-row{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;}
 .ab-seg{display:flex;flex-wrap:wrap;gap:0.4rem;}
 .ab-seg .btn{padding:0.3rem 0.8rem;font-size:0.9rem;min-height:0;}
@@ -74,6 +87,24 @@ body:not(.learn-mode) .ab-guide .brief-beat{background:var(--tray);border:2px so
 .ab-card.is-correct{border-color:var(--ab-right);}
 .ab-card.is-incorrect{border-color:var(--ab-wrong);}
 :root[data-theme="dark"] .ab-card{background:#0e1322;border-color:#2a3554;}
+/* a card with a small picture: picture on the left, prompt and answers beside it (Properties tab) */
+.ab-card.has-pic{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:0.75rem;align-items:start;}
+.ab-card.has-pic > *:not(.ab-card-pic){grid-column:2;}
+.ab-card-pic{grid-column:1;grid-row:1 / span 4;width:clamp(58px,5.4vw,80px);color:var(--ink);}
+.ab-card.has-pic .ab-card-again{justify-self:start;}
+.ab-card-pic svg{display:block;width:100%;height:auto;overflow:visible;}
+@media (prefers-reduced-motion:no-preference){
+  .ab-card-pic .pp-bubbles circle{animation:pp-rise 2.4s ease-in infinite;}
+  .ab-card-pic .pp-bubbles circle:nth-child(2){animation-delay:-0.6s;}
+  .ab-card-pic .pp-bubbles circle:nth-child(3){animation-delay:-1.2s;}
+  .ab-card-pic .pp-bubbles circle:nth-child(4){animation-delay:-1.8s;}
+  .ab-card-pic .pp-glow{animation:pp-glow 1.8s ease-in-out infinite alternate;}
+  .ab-card-pic .pp-drop{animation:pp-drip 2.6s ease-in infinite;}
+}
+@keyframes pp-rise{0%{transform:translateY(6px);opacity:0;}20%{opacity:1;}100%{transform:translateY(-16px);opacity:0;}}
+@keyframes pp-glow{from{opacity:0.35;}to{opacity:1;}}
+@keyframes pp-drip{0%,40%{transform:translateY(-3px);opacity:0;}55%{opacity:1;}100%{transform:translateY(4px);opacity:0;}}
+body.learn-mode .ab-card-pic{width:clamp(64px,6.2vw,96px);}
 :root[data-theme="dark"] .ab-opt.is-right{box-shadow:0 0 0 1px var(--ab-right),0 0 14px rgba(79,224,138,0.4);}
 :root[data-theme="dark"] .ab-opt.is-wrong{box-shadow:0 0 0 1px var(--ab-wrong),0 0 14px rgba(255,107,134,0.4);}
 
@@ -102,6 +133,18 @@ body:not(.learn-mode) .ab-guide .brief-beat{background:var(--tray);border:2px so
 .ab-table thead th{border-bottom:2px solid var(--ink);font-size:0.85rem;color:var(--ink-soft);}
 .ab-table td.num{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;}
 .ab-strong{display:flex;flex-direction:column;gap:0.7rem;}
+/* the six strong acids as equations: acid + H₂O → conjugate base + H₃O⁺, one-way arrows, columns lined up */
+.ab-strong-eqs{border-collapse:collapse;margin:0 auto;font-size:1.3rem;font-weight:700;}
+.ab-strong-eqs th{font-size:0.78rem;font-weight:700;color:var(--ink-soft);text-align:left;padding:0 0.35rem 0.35rem;border-bottom:2px solid var(--ink);}
+.ab-strong-eqs td{padding:0.4rem 0.35rem;border-bottom:1.5px solid var(--line);white-space:nowrap;}
+.ab-strong-eqs tr:last-child td{border-bottom:none;}
+.ab-strong-eqs .op{color:var(--dim);text-align:center;}
+.ab-strong-eqs .arr{color:var(--ink);text-align:center;padding:0.4rem 0.7rem;font-size:1.45rem;}
+.ab-strong-eqs .cb{color:#a07b0c;}
+.ab-strong-eqs .h3o{color:var(--ab-acid);}
+:root[data-theme="dark"] .ab-strong-eqs .cb{color:#ffe08a;}
+:root[data-theme="dark"] .ab-strong-eqs .h3o{color:#ff7a7a;}
+body.learn-mode .ab-strong-eqs{font-size:clamp(1.3rem,2vw,2rem);}
 .ab-strong-h{margin:0;font-weight:700;}
 .ab-strong-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.5rem;}
 .ab-strong-list span{display:grid;place-items:center;min-height:3.2rem;font-size:1.3rem;font-weight:700;border:2px solid var(--line-strong);border-radius:12px;
@@ -159,3 +202,147 @@ body.learn-mode .ab-brief-slide{font-size:clamp(1rem,1.3vw,1.3rem);}
 body.learn-mode .ab-brief-title{font-size:clamp(1.6rem,2.6vw,2.6rem);}
 
 body.learn-mode .ab-stage .ice-grid.no-left .ice-right{max-width:none;}
+
+/* ---------- Parts 1.2 and 1.3 ---------- */
+/* a worked problem: every line stays under the picture, newest last */
+.ab-eqn.ab-calc{text-align:left;display:flex;flex-direction:column;gap:0.35rem;font-size:1.12rem;line-height:1.5;padding:0.3rem 0.2rem;}
+.ab-calc-line{padding:0.2rem 0.5rem;border-left:3px solid transparent;border-radius:4px;}
+.ab-calc-line.is-new{border-left-color:var(--accent);background:var(--accent-soft);animation:ab-line-in 0.35s ease;}
+@keyframes ab-line-in{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+@media (prefers-reduced-motion:reduce){ .ab-calc-line.is-new{animation:none;} }
+.ab-calc .ua-frac{font-size:0.85em;}
+.ab-ans{white-space:nowrap;}
+/* the question a worked problem is solving, above its working (with any given data) */
+.ab-calc-q{font-weight:700;line-height:1.45;color:var(--ink);padding:0.1rem 0.5rem 0.5rem;border-bottom:2px solid var(--line);}
+.ab-calc-q .ab-mini{margin-top:0.5rem;font-weight:700;}
+.ab-sf{color:var(--accent);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;}
+.ab-mini{width:auto;font-size:0.95rem;}
+.ab-mini th,.ab-mini td{padding:0.25rem 0.6rem;text-align:center;}
+.ab-mini td.is-out{color:var(--dim);text-decoration:line-through;}
+/* mixing: the working in three columns under the three beakers; moles boxed, and the boxes travel to the mixture */
+.ab-mixrig{display:flex;flex-direction:column;gap:0.3rem;width:100%;}
+.ab-mixcols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;}
+.ab-mixcol.ab-calc{display:flex;flex-direction:column;font-size:0.92rem;font-weight:700;line-height:1.5;padding:0;gap:0.35rem;min-height:0;}
+.ab-mixcol .ab-calc-line{padding:0.2rem 0.3rem;}
+.ab-chip{display:inline-block;padding:0.05em 0.4em;border:2px solid var(--accent);border-radius:8px;background:var(--accent-soft);white-space:nowrap;}
+/* the pH slider */
+.ab-ph-slider{display:flex;align-items:center;gap:0.7rem;padding:0 0.4rem;}
+.ab-ph-slider label{font-weight:700;}
+.ab-ph-slider input{flex:1;accent-color:var(--accent);height:2rem;}
+/* the magic square: four corners you can type into, a two-way arrow on each side with how to go each way */
+.ab-square{display:grid;grid-template-columns:minmax(9rem,1fr) minmax(7rem,1.5fr) minmax(9rem,1fr);grid-template-rows:auto minmax(8rem,1fr) auto;
+  gap:0.4rem 0.6rem;align-items:center;max-width:48rem;margin:0.6rem auto 1rem;}
+.ab-sq-corner{display:flex;flex-direction:column;align-items:center;gap:0.25rem;padding:0.6rem 0.8rem 0.7rem;border:2px solid var(--line-strong);border-radius:16px;
+  background:var(--tray);box-shadow:var(--key-drop);color:var(--ink);cursor:text;}
+.ab-sq-corner.tl{grid-area:1 / 1;} .ab-sq-corner.tr{grid-area:1 / 3;} .ab-sq-corner.bl{grid-area:3 / 1;} .ab-sq-corner.br{grid-area:3 / 3;}
+.ab-sq-name{font-size:1.3rem;font-weight:700;}
+.ab-sq-in{width:100%;min-width:0;font:inherit;font-size:1.15rem;font-weight:700;text-align:center;color:var(--accent);background:transparent;
+  border:0;border-bottom:2px dashed var(--line-strong);padding:0.15rem 0.2rem;font-variant-numeric:tabular-nums;}
+.ab-sq-in:focus{outline:none;border-bottom-color:var(--accent);}
+.ab-sq-in::placeholder{color:var(--dim);}
+.ab-sq-unit{font-size:0.85rem;font-weight:700;color:var(--ink-soft);}
+.ab-sq-corner:focus-within{outline:3px solid var(--accent);outline-offset:2px;}
+.ab-sq-corner.is-known{border-color:var(--accent);}
+.ab-sq-corner.is-source{background:var(--accent-soft);}
+.ab-sq-corner.is-new{animation:ab-line-in 0.35s ease;}
+.ab-sq-corner.is-bad{border-color:var(--ab-wrong);}
+.ab-sq-corner.is-bad .ab-sq-in{color:var(--ab-wrong);}
+.ab-sq-side{display:flex;align-items:center;justify-content:center;gap:0.3rem;color:var(--ink-soft);font-weight:700;font-size:1rem;text-align:center;min-width:0;}
+.ab-sq-side.top,.ab-sq-side.bottom{flex-direction:column;gap:0.1rem;}
+.ab-sq-side.top{grid-area:1 / 2;} .ab-sq-side.bottom{grid-area:3 / 2;}
+.ab-sq-side.left{grid-area:2 / 1;flex-direction:column;align-self:stretch;} .ab-sq-side.right{grid-area:2 / 3;flex-direction:column;align-self:stretch;}
+.ab-sq-arrow{display:flex;align-items:center;width:100%;}
+.ab-sq-side.left .ab-sq-arrow,.ab-sq-side.right .ab-sq-arrow{flex-direction:column;width:auto;flex:1 1 auto;min-height:3.5rem;}
+.ab-sq-shaft{flex:1 1 auto;height:2.5px;background:currentColor;margin:0 -9px;}
+.ab-sq-side.left .ab-sq-shaft,.ab-sq-side.right .ab-sq-shaft{width:2.5px;height:auto;margin:-9px 0;}
+.ab-sq-head{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+.ab-sq-row{display:flex;align-items:baseline;gap:0.3rem;width:100%;}
+.ab-sq-wrap{display:flex;flex-direction:column;}
+.ab-sq-side.is-used{color:var(--accent);}
+/* presentation view: the square fills the left of the stage, its working runs down the right */
+body.learn-mode .ab-sq-wrap{flex-direction:row;align-items:stretch;gap:1.4rem;flex:1 1 auto;min-height:0;}
+body.learn-mode .ab-square{flex:1.5 1 0;max-width:none;grid-template-rows:auto minmax(6rem,1fr) auto;gap:0.6rem 1rem;margin:0;}
+body.learn-mode .ab-sq-log{flex:1 1 0;max-height:none;overflow:auto;align-self:stretch;justify-content:flex-start;}
+body.learn-mode .ab-sq-head{width:26px;height:26px;}
+body.learn-mode .ab-sq-name{font-size:clamp(1.4rem,2.2vw,2.2rem);}
+body.learn-mode .ab-sq-in{font-size:clamp(1.3rem,2vw,2rem);}
+body.learn-mode .ab-sq-side{font-size:clamp(1.05rem,1.5vw,1.5rem);}
+.ab-choice .btn{font-size:0.85rem;}
+/* the titration demo: the burette controls sit on the picture beside the burette (sized with the picture) */
+.ab-ti-rig{position:relative;container-type:inline-size;width:100%;}
+.ab-ti-rig .ab-canvas{width:100%;height:auto;}
+.ab-ti-panel{position:absolute;left:25.5%;top:9%;width:20%;display:flex;flex-direction:column;gap:1.1cqi;}
+.ab-ti-panel .btn{font-size:max(11px,2.05cqi);padding:0.9cqi 1.2cqi;min-height:0;justify-content:space-between;display:flex;align-items:center;gap:0.4em;text-align:left;}
+.ab-ti-panel .btn[aria-pressed="true"]{background:var(--ink);color:var(--on-ink,#fff);}
+.ab-ti-gap{height:1.6cqi;}
+.ab-key{display:inline-block;min-width:1.6em;padding:0.05em 0.35em;font:700 0.85em var(--font-mono, monospace);text-align:center;color:var(--ink);
+  background:var(--field, #f3f5f9);border:1.5px solid var(--line-strong);border-bottom-width:3px;border-radius:5px;line-height:1.3;}
+.btn[aria-pressed="true"] .ab-key,.btn.primary .ab-key{color:var(--ink);}
+body.learn-mode .ab-stage .ab-canvas-wrap .ab-ti-rig{height:100%;width:auto;max-width:100%;aspect-ratio:760 / 560;}
+body.learn-mode .ab-stage .ab-ti-rig .ab-canvas{width:100%;height:100%;max-height:none;}
+body.learn-mode .ab-stage .ice-grid.is-demo{display:grid;grid-template-columns:minmax(0,1fr) minmax(15rem,24rem);grid-template-rows:auto minmax(0,1fr);gap:0.7rem 1rem;}
+body.learn-mode .ab-stage .ice-grid.is-demo .ice-top{grid-column:1 / -1;}
+body.learn-mode .ab-stage .ice-grid.is-demo .ice-left{grid-column:1;min-height:0;}
+body.learn-mode .ab-stage .ice-grid.is-demo .ice-right{grid-column:2;overflow:auto;align-self:start;max-height:100%;}
+body.learn-mode .ab-stage .ice-grid.is-demo .ab-ti-table .ab-table{font-size:clamp(0.9rem,1.1vw,1.15rem);}
+body.learn-mode .ab-stage .ice-grid.is-demo .ab-ti-table th,body.learn-mode .ab-stage .ice-grid.is-demo .ab-ti-table td{padding:0.35rem 0.4rem;}
+/* the titration demo */
+.ab-ti-controls{display:flex;flex-direction:column;gap:0.45rem;}
+.ab-ti-table .ab-table{font-size:0.95rem;}
+.ab-ti-table th,.ab-ti-table td{text-align:center;font-variant-numeric:tabular-nums;}
+.ab-ti-table tr.is-now td,.ab-ti-table tr.is-now th{color:var(--dim);font-style:italic;}
+.ab-ti-table td.is-empty{color:var(--dim);}
+/* the glassware bench */
+.ab-bench{display:flex;flex-direction:column;gap:0.3rem;}
+.ab-bench-svg{display:block;width:100%;height:auto;border:1.5px solid var(--line);border-radius:12px;background:var(--ab-stage);}
+.ab-bench-svg .bg-e{stop-color:rgba(150,180,215,0.45);} .ab-bench-svg .bg-s{stop-color:rgba(255,255,255,0.75);} .ab-bench-svg .bg-c{stop-color:rgba(220,234,248,0.18);}
+.ab-bench-svg .bl-e{stop-color:#cfe3f4;} .ab-bench-svg .bl-c{stop-color:#e8f3fc;}
+.ab-bench-svg .bm-a{stop-color:#8f9aab;} .ab-bench-svg .bm-b{stop-color:#f1f4f8;} .ab-bench-svg .bm-c{stop-color:#9aa5b5;}
+.ab-bench-svg .bb-a{stop-color:#3a404c;} .ab-bench-svg .bb-b{stop-color:#20242c;}
+.ab-bench-svg .bp-e{stop-color:#dfe7f0;} .ab-bench-svg .bp-c{stop-color:#fbfdff;}
+.ab-bench-svg .b-edge{stroke:#56657c;stroke-width:1.6;}
+.ab-bench-svg .b-tick{stroke:#56657c;stroke-width:1.2;}
+.ab-bench-svg .b-men{stroke:#4a7fb5;stroke-width:1.6;fill:none;}
+.ab-bench-svg .b-etch{fill:none;stroke:#56657c;stroke-width:1.4;}
+.ab-bench-svg .b-rim{fill:none;stroke:#56657c;stroke-width:1.6;}
+.ab-bench-svg .b-shine{fill:none;stroke:rgba(255,255,255,0.9);stroke-width:2.6;stroke-linecap:round;}
+.ab-bench-svg .b-ptfe{fill:#f1f3f6;stroke:#56657c;stroke-width:1.2;}
+.ab-bench-svg .b-handle{fill:#4a7a8c;}
+.ab-bench-svg .b-print{stroke:#8d99a8;stroke-width:1.4;}
+.ab-bench-svg .b-tile{fill:#ffffff;stroke:#c9ced8;stroke-width:1;}
+.ab-bench-svg .b-label{fill:#f4ead8;}
+.ab-bench-svg .b-labtext{fill:#5e3a17;font:700 8px var(--font-display, sans-serif);text-anchor:middle;}
+.ab-bench-svg .b-wtext{fill:#4a7fb5;font-size:13px;}
+.ab-bench-svg .b-waste{fill:#8d99a8;font:700 11px var(--font-display, sans-serif);text-anchor:middle;letter-spacing:0.06em;}
+.ab-bench-svg .b-poly{stroke:#9aa7ba;stroke-width:1.4;}
+.ab-bench-svg .b-cap{fill:#3d78b3;}
+.ab-bench-svg .b-nozzle{fill:none;stroke:#9aa7ba;stroke-width:4.5;stroke-linecap:round;}
+.ab-bench-svg .b-name{fill:var(--ink-soft);font:700 14px var(--font-display, sans-serif);text-anchor:middle;}
+.ab-bench-svg .b-name-l{text-anchor:start;}
+.ab-bench-svg .b-piece{cursor:pointer;outline:none;}
+.ab-bench-svg .b-piece:hover,.ab-bench-svg .b-piece:focus-visible{filter:drop-shadow(0 0 4px var(--accent));}
+.ab-bench-svg .b-piece.is-on{filter:drop-shadow(0 0 6px var(--accent)) drop-shadow(0 0 2px var(--accent));}
+:root[data-theme="dark"] .ab-bench-svg .bg-e{stop-color:rgba(150,185,235,0.30);} :root[data-theme="dark"] .ab-bench-svg .bg-s{stop-color:rgba(255,255,255,0.30);} :root[data-theme="dark"] .ab-bench-svg .bg-c{stop-color:rgba(150,185,235,0.06);}
+:root[data-theme="dark"] .ab-bench-svg .bl-e{stop-color:#1b3356;} :root[data-theme="dark"] .ab-bench-svg .bl-c{stop-color:#22406a;}
+:root[data-theme="dark"] .ab-bench-svg .bm-a{stop-color:#3b4560;} :root[data-theme="dark"] .ab-bench-svg .bm-b{stop-color:#9aa7c2;} :root[data-theme="dark"] .ab-bench-svg .bm-c{stop-color:#4a5470;}
+:root[data-theme="dark"] .ab-bench-svg .b-edge,:root[data-theme="dark"] .ab-bench-svg .b-tick,:root[data-theme="dark"] .ab-bench-svg .b-rim,:root[data-theme="dark"] .ab-bench-svg .b-etch{stroke:#a9bddf;}
+:root[data-theme="dark"] .ab-bench-svg .b-shine{stroke:rgba(255,255,255,0.35);}
+:root[data-theme="dark"] .ab-bench-svg .bp-e{stop-color:#2a3554;} :root[data-theme="dark"] .ab-bench-svg .bp-c{stop-color:#3b4a70;}
+.ab-bench-name{min-height:1.6em;}
+body.learn-mode .ab-eqn.ab-calc{font-size:clamp(1.05rem,1.6vw,1.6rem);}
+body.learn-mode .ab-stage .ice-left .ab-calc{flex:0 1 auto;max-height:52%;overflow:auto;}
+body.learn-mode .ab-stage .ice-left .ab-bench{flex:1 1 auto;min-height:0;}
+body.learn-mode .ab-bench-svg{flex:1 1 auto;min-height:0;width:100%;height:100%;}
+/* a worked problem with no picture above it gets the whole stage */
+/* calculation slides (no picture): the question first, then the working, from the top left down the whole stage */
+body.learn-mode .ab-stage .ice-grid.is-calc .ice-left{justify-content:flex-start;overflow:auto;gap:1rem;}
+body.learn-mode .ab-stage .ice-grid.is-calc .ab-calc{max-height:none;overflow:visible;padding:0;gap:0.7rem;font-size:clamp(1.35rem,2.25vw,2.35rem);}
+body.learn-mode .ab-stage .ice-grid.is-calc .ab-calc-line{padding:0.25rem 0.4rem;}
+body.learn-mode .ab-stage .ice-grid.is-calc .ab-calc-q{font-size:clamp(1.25rem,2vw,2.05rem);padding:0 0.4rem 0.8rem;}
+body.learn-mode .ab-stage .ice-grid.is-calc .ab-mini{font-size:clamp(1.1rem,1.7vw,1.7rem);}
+body.learn-mode .ab-stage .ice-grid.is-mix .ice-left{justify-content:flex-start;overflow:auto;}
+body.learn-mode .ab-stage .ice-grid.is-mix .ab-mixrig .ab-canvas-wrap{flex:none;display:block;}
+body.learn-mode .ab-stage .ice-grid.is-mix .ab-mixrig .ab-canvas{width:100%;height:auto;max-height:none;}
+body.learn-mode .ab-stage .ice-grid.is-mix .ab-mixrig{width:min(100%, calc(30vh * 760 / 230));margin:0 auto;}
+body.learn-mode .ab-stage .ice-left .ab-mixcol.ab-calc{font-size:clamp(0.95rem,1.25vw,1.3rem);max-height:none;overflow:visible;}
+body.learn-mode .ab-stage .ice-grid.is-mix .ab-calc-q{font-size:clamp(1.05rem,1.5vw,1.5rem);}

@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../assets/suite.css?v=19">
+  <link rel="stylesheet" href="../../assets/suite.css?v=20">
   <link rel="stylesheet" href="assets/eq-intro.css?v=19">
   <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
@@ -585,6 +585,7 @@
 
   <script src="../../assets/suite-chrome.js"></script>
   <script src="../../assets/section-jump.js?v=1"></script>
+  <script src="../../assets/guide-inline.js?v=1"></script>
   <script src="assets/reactions.js?v=13"></script>
   <script src="assets/vessel-engine.js?v=3"></script>
   <script src="assets/eq-charts.js?v=3"></script>
@@ -609,6 +610,13 @@
     var gibbs = EqCharts.gibbs($('chartGibbs'), engine);
     var cfg = {};          // active beat's options
     var active = null;     // active beat element
+    // narrow screens: each beat's text, then the stage under it (assets/guide-inline.js)
+    var inline = GuideInline.attach({
+      stage: panel, beats: beats,
+      current: function () { return active; },
+      activate: function (b) { applyBeat(b); },
+      presenting: function () { return document.body.classList.contains('learn-mode'); }
+    });
     var cardIdx = 0;       // selected card within the beat
     var predictions = {};  // beatId:cardId → { H, S, revealed } (memory only)
     var signs = { dH: '+', dS: '+' };
@@ -936,6 +944,7 @@
     // ---------- beat switching ----------
     function applyBeat(b) {
       if (!b || b === active) return;
+      inline.place(b);   // before the stage is cleared, so its still copy keeps the last beat
       beats.forEach(function (x) { x.classList.toggle('is-active', x === b); });
       active = b; cardIdx = 0;
       $('badge').textContent = b.dataset.badge || '';
@@ -945,7 +954,7 @@
 
     var activeDist = Infinity, pinUntil = 0, HYSTERESIS = 56;
     function pickBeatFromScroll() {
-      if (Date.now() < pinUntil) return;
+      if (Date.now() < pinUntil || inline.on()) return;
       var mid = innerHeight * 0.38, best = null, bestDist = Infinity;
       activeDist = Infinity;
       beats.forEach(function (el) {
@@ -1044,6 +1053,7 @@
     var learnToggle = $('learnToggle'), LEARN_KEY = 'eq-guide-learn';
     function learnOn() { return document.body.classList.contains('learn-mode'); }
     function scrollToBeat(el, smooth) {
+      if (inline.on()) { inline.scrollTo(el, smooth); return; }
       var r = el.getBoundingClientRect();
       var y = window.scrollY + r.top + r.height / 2 - window.innerHeight * 0.38;
       window.scrollTo({ top: Math.max(0, y), behavior: smooth && !reduced ? 'smooth' : 'auto' });
@@ -1080,6 +1090,7 @@
     function setLearn(on) {
       if (on && $('guideContent').hidden) enterGuide(false);
       document.body.classList.toggle('learn-mode', on);
+      inline.sync();   // narrow screens: the stage leaves (or returns to) the slot under its beat
       learnToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
       try { localStorage.setItem(LEARN_KEY, on ? '1' : '0'); } catch (e) {}
       fitLearnStage();

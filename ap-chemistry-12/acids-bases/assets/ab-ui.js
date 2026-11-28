@@ -8,15 +8,19 @@
    - tabs(host, list, value, onChange): picture tabs for a section
    - stepper(host, lines, { bar, onStep }): Next step / Back drive the picture (visual primary, teacher 2026-11-27).
                          No sentences on the stage: a line can carry an equation (eqn), shown large under the
-                         picture; the newest equation stays until a later line replaces it. */
+                         picture; the newest equation stays until a later line replaces it.
+                         { stack: true }: a worked problem. Every equation so far stays, one per line, newest last
+                         (calculation, then its result where it belongs: memory presenting-tool). */
 (function (global) {
   'use strict';
   const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
   const plain = html => String(html).replace(/<[^>]+>/g, '');
 
-  // spec: { prompt, options: [{ label, correct }], why, onPick(i, ok) }
+  // spec: { prompt, options: [{ label, correct }], why, pic, onPick(i, ok) }
+  // pic: optional small picture (SVG markup) beside the prompt; decorative, the prompt carries the meaning
   function card(host, spec) {
-    const root = el('div', 'ab-card');
+    const root = el('div', 'ab-card' + (spec.pic ? ' has-pic' : ''));
+    if (spec.pic) { const p = el('div', 'ab-card-pic', spec.pic); p.setAttribute('aria-hidden', 'true'); root.appendChild(p); }
     if (spec.prompt) root.appendChild(el('p', 'ab-card-q', spec.prompt));
     const opts = el('div', 'ab-card-opts'); opts.setAttribute('role', 'group'); opts.setAttribute('aria-label', plain(spec.prompt || 'Choose one'));
     const why = el('p', 'ab-card-why'); why.setAttribute('aria-live', 'polite');
@@ -128,7 +132,7 @@
 
   function stepper(host, lines, o) {
     o = o || {};
-    const box = el('div', 'ab-eqn'); box.setAttribute('aria-live', 'polite');
+    const box = el('div', 'ab-eqn' + (o.stack ? ' ab-calc' : '')); box.setAttribute('aria-live', 'polite');
     const has = lines.some(l => l.eqn);
     if (has) host.appendChild(box);
     const bar = el('div', 'ws-bar');
@@ -141,8 +145,18 @@
     let shown = 0;
     function render(forward) {
       let eqn = null;
-      for (let k = 0; k < shown; k++) if (lines[k].eqn) eqn = lines[k].eqn;
-      box.innerHTML = eqn || '';
+      if (o.stack) {
+        const all = [];
+        for (let k = 0; k < shown; k++) if (lines[k].eqn) all.push(lines[k].eqn);
+        box.innerHTML = all.map((h, k) => '<div class="ab-calc-line' + (k === all.length - 1 && forward ? ' is-new' : '') + '">' + h + '</div>').join('');
+        eqn = all.length ? all[all.length - 1] : null;
+        const sc = forward && box.closest('.ice-grid');   // keep the newest line in view inside the stage only
+        if (sc && sc.scrollHeight > sc.clientHeight) sc.scrollTop = sc.scrollHeight;
+        if (forward && box.scrollHeight > box.clientHeight) box.scrollTop = box.scrollHeight;   // presentation view: the list scrolls in place
+      } else {
+        for (let k = 0; k < shown; k++) if (lines[k].eqn) eqn = lines[k].eqn;
+        box.innerHTML = eqn || '';
+      }
       box.classList.toggle('is-empty', !eqn);
       bBack.disabled = shown === 0; bNext.disabled = shown === lines.length; bAll.disabled = shown === lines.length;
       count.textContent = shown + ' / ' + lines.length;

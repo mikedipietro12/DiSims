@@ -251,11 +251,10 @@ body.present .de .btn{min-height:52px;font-size:1.05rem;}
 body.present .de-tally{font-size:1rem;}
 body.present #presentText{display:none !important;}   /* text stays hidden for now */
 
-/* Narrow screens: the stage rides at the top, the text scrolls under it */
+/* Narrow screens: each beat's text, then its stage under it (assets/guide-inline.js moves the one stage) */
 @media (max-width:860px){
-  .guide-layout{display:flex;flex-direction:column;}
-  .guide-stage-panel{order:-1;position:sticky;top:0;z-index:5;height:auto;max-height:none;overflow:visible;}
-  .guide-stage-panel .de-svg{height:34vh;}
+  .guide-stage-panel{height:auto;max-height:none;overflow:visible;}
+  .guide-stage-panel .de-svg{height:min(56vh,520px);}
 }
 
 /* Draw engine: blue prompt at the top of the tray ("Draw CH₄ and H₂O"), grouped tally */

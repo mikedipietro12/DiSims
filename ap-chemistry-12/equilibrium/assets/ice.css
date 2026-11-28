@@ -74,7 +74,9 @@
 .ua-den{padding:0.12em 0.3em 0;white-space:nowrap;}
 .ua-op{margin:0 0.1em;}
 .ua-step{white-space:nowrap;}
-.ua-x{text-decoration:line-through;text-decoration-color:var(--accent);text-decoration-thickness:2px;}
+.ua-x{text-decoration:none;padding:0 0.05em;background-repeat:no-repeat;   /* a diagonal stroke, corner to corner: a line
+  through the middle hid parts of some letters (teacher, 2026-11-27) */
+  background-image:linear-gradient(to top right,transparent calc(50% - 1.3px),var(--accent) calc(50% - 1.3px),var(--accent) calc(50% + 1.3px),transparent calc(50% + 1.3px));}
 
 /* ---------- ICE table ---------- */
 .ice-wrap{max-width:100%;overflow-x:auto;}

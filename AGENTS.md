@@ -35,7 +35,7 @@ with more specific build rules; those add to this file, they don't replace it.
   (K, Ksp, Q, x² / 4x³, ICE tables) or a substitution straight into an expression is shown as unit
   analysis: the given value, then conversion factors written as fractions with the **numerator stacked
   over the denominator**, units (and the substance, e.g. `g NaCl`, `mol OH⁻`) on every value, units that
-  cancel struck through, factors joined by ×. Long chains wrap before a ×, never after it.
+  cancel struck through with a diagonal line (user, 2026-11-27: a line through the middle hides parts of letters), factors joined by ×. Long chains wrap before a ×, never after it.
 - **No formula shortcuts for mole and concentration work.** Don't write `n = m ÷ M`, `c = n ÷ V` or
   `c₁V₁ = c₂V₂`, in worked steps or in body copy. Dilution is a volume ratio inside the chain
   (`0.100 mol KI / 1 L × 50.0 mL / 250.0 mL`).
@@ -50,6 +50,17 @@ with more specific build rules; those add to this file, they don't replace it.
 
 - **No dotted or dot-grid backgrounds** on stages, trays, canvases or pages (user preference, 2026-11-10).
   Plain surfaces only.
+- **Learning intentions and curricular competencies span the full page** (user, 2026-11-27). Any Before we begin /
+  briefing block that lists them runs the full width of the page, with the two lists side by side, and the
+  simulation stage only starts below it, beside the first section after it. While scrolling, the block hands the stage
+  to that first section so it is already loaded. Presentation view still shows the block as its own slide.
+  Solubility's Guide and the Acids and Bases review are the models.
+- **Guides on narrow screens alternate text and simulation** (user, 2026-11-27). At 860 px and under (phones and
+  tablet portrait) each section's text is followed by its stage, then the next section's text, instead of the stage
+  sitting at the top while the text scrolls under or away from it. `assets/guide-inline.js` does this for every
+  Guide: it moves the one stage into a slot under the section in view and leaves a still copy in the slot it left.
+  A new Guide hooks into it the same way (see the comment at the top of the file); check it with
+  `assets/dev/guide-inline-check.html?page=<guide path>` through `.claude/scripts/run-page.sh`.
 - **No "AI-tell" eyebrow labels** (user, 2026-11-17; students noticed it). Don't put a small capitalised,
   letter-spaced or mono label directly above a regular heading (e.g. a `.beat-kicker` / `.mod-num` /
   `.briefing-num` line over an `h2`). Students read this as AI-generated. If the label carries information,
@@ -73,7 +84,7 @@ The folders mirror the site (user, 2026-11-25): one folder per course hub, one s
 - `chemistry-11h/` → `atomic-structure/` (Unit 1), `bonding/` (Unit 2), `imf/` (Unit 3).
 - `other/` → sims outside a course (`bc-tides.html`).
 - `assets/` at the root holds files several suites share: `suite.css` and `suite-chrome.js` (the shared suite
-  chrome), `courses.css`, `home.css`, `section-jump.js`. A suite's own `assets/` holds only its own files.
+  chrome), `courses.css`, `home.css`, `section-jump.js`, `guide-inline.js` (Guides on narrow screens). A suite's own `assets/` holds only its own files.
 - `private/` is git-ignored and local only (e.g. `private/HEBDEN/`, the Hebden 12 textbook PDFs). Use it for
   reference while writing content (see "Grade 12 content: follow Hebden"), but never link to it, copy files out of it into the site, or un-ignore it.
 - A new unit or sim goes in its course folder, gets a card on that hub, and an entry in `sitemap.xml`.

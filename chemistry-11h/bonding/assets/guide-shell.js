@@ -2,6 +2,7 @@
  * Chemical Bonding - guide shell (Task 6).
  *
  * One long scroll: chapters → beats. A sticky stage panel shows the active beat's scene.
+ * Narrow screens: the stage sits under the beat in view instead (../../assets/guide-inline.js).
  * Ported from the IMF guide's scroll sync (reading line + hysteresis) and learn mode, plus:
  *   - scenes: each beat names a scene (data-scene); the shell mounts / updates / destroys them
  *   - presentation mode (P, or ?present=1): one beat at a time, big text left + stage right,
@@ -78,6 +79,14 @@
     var pinUntil = 0;
     var HYSTERESIS = 56;
     var ctx = { shell: null, presenting: function () { return document.body.classList.contains('present'); } };
+    // Narrow screens: each beat's text, then its stage (assets/guide-inline.js)
+    var inline = global.GuideInline ? GuideInline.attach({
+      stage: document.querySelector('.guide-stage-panel'), beats: beats,
+      skip: function (b) { return b.classList.contains('brief-beat'); },
+      current: function () { return active; },
+      activate: function (b) { apply(b); },
+      presenting: ctx.presenting
+    }) : null;
 
     // Number beats within their chapter ("B·1 · 3 of 10") for kickers and the presenter readout
     beats.forEach(function (b, i) {
@@ -118,6 +127,7 @@
 
     function apply(b, force) {
       if (!b || (b === active && !force)) return;
+      if (inline) inline.place(stageBeat(b));   // before the old scene leaves, so its still copy keeps it
       active = b;
       beats.forEach(function (x) { x.classList.toggle('is-active', x === b); });
       var sb = stageBeat(b);
@@ -132,7 +142,7 @@
 
     // --- Scroll sync (student mode) --------------------------------------------------------
     function pickFromScroll() {
-      if (ctx.presenting() || Date.now() < pinUntil) return;
+      if (ctx.presenting() || Date.now() < pinUntil || (inline && inline.on())) return;
       var line = window.innerHeight * 0.38;
       var best = null, bestD = Infinity, activeD = Infinity;
       beats.forEach(function (b) {
@@ -154,6 +164,7 @@
     }, { passive: true });
 
     function scrollToBeat(b, smooth) {
+      if (inline && inline.on()) { inline.scrollTo(b, smooth); return; }
       var r = b.getBoundingClientRect();
       var top = window.scrollY + r.top + r.height / 2 - window.innerHeight * 0.38;
       window.scrollTo({ top: Math.max(0, top), behavior: smooth ? 'smooth' : 'auto' });
@@ -193,6 +204,7 @@
     function setPresent(on) {
       document.body.classList.toggle('present', on);
       if (presentBtn) presentBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      if (inline) inline.sync();   // the stage leaves (or returns to) the slot under its beat
       if (active && active.classList.contains('brief-beat')) apply(active, true);   // card ↔ first scene
       if (on) focusBeat();
       else if (active) { pinUntil = Date.now() + 600; scrollToBeat(active, false); }

@@ -673,6 +673,16 @@ body.learn-mode .guide-stage-panel .hud-quiet{visibility:hidden;}
   .guide-beat{padding:1.6rem 0 1.8rem;}
 }
 
+/* Narrow screens (guide-inline.js): each section's text, then its stage, in turn. The stage sits in a slot
+   under the section in view; the slots it has left keep a still copy, and tapping one brings the stage back. */
+body.guide-inline .guide-layout{display:block;}
+body.guide-inline .guide-beat{min-height:0;padding-bottom:1rem;}
+body.guide-inline .guide-stage-panel{position:relative;top:auto;order:0;z-index:auto;}
+.guide-slot{position:relative;margin:0 0 2.2rem;}
+.guide-slot:empty{background:var(--tray);border:2px solid var(--line);border-radius:var(--radius-lg);}
+.guide-slot.has-still{overflow:hidden;cursor:pointer;}
+.guide-slot .guide-still{pointer-events:none;}
+
 @media (prefers-reduced-motion: reduce){
   .btn,.path a,
   #guideControls,.alt-pair-row,.guide-stage-wrap canvas,

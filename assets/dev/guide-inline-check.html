@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex, nofollow">
+<title>Guide Inline Check | Dev</title>
+<style>body{margin:0;font:12px monospace;display:flex;gap:8px}iframe{border:0;flex:none;background:#fff}#log{white-space:pre;padding:4px}</style>
+<link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+</head><body>
+<iframe id="f"></iframe><div id="log"></div>
+<script>
+// Dev-only check for assets/guide-inline.js (Guides on narrow screens). Run through .claude/scripts/run-page.sh:
+//   assets/dev/guide-inline-check.html?page=chemistry-11h/bonding/guide.html            scroll down and back up
+//   ...&present=%23learnToggle (Bonding: %23presentToggle)   presentation view on and off, then tap a still copy
+//   ...&rotate=1   past 860 px and back      ...&click=%23briefingEnter   press a button first (Equilibrium)
+//   ...&w=390&h=844&to=0.5 with --shot   scroll to this fraction of the page and stop, for a screenshot
+// ?page=...   scroll down the page in steps, then back up, and report where the stage is
+const q = new URLSearchParams(location.search), f = document.getElementById('f'), log = document.getElementById('log');
+const W = +(q.get('w') || 390), H = +(q.get('h') || 844);
+f.style.width = W + 'px'; f.style.height = H + 'px';
+const OK = 'PA' + 'SS', NO = 'FA' + 'IL';
+const out = s => { log.textContent += (/^(PA|FA)/.test(s) ? '' : OK + ' ~ ') + s + '\n'; };   // ~ lines are notes
+const check = (ok, what) => out((ok ? OK : NO) + ' ' + what);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+// the scroll handler waits on an animation frame, which headless runs unreliably: ask for the pick directly
+const frames = w => { (w.GuideInline ? w.GuideInline.all : []).forEach(g => g.pick()); return wait(4); };
+f.src = '/' + q.get('page');
+f.onload = async () => {
+  await wait(1200);
+  const w = f.contentWindow, d = f.contentDocument;
+  w.addEventListener('error', e => out('ERR ' + e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno));
+  const calls = { place: 0, scrollTo: 0 };
+  if (q.has('v') && w.GuideInline) w.GuideInline.all.forEach(g => ['place', 'scrollTo'].forEach(k => { const f0 = g[k]; g[k] = function () { calls[k]++; return f0.apply(this, arguments); }; }));
+  if (q.has('click')) { const b = d.querySelector(q.get('click')); if (b) b.click(); await wait(1200); }
+  const st = () => {
+    const slots = [...d.querySelectorAll('.guide-slot')];
+    const live = slots.findIndex(s => s.querySelector('.guide-stage-panel:not(.guide-still)'));
+    const stills = slots.filter(s => s.classList.contains('has-still')).length;
+    const emptyVisible = slots.filter(s => { const r = s.getBoundingClientRect(); return !s.firstChild && r.bottom > 0 && r.top < H; }).length;
+    return { slots: slots.length, live, stills, emptyVisible, inline: d.body.classList.contains('guide-inline') };
+  };
+  const max = () => d.documentElement.scrollHeight - H;
+  if (q.has('to')) {
+    const end = max() * +q.get('to');
+    for (let y = 0; y <= end; y += 150) { w.scrollTo(0, y); await frames(w); }
+    w.scrollTo(0, end); await frames(w);
+    await wait(900);
+    out(JSON.stringify(st()));
+    return;
+  }
+  // ?rotate=1 : turning a tablet past 860 px puts the stage back beside the text, and under it again
+  if (q.has('rotate')) {
+    for (let y = 0; y <= max() * 0.3; y += 150) { w.scrollTo(0, y); await frames(w); }
+    // headless sends media query and resize events only on rendered frames, which it runs unreliably: send resize ourselves
+    const until = async ok => { for (let i = 0; i < 40 && !ok(); i++) { w.document.body.offsetWidth; w.dispatchEvent(new w.Event('resize')); await wait(100); } };
+    let evs = 0; const mql = w.matchMedia('(max-width:860px)'); mql.addEventListener('change', () => evs++);
+    f.style.width = '1180px'; await until(() => !st().inline);
+    out('after wide: matches=' + mql.matches + ' events=' + evs + ' ' + JSON.stringify(st()));
+    const stage = d.querySelector('.guide-stage-panel:not(.guide-still)');
+    check(!st().inline && !st().slots && !stage.closest('.guide-slot'), 'wide: no slots, stage out of the slots');
+    check(stage.getBoundingClientRect().left > 400, 'wide: stage in the right-hand column (left ' + Math.round(stage.getBoundingClientRect().left) + ')');
+    f.style.width = W + 'px'; await until(() => st().inline && st().live >= 0);
+    out('after narrow: matches=' + mql.matches + ' events=' + evs + ' ' + JSON.stringify(st()));
+    check(st().inline && st().live >= 0, 'narrow again: stage in a slot (' + st().live + ')');
+    return;
+  }
+  // ?present=#learnToggle : presentation view takes the stage out of the slots and gives it back
+  if (q.has('present')) {
+    const btn = d.querySelector(q.get('present')), stage = () => d.querySelector('.guide-stage-panel:not(.guide-still)');
+    for (let y = 0; y <= max() * 0.3; y += 150) { w.scrollTo(0, y); await frames(w); }
+    const before = st();
+    btn.click(); await wait(300);
+    const inPres = st();
+    check(!inPres.inline && inPres.slots === 0 && !stage().closest('.guide-beat, .guide-slot'), 'presentation view: no slots, stage back in its own place');
+    const r = stage().getBoundingClientRect();
+    check(r.width > 0 && r.height > 0, 'presentation view: stage shown (' + Math.round(r.width) + ' × ' + Math.round(r.height) + ')');
+    btn.click(); await wait(1200);
+    const after = st();
+    check(after.inline && after.live === before.live, 'leaving it: stage back in the same slot (' + before.live + ' → ' + after.live + ')');
+    // a still copy above: tapping it brings the stage back there
+    await wait(1600);
+    for (let y = max() * 0.3; y <= max() * 0.6; y += 150) { w.scrollTo(0, y); await frames(w); }
+    const mid = st(), still = [...d.querySelectorAll('.guide-slot.has-still')][0];
+    if (!still) { check(false, 'a still copy to tap'); return; }
+    const target = [...d.querySelectorAll('.guide-slot')].indexOf(still);
+    still.scrollIntoView(); still.click(); await wait(100);
+    check(st().live === target, 'tapping a still copy brings the stage to it (' + mid.live + ' → ' + st().live + ', wanted ' + target + ')');
+    return;
+  }
+  out('start ' + JSON.stringify(st()) + ' height=' + d.documentElement.scrollHeight);
+  const seq = []; let emptyAt = null; let maxEmpty = 0, lastLive = -2, moves = 0, misses = 0, ids = new Set();
+  for (let y = 0; y <= max(); y += 180) {
+    w.scrollTo(0, y); await frames(w);
+    const s = st();
+    if (s.live !== lastLive) { moves++; lastLive = s.live; seq.push(s.live); }
+    if (s.live < 0) misses++;
+    if (s.emptyVisible > maxEmpty) emptyAt = y;
+    maxEmpty = Math.max(maxEmpty, s.emptyVisible);
+  }
+  w.scrollTo(0, max()); await wait(400);
+  const end = st();
+  out('end ' + JSON.stringify(end) + ' moves=' + moves + ' emptyAt=' + emptyAt);
+  if (q.has('v')) out('seq ' + seq.join(',') + ' instances=' + (w.GuideInline ? w.GuideInline.all.length : 0) + ' calls=' + JSON.stringify(calls) + ' on=' + (w.GuideInline && w.GuideInline.all.map(g => g.on()).join('/')));
+  check(end.live === end.slots - 1, 'stage reached the last slot (' + end.live + ' of ' + (end.slots - 1) + ')');
+  check(misses === 0, 'stage always in a slot (' + misses + ' misses)');
+  check(maxEmpty <= 1, 'at most one empty slot on screen at once (' + maxEmpty + ')');
+  const dup = [...d.querySelectorAll('[id]')].map(n => n.id).filter((id, i, a) => a.indexOf(id) !== i);
+  check(!dup.length, 'no repeated ids after the stills (' + dup.slice(0, 3).join(' ') + ')');
+  for (let y = max(); y >= 0; y -= 400) { w.scrollTo(0, y); await frames(w); }
+  w.scrollTo(0, 0); await wait(400);
+  check(st().live === 0, 'back at the top, stage in the first slot (' + st().live + ')');
+};
+</script>
+</body></html>
