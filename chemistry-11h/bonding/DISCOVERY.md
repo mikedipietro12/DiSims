@@ -59,6 +59,12 @@
 - We will review how "hybridization" can let us predict the shape of a bonding atom within a molecule
 - We will connect the type of hybridization with the common angles seen in molecules
 
+**Success Criteria** (drafted by the builder, approved by the teacher 2026-11-27. Shown in the Guide's Chapter C card)
+- **QP:** I can predict the hybridization of a carbon atom from the number of electron domains around it, and use it to predict the bond angles around that atom.
+- **PAI:** I can use orbital diagrams to show how carbon’s 2s and 2p orbitals combine into sp³, sp² or sp orbitals, and connect each one to its angle (about 109.5°, 120° or 180°).
+- **E:** I can evaluate what a Lewis structure, an orbital diagram and a 3D model each show and hide about the bonds and shape around a carbon atom.
+- **C:** I can label each carbon in a molecule as sp³, sp² or sp and explain my choice using correct terminology, such as hybrid orbital, σ bond, π bond and bond angle.
+
 ## Open questions
 - [x] Architecture: draw beats in Guide + standalone Draw Lab
 - [x] One guide or one per block? → **One long guide**, three chapters (A / B / C) with chapter markers; presentation mode can jump to a chapter

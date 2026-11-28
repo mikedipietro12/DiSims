@@ -19,7 +19,7 @@
     cat: tok('--sol-cat', '#f06a84'), catLine: tok('--sol-cat-line', '#b3263f'),
     an: tok('--sol-an', '#ffd257'), anLine: tok('--sol-an-line', '#b38a10'),
     water: tok('--sol-water', '#e3f1fb'), waterLine: tok('--sol-water-line', '#7fb3d9'),
-    acid: tok('--sol-acid', '#c2347a'), acidLine: tok('--sol-acid-line', '#86164f'),
+    acid: tok('--sol-acid', '#d62828'), acidLine: tok('--sol-acid-line', '#8f1515'),
     base: tok('--sol-base', '#5b5fd6'), baseLine: tok('--sol-base-line', '#3438a3'),
     neutral: tok('--sol-neutral', '#e4ebf3'), neutralLine: tok('--sol-neutral-line', '#7f8ea6')
   });

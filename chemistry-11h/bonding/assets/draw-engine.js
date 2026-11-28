@@ -156,21 +156,34 @@
     });
     return best;
   }
+  /** Write n unshared electrons round atom i as pairs (a single last if n is odd), spread into the open directions. */
+  function layLonePairs(s, i, n) {
+    var groups = [];
+    for (var p = 0; p < Math.floor(n / 2); p++) groups.push(2);
+    if (n % 2) groups.push(1);
+    var dirs = chooseDirs(bondAngles(s, i), groups.length);
+    s.atoms[i].slots = [0, 0, 0, 0, 0, 0, 0, 0];
+    groups.forEach(function (c, g) { s.atoms[i].slots[SLOTS.indexOf(dirs[g])] += c; });
+  }
   function fromModel(m) {
     var s = {
       atoms: m.atoms.map(function (a) { return newAtom(a.el, a.x, a.y); }),
       bonds: m.bonds.map(function (b) { return { a: b.a, b: b.b, order: b.order }; }),
       transfers: [],
     };
-    m.atoms.forEach(function (a, i) {
-      var n = a.ne != null ? a.ne : 2 * (a.lp || 0);
-      var groups = [];
-      for (var p = 0; p < Math.floor(n / 2); p++) groups.push(2);
-      if (n % 2) groups.push(1);
-      var dirs = chooseDirs(bondAngles(s, i), groups.length);
-      groups.forEach(function (c, g) { s.atoms[i].slots[SLOTS.indexOf(dirs[g])] += c; });
-    });
+    m.atoms.forEach(function (a, i) { layLonePairs(s, i, a.ne != null ? a.ne : 2 * (a.lp || 0)); });
     return s;
+  }
+  /** Each drawn electron of atom i, as an offset from the letter at scale 1 (the same spots drawState uses). */
+  function dotOffsets(s, i) {
+    var out = [];
+    displayGroups(s, i).forEach(function (grp) {
+      var r = grp.angle * Math.PI / 180, cx = Math.cos(r) * G.eR, cy = Math.sin(r) * G.eR;
+      var px = -Math.sin(r) * G.dotSep, py = Math.cos(r) * G.dotSep;
+      if (grp.n === 2) { out.push({ x: cx + px, y: cy + py }); out.push({ x: cx - px, y: cy - py }); }
+      else out.push({ x: cx, y: cy });
+    });
+    return out;
   }
 
   /** Where to draw each atom's electrons: stored slots, nudged off any bond that now covers them. */
@@ -376,13 +389,15 @@
     }
 
     s.atoms.forEach(function (a, i) {
+      var gliding = marks.anim && marks.anim[i];   // electrons gliding to their tidy spots: drawn on the way, clickable where they land
+      if (gliding) gliding.forEach(function (p) { el('circle', { cx: X(a) + p.x * k, cy: Y(a) + p.y * k, r: G.dot * k, fill: INK }, ge); });
       displayGroups(s, i).forEach(function (grp) {
         var r = grp.angle * Math.PI / 180;
         var cx = X(a) + Math.cos(r) * G.eR * k, cy = Y(a) + Math.sin(r) * G.eR * k;
         var px = -Math.sin(r) * G.dotSep * k, py = Math.cos(r) * G.dotSep * k;
         var pts = grp.n === 2 ? [[cx + px, cy + py], [cx - px, cy - py]] : [[cx, cy]];
         pts.forEach(function (p, n) {
-          el('circle', { cx: p[0], cy: p[1], r: G.dot * k, fill: INK }, ge);
+          if (!gliding) el('circle', { cx: p[0], cy: p[1], r: G.dot * k, fill: INK }, ge);
           dots.push({ atom: i, slot: grp.slots[Math.min(n, grp.slots.length - 1)], x: p[0], y: p[1] });
         });
       });
@@ -778,10 +793,85 @@
       if (!state.history.length) return;
       state.s = state.history.pop();
       state.selected = state.source = state.hover = null;
+      endTidy(); primeDone();   // undo puts the drawing back exactly as it was
       changed();
     }
     function say(m) { state.message = m || ''; }
+    /**
+     * Completed molecules tidy their electrons (user 2026-11-27: 'pair and spread out better'). The moment every
+     * count in a molecule is complete, each atom's unshared electrons are re-laid as pairs in the most open
+     * directions (the same layout as Show answer), gliding there so students see it happen. Only on that moment:
+     * after it, pairs can still be moved by hand. Loading or restoring a drawing never rearranges it.
+     */
+    function completeKeys() {
+      var t = L.tally(toModel(state.s)), out = {};
+      fragments(state.s).forEach(function (f) {
+        if (f.members.length < 2) return;
+        if (!f.members.every(function (i) { var q = t.atoms[i]; return q.status === 'ok' || q.status === 'expanded'; })) return;
+        var mem = f.members.slice().sort(function (p, q) { return p - q; });
+        var bonds = state.s.bonds.filter(function (b) { return mem.indexOf(b.a) !== -1; })
+          .map(function (b) { return Math.min(b.a, b.b) + '-' + Math.max(b.a, b.b) + ':' + b.order; }).sort();
+        out[mem.join(',') + '|' + bonds.join(',')] = mem;
+      });
+      return out;
+    }
+    function primeDone() { state.doneKeys = completeKeys(); }
+    function settleComplete() {
+      var now = completeKeys(), before = {}, after = {}, any = false;
+      Object.keys(now).forEach(function (key) {
+        if (state.doneKeys && state.doneKeys[key]) return;
+        now[key].forEach(function (i) {
+          var a = state.s.atoms[i], old = dotOffsets(state.s, i), keep = clone(a.slots);
+          layLonePairs(state.s, i, ne(a));
+          if (JSON.stringify(keep) === JSON.stringify(a.slots)) return;   // already tidy
+          before[i] = old; after[i] = dotOffsets(state.s, i); any = true;
+        });
+      });
+      state.doneKeys = now;
+      if (any) startTidy(before, after);
+    }
+    // The glide: each electron moves round its atom (by angle and distance, so it never crosses the letter)
+    var TIDY_MS = 520;
+    function startTidy(before, after) {
+      var paths = {};
+      Object.keys(after).forEach(function (i) {
+        var from = before[i].slice(), to = after[i];
+        // pair each new spot with the nearest old electron
+        var pairs = [];
+        to.forEach(function (p, a) { from.forEach(function (q, b) { pairs.push({ a: a, b: b, d: Math.hypot(p.x - q.x, p.y - q.y) }); }); });
+        pairs.sort(function (u, v) { return u.d - v.d; });
+        var usedA = {}, usedB = {}, match = [];
+        pairs.forEach(function (p) { if (usedA[p.a] || usedB[p.b]) return; usedA[p.a] = usedB[p.b] = true; match.push({ from: from[p.b], to: to[p.a] }); });
+        paths[i] = match.map(function (m) {
+          var r0 = Math.hypot(m.from.x, m.from.y), r1 = Math.hypot(m.to.x, m.to.y);
+          var t0 = Math.atan2(m.from.y, m.from.x), t1 = Math.atan2(m.to.y, m.to.x), dt = t1 - t0;
+          while (dt > Math.PI) dt -= 2 * Math.PI;
+          while (dt < -Math.PI) dt += 2 * Math.PI;
+          return { r0: r0, r1: r1, t0: t0, dt: dt };
+        });
+      });
+      state.tidy = { paths: paths, t0: performance.now() };
+      clearTimeout(state.tidyTimer);
+      state.tidyTimer = setTimeout(endTidy, TIDY_MS + 80);   // finishes even when frames are throttled
+      requestAnimationFrame(function tick() { if (!state.tidy) return; render(); if (state.tidy) requestAnimationFrame(tick); });
+    }
+    function tidyFrame() {
+      if (!state.tidy) return null;
+      var t = Math.min(1, (performance.now() - state.tidy.t0) / TIDY_MS);
+      if (t >= 1) { state.tidy = null; return null; }
+      var e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, out = {};
+      Object.keys(state.tidy.paths).forEach(function (i) {
+        out[i] = state.tidy.paths[i].map(function (p) {
+          var r = p.r0 + (p.r1 - p.r0) * e, a = p.t0 + p.dt * e;
+          return { x: Math.cos(a) * r, y: Math.sin(a) * r };
+        });
+      });
+      return out;
+    }
+    function endTidy() { clearTimeout(state.tidyTimer); if (state.tidy) { state.tidy = null; render(); } }
+
     function changed() {
+      settleComplete();
       render();
       if (opts.onChange) { var m = toModel(state.s); opts.onChange(m, L.tally(m)); }
     }
@@ -1030,7 +1120,7 @@
       dots = drawState(layer, state.s, view, {
         selected: state.selected, source: state.source, hover: state.hover, tally: t, subs: subs,
         target: drag && drag.target ? drag.target.atom : null,
-        showCharges: true, counters: state.counters, letters: !!opts.letters, arrows: Date.now() < (state.arrowUntil || 0),
+        showCharges: true, counters: state.counters, letters: !!opts.letters, anim: tidyFrame(), arrows: Date.now() < (state.arrowUntil || 0),
       }, true);
       drawMatch();
       eraseBtn.setAttribute('aria-pressed', state.erase ? 'true' : 'false');
@@ -1354,6 +1444,7 @@
       return degree(i) >= 2 || f.members.length === 2 ? f.members : [i];
     }
     function onDown(e) {
+      endTidy();   // a tap settles the glide
       if (drag || (e.button !== undefined && e.button > 0)) return;
       e.preventDefault();
       focusKey = null;
@@ -1568,9 +1659,9 @@
       svg: svg,
       get: function () { return toModel(state.s); },
       state: function () { return clone(state.s); },
-      restore: function (raw) { refit(); state.history = []; state.s = clone(raw); state.selected = state.source = state.hover = null; say(''); changed(); },
+      restore: function (raw) { refit(); state.history = []; state.s = clone(raw); state.selected = state.source = state.hover = null; primeDone(); say(''); changed(); },
       tally: function () { return L.tally(toModel(state.s)); },
-      load: function (structure) { refit(); state.history = []; state.s = fromModel(structure); state.selected = state.source = state.hover = null; recentre(); say(''); changed(); },
+      load: function (structure) { refit(); state.history = []; state.s = fromModel(structure); state.selected = state.source = state.hover = null; recentre(); primeDone(); say(''); changed(); },
       loadMany: function (structures) {
         refit();
         var combined = { atoms: [], bonds: [], transfers: [] }, x = 0;
@@ -1580,7 +1671,7 @@
           part.bonds.forEach(function (bd) { combined.bonds.push({ a: bd.a + base, b: bd.b + base, order: bd.order }); });
           x += (b.x1 - b.x0) + 2.6;
         });
-        state.history = []; state.s = combined; state.selected = state.source = state.hover = null;
+        state.history = []; state.s = combined; state.selected = state.source = state.hover = null; primeDone();
         recentre(); say(''); changed();
       },
       clear: function () { refit(); snapshot(); state.s = { atoms: [], bonds: [], transfers: [] }; state.selected = state.source = null; changed(); },

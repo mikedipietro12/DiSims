@@ -181,6 +181,27 @@ function selfTest(d) {
   ok('a loose atom gets its own line until it joins a molecule', sl.length === 3 && /^Not bonded yetValence electrons: H 1 = 1 · Placed: 0 · Still to place: 1$/.test(sl[2]), sl.join(' | '));
   d.setReference(null);
 
+  // --- A completed molecule tidies its electrons: pairs, spread round the open sides (user 2026-11-27) ---
+  function slotsOf(i) { return d.state().atoms[i].slots.join(''); }
+  var tidyH2O = { atoms: [
+      { el: 'O', x: 0, y: 0, slots: [1, 1, 1, 1, 1, 0, 0, 0] },      // five singles bunched on one side
+      { el: 'H', x: -0.8, y: -0.6, slots: [0, 0, 0, 0, 0, 0, 0, 0] },
+      { el: 'H', x: 0.8, y: -0.6, slots: [0, 0, 0, 0, 1, 0, 0, 0] } ],
+    bonds: [{ a: 0, b: 1, order: 1 }], transfers: [] };
+  d.restore(tidyH2O);
+  ok('restoring a drawing never rearranges it', slotsOf(0) === '11111000');
+  share(0, 2);
+  var expect = DrawEngine._.fromModel(d.get()).atoms[0].slots.join('');
+  ok('the last share completes H₂O: O\u2019s four electrons pair up and spread out (as Show answer lays them)',
+    LewisModel.tally(d.get()).allCounted && slotsOf(0) === expect && /^[02]+$/.test(slotsOf(0)) && (slotsOf(0).match(/2/g) || []).length === 2, slotsOf(0) + ' vs ' + expect);
+  var tidied = slotsOf(0), p0 = A(0), dz = d._dots().filter(function (x) { return x.atom === 0; })[0];
+  drag(dz, { x: p0.x + 24 * (d._atomPx(1).x - p0.x < 0 ? 1 : -1), y: p0.y + 2 });
+  ok('after that, a pair moved by hand stays where it was put', slotsOf(0) !== tidied && LewisModel.tally(d.get()).allCounted, slotsOf(0));
+  d.undo();
+  ok('undo returns to the tidy layout without re-tidying', slotsOf(0) === tidied, slotsOf(0));
+  d.undo();
+  ok('undo again: back to the student\u2019s own electrons, before the share', slotsOf(0) === '11111000', slotsOf(0));
+
   var pre = document.createElement('pre');
   pre.id = 'selftest';
   pre.textContent = out.join('\n');

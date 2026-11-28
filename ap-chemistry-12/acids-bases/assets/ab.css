@@ -1,0 +1,161 @@
+/* Acids and Bases Guides: additions on top of suite.css (Toy Box) and equilibrium/assets/ice.css (stage frame,
+   worked steps, unit analysis). Look: taste doc docs/designpowers/taste/2026-11-27-acids-bases-taste.md.
+   Light mode is "ink and spheres"; dark mode (assets/theme.js) is the "night lab" stage. */
+
+:root{
+  --ab-acid:#d62828; --ab-base:#5b5fd6; --ab-anion:#ffd257; --ab-cation:#f06a84;
+  --ab-right:#1f8a5b; --ab-right-soft:#e3f6ec; --ab-wrong:#c8233f; --ab-wrong-soft:#fde7eb;
+  --ab-stage:#ffffff; --ab-part-alt:#eceffd;
+}
+:root[data-theme="dark"]{
+  --ab-right:#4fe08a; --ab-right-soft:#0f2a1b; --ab-wrong:#ff6b86; --ab-wrong-soft:#33141c;
+  --ab-stage:#0b1020; --ab-part-alt:#12172a;
+}
+
+/* ---------- layout: text on the left, a wider stage on the right (as ICE Tables) ---------- */
+.ab-guide .guide-layout{grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr);}
+.ab-guide .guide-beat p,.ab-guide .guide-beat ul{max-width:36rem;}
+.ab-guide .guide-beat ul{padding-left:1.2rem;color:var(--ink-soft);line-height:1.55;}
+.ab-guide .guide-beat li{margin:0.3rem 0;}
+
+/* Parts: each opens with Before we begin as its own block; the Parts alternate white and lavender */
+.part-picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.8rem;margin-bottom:2rem;}
+.part-picker a{display:flex;flex-direction:column;gap:0.3rem;padding:0.85rem 1rem 0.95rem;font-family:var(--font-body);font-size:1rem;letter-spacing:0;text-transform:none;color:var(--ink);text-decoration:none;
+  background:var(--tray);border:2px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--key-drop);}
+.part-picker a:hover{background:var(--accent-soft);}
+.part-picker a.is-soon{opacity:0.55;pointer-events:none;box-shadow:none;}
+.pp-title{font-weight:700;line-height:1.25;}
+.pp-teaser{font-size:0.88rem;color:var(--ink-soft);line-height:1.4;}
+body:not(.learn-mode) .ab-guide .brief-beat{background:var(--tray);border:2px solid var(--line-strong);border-radius:var(--radius-lg);
+  box-shadow:0 4px 0 var(--ink);padding:1.4rem 1.5rem 1.6rem;min-height:0;margin:0 0 1.2rem;}
+.ab-guide .brief-beat + .guide-beat{border-top:none;}
+.ab-guide .part-start{margin-top:2.6rem;}
+.brief-cols{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:0.8rem;}
+.brief-block{border-left:4px solid var(--accent);padding:0.1rem 0 0.1rem 1rem;}
+.brief-block.cc{border-left-color:var(--ink);}
+.brief-block h3{font-size:1rem;margin:0 0 0.35rem;}
+.brief-block ul{margin:0;padding-left:1.1rem;}
+.brief-block li{margin:0.35rem 0;color:var(--ink-soft);line-height:1.45;}
+.brief-block li strong{color:var(--ink);}
+.ab-practice{margin-top:1rem;padding:0.6rem 0.8rem;border:2px dashed var(--line-strong);border-radius:var(--radius);max-width:36rem;}
+.ab-practice b{color:var(--ink);}
+
+/* ---------- the stage ---------- */
+.ab-stage .ice-grid{gap:0.75rem;}
+.ab-tab-row,.ab-switch-row{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;}
+.ab-seg{display:flex;flex-wrap:wrap;gap:0.4rem;}
+.ab-seg .btn{padding:0.3rem 0.8rem;font-size:0.9rem;min-height:0;}
+.ab-seg .btn[aria-pressed="true"]{background:var(--ink);color:var(--on-ink,#fff);}
+.ab-switch-row .ab-seg .btn{font-size:0.82rem;padding:0.22rem 0.65rem;}
+.ab-canvas-wrap{border-radius:12px;overflow:hidden;border:1.5px solid var(--line);background:var(--ab-stage);}
+.ab-canvas{display:block;width:100%;height:auto;cursor:pointer;}
+.ab-hint{margin:-0.35rem 0 0;font-family:var(--font-mono);font-size:0.72rem;color:var(--dim);}
+.ab-howto{margin:0;font-size:0.92rem;color:var(--dim);}
+.ab-note{margin:0;font-size:0.95rem;color:var(--ink-soft);line-height:1.5;}
+.ab-coef{color:var(--accent);}
+.ab-tag{display:inline-block;font-size:0.72em;font-weight:700;padding:0.05em 0.45em;border-radius:999px;vertical-align:middle;margin:0 0.15em;color:#fff;}
+.ab-tag.a{background:var(--ab-acid);}
+.ab-tag.b{background:var(--ab-base);}
+
+/* prediction cards: check themselves, then one line on why */
+.ab-cards{display:grid;grid-template-columns:minmax(0,1fr);gap:0.6rem;}
+.ab-cards.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.ab-card{border:2px solid var(--line-strong);border-radius:12px;padding:0.65rem 0.75rem;background:var(--tray);}
+.ab-card-q{margin:0 0 0.45rem;font-weight:700;line-height:1.35;}
+.ab-card-opts{display:flex;flex-wrap:wrap;gap:0.4rem;}
+.ab-opt{flex:1 1 auto;padding:0.35rem 0.6rem;font-size:0.9rem;min-height:0;}
+.ab-opt.is-right{background:var(--ab-right-soft);border-color:var(--ab-right);color:var(--ab-right);box-shadow:0 3px 0 var(--ab-right);}
+.ab-opt.is-wrong{background:var(--ab-wrong-soft);border-color:var(--ab-wrong);color:var(--ab-wrong);box-shadow:0 3px 0 var(--ab-wrong);}
+.ab-opt.is-right::before{content:"✓ ";}
+.ab-opt.is-wrong::before{content:"✗ ";}
+.ab-card-why{margin:0.45rem 0 0;font-size:0.88rem;color:var(--ink-soft);line-height:1.4;}
+.ab-card-why:empty{display:none;}
+.ab-card-again{margin-top:0.4rem;padding:0.15rem 0.55rem;font-size:0.78rem;min-height:0;}
+.ab-card.is-correct{border-color:var(--ab-right);}
+.ab-card.is-incorrect{border-color:var(--ab-wrong);}
+:root[data-theme="dark"] .ab-card{background:#0e1322;border-color:#2a3554;}
+:root[data-theme="dark"] .ab-opt.is-right{box-shadow:0 0 0 1px var(--ab-right),0 0 14px rgba(79,224,138,0.4);}
+:root[data-theme="dark"] .ab-opt.is-wrong{box-shadow:0 0 0 1px var(--ab-wrong),0 0 14px rgba(255,107,134,0.4);}
+
+/* conjugate matching game */
+.ab-match-head{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;margin-bottom:0.6rem;}
+.ab-match-count{margin:0;font-weight:700;}
+.ab-match-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0.55rem;}
+.ab-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.15rem;min-height:4.4rem;padding:0.4rem;font-size:1.25rem;font-weight:700;}
+.ab-tile[aria-pressed="true"]{outline:3px solid var(--accent);outline-offset:2px;background:var(--accent-soft);color:var(--ink);}
+.ab-tile-role{font-size:0.7rem;font-weight:700;text-transform:none;min-height:1em;}
+.ab-tile.is-locked{cursor:default;transform:none;}
+.ab-tile.is-locked.pair-0{background:#e3f6ec;border-color:#1f8a5b;}
+.ab-tile.is-locked.pair-1{background:#e7eaff;border-color:#4152d9;}
+.ab-tile.is-locked.pair-2{background:#fff3cf;border-color:#b38a10;}
+.ab-tile.is-locked.pair-3{background:#fde7eb;border-color:#b3263f;}
+.ab-tile.is-locked.pair-4{background:#e4f4fb;border-color:#2b7fa8;}
+.ab-tile.is-locked.pair-5{background:#f1e7fb;border-color:#7a3fb3;}
+.ab-tile.is-locked{color:#1d2433;}
+:root[data-theme="dark"] .ab-tile.is-locked{color:#1d2433;}
+@keyframes ab-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.ab-tile.is-shake{animation:ab-shake 0.3s ease-in-out 2;}
+
+/* tables and HTML pictures on the stage */
+.ab-table{border-collapse:collapse;width:100%;font-size:1rem;}
+.ab-table th,.ab-table td{padding:0.55rem 0.6rem;border-bottom:1.5px solid var(--line);text-align:left;}
+.ab-table thead th{border-bottom:2px solid var(--ink);font-size:0.85rem;color:var(--ink-soft);}
+.ab-table td.num{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;}
+.ab-strong{display:flex;flex-direction:column;gap:0.7rem;}
+.ab-strong-h{margin:0;font-weight:700;}
+.ab-strong-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.5rem;}
+.ab-strong-list span{display:grid;place-items:center;min-height:3.2rem;font-size:1.3rem;font-weight:700;border:2px solid var(--line-strong);border-radius:12px;
+  background:var(--tray);box-shadow:inset 0 -6px 0 rgba(214,40,40,0.12);}
+
+/* dark mode for the pieces borrowed from ice.css */
+:root[data-theme="dark"] .ice-problem{background:#141a2b;}
+:root[data-theme="dark"] .ice-card{background:#141a2b;}
+
+@media (max-width:1100px){ .part-picker{grid-template-columns:1fr;} }
+@media (max-width:860px){ .ab-cards.cols-2{grid-template-columns:1fr;} .ab-match-grid{grid-template-columns:repeat(3,minmax(0,1fr));} }
+
+/* screen-reader-only text (live regions for steps and cards) */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+/* a marked answer keeps its green / red over the suite's pressed-button colours (both themes) */
+:root .ab-card .ab-opt.is-right{background:var(--ab-right-soft);border-color:var(--ab-right);color:var(--ab-right);}
+:root .ab-card .ab-opt.is-wrong{background:var(--ab-wrong-soft);border-color:var(--ab-wrong);color:var(--ab-wrong);}
+:root .ab-match .ab-tile[aria-pressed="true"]{background:var(--accent-soft);color:var(--ink);}
+
+/* narrow screens (tablet portrait): the stage sits above the text, as in ICE Tables and Solubility */
+@media (max-width:860px){
+  .ab-guide .guide-layout{grid-template-columns:minmax(0,1fr);}
+  body:not(.learn-mode) .ab-stage{height:auto;overflow:visible;}
+  body:not(.learn-mode) .ab-stage .ice-grid{overflow:visible;}
+}
+
+/* ---------- visual primary (teacher, 2026-11-27) ----------
+   The stage is the picture plus the chemistry: no step sentences, no captions, no how-to lines.
+   The current equation sits large under the picture. In presentation view the picture fills the stage. */
+.ab-eqn{display:block;font-size:1.35rem;font-weight:700;text-align:center;padding:0.4rem 0.6rem;line-height:1.6;min-height:2.2em;font-variant-numeric:tabular-nums;}
+.ab-eqn.is-empty{visibility:hidden;}
+.ab-list{max-width:36rem;margin:0.2rem 0 0.8rem;padding-left:1.4rem;color:var(--ink-soft);line-height:1.55;}
+.ab-list li{margin:0.25rem 0;}
+.ab-strong-arrow{margin:0;text-align:center;font-size:1.4rem;font-weight:700;color:var(--ab-acid);}
+:root[data-theme="dark"] .ab-strong-arrow{color:#ff7a7a;}
+.ab-brief-slide{display:flex;flex-direction:column;gap:0.6rem;}
+.ab-brief-title{font-size:1.6rem;margin:0;}
+.ab-brief-slide .brief-cols{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.6rem;}
+
+body.learn-mode .ab-stage .ice-grid{display:flex;flex-direction:column;gap:0.7rem;overflow:hidden;}
+body.learn-mode .ab-stage .ice-top{flex:none;}
+body.learn-mode .ab-stage .ice-left{flex:1 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:center;}
+body.learn-mode .ab-stage .ice-right{flex:none;max-height:none;overflow:visible;}
+body.learn-mode .ab-stage .ab-canvas-wrap{flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;}
+body.learn-mode .ab-stage .ab-canvas{width:auto;height:auto;max-width:100%;max-height:100%;}
+body.learn-mode .ab-stage .ice-grid.no-left .ice-right{flex:1 1 auto;overflow:auto;}
+body.learn-mode .ab-eqn{font-size:clamp(1.5rem,2.4vw,2.4rem);}
+body.learn-mode .ab-card-why{display:none;}             /* the teacher explains; reasons stay for reading view */
+body.learn-mode .ab-card-q{font-size:clamp(1.05rem,1.4vw,1.35rem);}
+body.learn-mode .ab-opt{font-size:clamp(0.95rem,1.2vw,1.15rem);padding:0.45rem 0.8rem;}
+body.learn-mode .ab-tile{font-size:clamp(1.3rem,2vw,2rem);min-height:clamp(4.4rem,11vh,7rem);}
+body.learn-mode .ab-table{font-size:clamp(1rem,1.5vw,1.5rem);}
+body.learn-mode .ab-strong-list span{font-size:clamp(1.3rem,2.2vw,2.2rem);min-height:clamp(3.2rem,10vh,6rem);}
+body.learn-mode .ab-brief-slide{font-size:clamp(1rem,1.3vw,1.3rem);}
+body.learn-mode .ab-brief-title{font-size:clamp(1.6rem,2.6vw,2.6rem);}
+
+body.learn-mode .ab-stage .ice-grid.no-left .ice-right{max-width:none;}

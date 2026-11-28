@@ -38,6 +38,28 @@
     return { update: fill };
   });
 
+  // Before we begin: the chapter's learning intentions and competencies, shown on the stage in
+  // presentation mode (the text column is hidden there). While scrolling, the stage loads the
+  // chapter's first scene instead, so it is ready beside the card (see stageBeat below).
+  registerScene('brief', function (mount, beat) {
+    var box = document.createElement('div');
+    box.className = 'scene-brief';
+    mount.appendChild(box);
+    function fill(b) {
+      box.innerHTML = '';
+      var ch = b.closest('[data-chapter]');
+      var h = ch && ch.querySelector('.chapter-head h2');
+      var t = document.createElement('h2');
+      t.className = 'scene-brief-title';
+      t.textContent = h ? h.textContent : '';
+      box.appendChild(t);
+      var cols = b.querySelector('.brief-cols');
+      if (cols) box.appendChild(cols.cloneNode(true));
+    }
+    fill(beat);
+    return { update: fill };
+  });
+
   function init() {
     var beats = Array.prototype.slice.call(document.querySelectorAll('.guide-beat'));
     if (!beats.length) return;
@@ -67,11 +89,19 @@
       }
     });
 
+    // Which beat the stage shows: a Before we begin card hands the stage to the next beat while
+    // scrolling; in presentation mode the card itself is on the stage.
+    function stageBeat(b) {
+      if (!b.classList.contains('brief-beat') || ctx.presenting()) return b;
+      return beats[beats.indexOf(b) + 1] || b;
+    }
+
     function mountScene(b) {
+      if (scene && scene.beat === b) return;   // already on the stage (preloaded by a brief)
       var name = b.dataset.scene || 'placeholder';
       if (!SCENES[name]) name = 'placeholder';
       var sameGroup = scene && scene.name === name && (b.dataset.group || b.id) === scene.group;
-      if (sameGroup && scene.instance.update) { scene.instance.update(b); return; }
+      if (sameGroup && scene.instance.update) { scene.instance.update(b); scene.beat = b; return; }
       if (scene) {
         if (scene.instance.destroy) scene.instance.destroy();
         var old = scene.host;
@@ -81,21 +111,22 @@
       var host = document.createElement('div');
       host.className = 'scene-host';
       stageBody.appendChild(host);
-      scene = { name: name, group: b.dataset.group || b.id, host: host, instance: SCENES[name](host, b, ctx) || {} };
+      scene = { name: name, group: b.dataset.group || b.id, beat: b, host: host, instance: SCENES[name](host, b, ctx) || {} };
       // dev: ?settle jumps every scene to its end state (headless screenshots)
       if (/[?&]settle/.test(location.search)) { var inst = scene.instance; setTimeout(function () { if (inst.settle) inst.settle(); }, 60); }
     }
 
-    function apply(b) {
-      if (!b || b === active) return;
+    function apply(b, force) {
+      if (!b || (b === active && !force)) return;
       active = b;
       beats.forEach(function (x) { x.classList.toggle('is-active', x === b); });
-      var h = b.querySelector('h3');
+      var sb = stageBeat(b);
+      var h = sb.querySelector('h3');
       badge.textContent = h ? h.textContent : '';
-      where.textContent = b.dataset.part + (b.dataset.tag ? ' · ' + b.dataset.tag : '');
+      where.textContent = sb.dataset.part + (sb.dataset.tag ? ' · ' + sb.dataset.tag : '');
       if (progress) progress.textContent = (beats.indexOf(b) + 1) + ' / ' + beats.length;
       if (jump) jump.value = b.closest('[data-chapter]') ? b.closest('[data-chapter]').id : '';
-      mountScene(b);
+      mountScene(sb);
       if (history.replaceState && ctx.presenting()) history.replaceState(null, '', '#' + b.id);
     }
 
@@ -162,6 +193,7 @@
     function setPresent(on) {
       document.body.classList.toggle('present', on);
       if (presentBtn) presentBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      if (active && active.classList.contains('brief-beat')) apply(active, true);   // card ↔ first scene
       if (on) focusBeat();
       else if (active) { pinUntil = Date.now() + 600; scrollToBeat(active, false); }
       window.dispatchEvent(new Event('resize'));   // stages re-measure at the new scale

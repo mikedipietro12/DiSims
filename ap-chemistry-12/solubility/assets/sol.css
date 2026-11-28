@@ -22,7 +22,7 @@
   /* Acids and bases get their own colours site-wide (user, 2026-11-17): H⁺ / H₃O⁺ and OH⁻
      never use the plain cation / anion colours. "Indicator ends" (user pick, 2026-11-17):
      magenta acid, violet-blue base. The acids and bases unit reuses these. */
-  --sol-acid:#c2347a; --sol-acid-line:#86164f;
+  --sol-acid:#d62828; --sol-acid-line:#8f1515;
   --sol-base:#5b5fd6; --sol-base-line:#3438a3;
   --sol-neutral:#e4ebf3; --sol-neutral-line:#7f8ea6;   /* neutral products such as H₂O */
 }

@@ -10,14 +10,19 @@
     key('p');
     ok('P enters presentation mode', document.body.classList.contains('present'));
     var seen = [shell.active().id];
-    for (var i = 0; i < 40; i++) { key('ArrowRight'); if (seen[seen.length - 1] !== shell.active().id) seen.push(shell.active().id); }
-    ok('arrows step through all 33 beats in order', seen.length === 33 && seen[32] === 'b33-which-picture', seen.length);
+    var n = shell.beats.length;
+    ok('first beat is the Chapter A briefing, shown on the stage', seen[0] === 'a-brief' && !!document.querySelector('.scene-host:not(.is-leaving) .scene-brief .brief-block.cc li'));
+    for (var i = 0; i < n + 5; i++) { key('ArrowRight'); if (seen[seen.length - 1] !== shell.active().id) seen.push(shell.active().id); }
+    ok('arrows step through all ' + n + ' beats in order', seen.length === n && seen[n - 1] === 'b33-which-picture', seen.length);
+    ok('three briefings: A, B·1, C', ['a-brief', 'b-brief', 'c-brief'].every(function (id) { return seen.indexOf(id) >= 0; }) && document.querySelectorAll('.brief-beat').length === 3);
     ok('one scene mounted at a time (after leave fades)', document.querySelectorAll('.scene-host:not(.is-leaving)').length === 1);
     key('Home');
-    ok('Home returns to the first beat', shell.active().id === 'b01-left-off');
+    ok('Home returns to the first beat', shell.active().id === 'a-brief');
     var jump = document.getElementById('chapterJump');
     jump.value = 'ch-b1'; jump.dispatchEvent(new Event('change'));
-    ok('chapter jump lands on B·1 beat 9', shell.active().id === 'b09-count');
+    ok('chapter jump lands on the B briefing', shell.active().id === 'b-brief');
+    key('ArrowRight');
+    ok('next is B·1 beat 9', shell.active().id === 'b09-count');
     key('ArrowRight');
     ok('draw beat mounts the engine', !!document.querySelector('.scene-host:not(.is-leaving) .de-svg'));
     key('t');
@@ -78,6 +83,14 @@
     ok('paper: clicking it again hides the answer', !pc.classList.contains('is-open'));
     key('Escape');
     ok('Esc leaves presentation mode', !document.body.classList.contains('present'));
+    key('p');
+    shell.goTo(document.getElementById('c-brief'));
+    ok('Present: C briefing on the stage', !!document.querySelector('.scene-host:not(.is-leaving) .scene-brief'));
+    key('Escape');
+    ok('scrolling: C briefing hands the stage to its first scene', shell.active().id === 'c-brief' && !document.querySelector('.scene-host:not(.is-leaving) .scene-brief') && /Carbon/.test(document.getElementById('stageBadge').textContent), document.getElementById('stageBadge').textContent);
+    var host = document.querySelector('.scene-host:not(.is-leaving)');
+    shell.goTo(document.getElementById('b26-puzzle'));
+    ok('scrolling on to that scene keeps it (no remount)', document.querySelector('.scene-host:not(.is-leaving)') === host);
     ok('no script errors', errs.length === 0, errs.join(' | '));
     var pre = document.createElement('pre'); pre.id = 'selftest'; pre.textContent = out.join('\n'); document.body.appendChild(pre);
   });

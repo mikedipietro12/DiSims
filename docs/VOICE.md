@@ -4,6 +4,10 @@ Read this before writing or editing any text a student will read (Guide sections
 captions, cards). It is built from the teacher's own rewrites. AGENTS.md "Student-facing copy" rules
 still apply on top of this.
 
+**Grade 12 copy uses Hebden's terms.** For anything in `ap-chemistry-12/`, take definitions, terminology and
+notation from the Hebden Chemistry 12 textbook (`private/HEBDEN/`, see AGENTS.md "Grade 12 content: follow
+Hebden"). The wording stays in the teacher's voice below. Don't copy Hebden's sentences.
+
 ## Rules (confirmed)
 
 A pattern moves here once it shows up in more than one edit and the teacher agrees.

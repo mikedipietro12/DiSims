@@ -4,6 +4,9 @@
 > visual rules, and **copy length**. These are conformance rules — follow them so the sim sits
 > natively in the DiPietro Science Sims stream and doesn't read as generic AI output *or* as a
 > Unit 1b clone with telegram body copy.
+>
+> **Check the Hebden Chemistry 12 kinetics chapter first** (`private/HEBDEN/`). Terms, notation and scope follow
+> Hebden. See root `AGENTS.md`, "Grade 12 content: follow Hebden".
 
 ---
 

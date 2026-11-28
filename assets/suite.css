@@ -721,3 +721,45 @@ body.learn-mode .guide-stage-panel .hud-quiet{visibility:hidden;}
 @media (prefers-reduced-motion: reduce){
   .thermo-fill{transition:none;}
 }
+
+/* =====================================================================================
+   Dark mode, shared (lifted from chemistry-11h/bonding/assets/bonding.css, 2026-11-27). Turned on by
+   assets/theme.js, which sets <html data-theme="dark"> and adds the sun / moon keycap to the top nav.
+   Pages that don't load theme.js never get data-theme, so none of this applies to them.
+   Each suite remaps its own drawings in its own CSS.
+   ===================================================================================== */
+:root{--on-ink:#ffffff;}
+/* Copy that names the ink colour ("Black number"): one word for each theme */
+.if-dark{display:none;}
+:root[data-theme="dark"] .if-light{display:none;}
+:root[data-theme="dark"] .if-dark{display:inline;}
+.theme-toggle{display:inline-grid;place-items:center;min-width:40px;min-height:40px;padding:0.35rem;}
+.theme-toggle .theme-moon{display:none;}
+.theme-toggle[aria-pressed="true"]{transform:none;box-shadow:var(--key-drop);}
+.theme-toggle[aria-pressed="true"] .theme-sun{display:none;}
+.theme-toggle[aria-pressed="true"] .theme-moon{display:inline;}
+
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --field:#0b0d12;
+  --field-2:#0b0d12;
+  --tray:#161a22;
+  --ink:#ffffff;
+  --ink-soft:#dde1e9;
+  --dim:#aeb5c4;
+  --faint:#aeb5c4;
+  --accent:#8f9bff;
+  --accent-soft:#262c52;
+  --line:rgba(255,255,255,0.16);
+  --line-strong:#c9cfdb;
+  --key-drop:0 3px 0 #4a5264;
+  --on-ink:#0b0d12;
+}
+:root[data-theme="dark"] body{background:var(--field);}
+
+/* Text on an --ink fill: ink is white in dark mode, so the text turns black */
+:root[data-theme="dark"] .room-switch a[aria-current="page"],
+:root[data-theme="dark"] .btn.primary,
+:root[data-theme="dark"] .btn[aria-pressed="true"]{color:var(--on-ink);}
+:root[data-theme="dark"] .btn.primary:hover{background:var(--ink-soft);}
+:root[data-theme="dark"] .theme-toggle[aria-pressed="true"]{background:var(--tray);color:var(--ink);}

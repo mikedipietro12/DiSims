@@ -159,6 +159,26 @@
 .chapter-head p{color:var(--ink-soft);max-width:38rem;}
 .guide-beat h3{font-family:var(--font-display);font-size:clamp(1.45rem,2.8vw,1.9rem);font-weight:700;letter-spacing:-0.03em;line-height:1.15;margin-bottom:0.75rem;}
 .guide-beat h3:focus{outline:none;}
+
+/* Before we begin: each curriculum block opens with its learning intentions and competencies (A, B·1, C) */
+.brief-beat{min-height:0;margin:0.6rem 0 0.4rem;padding:1.4rem 1.5rem 1.5rem;background:var(--tray);border:2px solid var(--line-strong);border-radius:var(--radius-lg);box-shadow:0 4px 0 var(--ink);}
+.guide-beat.brief-beat + .guide-beat{border-top:none;}
+.brief-beat h3{margin-bottom:0.35rem;}
+.brief-lead{font-size:1.05rem;}
+.brief-cols{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:0.9rem;max-width:40rem;}
+.brief-block{border-left:4px solid var(--accent);padding:0.1rem 0 0.1rem 1rem;}
+.brief-block.cc{border-left-color:var(--ink);}
+.brief-block h4{font-family:var(--font-display);font-size:1rem;font-weight:700;margin:0 0 0.35rem;color:var(--ink);}
+.brief-block ul{margin:0;padding-left:1.1rem;}
+.brief-block li{margin:0.35rem 0;color:var(--ink-soft);line-height:1.45;}
+.brief-block li strong{color:var(--ink);}
+/* the same card on the stage (presentation mode) */
+.scene-brief{flex:1 1 auto;min-height:0;overflow-y:auto;padding:1.2rem 1.6rem 1.4rem;background:var(--tray);border:2px solid var(--line-strong);border-radius:var(--radius-lg);}
+.scene-brief-title{font-family:var(--font-display);font-size:clamp(1.6rem,2.6vw,2.4rem);font-weight:700;letter-spacing:-0.03em;line-height:1.1;margin:0 0 1rem;}
+.scene-brief .brief-cols{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.8rem;max-width:none;margin-top:0;}
+.scene-brief .brief-block h4{font-size:clamp(1.05rem,1.4vw,1.35rem);}
+.scene-brief .brief-block li{font-size:clamp(0.95rem,1.3vw,1.3rem);margin:0.45rem 0;}
+@media (max-width:860px){.scene-brief .brief-cols{grid-template-columns:1fr;}}
 .guide-beat .beat-formula{font-family:var(--font-mono);font-weight:700;color:var(--ink);background:var(--tray);border:2px solid var(--line-strong);border-radius:10px;padding:0.5rem 0.8rem;display:inline-block;}
 
 /* Stage panel: wider than IMF's, holds a whole draw engine */
@@ -628,44 +648,11 @@ body.present .ptable-toggle{font-size:1rem;min-height:42px;}
    animations) keep their light tray and colours: their code draws in dark ink, so the light tokens are
    put back inside them. Bonding only for now; lift this block into suite.css when the next suite gets it.
    ===================================================================================== */
-:root{--on-ink:#ffffff;}
-/* Copy that names the ink colour ("Black number"): one word for each theme */
-.if-dark{display:none;}
-:root[data-theme="dark"] .if-light{display:none;}
-:root[data-theme="dark"] .if-dark{display:inline;}
-.theme-toggle{display:inline-grid;place-items:center;min-width:40px;min-height:40px;padding:0.35rem;}
-.theme-toggle .theme-moon{display:none;}
-.theme-toggle[aria-pressed="true"]{transform:none;box-shadow:var(--key-drop);}
-.theme-toggle[aria-pressed="true"] .theme-sun{display:none;}
-.theme-toggle[aria-pressed="true"] .theme-moon{display:inline;}
-
-:root[data-theme="dark"]{
-  color-scheme:dark;
-  --field:#0b0d12;
-  --field-2:#0b0d12;
-  --tray:#161a22;
-  --ink:#ffffff;
-  --ink-soft:#dde1e9;
-  --dim:#aeb5c4;
-  --faint:#aeb5c4;
-  --accent:#8f9bff;
-  --accent-soft:#262c52;
-  --line:rgba(255,255,255,0.16);
-  --line-strong:#c9cfdb;
-  --key-drop:0 3px 0 #4a5264;
-  --on-ink:#0b0d12;
-}
-:root[data-theme="dark"] body{background:var(--field);}
-
-/* Text on an --ink fill: ink is white in dark mode, so the text turns black */
-:root[data-theme="dark"] .room-switch a[aria-current="page"],
-:root[data-theme="dark"] .btn.primary,
-:root[data-theme="dark"] .btn[aria-pressed="true"],
+/* Dark tokens, the theme keycap and text on ink fills now live in ../../assets/suite.css (lifted 2026-11-27
+   for the Acids and Bases unit). Bonding's own pieces follow. */
 :root[data-theme="dark"] .scene-chip[aria-pressed="true"],
 :root[data-theme="dark"] .shape-choice[aria-pressed="true"],
 :root[data-theme="dark"] .which-next{color:var(--on-ink);}
-:root[data-theme="dark"] .btn.primary:hover{background:var(--ink-soft);}
-:root[data-theme="dark"] .theme-toggle[aria-pressed="true"]{background:var(--tray);color:var(--ink);}
 /* White text on the lighter dark-mode accent */
 :root[data-theme="dark"] .lift-go{color:var(--on-ink);}
 /* The drag ghost floats over the page, outside any drawing */

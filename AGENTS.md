@@ -15,6 +15,20 @@ with more specific build rules; those add to this file, they don't replace it.
   - Physical verbs are fine: *pulls*, *attracts*, *repels*, *shifts*, *bonds*.
 - **Atoms are spheres, not balls**, when describing space-filling or model-kit atoms.
 
+## Grade 12 content: follow Hebden
+
+- **Check the Hebden Chemistry 12 textbook before building or editing anything for grade 12** (user, 2026-11-27).
+  That covers everything in `ap-chemistry-12/`. The PDFs are in `private/HEBDEN/` (local only, see Folder layout):
+  `Hebden 12 (p1-100).pdf`, `(p101-226).pdf`, `(p227-336).pdf`. Read the chapter for the topic first.
+- **Match Hebden on content:** definitions, terms, symbols and notation, the order ideas are taught in, and how
+  deep a topic goes. Don't add content past what Hebden covers unless the teacher asks for it.
+- **This file still decides how things are shown.** Unit analysis, voice (`docs/VOICE.md`), colours and the other
+  rules here apply even where Hebden lays something out differently. Numbers come from the Data Booklet
+  (`docs/reference/chem12-data-booklet.md`).
+- **Copyrighted: don't copy it into the site.** No pasted passages, figures, scans or textbook questions word for
+  word. Write the sim's own copy and examples, consistent with Hebden.
+- Reading the PDFs needs poppler (`brew install poppler`) for the Read tool, or `pdftotext`.
+
 ## Calculations
 
 - **Show calculations as unit analysis** (user, 2026-11-18). Any calculation that isn't a K calculation
@@ -43,7 +57,8 @@ with more specific build rules; those add to this file, they don't replace it.
   All suites were cleaned on 2026-11-17 (hub card labels, Guide section labels, briefing titles).
   Small labels over a *list or paragraph* (e.g. "Learning intentions" in a briefing) are a separate case, left as is.
 - **Ion, acid and base colours** (user, 2026-11-17). Cations rose `#f06a84`, anions yellow `#ffd257`, each
-  labelled with symbol + charge. Acids (H⁺ / H₃O⁺) magenta `#c2347a`, bases (OH⁻) violet-blue `#5b5fd6`:
+  labelled with symbol + charge. Acids (H⁺ / H₃O⁺) red `#d62828` (user 2026-11-27, was magenta `#c2347a`: changed so
+  pink only ever means phenolphthalein), bases (OH⁻) violet-blue `#5b5fd6`:
   they never use the plain cation / anion colours. Neutral products such as H₂O are pale grey `#e4ebf3`.
   Ions inside a solid take the solid's real colour; a yellow solid is a paler yellow than the anion yellow
   (PbI₂ `#f6e39a`, user 2026-11-20), so solid and dissolved never look alike. Tokens live in `ap-chemistry-12/solubility/assets/sol.css`; the
@@ -59,6 +74,8 @@ The folders mirror the site (user, 2026-11-25): one folder per course hub, one s
 - `other/` → sims outside a course (`bc-tides.html`).
 - `assets/` at the root holds files several suites share: `suite.css` and `suite-chrome.js` (the shared suite
   chrome), `courses.css`, `home.css`, `section-jump.js`. A suite's own `assets/` holds only its own files.
+- `private/` is git-ignored and local only (e.g. `private/HEBDEN/`, the Hebden 12 textbook PDFs). Use it for
+  reference while writing content (see "Grade 12 content: follow Hebden"), but never link to it, copy files out of it into the site, or un-ignore it.
 - A new unit or sim goes in its course folder, gets a card on that hub, and an entry in `sitemap.xml`.
 - **Moving a public page changes its URL.** Update every link to it, its canonical / `og:url` / JSON-LD URLs and
   `sitemap.xml`, and add the old path to the redirect list in `404.html` so old links and bookmarks still work.

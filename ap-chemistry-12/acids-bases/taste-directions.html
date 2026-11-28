@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Taste Directions · Acids and Bases</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/suite.css?v=19">
+  <script src="../../assets/theme.js"></script>
+  <style>
+/* Dev-only comparison page (not linked from the hub). Three looks for the Acids and Bases Guides.
+   Same scenes in each direction; the numbers are real (Data Booklet), only the look changes. */
+:root{--on-ink:#ffffff;}
+.theme-toggle{display:inline-grid;place-items:center;min-width:40px;min-height:40px;padding:0.35rem;}
+.theme-toggle .theme-moon{display:none;}
+.theme-toggle[aria-pressed="true"] .theme-sun{display:none;}
+.theme-toggle[aria-pressed="true"] .theme-moon{display:inline;}
+.top-nav-end{display:flex;align-items:center;gap:0.6rem;}
+/* Dark page chrome: same tokens as Bonding's dark block (to be lifted into suite.css at build) */
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --field:#0b0d12; --field-2:#0b0d12; --tray:#161a22;
+  --ink:#ffffff; --ink-soft:#dde1e9; --dim:#aeb5c4; --faint:#aeb5c4;
+  --accent:#8f9bff; --accent-soft:#262c52;
+  --line:rgba(255,255,255,0.16); --line-strong:#c9cfdb; --key-drop:0 3px 0 #4a5264;
+  --on-ink:#0b0d12;
+}
+:root[data-theme="dark"] body{background:var(--field);}
+:root[data-theme="dark"] .btn{background:var(--tray);color:var(--ink);border-color:var(--line-strong);}
+
+.dirs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin-top:1.2rem;}
+#dirs{margin-top:1.2rem;}
+.scenes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2rem 1.4rem;}
+.scenes > div{min-width:0;}
+.scenes h3{font-size:1.05rem;margin:0 0 0.5rem;}
+.scenes canvas{display:block;width:100%;height:auto;border-radius:var(--radius);border:1.5px solid var(--line);}
+.dir{background:var(--tray);border:2px solid var(--line-strong);border-radius:var(--radius-lg);box-shadow:var(--key-drop);padding:1.1rem 1.1rem 1.3rem;}
+.dir h2{font-size:1.35rem;letter-spacing:-0.02em;margin:0 0 0.25rem;}
+.dir .why{font-size:0.9rem;color:var(--dim);margin:0 0 0.4rem;line-height:1.45;}
+.dir .risk{font-size:0.85rem;color:var(--ink-soft);margin:0 0 0.6rem;line-height:1.45;}
+.dir h3{font-size:1rem;margin:1rem 0 0.4rem;}
+.dir canvas{display:block;width:100%;height:auto;border-radius:var(--radius);border:1.5px solid var(--line);}
+.lead{color:var(--dim);max-width:62rem;line-height:1.55;}
+.lead + .lead{margin-top:0.5rem;}
+.note{margin-top:2rem;max-width:62rem;background:var(--tray);border:2px solid var(--line-strong);border-radius:var(--radius-lg);padding:1rem 1.2rem;box-shadow:var(--key-drop);}
+.note h2{font-size:1.2rem;margin-bottom:0.4rem;}
+.note p,.note li{color:var(--ink-soft);line-height:1.5;font-size:0.95rem;}
+.note ul{margin:0.4rem 0 0 1.2rem;}
+
+/* Prediction card, one look per direction */
+.card{border-radius:12px;padding:0.7rem 0.8rem;}
+.card .q{font-weight:700;margin-bottom:0.45rem;font-size:0.95rem;}
+.card .opts{display:flex;gap:0.45rem;}
+.card .opt{flex:1;text-align:center;padding:0.45rem 0.3rem;font-weight:700;border-radius:10px;font-size:0.9rem;}
+.card .why-line{margin-top:0.45rem;font-size:0.85rem;line-height:1.4;}
+.card .mark{font-family:var(--font-mono);margin-right:0.25rem;}
+/* A: Toy Box keycaps */
+.card-A{background:var(--tray);border:2px solid var(--line-strong);}
+.card-A .opt{border:2px solid var(--line-strong);box-shadow:var(--key-drop);background:var(--tray);color:var(--ink);}
+.card-A .opt.ok{background:#d9f5df;border-color:#1f7a3a;color:#14532a;box-shadow:0 3px 0 #1f7a3a;}
+.card-A .opt.no{background:#fde0e3;border-color:#b3263f;color:#7d1428;box-shadow:0 3px 0 #b3263f;}
+.card-A .why-line{color:var(--ink-soft);}
+/* B: soft, rounded, no ink */
+.card-B{background:linear-gradient(180deg,#f6f9fc,#eef3f9);border:1px solid rgba(29,36,51,0.10);box-shadow:0 6px 18px rgba(29,36,51,0.08);color:#1d2433;}
+.card-B .opt{background:#ffffff;border:1px solid rgba(29,36,51,0.12);box-shadow:0 2px 6px rgba(29,36,51,0.08);color:#1d2433;}
+.card-B .opt.ok{background:#e3f6e8;border-color:#7cc993;color:#14532a;}
+.card-B .opt.no{background:#fde8ea;border-color:#ee9aa6;color:#7d1428;}
+.card-B .why-line{color:#3d4658;}
+:root[data-theme="dark"] .card-B{background:linear-gradient(180deg,#1b212c,#151a23);border-color:rgba(255,255,255,0.10);color:#fff;box-shadow:0 6px 18px rgba(0,0,0,0.4);}
+:root[data-theme="dark"] .card-B .opt{background:#222937;border-color:rgba(255,255,255,0.12);color:#fff;}
+:root[data-theme="dark"] .card-B .opt.ok{background:#173a24;border-color:#3f9d5e;color:#c9f2d5;}
+:root[data-theme="dark"] .card-B .opt.no{background:#3d1820;border-color:#b3485a;color:#ffd3da;}
+:root[data-theme="dark"] .card-B .why-line{color:#c7cdd8;}
+/* C: night lab, glowing edges */
+.card-C{background:#0e1322;border:1px solid #2a3554;color:#e8ecf6;}
+.card-C .opt{background:#141b2f;border:1px solid #33406a;color:#e8ecf6;}
+.card-C .opt.ok{border-color:#4fe08a;color:#bff7d3;box-shadow:0 0 0 1px #4fe08a,0 0 14px rgba(79,224,138,0.45);}
+.card-C .opt.no{border-color:#ff6b86;color:#ffd0da;box-shadow:0 0 0 1px #ff6b86,0 0 14px rgba(255,107,134,0.4);}
+.card-C .why-line{color:#aeb7cf;}
+:root[data-theme="dark"] .btn[aria-pressed="true"]{background:var(--ink);color:var(--on-ink);}
+.seg{display:flex;gap:0.45rem;flex-wrap:wrap;align-items:center;margin:0 0 0.6rem;}
+.seg .seg-lab{font-weight:700;margin-right:0.2rem;}
+.sw{display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.9rem;align-items:flex-start;}
+.sw figure{margin:0;text-align:center;font-size:0.78rem;color:var(--dim);width:6.2rem;line-height:1.3;}
+.sw i{display:block;width:46px;height:46px;border-radius:50%;border:2px solid var(--line-strong);margin:0 auto 0.3rem;}
+.sw figure.pick i{width:58px;height:58px;}
+@media (max-width:1100px){.dirs{grid-template-columns:1fr;max-width:40rem;}.scenes{grid-template-columns:1fr;max-width:40rem;}}
+  </style>
+  <link rel="icon" href="/assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+</head>
+<body>
+  <div class="module-wrap">
+    <div class="top-nav">
+      <a href="index.html" class="back-link">← Acids and Bases</a>
+      <div class="mod-meta">Taste pass · dev only</div>
+    </div>
+    <h1 style="font-size:2.2rem;letter-spacing:-0.03em;margin-bottom:0.4rem;">Taste: Ink and spheres</h1>
+    <p class="lead">The chosen look (direction A) with the teacher's changes, in four scenes: 0.10 M HCl beside 0.10 M HF (numbers from the Data Booklet), NH₃ taking a proton from water, the Kw balance as acid and then base is added, and a phenolphthalein endpoint. Directions B and C are retired; C's night-lab stage is kept as the dark-mode look.</p>
+    <p class="lead">Use the moon button (top right) for dark mode. Tap any scene to restart it.</p>
+    <div id="dirs"></div>
+
+    <div class="note">
+      <h2>What this look includes</h2>
+      <ul>
+        <li><b>Light mode: ink and spheres.</b> <b>Dark mode: the night-lab stage</b> (dark navy, glowing atoms, rim-lit glass).</li>
+        <li><b>H₃O⁺ is red #d62828 site-wide</b> (was magenta), so pink only ever means phenolphthalein. OH⁻ violet-blue, other anions yellow, other cations rose.</li>
+        <li><b>Particles show their atoms</b>: H₃O⁺ is O + 3 H, OH⁻ is O + H; the role colour sits on the oxygen, hydrogens stay white.</li>
+        <li><b>Proton transfers switch</b> between Lewis, ball-and-stick and space-filling. Ball-and-stick uses role colours (molecules grey, OH⁻ violet-blue, NH₄⁺ rose). <b>Space-filling uses the classic atom colours</b> (O red, N blue, H white) with a <b>charge haze</b> around each ion: red for +, yellow for −, the site's δ+ / δ− colours. The moving H keeps a red ring in every model.</li>
+        <li><b>Kw bars</b>: rounded, gradient fill, no ink edge.</li>
+      </ul>
+    </div>
+  </div>
+<script>
+(function () {
+  'use strict';
+  // ---------- shared chemistry and colours ----------
+  const C = { acid:'#d62828', base:'#5b5fd6', anion:'#ffd257', cation:'#f06a84', neutral:'#e4ebf3', ink:'#1d2433' };
+  const DPOS = '#e8264f', DNEG = '#ffc21a'; // δ+ red / δ− yellow (suite.css), used for charge haze
+  const ATOM = { O:'#e5533d', H:'#f4f6f8', Cl:'#3fbf5f', F:'#a6db6e', N:'#3f6fe0' };
+  const isDark = () => document.documentElement.getAttribute('data-theme') === 'dark';
+  const SUP = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻' };
+  const sup = s => String(s).split('').map(ch => SUP[ch] || ch).join('');
+  function sci(v) { const e = Math.floor(Math.log10(v) + 1e-9); let m = v / Math.pow(10, e); if (m >= 9.95) { m = 1; return '1.0 × 10' + sup(e + 1); } return m.toFixed(1) + ' × 10' + sup(e); }
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  const ease = u => u < 0 ? 0 : u > 1 ? 1 : u * u * (3 - 2 * u);
+  function tri(u, lo, hi) { const L = hi - lo; let m = ((u - lo) % (2 * L) + 2 * L) % (2 * L); return lo + (m < L ? m : 2 * L - m); }
+  function rnd(i, k) { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); }
+  const FONT = "'Space Grotesk', Helvetica, sans-serif";
+
+  // 0.10 M HF: Ka 3.5 × 10⁻⁴ (booklet) → [H₃O⁺] = √(3.5e-5) = 5.9 × 10⁻³ M, about 6% ionized.
+  // Drawn at 17 acid particles: 16 HF + 1 H₃O⁺ / F⁻ pair. 0.10 M HCl: every particle ionized.
+
+  // ---------- direction styles ----------
+  // One look (teacher, 2026-11-27): A in light mode; C's night-lab stage in dark mode. D.id follows the theme.
+  const DIRS = [{ id:'A', name:'Ink and spheres' }];
+
+  // stage colours per direction and theme
+  function pal(D) {
+    const dk = isDark();
+    if (D.id === 'A') return dk
+      ? { stage:'#161a22', water:'#1c2a3d', waterLine:'#5d8fbf', ink:'#ffffff', dim:'#aeb5c4', glass:'#c9cfdb', faint:'rgba(255,255,255,0.10)' }
+      : { stage:'#ffffff', water:'#e3f1fb', waterLine:'#7fb3d9', ink:C.ink, dim:'#5b6474', glass:C.ink, faint:'rgba(29,36,51,0.10)' };
+    if (D.id === 'B') return dk
+      ? { stage:'#10141c', water:'#15243a', waterLine:'#4f7fb0', ink:'#eef2f8', dim:'#aab3c3', glass:'#9fb3cc', faint:'rgba(200,220,255,0.10)' }
+      : { stage:'#f4f7fb', water:'#dcecf8', waterLine:'#8fbde0', ink:'#24304a', dim:'#5f6a80', glass:'#7f93ad', faint:'rgba(36,48,74,0.10)' };
+    return { stage:'#0b1020', water:'#101c34', waterLine:'#3a6aa8', ink:'#e8ecf6', dim:'#8f9ab8', glass:'#6fa8e8', faint:'rgba(140,170,230,0.12)' };
+  }
+
+  // ---------- species ----------
+  // role: acid / base / anion / mol (whole acid molecule) / water
+  const SPECIES = {
+    H3O:{ label:'H₃O⁺', role:'acid',  charge:'+', heavy:'O',  hs:[[-90,0.82],[30,0.82],[150,0.82]] },
+    OH: { label:'OH⁻',  role:'base',  charge:'−', heavy:'O',  hs:[[-35,0.82]] },
+    Cl: { label:'Cl⁻',  role:'anion', charge:'−', heavy:'Cl', hs:[] },
+    F:  { label:'F⁻',   role:'anion', charge:'−', heavy:'F',  hs:[] },
+    HF: { label:'HF',   role:'mol',   charge:'',  heavy:'F',  hs:[[0,0.92]] },
+    H2O:{ label:'H₂O',  role:'water', charge:'',  heavy:'O',  hs:[[38,0.8],[142,0.8]] }
+  };
+  const HEAVY_R = { O:1.0, Cl:1.28, F:0.98, N:1.05 };
+  const roleColour = r => r === 'acid' ? C.acid : r === 'base' ? C.base : r === 'anion' ? C.anion : r === 'mol' ? '#c9ced8' : C.neutral;
+
+  function shadeBall(ctx, x, y, r, col, D) {
+    const g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.4, r * 0.1, x, y, r);
+    if (D.id === 'B') { g.addColorStop(0, '#ffffff'); g.addColorStop(0.28, col); g.addColorStop(1, shadeHex(col, -0.38)); }
+    else { g.addColorStop(0, shadeHex(col, 0.45)); g.addColorStop(0.55, col); g.addColorStop(1, shadeHex(col, -0.18)); }
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  }
+  function shadeHex(hex, amt) {
+    const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+    const f = amt < 0 ? 0 : 255, a = Math.abs(amt);
+    r = Math.round(r + (f - r) * a); g = Math.round(g + (f - g) * a); b = Math.round(b + (f - b) * a);
+    return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
+  }
+  const textCol = col => (col === C.acid || col === C.base) ? '#ffffff' : C.ink;
+
+  // Round 2: every particle shows its atoms. Role colour on the heavy atom, hydrogens white.
+  function drawSpecies2(ctx, D, P, key, x, y, s, rot, alpha) {
+    const sp = SPECIES[key], dark = D.id === 'C';
+    const heavyCol = sp.role === 'acid' ? C.acid : sp.role === 'base' ? C.base : sp.role === 'anion' ? C.anion
+      : sp.role === 'mol' ? (dark ? '#8c93b8' : '#c9ced8') : (dark ? '#3b4a72' : '#d5dce7');
+    const water = sp.role === 'water', k = water ? 0.62 : 1, R = s * k * HEAVY_R[sp.heavy], hr = s * k * 0.56;
+    ctx.save(); ctx.globalAlpha = alpha * (water ? 0.6 : 1);
+    const Dshade = { id:'A' };
+    sp.hs.forEach(([a, d]) => {
+      const t = rot + a * Math.PI / 180, hx = x + Math.cos(t) * d * s * k * 1.08, hy = y + Math.sin(t) * d * s * k * 1.08;
+      if (dark) { ctx.fillStyle = water ? '#33406a' : '#dfe6ff'; if (!water) { ctx.shadowColor = '#dfe6ff'; ctx.shadowBlur = 5; } circ(ctx, hx, hy, hr); ctx.shadowBlur = 0; }
+      else { shadeBall(ctx, hx, hy, hr, '#ffffff', Dshade); if (!water) ring(ctx, hx, hy, hr, P.ink, 1.3); else ring(ctx, hx, hy, hr, 'rgba(29,36,51,0.25)', 1); }
+    });
+    if (dark) {
+      if (!water) { ctx.shadowColor = heavyCol; ctx.shadowBlur = sp.role === 'mol' ? 4 : 16; }
+      const g = ctx.createRadialGradient(x, y, 0, x, y, R); g.addColorStop(0, shadeHex(heavyCol, 0.5)); g.addColorStop(0.7, heavyCol); g.addColorStop(1, shadeHex(heavyCol, -0.25));
+      ctx.fillStyle = g; circ(ctx, x, y, R); ctx.shadowBlur = 0;
+    } else {
+      shadeBall(ctx, x, y, R, heavyCol, Dshade); ring(ctx, x, y, R, water ? 'rgba(29,36,51,0.25)' : P.ink, water ? 1 : 1.7);
+    }
+    if (!water) {
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const onDark = sp.role === 'acid' || sp.role === 'base';
+      if (sp.hs.length === 0 || sp.role === 'mol') { // Cl⁻, F⁻, HF: formula inside the big atom
+        ctx.fillStyle = (dark && sp.role === 'mol') ? '#ffffff' : C.ink; ctx.font = '700 ' + Math.round(s * 0.62) + 'px ' + FONT; ctx.fillText(sp.label, x, y + 0.5);
+      } else { // H₃O⁺, OH⁻: charge on the oxygen, formula underneath
+        ctx.fillStyle = onDark ? '#ffffff' : C.ink; ctx.font = '700 ' + Math.round(s * 0.9) + 'px ' + FONT; ctx.fillText(sp.charge, x, y + 0.5);
+        ctx.fillStyle = dark ? shadeHex(heavyCol, 0.45) : P.ink; ctx.font = '700 ' + Math.round(s * 0.62) + 'px ' + FONT; ctx.textBaseline = 'top';
+        ctx.fillText(sp.label, x, y + s * 1.55);
+      }
+    }
+    ctx.restore();
+  }
+  function drawSpecies(ctx, D, P, key, x, y, s, rot, alpha) {
+    if (D.id === 'A' || D.id === 'C') return drawSpecies2(ctx, D, P, key, x, y, s, rot, alpha);
+    const sp = SPECIES[key]; ctx.save(); ctx.globalAlpha = alpha;
+    if (D.id === 'A') {
+      const col = roleColour(sp.role);
+      if (sp.role === 'water') { ctx.globalAlpha = alpha * 0.55; waterGlyph(ctx, x, y, s * 0.55, rot, P.dim); ctx.restore(); return; }
+      const r = s * (sp.role === 'mol' ? 0.95 : 1);
+      if (sp.role === 'mol') { // two fused spheres
+        const hx = x + Math.cos(rot) * r * 0.85, hy = y + Math.sin(rot) * r * 0.85;
+        shadeBall(ctx, hx, hy, r * 0.55, '#ffffff', D); ring(ctx, hx, hy, r * 0.55, P.ink, 1.6);
+      }
+      shadeBall(ctx, x, y, r, col, D); ring(ctx, x, y, r, P.ink, 1.8);
+      ctx.fillStyle = sp.role === 'mol' ? C.ink : textCol(col);
+      ctx.font = '700 ' + Math.round(s * 0.62) + 'px ' + FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(sp.label, x, y + 0.5);
+    } else if (D.id === 'B') {
+      if (sp.role === 'water') { ctx.globalAlpha = alpha * 0.45; molecule(ctx, D, sp, x, y, s * 0.5, rot); ctx.restore(); return; }
+      if (sp.role === 'acid' || sp.role === 'base' || sp.role === 'anion') {
+        const hc = roleColour(sp.role), R = s * (HEAVY_R[sp.heavy] + 0.55);
+        const g = ctx.createRadialGradient(x, y, R * 0.6, x, y, R * 1.25);
+        g.addColorStop(0, hexA(hc, 0.0)); g.addColorStop(0.55, hexA(hc, 0.35)); g.addColorStop(1, hexA(hc, 0));
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, R * 1.25, 0, Math.PI * 2); ctx.fill();
+        ring(ctx, x, y, R, hc, 2.4);
+      }
+      molecule(ctx, D, sp, x, y, s, rot);
+      if (sp.charge) badge(ctx, x + s * 1.05, y - s * 1.05, s * 0.36, roleColour(sp.role), sp.charge);
+      ctx.fillStyle = P.dim; ctx.font = '600 ' + Math.round(s * 0.5) + 'px ' + FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText(sp.label, x, y + s * 1.55);
+    } else {
+      if (sp.role === 'water') { ctx.globalAlpha = alpha * 0.5; waterGlyph(ctx, x, y, s * 0.5, rot, '#3b4a72'); ctx.restore(); return; }
+      const col = sp.role === 'mol' ? '#8c93b8' : roleColour(sp.role), r = s * (sp.role === 'mol' ? 0.9 : 1);
+      ctx.shadowColor = col; ctx.shadowBlur = sp.role === 'mol' ? 4 : 16;
+      if (sp.role === 'mol') { const hx = x + Math.cos(rot) * r * 0.85, hy = y + Math.sin(rot) * r * 0.85; ctx.fillStyle = '#b9bfdc'; circ(ctx, hx, hy, r * 0.5); }
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, shadeHex(col, 0.55)); g.addColorStop(0.7, col); g.addColorStop(1, shadeHex(col, -0.25));
+      ctx.fillStyle = g; circ(ctx, x, y, r); ctx.shadowBlur = 0;
+      ctx.fillStyle = (sp.role === 'anion') ? '#1d2433' : '#ffffff';
+      ctx.font = '700 ' + Math.round(s * 0.62) + 'px ' + FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(sp.label, x, y + 0.5);
+    }
+    ctx.restore();
+  }
+  function molecule(ctx, D, sp, x, y, s, rot) {
+    const R = s * HEAVY_R[sp.heavy], hr = s * 0.6;
+    sp.hs.forEach(([a, d]) => { const t = rot + a * Math.PI / 180; shadeBall(ctx, x + Math.cos(t) * d * s * 1.05, y + Math.sin(t) * d * s * 1.05, hr, ATOM.H, D); });
+    shadeBall(ctx, x, y, R, ATOM[sp.heavy], D);
+  }
+  function waterGlyph(ctx, x, y, s, rot, col) {
+    ctx.fillStyle = col; circ(ctx, x, y, s);
+    [38, 142].forEach(a => { const t = rot + a * Math.PI / 180; circ(ctx, x + Math.cos(t) * s * 0.95, y + Math.sin(t) * s * 0.95, s * 0.58); });
+  }
+  const circ = (ctx, x, y, r) => { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); };
+  const ring = (ctx, x, y, r, col, w) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke(); };
+  function mixHex(a, b, k) { const A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16); const m = (x, y) => Math.round(x + (y - x) * k);
+    return '#' + ((1 << 24) | (m(A >> 16, B >> 16) << 16) | (m((A >> 8) & 255, (B >> 8) & 255) << 8) | m(A & 255, B & 255)).toString(16).slice(1); }
+  function hexA(hex, a) { const n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; }
+  function badge(ctx, x, y, r, col, ch) {
+    ctx.fillStyle = col; circ(ctx, x, y, r); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = col === C.anion ? C.ink : '#ffffff'; ctx.font = '700 ' + Math.round(r * 1.7) + 'px ' + FONT;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(ch, x, y + 0.5);
+  }
+  function rrect(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+  function label(ctx, txt, x, y, col, size, weight, align) { ctx.fillStyle = col; ctx.font = (weight || 700) + ' ' + size + 'px ' + FONT; ctx.textAlign = align || 'center'; ctx.textBaseline = 'alphabetic'; ctx.fillText(txt, x, y); }
+
+  // ---------- scene 1: strong vs weak ----------
+  function sceneStrongWeak(ctx, W, H, t, D) {
+    const P = pal(D); ctx.fillStyle = P.stage; ctx.fillRect(0, 0, W, H);
+    const pads = [{ x:12, title:'0.10 M HCl', sub:'strong: 100% ionized', list:[] }, { x:W / 2 + 6, title:'0.10 M HF', sub:'weak: about 6% ionized', list:[] }];
+    for (let i = 0; i < 7; i++) { pads[0].list.push('H3O', 'Cl'); }
+    for (let i = 0; i < 16; i++) pads[1].list.push('HF');
+    pads[1].list.push('H3O', 'F');
+    const ww = W / 2 - 18, wy = 30, wh = H - 58;
+    pads.forEach((pd, k) => {
+      // window
+      ctx.save(); rrect(ctx, pd.x, wy, ww, wh, 12);
+      if (D.id === 'C') { ctx.fillStyle = P.water; ctx.fill(); ctx.strokeStyle = hexA('#6fa8e8', 0.55); ctx.lineWidth = 1.5; ctx.shadowColor = '#6fa8e8'; ctx.shadowBlur = 8; ctx.stroke(); ctx.shadowBlur = 0; }
+      else if (D.id === 'B') { const g = ctx.createLinearGradient(0, wy, 0, wy + wh); g.addColorStop(0, shadeHex(P.water, isDark() ? 0.05 : 0.35)); g.addColorStop(1, P.water); ctx.fillStyle = g; ctx.fill(); ctx.strokeStyle = hexA('#7f93ad', 0.5); ctx.lineWidth = 1; ctx.stroke(); }
+      else { ctx.fillStyle = P.water; ctx.fill(); ctx.strokeStyle = P.glass; ctx.lineWidth = 2; ctx.stroke(); }
+      ctx.clip();
+      const x0 = pd.x + 14, x1 = pd.x + ww - 14, y0 = wy + 14, y1 = wy + wh - 14;
+      for (let i = 0; i < 26; i++) { // background water
+        const x = tri(x0 + rnd(i, 1 + k) * (x1 - x0) + (rnd(i, 3) - 0.5) * 14 * t, x0, x1), y = tri(y0 + rnd(i, 2 + k) * (y1 - y0) + (rnd(i, 4) - 0.5) * 12 * t, y0, y1);
+        drawSpecies(ctx, D, P, 'H2O', x, y, 9, t * 0.6 + i, 0.7);
+      }
+      const items = pd.list.map((key, i) => {
+        const z = rnd(i, 9 + k);
+        return { key, z, x: tri(x0 + rnd(i, 5 + k) * (x1 - x0) + (rnd(i, 7) - 0.5) * 22 * t, x0, x1), y: tri(y0 + rnd(i, 6 + k) * (y1 - y0) + (rnd(i, 8) - 0.5) * 18 * t, y0, y1) };
+      }).sort((a, b) => a.z - b.z);
+      items.forEach((it, i) => drawSpecies(ctx, D, P, it.key, it.x, it.y, (D.id === 'B' ? 8.5 : 12) * (0.82 + it.z * 0.3), t * 0.5 + i * 1.7, 0.6 + it.z * 0.4));
+      ctx.restore();
+      label(ctx, pd.title, pd.x + ww / 2, 20, P.ink, 14, 700);
+      label(ctx, pd.sub, pd.x + ww / 2, wy + wh + 16, P.dim, 11, 600);
+    });
+    label(ctx, 'scaled', W - 12, 20, P.dim, 9.5, 500, 'right');
+  }
+
+  // ---------- scene 2: proton transfer, NH₃ + H₂O ⇌ NH₄⁺ + OH⁻ ----------
+  function sceneTransfer(ctx, W, H, t, D) {
+    const P = pal(D.palId ? { id:D.palId } : D); ctx.fillStyle = P.stage; ctx.fillRect(0, 0, W, H);
+    const cyc = 7.0, u = t % cyc;
+    // 0-1.2 hold, 1.2-2.6 forward, 2.6-4.0 hold products, 4.0-5.4 back, 5.4-7 hold
+    let f = u < 1.2 ? 0 : u < 2.6 ? ease((u - 1.2) / 1.4) : u < 4.0 ? 1 : u < 5.4 ? 1 - ease((u - 4.0) / 1.4) : 0;
+    const N = { x:W * 0.25, y:H * 0.48 }, O = { x:W * 0.72, y:H * 0.48 };
+    const bl = D.fill ? 30 : D.id === 'B' ? 48 : 42;
+    const nH = [[180], [90 + 30], [270 - 30]].map(a => a[0] * Math.PI / 180);
+    const hStart = { x:O.x - bl, y:O.y }, hEnd = { x:N.x + bl, y:N.y };
+    const hp = { x:hStart.x + (hEnd.x - hStart.x) * f, y:hStart.y + (hEnd.y - hStart.y) * f - Math.sin(Math.PI * f) * 16 };
+    const oOther = { x:O.x + Math.cos(55 * Math.PI / 180) * bl, y:O.y + Math.sin(55 * Math.PI / 180) * bl };
+    const inkLine = D.id === 'C' ? '#cfd8f2' : P.ink;
+    // Role colours for the 3D models (teacher, 2026-11-27): molecules grey, OH⁻ violet-blue, NH₄⁺ rose (a cation)
+    const darkStage = isDark() || (D.palId || D.id) === 'C';
+    const GREY = darkStage ? '#8c93b8' : '#c9ced8';
+    const acol = sym => !D.role ? ATOM[sym] : sym === 'H' ? '#ffffff' : sym === 'N' ? mixHex(GREY, C.cation, f) : mixHex(GREY, C.base, f);
+    const lcol = sym => sym === 'H' ? C.ink : (D.role && f < 0.5 ? C.ink : '#ffffff');
+    function bond(a, b, alpha) {
+      ctx.save(); ctx.globalAlpha = alpha;
+      if (D.id === 'B') { ctx.strokeStyle = isDark() ? '#8a96ab' : '#9aa6b8'; ctx.lineWidth = 7; ctx.lineCap = 'round'; }
+      else { ctx.strokeStyle = inkLine; ctx.lineWidth = 2.4; if (D.id === 'C') { ctx.shadowColor = '#9fc0ff'; ctx.shadowBlur = 6; } }
+      const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy), k1 = 14 / L, k2 = (L - 12) / L;
+      ctx.beginPath(); ctx.moveTo(a.x + dx * k1, a.y + dy * k1); ctx.lineTo(a.x + dx * k2, a.y + dy * k2); ctx.stroke(); ctx.restore();
+    }
+    function atom(sym, p, isProton) {
+      if (D.id === 'B') { shadeBall(ctx, p.x, p.y, sym === 'H' ? 11 : 17, acol(sym), D); atomLetter(sym, p, 11); if (isProton) ring(ctx, p.x, p.y, 15, C.acid, 2.6); return; }
+      ctx.save();
+      if (isProton) { ctx.fillStyle = C.acid; if (D.id === 'C') { ctx.shadowColor = C.acid; ctx.shadowBlur = 18; } circ(ctx, p.x, p.y, 13); ctx.shadowBlur = 0; ctx.fillStyle = '#fff'; }
+      else ctx.fillStyle = inkLine;
+      ctx.font = '700 ' + (sym === 'H' ? 20 : 24) + 'px ' + FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(sym, p.x, p.y + 1); ctx.restore();
+    }
+    function pair(p, ang, alpha, col) {
+      const a = ang * Math.PI / 180, d = D.id === 'B' ? 25 : 20, cx = p.x + Math.cos(a) * d, cy = p.y + Math.sin(a) * d, ox = -Math.sin(a) * 4, oy = Math.cos(a) * 4;
+      ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = col || (D.id === 'C' ? '#cfd8f2' : P.ink);
+      if (D.id === 'C') { ctx.shadowColor = '#9fc0ff'; ctx.shadowBlur = 5; }
+      circ(ctx, cx + ox, cy + oy, 3); circ(ctx, cx - ox, cy - oy, 3); ctx.restore();
+    }
+    function atomLetter(sym, p, size) { ctx.save(); ctx.fillStyle = lcol(sym); ctx.font = '700 ' + size + 'px ' + FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(sym, p.x, p.y + 0.5); ctx.restore(); }
+    if (D.fill) { // space-filling: overlapping spheres, no bonds or lone pairs drawn
+      const SB = { id:'B' }, rN = 25, rO = 24, rH = 15;
+      // Charge haze (teacher, 2026-11-27): red for +, yellow for −, the site's δ+ / δ− colours, fading in with the transfer
+      const haze = (cx, cy, R, col) => {
+        const a = (darkStage ? 0.55 : 0.45) * f; if (a <= 0.01) return;
+        const g = ctx.createRadialGradient(cx, cy, R * 0.55, cx, cy, R * 1.6);
+        g.addColorStop(0, hexA(col, a)); g.addColorStop(0.6, hexA(col, a * 0.45)); g.addColorStop(1, hexA(col, 0));
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R * 1.6, 0, Math.PI * 2); ctx.fill();
+      };
+      haze(N.x + 4, N.y, rN + 24, DPOS); haze(O.x + 4, O.y + 4, rO + 20, DNEG);
+      const hs = nH.map(a => ({ x:N.x + Math.cos(a) * bl, y:N.y + Math.sin(a) * bl }));
+      hs.forEach(p => shadeBall(ctx, p.x, p.y, rH, acol('H'), SB));
+      shadeBall(ctx, oOther.x, oOther.y, rH, acol('H'), SB);
+      shadeBall(ctx, hp.x, hp.y, rH, acol('H'), SB);
+      if (darkStage) { ctx.save(); ctx.shadowColor = '#6fa8e8'; ctx.shadowBlur = 10; }
+      shadeBall(ctx, N.x, N.y, rN, acol('N'), SB); shadeBall(ctx, O.x, O.y, rO, acol('O'), SB);
+      if (darkStage) ctx.restore();
+      atomLetter('N', N, 15); atomLetter('O', O, 15); hs.forEach(p => atomLetter('H', p, 11)); atomLetter('H', oOther, 11);
+      ring(ctx, hp.x, hp.y, rH + 3, C.acid, 3); atomLetter('H', hp, 11);
+    } else {
+    // NH₃ / NH₄⁺
+    nH.forEach(a => { const p = { x:N.x + Math.cos(a) * bl, y:N.y + Math.sin(a) * bl }; bond(N, p, 1); atom('H', p); });
+    pair(N, 0, 1 - f);
+    bond(N, hEnd, f); bond(O, hStart, 1 - f);
+    // water / hydroxide
+    bond(O, oOther, 1); atom('H', oOther);
+    pair(O, -70, 1); pair(O, 180 + 0, f); pair(O, 125, 1);
+    if (D.id === 'B') pair(O, 180, 0); // lone pair positions read the same
+    atom('N', N); atom('O', O); atom('H', hp, true);
+    }
+    // charges
+    const chA = clamp(f * 1.4 - 0.2, 0, 1);
+    ctx.save(); ctx.globalAlpha = chA;
+    const plusCol = D.fill ? DPOS : D.role ? shadeHex(C.cation, -0.2) : C.acid, minusCol = D.fill ? (darkStage ? DNEG : '#b38a10') : C.base;
+    label(ctx, '+', N.x + 34, N.y - 34, plusCol, 22, 700); label(ctx, '−', O.x + 36, O.y - 32, minusCol, 24, 700);
+    ctx.restore();
+    // equation strip
+    const fwd = f > 0.5;
+    const eq = ['NH₃', ' + ', 'H₂O', '  ⇌  ', 'NH₄⁺', ' + ', 'OH⁻'];
+    ctx.font = '700 15px ' + FONT; let wsum = 0; const ws = eq.map(s => { const w = ctx.measureText(s).width; wsum += w; return w; });
+    let x = W / 2 - wsum / 2; const y = H - 14;
+    eq.forEach((s, i) => { const side = i < 3 ? 0 : i > 3 ? 1 : -1; let col = P.dim; if (side === 0 && !fwd) col = P.ink; if (side === 1 && fwd) col = P.ink; if (s === 'OH⁻' && fwd) col = C.base; if (s === 'NH₄⁺' && fwd) col = D.role ? shadeHex(C.cation, -0.15) : D.id === 'C' || D.palId === 'C' ? shadeHex(C.acid, 0.35) : C.acid;
+      ctx.fillStyle = col; ctx.textAlign = 'left'; ctx.fillText(s, x, y); x += ws[i]; });
+    label(ctx, fwd ? 'H₂O is the acid: it donates H⁺' : 'NH₃ is the base: it accepts H⁺', W / 2, 20, P.dim, 11.5, 500);
+  }
+
+  // ---------- scene 3: the Kw balance ----------
+  function sceneKw(ctx, W, H, t, D) {
+    const P = pal(D); ctx.fillStyle = P.stage; ctx.fillRect(0, 0, W, H);
+    const cyc = 12, u = t % cyc;
+    // pH path: 7 → 2 (add acid) → 7 → 12 (add base) → 7
+    const keys = [[0, 7], [1, 7], [3, 2], [4.5, 2], [6, 7], [7, 7], [9, 12], [10.5, 12], [12, 7]];
+    let pH = 7; for (let i = 0; i < keys.length - 1; i++) { const [a, pa] = keys[i], [b, pb] = keys[i + 1]; if (u >= a && u <= b) { pH = pa + (pb - pa) * ease((u - a) / (b - a)); break; } }
+    const h = Math.pow(10, -pH), oh = Math.pow(10, -(14 - pH));
+    const sH = 1 + 0.07 * (7 - pH), sO = 1 + 0.07 * (pH - 7);
+    const fam = FONT;
+    // equation, terms resize
+    const base = 21, cy = 56;
+    const parts = [{ s:'[H₃O⁺]', k:sH, col:C.acid }, { s:'[OH⁻]', k:sO, col:C.base }, { s:' = 1.00 × 10⁻¹⁴', k:1, col:P.ink }];
+    ctx.textBaseline = 'alphabetic'; let tot = 0;
+    parts.forEach(p => { ctx.font = '700 ' + Math.round(base * p.k) + 'px ' + fam; p.w = ctx.measureText(p.s).width; tot += p.w; });
+    let x = 18;
+    parts.forEach(p => {
+      ctx.save(); ctx.font = '700 ' + Math.round(base * p.k) + 'px ' + fam; ctx.fillStyle = p.col === P.ink ? P.ink : (D.id === 'C' ? shadeHex(p.col, 0.25) : p.col);
+      if (D.id === 'C' && p.col !== P.ink) { ctx.shadowColor = p.col; ctx.shadowBlur = 14; }
+      ctx.textAlign = 'left'; ctx.fillText(p.s, x, cy + 8); ctx.restore(); p.x = x; x += p.w;
+    });
+    label(ctx, '[H₃O⁺] = ' + sci(h) + ' M', 18, cy + 40, D.id === 'C' ? shadeHex(C.acid, 0.35) : C.acid, 13, 700, 'left');
+    label(ctx, '[OH⁻] = ' + sci(oh) + ' M', 18, cy + 60, D.id === 'C' ? '#9ea2ff' : C.base, 13, 700, 'left');
+    // powers-of-ten bars
+    const bx = W - 82, top = 26, bot = H - 30, bw = 24;
+    [[h, C.acid, 'H₃O⁺', bx], [oh, C.base, 'OH⁻', bx + 36]].forEach(([v, col, lab, xx]) => {
+      const frac = clamp((14 + Math.log10(v)) / 14, 0, 1), yv = bot - frac * (bot - top);
+      ctx.save(); rrect(ctx, xx, top, bw, bot - top, 6);
+      ctx.fillStyle = D.id === 'C' ? '#141f38' : (D.id === 'A' && !isDark() ? '#eef1f6' : P.faint); ctx.fill();
+      ctx.clip();
+      { const g = ctx.createLinearGradient(0, yv, 0, bot); g.addColorStop(0, shadeHex(col, 0.3)); g.addColorStop(1, col); ctx.fillStyle = g; } // B's bars, all directions (teacher, 2026-11-27)
+      if (D.id === 'C') { ctx.shadowColor = col; ctx.shadowBlur = 14; }
+      ctx.fillRect(xx, yv, bw, bot - yv); ctx.restore();
+      label(ctx, lab, xx + bw / 2, H - 14, P.ink, 11, 700);
+    });
+    [0, -7, -14].forEach(e => { const y = bot - ((14 + e) / 14) * (bot - top); ctx.fillStyle = P.dim; ctx.font = '500 9.5px ' + FONT; ctx.textAlign = 'right'; ctx.fillText('10' + sup(e), bx - 5, y + 3); });
+    // verdict
+    const verdict = pH < 6.95 ? 'acidic' : pH > 7.05 ? 'basic' : 'neutral';
+    const step = u < 1 ? 'Neutral water' : u < 4.5 ? 'Add a strong acid' : u < 7 ? 'Back to neutral' : u < 10.5 ? 'Add a strong base' : 'Back to neutral';
+    label(ctx, step, 20, H - 40, P.dim, 12, 500, 'left');
+    label(ctx, 'pH ' + pH.toFixed(2) + ', ' + verdict, 20, H - 18, P.ink, 17, 700, 'left');
+  }
+
+  // ---------- scene 4: phenolphthalein endpoint ----------
+  function sceneTitration(ctx, W, H, t, D) {
+    const P = pal(D); ctx.fillStyle = P.stage; ctx.fillRect(0, 0, W, H);
+    const cyc = 10, u = t % cyc, cx = W * 0.36;
+    const drops = [0.6, 1.7, 2.8, 3.9, 5.0, 6.3]; // last one reaches the endpoint
+    const fadeFor = i => 0.5 + i * 0.35;
+    // burette
+    const bxl = cx - 9, bxr = cx + 9;
+    ctx.save();
+    if (D.id === 'C') { ctx.shadowColor = '#6fa8e8'; ctx.shadowBlur = 6; }
+    ctx.fillStyle = D.id === 'C' ? '#14213d' : P.water; ctx.fillRect(bxl, 0, 18, 44);
+    ctx.strokeStyle = P.glass; ctx.lineWidth = D.id === 'B' ? 1.2 : 2; ctx.strokeRect(bxl, -2, 18, 46);
+    ctx.fillStyle = D.id === 'C' ? '#cfd8f2' : P.ink; ctx.fillRect(cx - 16, 44, 32, 6);
+    ctx.beginPath(); ctx.moveTo(cx - 4, 50); ctx.lineTo(cx + 4, 50); ctx.lineTo(cx + 1.5, 62); ctx.lineTo(cx - 1.5, 62); ctx.closePath(); ctx.fill();
+    ctx.restore();
+    // flask
+    const neckT = 86, neckB = 112, baseY = H - 24, nl = cx - 15, nr = cx + 15, bl = cx - 72, br = cx + 72, surf = 158;
+    const wall = (y, side) => { if (y <= neckB) return side < 0 ? nl : nr; const k = (y - neckB) / (baseY - neckB); return side < 0 ? nl + (bl - nl) * k : nr + (br - nr) * k; };
+    // liquid
+    let pinkBase = 0, flash = null;
+    drops.forEach((d, i) => {
+      const land = d + 0.38;
+      if (i === drops.length - 1 && u > land) pinkBase = 0.2; // faint pink that stays
+      else if (u > land && u < land + fadeFor(i)) flash = { a:(1 - (u - land) / fadeFor(i)) * 0.85, r:16 + (u - land) * 60, i };
+    });
+    const swirl = Math.sin(u * 5) * 2.5;
+    ctx.save(); ctx.beginPath();
+    ctx.moveTo(wall(surf, -1), surf + swirl); ctx.quadraticCurveTo(cx, surf - swirl, wall(surf, 1), surf + swirl);
+    ctx.lineTo(br - 6, baseY); ctx.quadraticCurveTo(cx, baseY + 4, bl + 6, baseY); ctx.closePath();
+    const lq = D.id === 'C' ? '#13233f' : P.water; ctx.fillStyle = lq; ctx.fill(); ctx.clip();
+    if (pinkBase) { ctx.fillStyle = hexA('#ff5aa8', pinkBase); ctx.fillRect(0, 0, W, H); }
+    if (flash) { const g = ctx.createRadialGradient(cx, surf + 6, 0, cx, surf + 6, flash.r); g.addColorStop(0, hexA('#ff4fa3', flash.a)); g.addColorStop(1, hexA('#ff4fa3', 0)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
+    ctx.restore();
+    // glass
+    ctx.save(); ctx.beginPath();
+    ctx.moveTo(nl, neckT); ctx.lineTo(nl, neckB); ctx.lineTo(bl, baseY - 6); ctx.quadraticCurveTo(bl - 2, baseY + 2, bl + 10, baseY + 2);
+    ctx.lineTo(br - 10, baseY + 2); ctx.quadraticCurveTo(br + 2, baseY + 2, br, baseY - 6); ctx.lineTo(nr, neckB); ctx.lineTo(nr, neckT);
+    if (D.id === 'C') { ctx.strokeStyle = '#7fb4ff'; ctx.lineWidth = 1.6; ctx.shadowColor = '#6fa8e8'; ctx.shadowBlur = 10; }
+    else if (D.id === 'B') { ctx.strokeStyle = P.glass; ctx.lineWidth = 1.4; }
+    else { ctx.strokeStyle = P.glass; ctx.lineWidth = 2.4; ctx.lineJoin = 'round'; }
+    ctx.stroke(); ctx.restore();
+    if (D.id !== 'A') { // highlights
+      ctx.save(); ctx.strokeStyle = D.id === 'C' ? 'rgba(160,200,255,0.35)' : 'rgba(255,255,255,0.8)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(nl + 5, neckT + 6); ctx.lineTo(nl + 5, neckB - 2); ctx.moveTo(wall(130, -1) + 8, 132); ctx.lineTo(wall(178, -1) + 10, 178); ctx.stroke(); ctx.restore();
+      ctx.fillStyle = D.id === 'C' ? 'rgba(111,168,232,0.10)' : 'rgba(29,36,51,0.10)'; ctx.beginPath(); ctx.ellipse(cx, baseY + 6, 80, 5, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    // falling drop
+    drops.forEach(d => { if (u > d && u < d + 0.38) { const y = 62 + (surf - 62) * ((u - d) / 0.38) ** 2; ctx.fillStyle = D.id === 'C' ? '#9fc0ff' : P.waterLine; ctx.beginPath(); ctx.ellipse(cx, y, 2.6, 3.4, 0, 0, Math.PI * 2); ctx.fill(); } });
+    // readout
+    const nDone = drops.filter(d => u > d).length;
+    const reading = (18.40 + nDone * 0.05).toFixed(2);
+    const tx = W * 0.66;
+    label(ctx, 'Burette reading', tx, 54, P.dim, 11.5, 500, 'left');
+    label(ctx, reading + ' mL', tx, 76, P.ink, 19, 700, 'left');
+    const state = pinkBase ? 'Faint pink stays:\nthe endpoint' : flash ? 'Pink fades\non swirling' : 'Colourless';
+    state.split('\n').forEach((ln, i) => label(ctx, ln, tx, 112 + i * 18, pinkBase ? (isDark() || D.id === 'C' ? '#ff8cc4' : '#c0307a') : P.ink, 14, 700, 'left'));
+    label(ctx, 'phenolphthalein', tx, H - 34, P.dim, 11, 500, 'left'); label(ctx, 'NaOH into HCl', tx, H - 18, P.dim, 11, 500, 'left');
+  }
+
+  // ---------- build the page ----------
+  const SCENES = [
+    { title:'Strong and weak, same concentration', fn:sceneStrongWeak, h:290 },
+    { title:'A proton moves: NH₃ and water', h:260, toggle:true, fn:(c, w, h, t, D) => {
+        // A and C: role-coloured 3D models; B: real atom colours (its premise)
+        const m = D.mode, id = D.id;
+        const d = m === 'lewis' ? (id === 'B' ? { id:'A', palId:'B' } : { id })
+          : m === 'ball' ? (id === 'B' ? { id:'B' } : { id:'B', palId:id, role:true })
+          : { id: id === 'B' ? 'A' : id, palId: id === 'B' ? 'B' : undefined, fill:true }; // classic atom colours + charge haze (teacher, 2026-11-27)
+        sceneTransfer(c, w, h, t, d);
+      } },
+    { title:'Kw holds the balance', fn:sceneKw, h:220 },
+    { title:'The endpoint', fn:sceneTitration, h:240 }
+  ];
+  const qs = new URLSearchParams(location.search);
+  const MODE0 = ['lewis', 'ball', 'fill'].indexOf(qs.get('mode')) >= 0 ? qs.get('mode') : 'lewis';
+  DIRS.forEach(D => { D.mode = MODE0; });
+  const W = 520, items = [];
+  const host = document.getElementById('dirs');
+  DIRS.forEach(D => {
+    const box = document.createElement('section'); box.className = 'dir';
+    const grid = document.createElement('div'); grid.className = 'scenes'; box.appendChild(grid);
+    SCENES.forEach(S => {
+      const el = document.createElement('div'); grid.appendChild(el);
+      const h3 = document.createElement('h3'); h3.textContent = S.title; el.appendChild(h3);
+      if (S.toggle) {
+        const seg = document.createElement('div'); seg.className = 'seg'; seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Model');
+        const btns = [['lewis', 'Lewis'], ['ball', 'Ball and stick'], ['fill', 'Space-filling']].map(([m, lab]) => {
+          const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = lab;
+          b.setAttribute('aria-pressed', D.mode === m ? 'true' : 'false');
+          b.addEventListener('click', () => { D.mode = m; btns.forEach((x, k) => x.setAttribute('aria-pressed', ['lewis', 'ball', 'fill'][k] === m ? 'true' : 'false')); });
+          seg.appendChild(b); return b;
+        });
+        el.appendChild(seg);
+      }
+      const cv = document.createElement('canvas'); cv.width = W * 2; cv.height = S.h * 2;
+      cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', S.title);
+      el.appendChild(cv);
+      const it = { cv, ctx:cv.getContext('2d'), S, D, t0:performance.now() };
+      cv.addEventListener('click', () => { it.t0 = performance.now(); });
+      items.push(it);
+    });
+    const el = document.createElement('div'); grid.appendChild(el);
+    const h3 = document.createElement('h3'); h3.textContent = 'A prediction card, checked'; el.appendChild(h3);
+    const card = document.createElement('div'); card.className = 'card card-A'; D.card = card;
+    card.innerHTML = '<div class="q">0.10 M HF is a…</div><div class="opts"><div class="opt no"><span class="mark">✗</span>strong acid</div><div class="opt ok"><span class="mark">✓</span>weak acid</div></div>' +
+      '<div class="why-line">HF sits below H₃O⁺ in the Data Booklet table, so it is less than 100% ionized. Only about 6% of it is.</div>';
+    el.appendChild(card);
+    host.appendChild(box);
+  });
+  // dev hooks: ?t=seconds starts every scene at that time (for screenshots); ?mode=lewis|ball|fill; ?theme=light|dark
+  const T0 = +(qs.get('t') || 0);
+  function frame(now) {
+    DIRS.forEach(D => { D.id = isDark() ? 'C' : 'A'; D.card.className = 'card card-' + D.id; });
+    items.forEach(it => {
+      const t = (now - it.t0) / 1000 + T0; it.ctx.setTransform(2, 0, 0, 2, 0, 0);
+      it.S.fn(it.ctx, W, it.S.h, t, it.D);
+    });
+    requestAnimationFrame(frame);
+  }
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => requestAnimationFrame(frame));
+})();
+</script>
+</body>
+</html>
